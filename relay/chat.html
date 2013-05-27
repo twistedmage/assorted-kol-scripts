@@ -1,0 +1,124 @@
+<html><head>
+<title>KoLmafia Chat</title>
+
+<script language="JavaScript" src="basics.js"></script>
+<link rel="stylesheet" type="text/css" href="images/styles.css">
+
+<style type=text/css>
+
+	body
+	{
+		padding: 0px;
+		overflow: hidden;
+	}
+
+	a
+	{
+		text-decoration: none;
+	}
+
+	.toggledisplay
+	{
+		position: absolute;
+		top: 2px;
+		left: 2px;
+		padding: 2px 2px;
+		font-size: 12px;
+		border: none;
+		text-align: center;
+	}
+
+	.cmddisplay, .chatdisplay
+	{
+		position: absolute;
+		left: 0px;
+		padding: 0px 0px 0px 0px;
+		border: none;
+	}
+
+</style>
+
+<script language="Javascript">
+
+	var initialized = false;
+	var initwidth = 0;
+	var initheight = 0;
+	var timeout = 0;
+	var lastseen = 0;
+
+	function initSizes()
+	{
+		if ( navigator.appName.indexOf( "Explorer" ) != -1 )
+		{
+			initwidth = document.body.offsetWidth;
+		}
+		else
+		{
+			initwidth = self.innerWidth;
+		}
+
+		document.getElementById( "ChatFrame" ).style.width = initwidth;
+		document.getElementById( "CmdFrame" ).style.width = initwidth;
+		document.getElementById( "ToggleDisplay" ).style.width = initwidth;
+
+		if ( navigator.appName.indexOf( "Explorer" ) != -1 )
+		{
+			initheight = document.body.clientHeight - 10 - document.getElementById( "ToggleDisplay" ).offsetHeight;
+		}
+		else
+		{
+			initheight = document.body.clientHeight - 10 - document.getElementById( "ToggleDisplay" ).offsetHeight;
+		}
+
+		document.getElementById( "ChatFrame" ).style.height = initheight;
+		document.getElementById( "CmdFrame" ).style.height = initheight;
+
+		document.getElementById( "ChatFrame" ).style.top = document.getElementById( "ToggleDisplay" ).offsetHeight + 6;
+		document.getElementById( "CmdFrame" ).style.top = document.getElementById( "ToggleDisplay" ).offsetHeight + 6;
+	}
+
+	function switchToCLI()
+	{
+		document.getElementById( "ChatTag" ).style.fontWeight = "";
+		document.getElementById( "CmdTag" ).style.fontWeight = "bold";
+		document.getElementById( "ChatFrame" ).style.display = "none";
+		document.getElementById( "CmdFrame" ).style.display = "";
+
+		initSizes();
+
+		var contentWindow = document.getElementById( "CmdFrame" ).contentWindow;
+
+		contentWindow.document.getElementById("ToggleDisplay").style.display = "none";
+		contentWindow.initSizes();
+	}
+
+	function switchToChat()
+	{
+		document.getElementById( "ChatTag" ).style.fontWeight = "bold";
+		document.getElementById( "CmdTag" ).style.fontWeight = "";
+		document.getElementById( "ChatFrame" ).style.display = "";
+		document.getElementById( "CmdFrame" ).style.display = "none";
+
+		initSizes();
+
+		var contentWindow = document.getElementById( "ChatFrame" ).contentWindow;
+
+		contentWindow.initsizes();
+	}
+
+</script></head>
+
+
+ <body link=black alink=black vlink=black onLoad="initSizes(); switchToChat();" onResize="initSizes();">
+
+	<div id="ToggleDisplay" class="toggledisplay">
+		<a href="javascript:switchToChat();" id="ChatTag">Chat</a> /
+		<a href="javascript:switchToCLI();" id="CmdTag"> gCLI</a> /
+		<a href="chatlaunch.php">Exit</a>
+	</div>
+
+	<iframe id="ChatFrame" src="/lchat.php" class="chatdisplay" frameborder=0></iframe>
+	<iframe id="CmdFrame" src="/cli.html" class="cmddisplay" frameborder=0></iframe>
+
+ </body>
+</html>

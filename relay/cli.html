@@ -1,0 +1,212 @@
+<html><head>
+<title>KoLmafia gCLI</title>
+<script language="JavaScript" src="basics.js"></script>
+<link rel="stylesheet" type="text/css" href="http://images.kingdomofloathing.com/styles.css">
+
+<style type=text/css>
+
+	input.text, textarea
+	{
+		border: 1px black solid;
+		font-family: Arial, Helvetica,  sans-serif;
+		font-size: 10pt;
+	}
+
+	input.button
+	{
+		border: 1px black solid;
+		font-family: Arial, Helvetica, sans-serif;
+		font-size: 9pt;
+		font-weight: bold;
+		background-color: #FFFFFF;
+	}
+
+	body
+	{
+		padding: 0px;
+		overflow: hidden;
+	}
+
+	a
+	{
+		text-decoration: none;
+	}
+
+	.toggledisplay
+	{
+		position: absolute;
+		top: 2px;
+		left: 3px;
+		padding: 2px;
+		font-size: 12px;
+		border: none;
+		text-align: center;
+	}
+
+	.cmddisplay
+	{
+		position: absolute;
+		top: 2px;
+		left: 3px;
+		padding: 2px 2px;
+		font-family: arial;
+		font-size: 12px;
+		border: 1px solid black;
+		overflow: auto;
+	}
+
+	.inputform
+	{
+		position: absolute;
+		top: 2px;
+		left: 3px;
+		padding: 2px 2px;
+		border: none;
+		text-align: center;
+	}
+
+</style>
+
+<script language=Javascript>
+
+	var initwidth = 0;
+	var initheight = 0;
+	var timeout = 0;
+
+	function initSizes()
+	{
+		if ( navigator.appName.indexOf( "Explorer" ) != -1 )
+		{
+			initwidth = document.body.offsetWidth - 7;
+		}
+		else
+		{
+			initwidth = self.innerWidth - 10;
+		}
+
+		document.getElementById( "CmdWindow" ).style.width = initwidth;
+		document.getElementById( "InputForm" ).style.width = initwidth;
+		document.getElementById( "ToggleDisplay" ).style.width = initwidth;
+
+		if ( navigator.appName.indexOf( "Explorer" ) != -1 )
+		{
+			initheight = document.body.clientHeight + 10 -
+				document.getElementById( "ToggleDisplay" ).offsetHeight - document.getElementById( "InputForm" ).offsetHeight;
+		}
+		else
+		{
+			initheight = document.body.clientHeight -
+				document.getElementById( "ToggleDisplay" ).offsetHeight - document.getElementById( "InputForm" ).offsetHeight;
+		}
+
+		document.getElementById( "CmdWindow" ).style.height = initheight;
+		document.getElementById( "CmdWindow" ).style.top = document.getElementById( "ToggleDisplay" ).offsetHeight + 6;
+		document.getElementById( "InputForm" ).style.top = document.getElementById( "ToggleDisplay" ).offsetHeight +
+			document.getElementById( "CmdWindow" ).offsetHeight + 6;
+	}
+
+	var requests = new Array();
+	var commands = new Array();
+	var commandCount = 0;
+	var isRefreshing = false;
+
+	function checkForKeyEvent( e )
+	{
+		var key = window.event ? e.keyCode : e.which;
+
+		if ( key == 13 )
+			submitCommand();
+
+		if ( key == 38 && commandCount > 0 )
+			document.cmdform.cmd.value = commands[ --commandCount ];
+
+		if ( key == 40 && commandCount + 1 < commands.length )
+			document.cmdform.cmd.value = commands[ ++commandCount ];
+
+		// Safari processes the key event twice; in order
+		// to make sure this doesn't cause problems, you
+		// will need to stop the propogation for each event.
+
+		if ( e.stopPropagation )
+			e.stopPropagation();
+	};
+
+	function getCLIUpdate()
+	{
+		var display = document.getElementById( "CmdWindow" );
+		var httpObject = getHttpObject();
+
+		if ( !httpObject )
+			return true;
+
+		httpObject.onreadystatechange = function()
+		{
+			if ( httpObject.readyState != 4 )
+				return;
+
+			updateDisplay( display, httpObject.responseText );
+		};
+
+		httpObject.open( "GET", "/KoLmafia/messageUpdate?MAFIAHIT", true );
+		httpObject.send( "" );
+
+		setTimeout( getCLIUpdate, 4000 );
+		return true;
+	};
+
+
+	function submitCommand()
+	{
+		var display = document.getElementById( "CmdWindow" );
+		var command = document.cmdform.cmd.value;
+		document.cmdform.cmd.value = "";
+
+		if ( command == "" )
+			return true;
+
+		commandCount = commands.push( command );
+
+		if ( command == "clear" || command == "cls" || command == "reset" )
+		{
+			display.innerHTML = "";
+			return true;
+		}
+
+		display.style.width = initwidth;
+		display.scrollTop = display.scrollHeight;
+
+		var httpObject = getHttpObject();
+		if ( !httpObject )
+			return true;
+
+		executed = false;
+
+		httpObject.open( "GET", "/KoLmafia/submitCommand?cmd=" + URLEncode( command ) + "&MAFIAHIT", true );
+		httpObject.send( "" );
+
+		document.cmdform.cmd.focus();
+		return true;
+	};
+
+</script>
+
+</head>
+
+
+ <body link=black alink=black vlink=black onLoad="initSizes(); getCLIUpdate();" onResize="initSizes();">
+
+	<div id="ToggleDisplay" class=toggledisplay>
+		<b>KoLmafia gCLI</b><br>[ <u><a href="/chatlaunch.php">Announcements</a></u> ]
+	</div>
+	<div id="CmdWindow" class=cmddisplay></div>
+
+	 <div id="InputForm" class=inputform>
+	 	<center>
+	 		<form name=cmdform onSubmit='return false;'>
+				 <input style="width: 70%" maxlength=200 class=text type=text size=12 name=cmd onKeyUp='checkForKeyEvent( event );' autocomplete="off">
+				 <input class=button type=button onClick="submitCommand();" value="exec">
+	 		</form>
+	 	</center>
+	 </div>
+ </body>
+</html>

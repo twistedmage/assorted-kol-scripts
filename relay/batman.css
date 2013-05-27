@@ -1,0 +1,154 @@
+/* buttons-as-links, to allow macros from apparent links */
+.buttlink {
+   overflow: visible;
+   margin: 0;
+   padding: 0;
+   border: 0;
+   background: transparent;
+   font: inherit;
+   line-height: normal;
+   text-decoration: underline;
+   cursor: pointer;
+}
+.buttlink:hover,
+.buttlink:focus {
+    background-color:#e3e0d1;
+}
+.item { color: #620; }
+.skill { color: #007; }
+
+/* Style the rest of the BAT TABLE */
+.dataTable { border-spacing: 0; }
+.dataTable thead th {
+   border-bottom: 1px solid black;
+   font-weight: bold; font-size: 0.8em;
+}
+#battable td {
+   text-align: center;
+   font-size: 0.75em;
+   padding: 0px;
+   padding-left: 3px;
+   margin: 0;
+}
+#battable td.attackcol {
+   text-align: left;
+}
+#battable td.mpcol {
+   color: blue;
+}
+#battable td.delevelcol {
+   color: gray;
+   font-weight: 900;
+}
+#battable td.profitcol {
+   font-weight: bold;
+   text-align: right;
+}
+tr.odd { background-color: #f2f2f2; }
+tr.even { background-color: white; }
+#battable_info {
+   font-size: 0.7em;
+   color: #555;
+   border-top: 1px solid black;
+}
+.littlemeat {
+   color: green;
+   font-size: 0.7em;
+}
+
+/* Action Menu! */
+#actbox {
+   position: fixed;
+   display: none;
+   top: 40px;
+   left: -50px;
+   padding: 3px;
+   font-size: 1.0em;
+   z-index: 100;
+}
+.onemenu {
+   border: 2px solid #000;
+   border-left: none;
+   background-color: white;
+   padding: 2px;
+   width: 28px;
+   margin-bottom: 4px;
+   text-align: right;
+}
+.popout {
+   position: fixed;
+   left: 39px;
+   display: none;
+   background-color: white;
+   font-size: 0.9em;
+   border: 1px solid #222;
+   padding: 6px;
+}
+.littlesort {
+   font-size: 0.7em;
+   background-color: #ddd;
+   padding: 1px;
+   cursor: pointer;
+}
+.littlesort img {
+   height: 22px;
+   width: 22px;
+   vertical-align: middle;
+   margin-right: 0;
+   padding-right: 0;
+}
+.versioninfo {
+   background-color: #ddd;
+   border: 1px solid #bbb;
+   padding: 5px;
+}
+#batquote {
+   color: #555;
+   font-size: 0.8em;
+   font-style: italic;
+   background-color: #eee;
+   padding: 12px;
+}
+
+/* CLI box! */
+#mask {
+  position:fixed; left:0; top:0; width: 100%; height: 100%;
+  display:none;
+  z-index: 999;
+  background-color:#222;
+}
+#clibox, #clifeedback {
+   position: fixed;
+   display: none;
+   border-width: 2px;
+   border-style: solid;
+   background-color: white;
+   font-size: 0.9em;
+   padding: 10px;
+   z-index: 1000;
+}
+#clifeedback {
+   top: 40px;
+   right: 10px;
+}
+.clisuccess {
+   border-color: #080;
+   color: #080;
+}
+.clierror {
+   border-color: #800;
+   color: #800;
+}
+.clilink {
+   font-size: 0.7em;
+}
+.clilink:before {
+   content: "[";
+}
+.clilink:after {
+   content: "]";
+}
+#undermon {
+   font-size: 0.7em;
+   color: #888;
+}
