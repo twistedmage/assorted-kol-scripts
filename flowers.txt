@@ -1,0 +1,46 @@
+#everything with a modifier of 7 is unknown
+#weapon damage is really passive physical damage, except spider plant which poisons
+#Damage Absorption is really blocking (or dodge skill in the case of duckweed)
+0	Rabid Dogwood	0	1	true	30	ml
+1	Rutabeggar	0	2	true	25	items
+2	Rad-ish Radish	0	3	true	5	moxie exp
+3	Artichoker	0	4	false	7	Weakens Monster
+4	Smoke-ra	0	5	false	7	Damage Absorption
+5	Skunk Cabbage	0	6	false	7	stench damage
+6	Deadley Cinnamon	0	7	false	7	hot damage
+7	Celery Stalker	0	8	false	7	spooky damage
+8	Lettuce Spray	0	9	false	7	hp regen min
+9	Seltzer Watercress	0	10	false	7	mp regen min
+
+10	War Lilly	0	11	true	30	ml
+11	Stealing Magnolia	0	12	true	25	items
+12	Canned Spinach	0	13	true	5	muscle exp
+13	Impatiens	0	14	false	25	initiative
+14	Spider Plant	0	15	false	7	weapon damage
+15	Red Fern	0	16	false	7	Weakens Monster
+16	BamBOO!	0	17	false	7	spooky damage
+17	Arctic Moss	0	18	false	7	cold damage
+18	Aloe Guv'nor	0	19	false	7	hp regen min
+19	Pitcher Plant	0	20	false	7	mp regen min
+
+20	Blustery Puffball	0	21	true	30	ml
+21	Horn of Plenty	0	22	true	25	items
+22	Wizards Wig	0	23	true	5	myst exp
+23	Shuffle Truffle	0	24	false	25	initiative
+24	Dis Lichen	0	25	false	7	Weakens Monster
+25	Loose Morels	0	26	false	7	sleaze damage
+26	Foul Toadstool	0	27	false	7	stench damage
+27	Chillterelle	0	28	false	7	cold damage
+28	Portlybella	0	29	false	7	hp regen min
+29	Max Headshroom	0	30	false	7	mp regen min
+
+30	Spankton	0	31	true	7	Weakens Monster
+31	Kelptomaniac	0	32	true	40	items
+32	Crookweed	0	33	true	60	meat
+33	Electric Eelgrass	0	34	false	7	Damage Absorption
+34	Duckweed	0	35	false	7	Damage Absorption
+35	Orca Orchid	0	36	false	7	weapon damage
+36	Sargassum	0	37	false	7	stench damage
+37	Sub-Sea Rose	0	38	false	7	cold damage
+38	Snori	0	39	false	7	hp regen min, mp regen min
+39	Up Sea Daisy	0	40	false	30	exp

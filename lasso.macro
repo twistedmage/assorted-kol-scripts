@@ -1,0 +1,13 @@
+scrollwhendone
+
+abort hppercentbelow 20
+
+if hasskill ambidextrous funkslinging
+	use sea lasso, rain-doh blue balls
+endif
+if !hasskill ambidextrous funkslinging
+	use sea lasso
+endif
+while !missed 2
+	attack
+endwhile

@@ -1,0 +1,20 @@
+scrollwhendone
+
+abort hppercentbelow 20
+
+if monstername wild seahorse
+	if hasskill ambidextrous funkslinging
+		use sea cowbell, sea cowbell
+		use sea cowbell, sea lasso
+	endif
+	if !hasskill ambidextrous funkslinging
+		use sea cowbell
+		use sea cowbell
+		use sea cowbell
+		use sea lasso
+	endif
+endif
+if monstername Mer-kin rustler
+	use pulled indigo taffy
+endif
+runaway

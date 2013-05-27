@@ -1,0 +1,10 @@
+scrollwhendone
+
+abort hppercentbelow 20
+
+if monstername mer-kin drifter && ! haseffect Everything Looks Yellow
+	use pulled yellow taffy
+endif
+while !missed 2
+	attack
+endwhile

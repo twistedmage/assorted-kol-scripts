@@ -17,11 +17,11 @@ int zone_type(location loc)
 {
 print("checking zone type for "+loc);
 	//outdoor
-	if($locations[wartime sonofa beach, battlefield (hippy uniform), 8-bit realm, pirate cove, Goatlet, eXtreme Slope, F'c'le, Smut Orc Logging Camp, A-Boo Peak, Spooky Forest, Oil Peak, Fantasy Airship, Black Forest, Poop Deck, Palindome, Whitey's Grove, Desert (ultrahydrated), Oasis in the Desert, wartime Frat House, Pond, back 40, Other Back 40, Themthar Hills, Over Where the Old Tires Are, Out By that Rusted-Out Car, Hole in the Sky, outskirts of the knob, Dark Elbow of the Woods, Dark Heart of the Woods, Dark Neck of the Woods] contains loc)
+	if($locations[wartime sonofa beach, battlefield (hippy uniform), 8-bit realm, pirate cove, Goatlet, eXtreme Slope, F'c'le, Smut Orc Logging Camp, A-Boo Peak, Spooky Forest, Oil Peak, Fantasy Airship, Black Forest, Poop Deck, Palindome, Whitey's Grove, Desert (ultrahydrated), Oasis in the Desert, wartime Frat House, Pond, back 40, Other Back 40, Themthar Hills, Over Where the Old Tires Are, Out By that Rusted-Out Car, Hole in the Sky, outskirts of the knob, Dark Elbow of the Woods, Dark Heart of the Woods, Dark Neck of the Woods, Hippy Camp] contains loc)
 		return 0;
 	
 	//indoor
-	if($locations[Haunted Library, Haunted Conservatory, Haunted Gallery, Haunted Bedroom, Barrrney's Barrr, Haunted Ballroom, Giant's Castle (Ground Floor), Giant's Castle (Top Floor), Belowdecks, Barn, Haunted Pantry, Hey Deze Arena, Belilafs Comedy Club] contains loc)
+	if($locations[Haunted Library, Haunted Conservatory, Haunted Gallery, Haunted Bedroom, Barrrney's Barrr, Haunted Ballroom, Giant's Castle (Ground Floor), Giant's Castle (Top Floor), Belowdecks, Barn, Haunted Pantry, Hey Deze Arena, Belilafs Comedy Club, Haunted Billiards Room] contains loc)
 		return 1;
 	
 	//underground
