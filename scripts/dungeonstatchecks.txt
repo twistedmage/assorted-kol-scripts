@@ -1,0 +1,10 @@
+Locked Door	Muscle	29	51
+A Hairier Barrier	Mysticality	29	48
+Piledriver	Muscle	26	46
+Smooth Criminal	Moxie	28	44
+The Mystic Seal	Mysticality	25	41
+Yet Another Troll	Muscle	24	40
+Badger Badger Badger Badger	Moxie	26	38
+Magic Shell	Mysticality	19	29
+The Biggest Bathtub Ever	Muscle	17	30
+Dungeon Fever	Moxie	20	28

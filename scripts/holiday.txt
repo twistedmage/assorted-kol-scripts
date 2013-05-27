@@ -1,0 +1,18 @@
+void main()
+{
+	cli_execute("maximize mp regen min, mp regen max, equip stinky cheese eye");
+	while(my_adventures()>2)
+	{
+	
+		cli_execute("mood execute");
+		cli_execute("burn *");
+		if(my_muscle()>my_moxie())
+		{
+		
+		}
+		else
+		{
+		
+		}
+	}
+}

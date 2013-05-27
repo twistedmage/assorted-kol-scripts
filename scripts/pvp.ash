@@ -1,0 +1,140 @@
+import awake.ash
+
+void fill_up()
+{
+	while(my_inebriety() <= inebriety_limit())
+	{
+		if(my_meat()<500)
+		{
+			take_stash(5,$item[dense meat stack]);
+			autosell(5,$item[dense meat stack]);
+		}
+		if(item_amount($item[used beer])==0)
+			buy(1,$item[used beer]);
+		overdrink(1,$item[used beer]);
+	}
+	while(fullness_limit() - my_fullness() > 1)
+	{
+		if(my_meat()<500)
+		{
+			take_stash(5,$item[dense meat stack]);
+			autosell(5,$item[dense meat stack]);
+		}
+		if(item_amount($item[nailswurst])==0)
+			buy(1,$item[nailswurst]);
+		eat(1,$item[nailswurst]);
+	}
+}
+
+void pvp_turn_burn()
+{
+//	while(my_adventures()>0 && my_inebriety() <= inebriety_limit())
+//	{
+//		adventure(1,$location[]);
+//	}
+}
+
+int fights_left()
+{
+	//get original page
+	string page=visit_url("peevpee.php?place=fight");
+	
+	//break stone if needed
+	if(contains_text(page,"You must break your"))
+	{
+		string catch = visit_url("campground.php?smashstone=Yep.&confirm=on&shatter=Smash+that+Hippy+Crap%21");
+		page=visit_url("peevpee.php?place=fight");
+	}
+	
+	//pledge support if needed
+	if(contains_text(page,"you must pledge your allegiance"))
+	{
+		string catch = visit_url("peevpee.php?action=pledge&place=fight&pwd");
+		page=visit_url("peevpee.php?place=fight");
+	}
+	
+	//find number of matches left
+	matcher fights_matcher = create_matcher("You have (\\d*) fights? remaining today",page);
+	if(find(fights_matcher))
+	{
+		int left = group(fights_matcher,1).to_int();
+		print("You have "+left+" fights left");
+		return left;
+	}
+	else
+		return 0;
+}
+
+int check_swagger()
+{
+	//get original page
+	string page=visit_url("peevpee.php?place=shop");
+	
+	//find swagger
+	matcher swagger_matcher = create_matcher("You have (\\d*) swagger.",page);
+	if(find(swagger_matcher))
+	{
+		int left = group(swagger_matcher,1).to_int();
+		print("You have "+left+" swagger.");
+		return left;
+	}
+	else
+		return 0;
+}
+
+void do_fights()
+{
+	if(my_name()=="asica" || my_name()=="anid")
+	{
+		pvp_turn_burn();
+		fill_up();
+	}
+	if(fights_left()!=0)
+	{
+		//equip best, hobo and stats?
+		string max_string="maximize 0.01 "+my_primestat();
+		foreach s in $stats[]
+		{
+			if(s!=my_primestat())
+				max_string+=", 0.005 "+s;
+		}
+		if(my_path()!="Avatar of Jarlsberg")
+			max_string+=", switch disembodied hand";
+		print(max_string);
+		cli_execute(max_string);
+	}
+	
+	//loop until done
+	if(can_interact())
+		cli_execute("pvp loot");
+	else
+		cli_execute("pvp flowers");
+//	while(fights_left()>0)
+//	{
+		//fight person
+//		string catch=visit_url("peevpee.php?place=fight&action=fight&ranked=1&stance=4&attacktype=flowers");
+//	}	
+	print("Done with pvp today");
+	int swagger=check_swagger();
+	if(swagger>10000 && available_amount($item[cursed microwave])<1 && can_interact())
+		abort("buy cursed microwave");
+	if(swagger>10000 && available_amount($item[cursed pony keg])<1 && can_interact())
+		abort("buy cursed pony keg");
+//	if(swagger>1000 && available_amount($item[insulting hat])<1 && can_interact())
+//		abort("buy insulting hat");
+//	if(swagger>2000 && available_amount($item[offensive moustache])<1 && can_interact())
+//		abort("buy offensive moustache");
+//	if(swagger>2000 && available_amount($item[hairshirt])<1 && can_interact())
+//		abort("buy hairshirt");
+//	if(swagger>2000 && available_amount($item[How to Tolerate Jerks])<1 && can_interact())
+//		abort("buy How to Tolerate Jerks");
+//	if(swagger>5000 && available_amount($item[slap and slap again recipe])<1 && can_interact())
+//		abort("buy slap and slap again recipe");
+//	if(swagger>5000 && available_amount($item[fettucini épines Inconnu recipe])<1 && can_interact())
+//		abort("buy fettucini épines Inconnu recipe");
+}
+
+void main()
+{
+	do_fights();
+}

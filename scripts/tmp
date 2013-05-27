@@ -1,0 +1,13 @@
+int bountysize=0;
+item ihunt = to_item(to_int(get_property("currentBountyItem")));
+record {item what;          int amount;          location where;       } [int] bounty;
+if(!file_to_map("bounty.txt",bounty))
+{
+print("failed to load");
+}
+int nowh;
+
+foreach i,r in bounty
+{
+print(i+" "+r.what);
+}
