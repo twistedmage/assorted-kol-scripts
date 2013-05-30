@@ -1,7 +1,7 @@
 script "Character Info Toolbox";
 #notify Chez;
 import <zlib.ash>
-string chitVersion = "0.8.4";
+string chitVersion = "0.8.5";
 /************************************************************************************
 CHaracter Info Toolbox
 A character pane relay override script
@@ -69,7 +69,7 @@ string [string] chitTools;
 string [string] chitEffectsMap;
 boolean isCompact = false;
 boolean inValhalla = false;
-string imagePath = "/images/relayimages/chit/";
+string imagePath = "/images/chit/";
 
 
 /*****************************************************
@@ -120,8 +120,8 @@ void checkVersion(string soft, string thisver, int thread) {
 				vprint("You have a current version of "+soft+".","green",1); 
 			} else {
 				string msg = "<font color=red><b>New Version of "+soft+" Available: "+zv[soft].ver+"</b></font>";
-				msg = msg + "<br><a href='http://kolmafia.us/showthread.php?t="+thread+"' target='_blank'><u>Upgrade from "+thisver+" to "+zv[soft].ver+" here!</u></a><br>";
-				#msg = msg + "<small>Think you are getting this message in error?  Force a re-check by typing \"set _version_"+prop+" =\" in the CLI.</small><br>";
+				#msg = msg + "<br><a href='http://kolmafia.us/showthread.php?t="+thread+"' target='_blank'><u>Upgrade from "+thisver+" to "+zv[soft].ver+" here!</u></a><br>";
+				msg = msg + '<br>Upgrade from '+thisver+' to '+zv[soft].ver+' with <font color=blue><u>svn update</u></font> command!<br>';
 				vprint_html(msg,1);
 			}
 		} else {
@@ -139,11 +139,11 @@ void checkVersion(string soft, string thisver, int thread) {
 		//result.append('<p>A new version of Character Info Toolbox is available</p>');
 		result.append('<p>(Version ' + thisver + ')</p>');
 		result.append('<p>Version ' + zv[soft].ver + ' is now available');
-		result.append('<br>Click <a href="http://kolmafia.us/showthread.php?t='+thread+'" target="_blank">here</a> to upgrade</p>');
+		result.append('<br>Click <a href="/KoLmafia/sideCommand?cmd=svn+update&pwd=' + my_hash() + '" title="SVN Update">here</a> to upgrade from SVN</p>');
 		result.append('</td></tr></tbody></table>');
 		chitBricks["update"] = result.to_string();		
 	}
-	
+
 	return;
 }
 
@@ -163,7 +163,7 @@ string formatModifier(int n) {
 	return to_string(n, "%+,d");
 }
 
-// Round off to d decimals
+// Round off to p decimals
 string formatModifier(float f, int p) {
 	if(p<1) return to_string(round(f), "%+,d%%");
 	return replace_all(create_matcher("(?<!\\.)0+$", to_string(f, "%+,."+p+"f") ), "")+"%";
@@ -184,11 +184,11 @@ string myLifeStyle = "";
 string ronin = "--";
 if (get_property("kingLiberated") == true) {
 	myLifeStyle = "Aftercore";
-} else if (in_bad_moon()) {
+} else if(in_bad_moon()) {
+	myLifeStyle = "Bad Moon";
+} else if(in_hardcore()) {
 	myLifeStyle = "Hardcore";
-} else if (in_hardcore()) {
-	myLifeStyle = "Hardcore";
-} else if (can_interact()) {
+} else if(can_interact()) {
 	myLifeStyle = "Casual";
 } else {
 	myLifeStyle = '<a target=mainpane href="storage.php">Ronin</a>: ' + formatInt(1000 - turns_played());
@@ -205,7 +205,7 @@ if (myLifestyle == "Aftercore") {
 	//myPath = "Surprising Fist: " + get_property("fistSkillsKnown");
 } else if (my_path() == "Avatar of Jarlsberg") {
 	myPath = "Jarlsberg";
-} else if (my_path() == "Avatar of Sneaky Pete") {
+} else if (my_path() == "Avatar of St. Sneaky Pete") {
 	myPath = "Sneaky Pete";
 } else {
 	myPath = my_path();
@@ -845,6 +845,27 @@ void bakeTrail() {
 
 }
 
+// Fucntions for pickers
+void pickerStart(buffer picker, string rel, string message) {
+	picker.append('<div id="chit_picker' + rel + '" class="chit_skeleton" style="display:none">');	
+	picker.append('<table class="chit_picker">');
+	picker.append('<tr><th colspan="2">' + message + '</th></tr>');
+}
+
+void addLoader(buffer picker, string message) {
+	picker.append('<tr class="pickloader" style="display:none">');
+	picker.append('<td class="info">' + message + '</td>');
+	picker.append('<td class="icon"><img src="/images/itemimages/karma.gif"></td>');
+	picker.append('</tr>');
+}
+
+void addSadFace(buffer picker, string message) {
+	picker.append('<tr class="picknone">');
+	picker.append('<td class="info" colspan="2">');
+	picker.append(message);
+	picker.append('</td></tr>');
+}
+
 void pickerFamiliar(familiar myfam, item famitem, boolean isFed) {
 
 	int [item] allmystuff = get_inventory();
@@ -1002,21 +1023,9 @@ void pickerFamiliar(familiar myfam, item famitem, boolean isFed) {
 		}
 	}
 
-	void addLoader(string message) {
-		picker.append('<tr class="pickloader" style="display:none">');
-		picker.append('<td class="info">' + message + '</td>');
-		picker.append('<td class="icon"><img src="/images/itemimages/karma.gif"></td>');
-		picker.append('</tr>');
-	}
-	void addSadFace(string message) {
+	string sadMessage(string it, string fam) {
 		string famname = my_path() == "Avatar of Boris"? "Clancy": myfam.name;
-		if(count(addeditems) == 0) {
-			picker.append('<tr class="picknone">');
-			picker.append('<td class="info" colspan="2">');
-			picker.append(message);
-			picker.append('<br><br>Poor ' + famname + '</td>');
-			picker.append('</tr>');
-		}
+		return "You don't have any "+it+" for your " + fam + ".<br><br>Poor "+famname;
 	}
 	
 	void pickEquipment() {
@@ -1025,7 +1034,7 @@ void pickerFamiliar(familiar myfam, item famitem, boolean isFed) {
 		if(equipped_item($slot[familiar]) == $item[Snow Suit]) {
 			string suiturl = '<a target=mainpane class="change" href="inventory.php?pwd='+my_hash()+'&action=decorate" title="Decorate your Snow Suit\'s face">';
 			int faceIndex = index_of(chitSource["familiar"], "itemimages/snow");
-			string face = substring(chitSource["familiar"], faceIndex + 11, faceIndex + 24); 
+			string face = substring(chitSource["familiar"], faceIndex + 11, faceIndex + 24);
 			picker.append('<tr class="pickitem">');
 			picker.append('<td class="fold">' +suiturl+ 'Decorate Snow Suit<br /><span style="color:#707070">Choose a Face</span></a></td>');
 			picker.append('<td class="icon">'+suiturl+'<img src="/images/itemimages/' + face + '"></a></td>');
@@ -1126,10 +1135,7 @@ void pickerFamiliar(familiar myfam, item famitem, boolean isFed) {
 		}
 	}
 	
-	
-	picker.append('<div id="chit_pickerfam" class="chit_skeleton" style="display:none">');
-	picker.append('<table class="chit_picker">');
-	picker.append('<tr><th colspan="2">Equip Thine Familiar Well</th></tr>');
+	picker.pickerStart("fam", "Equip Thine Familiar Well");
 	
 	//Feeding time
 	string [familiar] feedme;
@@ -1194,36 +1200,37 @@ void pickerFamiliar(familiar myfam, item famitem, boolean isFed) {
 	
 	switch (myfam) {
 		case $familiar[Mad Hatrack]:
-			addLoader("Changing Hats...");
+			picker.addLoader("Changing Hats...");
 			pickSlot("hats");
-			addSadFace("You don't have any hats for your " + myfam + ".");
+			if(count(addeditems) == 0) picker.addSadFace(sadMessage("hats", myfam));
 			break;
 		case $familiar[Fancypants Scarecrow]:
-			addLoader("Changing Pants...");
+			picker.addLoader("Changing Pants...");
 			pickSlot("pants");
-			addSadFace("You don't have any pants for your " + myfam + ".");
+			if(count(addeditems) == 0) picker.addSadFace(sadMessage("pants", myfam));
 			break;
 		case $familiar[disembodied hand]:
-			addLoader("Changing Weapons...");
+			picker.addLoader("Changing Weapons...");
 			pickSlot("weapons");
-			addSadFace("You don't have any weapons for your " + myfam + ".");
+			if(count(addeditems) == 0) picker.addSadFace(sadMessage("weapons", myfam));
 			break;
 		case $familiar[comma chameleon]:
-			addLoader("Changing Equipment...");
+			picker.addLoader("Changing Equipment...");
 			pickChameleon();
-			addSadFace("You don't have any equipment for your " + myfam + ".");
+			if(count(addeditems) == 0) picker.addSadFace(sadMessage("equipment", myfam));
 			break;
 		case $familiar[none]:
 			if(myPath == "Avatar of Boris") {
-				addLoader("Changing Instrument...");
+				picker.addLoader("Changing Instrument...");
 				pickClancy();
-				addSadFace("Clancy only has a sackbut to play with.");
+				if(item_amount($item[Clancy's lute]) + item_amount($item[Clancy's crumhorn]) == 0)
+					picker.addSadFace("Clancy only has a sackbut to play with.<br><br>Poor Clancy.");
 			}
 			break;
 		default:
-			addLoader("Changing Equipment...");
+			picker.addLoader("Changing Equipment...");
 			pickEquipment();
-			addSadFace("You don't have any equipment for your " + myfam + ".");
+			if(count(addeditems) == 0) picker.addSadFace(sadMessage("equipment", myfam));
 	}
 	picker.append('</table></div>');
 
@@ -1279,24 +1286,8 @@ void pickerCompanion(string famname, string famtype) {
 		result.append('</tr>');
 	}
 
-	void addLoader(buffer result, string message) {
-		result.append('<tr class="pickloader" style="display:none">');
-		result.append('<td class="info">' + message + '</td>');
-		result.append('<td class="icon"><img src="/images/itemimages/karma.gif"></td>');
-		result.append('</tr>');
-	}
-	
-	void addSadFace(buffer result, string message) {
-		result.append('<tr class="picknone">');
-		result.append('<td class="info" colspan="2">');
-		result.append(message);
-		result.append('</td></tr>');
-	}
-	
 	buffer picker;
-	picker.append('<div id="chit_pickerfam" class="chit_skeleton" style="display:none">');
-	picker.append('<table class="chit_picker">');
-	picker.append('<tr><th colspan="2">Summon thy Companion</th></tr>');
+	picker.pickerStart("fam", "Summon thy Companion");
 	
 	// Check for all companions
 	picker.addLoader("Summoning Companion...");
@@ -1580,7 +1571,7 @@ void bakeFamiliar() {
 		
 		result.append('<tr><td class="companion" title="Playing with this food">');
 		result.append('<a class="chit_launcher" rel="chit_pickerfam" href="#">');
-		result.append('<img src="images/' + famimage + '"></a></td>');
+		result.append('<img src="images/adventureimages/' + famimage + '"></a></td>');
 		result.append('<td class="info" style="' + famstyle + '"><a class="chit_launcher" rel="chit_pickerfam" href="#">' + equiptype + '</a></td>');
 		result.append('</tr></table>');
 		
@@ -1590,19 +1581,6 @@ void bakeFamiliar() {
 		pickerCompanion(famname, famtype);
 
 		return;
-		/*
-		buffer result;
-		result.append('<table id="chit_familiar" class="chit_brick nospace">');
-		
-		result.append('<tr><td>');
-		result.append(source);
-		result.append('</td></tr>');
-		
-		result.append('</table>');
-		chitBricks["familiar"] = result;
-
-		return;
-		*/
 	}
 
 	//Add final touches to additional info
@@ -1692,6 +1670,63 @@ void bakeFamiliar() {
 	
 }
 
+void addCurrentMood(buffer result, boolean picker) {
+	void addPick(buffer prefix) {
+		if(picker)
+			prefix.append('<tr class="pickitem "><td class="info"><a class="visit" ');
+		prefix.append('<a ');
+	}
+	string source = chitSource["mood"];
+	if(contains_text(source, "save+as+mood")) {
+		result.addPick();
+		result.append('title="Save as Mood" href="/KoLmafia/sideCommand?cmd=save+as+mood&pwd=' + my_hash() + '">');
+		result.append('<img src="' + imagePath + 'moodsave.png">');
+		if(picker) result.append(' Save as Mood');
+		result.append('</a>');
+	} else if(contains_text(source, "mood+execute")) {
+		string moodname = "???";
+		matcher pattern = create_matcher(">mood (.*?)</a>", source);
+		if(find(pattern))
+			moodname = group(pattern, 1);
+		result.addPick();
+		result.append('title="Execute Mood: ' + moodname + '" href="/KoLmafia/sideCommand?cmd=mood+execute&pwd=' + my_hash() + '">');
+		result.append('<img src="' + imagePath + 'moodplay.png">');
+		if(picker) result.append(" "+moodname);
+		result.append('</a>');
+	} else if(contains_text(source, "burn+extra+mp")) {
+		result.addPick();
+		result.append('title="Burn extra MP" href="/KoLmafia/sideCommand?cmd=burn+extra+mp&pwd=' + my_hash() + '">');
+		result.append('<img src="' + imagePath + 'moodburn.png">');
+		if(picker) result.append(' Burn MP');
+		result.append('</a>');
+		//[<a title="I'm feeling moody" href="/KoLmafia/sideCommand?cmd=burn+extra+mp&pwd=ea073fd3cf87360cd2316377bd85c92f" style="color:black">burn extra mp</a>]
+	} else {
+		if(picker) result.append('<tr><td>');
+		result.append('<img src="' + imagePath + 'moodnone.png">');
+	}
+	if(picker)
+		result.append('</td></tr>');
+}
+
+void pickMood() {
+	buffer picker;
+	picker.pickerStart("mood", "Select New Mood");
+	picker.addLoader("Getting Moody");
+	foreach i,m in get_moods()
+		picker.append('<tr class="pickitem "><td class="info"><a class="visit" href="/KoLmafia/sideCommand?cmd=mood+' + m + '&pwd=' + my_hash() + '">' + m + '</a></td></tr>');
+		
+	// Add link to execute mood unless it's on the toolbar
+	if(vars["chit.toolbar.moods"] != "bonus") {
+		picker.append('<tr><td style="color:white;background-color:blue;font-weight:bold;">Current Mood</td></tr>');
+		picker.addCurrentMood(true);
+	}
+	
+	picker.append('</table>');
+	picker.append('</div>');
+	
+	chitPickers["mood"] = picker.to_string();
+}
+
 void bakeToolbar() {
 	buffer result;
 	
@@ -1700,40 +1735,25 @@ void bakeToolbar() {
 	}
 
 	void addMood() {
-		if (vars["chit.toolbar.moods"] == "false") {
+		if(vars["chit.toolbar.moods"] == "false")
 			return;
+
+		result.append('<ul style="float:right">');
+
+		// Add button to switch mood
+		result.append('<li><a href="#" class="chit_launcher" rel="chit_pickermood" title="Select Mood">');
+		result.append('<img src="' + imagePath + 'select_mood.png"></a></li>');
+		
+		// If chit.toolbar.moods == bonus, then add extra mood execution button
+		if(vars["chit.toolbar.moods"] == "bonus") {
+			result.append('<li>');
+			result.addCurrentMood(false);
+			result.append('</li>');
 		}
-		string source = chitSource["mood"];
-		if (source == "")
-			return;
-		if (contains_text(source, "save+as+mood")) {
-			result.append('<ul style="float:right"><li>');
-			result.append('<a title="Save as Mood" href="/KoLmafia/sideCommand?cmd=save+as+mood&pwd=' + my_hash() + '">');
-			result.append('<img src="' + imagePath + 'moodsave.png">');
-			result.append('</a></li></ul>');
-		} else if (contains_text(source, "mood+execute")) {
-			string moodname = "???";
-			matcher pattern = create_matcher(">mood (.*?)</a>", source);
-			if (find(pattern)) {
-				moodname = group(pattern, 1);
-			}
-			result.append('<ul style="float:right"><li>');
-			result.append('<a title="Execute Mood: ' + moodname + '" href="/KoLmafia/sideCommand?cmd=mood+execute&pwd=' + my_hash() + '">');
-			result.append('<img src="' + imagePath + 'moodplay.png">');
-			result.append('</a></li></ul>');
-		} else if (contains_text(source, "burn+extra+mp")) {
-			result.append('<ul style="float:right"><li>');
-			result.append('<a title="Burn extra MP" href="/KoLmafia/sideCommand?cmd=burn+extra+mp&pwd=' + my_hash() + '">');
-			result.append('<img src="' + imagePath + 'moodburn.png">');
-			result.append('</a></li></ul>');
-			
-			//[<a title="I'm feeling moody" href="/KoLmafia/sideCommand?cmd=burn+extra+mp&pwd=ea073fd3cf87360cd2316377bd85c92f" style="color:black">burn extra mp</a>]
-			
-		} else {
-			result.append('<ul style="float:right"><li>');
-			result.append('<img src="' + imagePath + 'moodnone.png">');
-			result.append('</li></ul>');
-		}
+		
+		result.append('</ul>');
+		pickMood();
+		
 	}
 	
 	void addTools () {
@@ -2188,15 +2208,10 @@ void addMCD(buffer result, boolean bake) {
 	//Create MCD picker
 	if(mcdSettable && !(chitPickers contains "mcd")) {
 		buffer picker;
-		picker.append('<div id="chit_pickermcd" class="chit_skeleton" style="display:none">');	
-		picker.append('<table class="chit_picker">');
-		picker.append('<tr><th colspan="2">' + mcdtitle + '</th></tr>');
+		picker.pickerStart("mcd", mcdtitle);
 		
 		//Loader
-		picker.append('<tr class="pickloader" style="display:none">');
-		picker.append('<td class="info">' + mcdbusy + '</td>');
-		picker.append('<td class="icon"><img src="/images/itemimages/karma.gif"></td>');
-		picker.append('</tr>');
+		picker.addLoader(mcdbusy);
 		picker.mcdlist(true);
 		picker.append('</table>');
 		picker.append('</div>');
@@ -2336,16 +2351,25 @@ void bakeStats() {
 		return "restore+"+p;
 	}
 	
+	boolean addRestoreLinks(string val) {
+		if(get_property("relayAddsRestoreLinks") == "false")
+			return false;
+		int cur = call int ("my_"+val) ();  // Call my_hp() or my_mp()
+		float top = get_property(val+"AutoRecoveryTarget").to_float() * call int ("my_max"+val) ();  // call my_maxhp() or my_maxmp()
+		return cur < top;
+	}
+	
 	void addHP() {
 		result.append('<tr>');
 		result.append('<td class="label">HP</td>');
-		if (contains_text(health, "restore+HP")) {
+		#if(contains_text(health, "restore+HP")) {
+		if(addRestoreLinks("hp")) {
 			result.append('<td class="info"><a title="Restore HP" href="/KoLmafia/sideCommand?cmd=restore+hp&pwd=' + my_hash() + '">' + my_hp() + '&nbsp;/&nbsp;' + my_maxhp() + '</a></td>');
 		} else {
 			result.append('<td class="info">' + my_hp() + '&nbsp;/&nbsp;' + my_maxhp() + '</td>');
 		}
 		if(showBars) {
-			if (contains_text(health, "restore+HP")) {
+			if(addRestoreLinks("hp")) {
 				result.append('<td class="progress"><a href="/KoLmafia/sideCommand?cmd=restore+hp&pwd=' + my_hash() + '">' 
 					+ progressCustom(my_hp(), my_maxhp(), "Restore your HP", severity(my_hp(), my_maxhp(), to_float(get_property("hpAutoRecovery"))), false) + '</a></td>');
 			} else {
@@ -2380,14 +2404,14 @@ void bakeStats() {
 			return;
 		}
 		result.append('<td class="label">MP</td>');
-		if (contains_text(health, "restore+mp")) {
+		if(addRestoreLinks("mp")) {
 			result.append('<td class="info"><a title="Restore MP" href="/KoLmafia/sideCommand?cmd=restore+mp&pwd=' + my_hash() + '">' + my_mp() + '&nbsp;/&nbsp;' + my_maxmp() + '</a></td>');
 		} else {
 			result.append('<td class="info">' + my_mp() + '&nbsp;/&nbsp;' + my_maxmp() + '</td>');
 		}
 
-		if (showBars) {
-			if (contains_text(health, "restore+MP")) {
+		if(showBars) {
+			if(addRestoreLinks("mp")) {
 				result.append('<td class="progress"><a href="/KoLmafia/sideCommand?cmd=restore+mp&pwd=' + my_hash() + '">'
 					+ progressCustom(my_mp(), my_maxmp(), "Restore your MP", severity(my_mp(), my_maxmp(), to_float(get_property("mpAutoRecovery"))), false) + '</a></td>');
 			} else {
@@ -2516,6 +2540,38 @@ string fancycurrency(string page) {
 	return page;
 }
 
+void pickOutfit() {
+	buffer picker;
+	picker.pickerStart("outfit", "Select Outfit");
+	
+	//Loader
+	picker.addLoader("Getting Dressed");
+	foreach i,o in get_outfits()
+		if(i != 0) {
+			if(is_wearing_outfit(o) && o != "Birthday Suit")
+				picker.append('<tr class="pickitem current"><td class="info">' + o + '</td>');
+			else
+				picker.append('<tr class="pickitem "><td class="info"><a class="change" href="/KoLmafia/sideCommand?cmd=outfit+'+o+'&pwd=' + my_hash() + '">' + o + '</a></td>');
+		}
+		
+	picker.append('<tr><td style="color:white;background-color:blue;font-weight:bold;">Custom Outfits</td></tr>');
+	foreach i,o in get_custom_outfits() {
+		if(i != 0)
+#			picker.append('<tr class="pickitem "><td class="info"><a class="change" href="/KoLmafia/sideCommand?cmd=outfit+'+o+'&pwd=' + my_hash() + '"><div style="white-space:nowrap;max-width:175px;overflow-x:hidden;" title="' 
+#			  + o + '">' + o + '</div></a></td>');
+#			picker.append('<tr class="pickitem "><td class="info" style="white-space:nowrap;max-width:180px;overflow:hidden;" title="' + o  // Custom Outfits can have really long names. Crop and title with full name.
+#			  + '"><a class="change" href="/KoLmafia/sideCommand?cmd=outfit+'+o+'&pwd=' + my_hash() + '">' + o + '</a></td>');
+			picker.append('<tr class="pickitem "><td class="info"><a class="change" href="/KoLmafia/sideCommand?cmd=outfit+'+o+'&pwd=' + my_hash() + '">' + o + '</a></td>');
+	}
+	
+	#picker.append('<tr class="pickitem "><td class="info" style="background-color:lightgray;font-weight:bold;"><a class="change" href="charsheet.php" target="mainpane">Check Character Profile</a></td></tr>');
+	
+	picker.append('</table>');
+	picker.append('</div>');
+	
+	chitPickers["outfit"] = picker.to_string();
+}
+
 void bakeCharacter() {
 
 	string source = chitSource["character"];
@@ -2545,7 +2601,7 @@ void bakeCharacter() {
 				myTitle = group(titleMatcher, 1);
 			}
 		}
-		if(myTitle == "Avatar of Jarlsberg" || myTitle == "Avatar of Sneaky Pete")  // Too long!
+		if(myTitle == "Avatar of Jarlsberg" || myTitle == "Avatar of St. Sneaky Pete")  // Too long!
 			myTitle = "Avatar";
 	}
 
@@ -2583,21 +2639,21 @@ void bakeCharacter() {
 			mySubStats = my_basestat($stat[submoxie]);
 			break;
 		case $stat[muscle]:
-			if(myPath == "Avatar of Boris")
-				myGuild = "da.php?place=gate1";
-			else if(myPath == "Zombie Slayer")
-				myGuild = "campground.php?action=grave";
-			else myGuild += "f";
+			myGuild += "f";
 			myMainStats = my_basestat($stat[muscle]);
 			mySubStats = my_basestat($stat[submuscle]);
 			break;
 	}
 	
-	if(myPath == "Jarlsberg")
+	if(myPath == "Avatar of Boris")
+		myGuild = "da.php?place=gate1";
+	else if(myPath == "Zombie Slayer")
+		myGuild = "campground.php?action=grave";
+	else if(myPath == "Jarlsberg")
 		myGuild = "da.php?place=gate2";
 
 	//Path
-	if (myPath == "Bees Hate You") {
+	if(myPath == "Bees Hate You") {
 		int bees = 0;
 		matcher bs;
 		foreach s in $slots[] {
@@ -2630,8 +2686,6 @@ void bakeCharacter() {
 	//Level + Council
 	string councilStyle = "";
 	string councilText = "Visit the Council";
-	#if(my_level() == 1 && to_int(get_property("lastCouncilVisit")) > 12)
-	#	set_property("lastCouncilVisit", "0");
 	if(to_int(get_property("lastCouncilVisit")) < my_level() && get_property("kingLiberated") == "false") {
 		councilStyle = ' style="background-color:#F0F060"';
 		councilText = "The Council wants to see you urgently";		
@@ -2639,19 +2693,22 @@ void bakeCharacter() {
 
 	result.append('<table id="chit_character" class="chit_brick nospace">');
 
+	// Character name and outfit name
 	result.append('<tr>');
-	if (myAvatar == "") {
-		result.append('<th colspan="2"><a target="mainpane" href="charsheet.php">' + myName + '</a>' + myOutfit + '</th>');
-	} else {
-		result.append('<th colspan="3"><a target="mainpane" href="charsheet.php">' + myName + '</a>' + myOutfit + '</th>');
+	result.append('<th colspan="'+ (myAvatar == ""? "2": "3") +'">');
+	// If there's no avatar, place Outfit switcher here
+	if(vars["chit.character.avatar"] == "false") {
+		result.append('<div style="float:left"><a href="#" class="chit_launcher" rel="chit_pickeroutfit" title="Select Outfit"><img src="');
+		result.append(imagePath);
+		result.append('select_outfit.png"></a></div>');
 	}
-	result.append('</th>');
+	result.append('<a target="mainpane" href="charsheet.php">' + myName + '</a>' + myOutfit + '</th>');
  	result.append('</tr>');
 	
 	result.append('<tr>');
-	if (myAvatar != "") {
-		result.append('<td rowspan="4" class="avatar"><a target="mainpane" href="charsheet.php"><img src="' + myAvatar + '"></a></td>');
-	}
+	if(myAvatar != "")
+		result.append('<td rowspan="4" class="avatar"><a href="#" class="chit_launcher" rel="chit_pickeroutfit" title="Select Outfit"><img src="' + myAvatar + '"></a></td>');
+	pickOutfit();
 	result.append('<td class="label"><a target="mainpane" href="' + myGuild +'" title="Visit your guild">' + myTitle + '</a></td>');
 	result.append('<td class="level" rowspan="2"' + councilStyle + '><a target="mainpane" href="council.php" title="' + councilText + '">' + my_level() +	'</a></td>');
 	result.append('</tr>');
@@ -2892,9 +2949,7 @@ void bakeTracker() {
 				int famw = round( familiar_weight(my_familiar()) + weight_adjustment() - numeric_modifier(fameq, "Familiar Weight") ); 
 				return numeric_modifier( my_familiar(), "Item Drop", famw , fameq );
 		}
-		float foodDrop() {
-			return round( numeric_modifier("Item Drop") - famBonus() + numeric_modifier("Food Drop") ); 
-		}
+		float foodDrop() { return round(numeric_modifier("Item Drop") - famBonus() + numeric_modifier("Food Drop")); }
 		void comma(buffer b, string s) {
 			if(length(b) > 0)
 				b.append(", ");
@@ -3117,7 +3172,7 @@ void bakeTracker() {
 		int chasmBridgeProgress = get_property("lastChasmReset").to_int() == my_ascensions()? get_property("chasmBridgeProgress").to_int(): 0;
 		if(chasmBridgeProgress < 30) {
 		result.append('Cross the <a target="mainpane" href="place.php?whichplace=orc_chasm">Orc Chasm</a>');
-			result.append("<br>Bridge Progress: "+get_property("chasmBridgeProgress")+"/30");
+			result.append("<br>Bridge Progress: "+(get_property("lastChasmReset") == my_ascensions()? get_property("chasmBridgeProgress"): "0")+"/30");
 		} else {
 			result.append('Explore the <a target="mainpane" href="place.php?whichplace=highlands">Highlands</a>');
 			//L9: A-boo peak
@@ -3128,7 +3183,7 @@ void bakeTracker() {
 			//check 4 stench res, 50% items (no familiars), jar of oil, 40% init
 			//L9: oil peak
 			result.append("<br>Oil Peak: ");
-			result.append(item_report(get_property("oilPeakProgress") == "0", get_property("oilPeakProgress")+' ÂµB/Hg'));
+			result.append(item_report(get_property("oilPeakProgress").to_int() == 0, get_property("oilPeakProgress")+' µB/Hg'));
 		}
 		result.append("</td></tr>");
 	}
@@ -3592,9 +3647,10 @@ void bakeTracker() {
 
 	result.append("</table>");
 	
-
-	chitBricks["tracker"] = result;
-	chitTools["tracker"] = "Tracker|quests.png";
+	if(length(result) != 136) { // 136 is the size of an empty table
+		chitBricks["tracker"] = result;
+		chitTools["tracker"] = "Tracker|quests.png";
+	}
 
 }
 
@@ -4045,7 +4101,7 @@ buffer modifyPage(buffer source) {
 	setvar("chit.stats.showbars",true);
 	setvar("chit.stats.layout","muscle,myst,moxie|hp,mp,axel|mcd|trail");
 	setvar("chit.toolbar.layout","trail,quests,modifiers,elements,organs");
-	setvar("chit.toolbar.moods",true);
+	setvar("chit.toolbar.moods","true");
 	setvar("chit.kol.coolimages",true);
 	
 	//Check for updates (once a day)
@@ -4054,7 +4110,6 @@ buffer modifyPage(buffer source) {
 	if( index_of(source, 'alt="Karma" title="Karma"><br>') > 0 ) {
 		inValhalla = true;
 	}
-	#if( index_of(source, "Familiar:") == -1 && myPath != "Avatar of Boris") {
 	if( contains_text(source, "<hr width=50%>") ) {
 		isCompact = true;
 		vprint("CHIT: Compact Character Pane not supported", "blue", 1);
@@ -4073,6 +4128,7 @@ buffer modifyPage(buffer source) {
 	chitTools["modifiers"] = "Modifiers|modifiers.png";
 	chitTools["elements"] = "Elements|elements.png";
 	chitTools["tracker"] = "No trackers available|questsnone.png";
+	chitTools["moods"] = "Change Moods|select_mood.png";
 	chitTools["update"] = "New version available|update.png";
 	
 	// Bake all the bricks we're gonna need
@@ -4095,4 +4151,5 @@ void charpane_relay()
 
 void main() {
 	charpane_relay();
+
 }
