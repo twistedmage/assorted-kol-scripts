@@ -85,7 +85,6 @@ item to_paste(monster whatsit) {
       case $phylum[construct]: return $item[oily paste];
       case $phylum[dude]: return $item[gooey paste];
       case $phylum[elf]: return $item[crimbo paste];
-
       case $phylum[horror]: return $item[indescribably horrible paste];
       case $phylum[humanoid]: return $item[greasy paste];
       case $phylum[plant]: return $item[chlorophyll paste];
@@ -223,13 +222,13 @@ void build_custom() {
        should_olfact && !happened($skill[olfaction]))
       custom[count(custom)] = to_event("skill 19","mp -"+mp_cost($skill[olfaction]),1);
   // insults
-   if (my_location().zone == "Island" && have_item($item[pirate fledges]) == 0 &&
-       m.phylum == $phylum[pirate] && monster_attack(m) - monster_level_adjustment() < 100)
+   if (m.phylum == $phylum[pirate] && !($strings[step5, finished] contains get_property("questM12Pirate")) &&
+      !($monsters[scary pirate, migratory pirate, ambulatory pirate, peripatetic pirate, black crayon pirate] contains m))
      foreach i in $items[massive manual of marauder mockery, big book of pirate insults]
        if (item_amount(i) > 0 && !happened(i)) {
           int insultsknown;
           for n from 1 to 8 if (get_property("lastPirateInsult"+n) == "true") insultsknown += 1;
-          if (insultsknown < 8) custom[count(custom)] = to_event("use "+to_int(i),"att 0.3*buffedmox",1);
+          if (insultsknown < 8) custom[count(custom)] = to_event("use "+to_int(i),"att 0.3*buffedmox",1); break;
        }
   // identify potions
    float dier,bangcount;
@@ -379,7 +378,6 @@ void enqueue_custom() {
       boolean stunfirst = (adj.stun < 1 && !ev.endscombat && to_profit(merge(stun_action(contains_text(ev.id,"use ")),ev)) > to_profit(ev));  // should we stun?
       if (!stunfirst && !ev.endscombat && my_stat("hp") - ev.pdmg[$element[none]] < 0) continue;   // you will die
       vprint("Custom action: "+ev.id+((stunfirst) ? " (stun first with "+buytime.id+")" : " (no stun)"),"purple",5);
-
       if (stunfirst) enqueue(buytime);
       if (enqueue(ev)) remove custom[n];
    }
@@ -551,7 +549,7 @@ setvar("cameraPutty",false);
 setvar("ftf_olfact","blooper, dairy goat, shaky clown, zombie waltzers, goth giant, knott yeti, hellion, violent fungus","list of monster");
 setvar("ftf_grin","procrastination giant","list of monster");
 setvar("ftf_yellow","knob goblin harem girl","list of monster");
-string SSver = check_version("SmartStasis","SS","3.19",1715);
+string SSver = check_version("SmartStasis","SS","3.20",1715);
 
 void main(int initround, monster foe, string pg) {
    act(pg);

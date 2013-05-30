@@ -27,24 +27,7 @@ int turncount = my_turncount();  // cache this for happenings
 boolean finished() {             // returns true if the combat is over
    return (round > maxround);
 }
-
-// values for formulas
-float[string] fvars;
-fvars["myhp"] = my_hp();
-fvars["monsterhp"] = monster_hp();
-fvars["famgear"] = to_int(equipped_item($slot[familiar]) == familiar_equipment(my_familiar()));
-fvars["spelldmgpercent"] = 1.0 + (numeric_modifier("Spell Damage Percent")/100.0);
-fvars["yuletide"] = to_int(have_effect($effect[yuletide mutations]) > 0);
-fvars["fweight"] = familiar_weight(my_familiar()) + numeric_modifier("Familiar Weight");
-if (to_int(get_property("fistSkillsKnown")) > 0) fvars["fistskills"] = to_int(get_property("fistSkillsKnown"));
-if (have_skill($skill[intimidating bellow])) fvars["bellows"] = have_skill($skill[louder bellows]) ? 2 : 1;
-if (have_skill($skill[kneebutt])) fvars["pantspower"] = (have_skill($skill[tao of the terrapin])) ?
-   get_power(equipped_item($slot[pants]))*2 : get_power(equipped_item($slot[pants]));
-if (have_skill($skill[headbutt])) fvars["helmetpower"] = (have_skill($skill[tao of the terrapin])) ?
-   get_power(equipped_item($slot[hat]))*2 : get_power(equipped_item($slot[hat]));
-if (have_skill($skill[shieldbutt])) fvars["shieldpower"] = (item_type(equipped_item($slot[offhand])) == "shield") ? get_power(equipped_item($slot[offhand])) : 0;
-if (have_equipped($item[staff of queso escusado])) fvars["stinkycheese"] = to_int(get_property("_stinkyCheeseCount"));
-if (have_equipped($item[mer-kin hookspear])) fvars["monstermeat"] = to_float(my_path() == "Way of the Surprising Fist" ? max(meat_drop(m),12) : meat_drop(m));
+float[string] fvars;             // variables for formulas
 
 //=======================  SPREADS AND ADVEVENTS! =========================
 
@@ -223,7 +206,12 @@ advevent to_event(string id, spread dmg, spread pdmg, string special, int howman
    while (bittles.find()) switch (bittles.group(1)) {
       case "att": res.att = aoe*eval(bittles.group(2),fvars); break;
       case "def": res.def = aoe*eval(bittles.group(2),fvars); break;
-      case "stun": res.stun = eval(bittles.group(2),fvars); break;
+      case "stun": if ($monsters[clancy] contains m) break;       // immune to all stuns
+	     res.stun = eval(bittles.group(2),fvars);
+     // detect multi-round stun immune monsters here
+         if (res.stun > 1 && $monsters[your shadow, cyrus the virus, queen bee, beebee king, bee thoven, buzzerker, oil tycoon, oil baron, oil cartel, clancy,
+             trophyfish, chester, frosty, ol' scratch, oscus, zombo, hodgman the hoboverlord, stella the demonic turtle poacher] contains m) res.stun = 0;
+         break;
       case "mp": if (my_class() == $class[zombie master]) continue;
          res.mp = eval(bittles.group(2),fvars); break;
       case "meat": res.meat = eval(bittles.group(2),fvars); break;
@@ -257,30 +245,33 @@ advevent to_event(string id, combat_rec src) { return to_event(id,src,0); }
 //=============== BLACKLIST ===================
 
 int[string] blacklist;
-if (!file_to_map("BatMan_blacklist_"+replace_string(my_name()," ","_")+".txt",blacklist)) vprint("Error loading blacklist.",-2);
 void temp_blacklist_inc(string id, int amt) {
    if (((blacklist contains id) && blacklist[id] == 0) || amt < 1) return;
    blacklist[id] += amt;
 }
-if (my_location() != $location[none]) foreach it in tower_items(true) {     // add possible tower items to blacklist for known locations
-   if (item_amount(it) == 0) continue;
-   temp_blacklist_inc("use "+to_string(to_int(it)),1);
+void build_blacklist() {
+   if (!file_to_map("BatMan_blacklist_"+replace_string(my_name()," ","_")+".txt",blacklist)) vprint("Error loading blacklist.",-2);
+   if (my_location() != $location[none]) foreach it in tower_items(true) {     // add possible tower items to blacklist for known locations
+      if (item_amount(it) == 0) continue;
+      temp_blacklist_inc("use "+to_string(to_int(it)),1);
+   }
+   if (my_class() == $class[avatar of jarlsberg]) blacklist["attack"] = 0;     // Jarlsberg doesn't dirty his hands (even from range, which is kind of stupid)
+   if (my_location().zone == "Hobopolis") {                                    // block Richard skills temporarily due to KoL bug
+      blacklist["skill 7021"] = 0;
+      blacklist["skill 7022"] = 0;
+      blacklist["skill 7023"] = 0;
+   }
+   if (get_property("questM10Azazel") != "finished") {
+      if (item_amount($item[imp air]) > 0) temp_blacklist_inc("use 4698",5);   // don't accidentally use your quest items
+      if (item_amount($item[bus pass]) > 0) temp_blacklist_inc("use 4699",5);
+   }
+   if (get_property("sideDefeated") == "neither" && item_amount($item[flaregun]) > 0) temp_blacklist_inc("use 1705",1);   // save a flaregun in case of Wossname
+   if (my_path() == "Bugbear Invasion") temp_blacklist_inc("use 1705",1);      // save a different flaregun for Bugbear invasion
+   temp_blacklist_inc("skill 7074",to_int(get_property("burrowgrubSummonsRemaining")));  // cap burrowgrub at remaining uses
+   if (have_equipped($item[stress ball])) temp_blacklist_inc("skill 7113",5-to_int(get_property("_stressBallSqueezes")));  // cap stress ball at remaining uses
+   // TODO: expand this, more situational blockages
 }
-if (my_class() == $class[avatar of jarlsberg]) blacklist["attack"] = 0;     // Jarlsberg doesn't dirty his hands (even from range, which is kind of stupid)
-if (my_location().zone == "Hobopolis") {                                    // block Richard skills temporarily due to KoL bug
-   blacklist["skill 7021"] = 0;
-   blacklist["skill 7022"] = 0;
-   blacklist["skill 7023"] = 0;
-}
-if (get_property("questM10Azazel") != "finished") {
-   if (item_amount($item[imp air]) > 0) temp_blacklist_inc("use 4698",5);   // don't accidentally use your quest items
-   if (item_amount($item[bus pass]) > 0) temp_blacklist_inc("use 4699",5);
-}
-if (get_property("sideDefeated") == "neither" && item_amount($item[flaregun]) > 0) temp_blacklist_inc("use 1705",1);   // save a flaregun in case of Wossname
-if (my_path() == "Bugbear Invasion") temp_blacklist_inc("use 1705",1);      // save a different flaregun for Bugbear invasion
-temp_blacklist_inc("skill 7074",to_int(get_property("burrowgrubSummonsRemaining")));  // cap burrowgrub at remaining uses
-temp_blacklist_inc("skill 7113",5-to_int(get_property("_stressBallSqueezes")));  // cap stress ball at remaining uses
-// TODO: expand this, more situational blockages
+build_blacklist();
 
 //=============== RESISTANCE / VULNERABILITY ===================
 
@@ -307,7 +298,7 @@ spread get_resistance(element which) {
 float dmg_dealt(spread action) {
    float res;
    spread newdeal;
-   foreach el,amt in action newdeal[el] = max(to_int(amt > 0),amt - mres[el]*amt);  // first, apply monster resistances
+   foreach el,amt in action newdeal[el] = amt < 0 ? amt : max(to_int(amt > 0),amt - mres[el]*amt);  // first, apply monster resistances
    float softcapped(float orig, float cap, float exponent) {
       if (orig <= cap) return orig;
 	  return cap + floor((orig - cap)**exponent);
@@ -580,7 +571,7 @@ foreach te,it,rd in factors {                 // remove placeholders, reduce ran
 
 advevent famevent() {
    advevent fam;
-   if (my_class() == $class[avatar of boris]) return fam;
+   if ($classes[avatar of boris, avatar of jarlsberg] contains my_class()) return fam;
    if (!(factors["fam"] contains to_int(my_fam())) || (my_fam() == $familiar[dandy lion] && item_type(equipped_item($slot[weapon])) != "whip")) return fam;
    fam.id = to_string(my_fam());
    if (happened("famspent")) return fam;
@@ -627,47 +618,52 @@ advevent baseround() {                       // base round event
    return basecache;
 }
 
-// ======== EFFECTS =========
-advevent aedoh;
-foreach ef,fect in factors["effect"] {
-   if (have_effect(to_effect(ef)) == 0) continue;
-   vprint_html("Factoring in "+to_effect(ef)+": "+to_html(to_spread(fect.dmg))+" damage, "+fect.special,4);
-   aedoh = to_event(to_string(to_effect(ef)),fect);
-   if (contains_text(fect.special,"retal"))
-      retal = merge(retal,aedoh);
-    else if (contains_text(fect.special,"onhit"))
-      onhit = merge(onhit,aedoh);
-     else base = merge(base,aedoh);
+void fxngear() { 
+  // ======== EFFECTS =========
+   advevent aedoh;
+   foreach ef,fect in factors["effect"] {
+      if (have_effect(to_effect(ef)) == 0) continue;
+      vprint_html("Factoring in "+to_effect(ef)+": "+to_html(to_spread(fect.dmg))+" damage, "+fect.special,4);
+      aedoh = to_event(to_string(to_effect(ef)),fect);
+      if (contains_text(fect.special,"retal"))
+         retal = merge(retal,aedoh);
+       else if (contains_text(fect.special,"onhit"))
+         onhit = merge(onhit,aedoh);
+        else base = merge(base,aedoh);
+   }
+  // ======== GEAR ==========
+   foreach eq,uip in factors["gear"] {
+      if (!have_equipped(to_item(eq))) continue;
+      vprint_html("You have "+to_item(eq)+" equipped: "+to_html(to_spread(uip.dmg))+" damage, "+uip.special,4);
+      aedoh = to_event(to_string(to_item(eq)),uip);
+      if (contains_text(uip.special,"retal"))
+         retal = merge(retal,aedoh);
+       else if (contains_text(uip.special,"onhit"))
+          onhit = merge(onhit,aedoh);
+        else if (contains_text(uip.special,"oncrit"))
+           oncrit = merge(oncrit,aedoh);
+         else base = merge(base,aedoh);
+   }
+   retal.id = "";
+   onhit.id = "";
+   oncrit.id = "";
+   onwin.id = "";
 }
-
-// ======== GEAR ==========
-foreach eq,uip in factors["gear"] {
-   if (!have_equipped(to_item(eq))) continue;
-   vprint_html("You have "+to_item(eq)+" equipped: "+to_html(to_spread(uip.dmg))+" damage, "+uip.special,4);
-   aedoh = to_event(to_string(to_item(eq)),uip);
-   if (contains_text(uip.special,"retal"))
-      retal = merge(retal,aedoh);
-    else if (contains_text(uip.special,"onhit"))
-       onhit = merge(onhit,aedoh);
-     else if (contains_text(uip.special,"oncrit"))
-        oncrit = merge(oncrit,aedoh);
-      else base = merge(base,aedoh);
-}
-retal.id = "";
-onhit.id = "";
-oncrit.id = "";
-onwin.id = "";
 
 // ====== MONSTER ======
 float m_hit_chance() {            // monster hit chance
    float stunmod = minmax(merge(baseround(),adj).stun,0,1.0);
    if ($monsters[a.m.c. gremlin, batwinged gremlin, erudite gremlin, spider gremlin, vegetable gremlin, oil tycoon, oil baron, 
                  oil cartel, reanimated baboon skeleton, reanimated bat skeleton, reanimated demon skeleton, reanimated giant spider skeleton,
-                 reanimated serpent skeleton, reanimated wyrm skeleton] contains m) return 1.0 - stunmod;
+                 reanimated serpent skeleton, reanimated wyrm skeleton, your shadow] contains m) return 1.0 - stunmod;
    return (1.0 - stunmod)*minmax(0.55 + (max(monster_stat("att"),0.0) - my_stat("Moxie"))*0.055,my_location() == $location[slime tube] ? 0.8 : 0.06,0.94);
 }
 spread m_regular() {               // damage dealt by monster attack
-   if ($monsters[naughty sorority nurse, antique database server] contains m) return to_spread(0);   // these monsters have no attack
+   switch (m) {
+      case $monster[naughty sorority nurse]:
+      case $monster[antique database server]: return to_spread(0);        // these monsters have no attack
+      case $monster[your shadow]: return to_spread(95 + (my_maxhp()/6));  // Your Shadow has a unique damage formula
+   }
    spread res;
    res[m.attack_element] = max(1.0,max(0.0,max(monster_stat("att"),0.0) - my_defstat(true)) + 0.225*max(monster_stat("att"),0.0) - numeric_modifier("Damage Reduction")) *
       (1 - minmax((square_root(numeric_modifier("Damage Absorption")/10) - 1)/10,0,0.9));
@@ -693,8 +689,10 @@ advevent m_event(float att_mod, float stun_mod) {      // monster event -- attac
       case $monster[stench hobo]: 
       case $monster[hot hobo]:
 	  case $monster[cold hobo]: res.pdmg[m.attack_element] += 0.1*my_maxhp(); break; // totally guessing with these
-      case $monster[frustrating knight]: res.pdmg[$element[none]] += 95; break; 
-      case $monster[huge ghuol]: res.dmg = to_spread("-5"); break;                   // assuming 50%
+      case $monster[frustrating knight]: res.pdmg[$element[none]] += 95; break;
+      case $monster[gaunt ghuol]:
+      case $monster[gluttonous ghuol]: res.dmg = to_spread("-1.65"); break;          // 30% chance to heal 1-10 HP
+      case $monster[huge ghuol]: res.dmg = to_spread("-1.65"); break;                // 30% chance to heal 1-10 HP
       case $monster[dr awkward]: res.dmg = to_spread("-25"); break;                  // assuming 50%
       case $monster[quiet healer]: res.pdmg[$element[none]] -= 0.25*17.5; break;     // ... 25% ... ...??
       case $monster[knob goblin mad scientist]: res.mp += 0.25*9; break;             // assuming 25% activation rate??
@@ -755,7 +753,6 @@ float critchance() {         // CRITCH-nce
 
 float hitchance(string id) {        // HITCH-nce
    if (id == "jiggle") return 1.0;
-
    if (have_equipped($item[operation patriot shield]) && happened($skill[throw shield]) && !happened("shieldcrit")) return 1.0;
   // cunctatitis blocks 50% of everything, black cat blocks 50% of items
    float through = 1.0 - 0.5*to_int(have_effect($effect[cunctatitis]) > 0);
@@ -854,9 +851,6 @@ void addopt(advevent a, float meatcost, int mpcost) {
    if (happened("skill 5023")) foreach n in $ints[5003,5005,5008,5012,5019]
       if (a.id == "skill "+n) { a.att *= 2.0; a.def *= 2.0; }   // mistletoe doubles DB skill deleveling
   // TODO: add overkilling hobos
-  // detect multi-round stun immune monsters here
-   if (a.stun > 1 && $monsters[cyrus the virus, queen bee, beebee king, bee thoven, buzzerker, oil tycoon, oil baron, oil cartel, 
-       trophyfish, chester, frosty, ol' scratch, oscus, zombo, hodgman the hoboverlord, stella the demonic turtle poacher] contains m) a.stun = 0;
    int c = count(opts);
    opts[c] = factor(a,hitchance(a.id));
    opts[c].meat -= meatcost;
@@ -915,27 +909,26 @@ combat_rec get_sphere(string which) {
 //======== ATTACK ==========
 
 // regular attack (also other attack skills with related damage formulae)
-spread regular(int ts) {  // 0) moxman, 1) norm, 2) thrust-smack / axing, 3) lts, 5) bashing slam smash / cleave
+spread regular(int ts) {  // 1) norm, 2) thrust-smack / axing, 3) lts, 5) bashing slam smash / cleave
    spread res;
-   if (ts != 0 && m == $monster[x-dimensional horror]) return res;
+   if (m == $monster[x-dimensional horror]) return res;
    float ltsadj = (ts == 3) ? 1.25 + 0.05*to_int(my_class() == $class[seal clubber]) : (ts == 5) ? 1.4 : 1.0;
-   boolean ranged = (weapon_type(equipped_item($slot[weapon])) == $stat[moxie] && ts > 0);
+   boolean ranged = (weapon_type(equipped_item($slot[weapon])) == $stat[moxie]);
    float radj = (ranged) ? 0.75 : 1.0;
    if (equipped_item($slot[weapon]) == $item[none]) radj = 0.25 + 0.75*to_int(ts == 0);
-   res[$element[none]] = max(0,max(0,floor((ts != 0 ? my_stat("Muscle") : my_stat("Moxie"))*ltsadj*radj) - monster_stat("def")) +
-      max(1,numeric_modifier("Weapon Damage") + 0.5) * (critchance()+1.0) * max(1.0,ts) +
+   res[$element[none]] = max(0,max(0,floor((ranged ? my_stat("Moxie") : my_stat("Muscle"))*ltsadj*radj) - monster_stat("def")) +
+      max(1,numeric_modifier("Weapon Damage") + 0.5) * (critchance()+1.0) * ts +
       to_int(ranged)*numeric_modifier("Ranged Damage")) * (100 + numeric_modifier("Weapon Damage Percent") +
       to_int(ranged)*numeric_modifier("Ranged Damage Percent"))/100;
    if (have_skill($skill[double-fisted]) && to_slot(equipped_item($slot[offhand])) == $slot[weapon])
       res[$element[none]] += 0.15*get_power(equipped_item($slot[offhand])) + 0.5;
    if (unarmed() && have_skill($skill[master of the surprising fist])) res[$element[none]] += 10;
-   if (ts > 0) foreach el in $elements[] if (numeric_modifier(el+" Damage") > 0) res[el] = numeric_modifier(el+" Damage");
+   foreach el in $elements[] if (numeric_modifier(el+" Damage") > 0) res[el] = numeric_modifier(el+" Damage");
    return (have_equipped($item[skeletal scabbard]) && item_type(equipped_item($slot[weapon])) == "sword") ? factor(res,2) : res;
 }
 
 spread d;
 float rate;
-
 
 // ======== ITEMS ==========         cost: item_value, unless reusable
 void build_items() {                                                // TODO: spheres, bang potions
@@ -1072,7 +1065,6 @@ void build_skillz() {
               switch (sk) {    // dmg formulas too complicated for data file
                 case 2005: case 2105: case 2106: case 2107:      // skip shield skills if no shield
                    if (fvars["shieldpower"] == 0) continue; d = merge(to_spread(fields.dmg),regular(1)); break;
-                case 7008: d = regular(0); break;                // moxman
                 case 11000: if (!have_equipped($item[trusty])) continue;  // axing
                 case 1003: d = regular(2); break;                // ts
                 case 1005: d = regular(3); break;                // lts
@@ -1251,10 +1243,11 @@ boolean enqueue(advevent a) {     // handle inserts/auto-funk
       enqueue(get_action($skill[stealth mistletoe]));  // doesn't take a round, w00th!
   // Auto-funk!
    boolean funk;
-   matcher bob = create_matcher("use \\d+\\Z",a.id);
+   matcher bob = create_matcher("use (\\d+)\\Z",a.id);
    if (have_skill($skill[funkslinging]) && bob.find() && count(queue) > 0) {
       bob.reset(queue[count(queue)-1].id);
-      if (bob.find() && (queue[count(queue)-1].id != a.id || m_dpr(0,-adj.stun)*meatperhp > to_float(vars["BatMan_profitforstasis"])))
+      if (bob.find() && (queue[count(queue)-1].id != a.id || (item_amount(to_item(to_int(bob.group(1)))) > 1 &&
+	      m_dpr(0,-adj.stun)*meatperhp > to_float(vars["BatMan_profitforstasis"]))))
          funk = vprint("Auto-funk: merging '"+queue[count(queue)-1].id+"' and '"+a.id+"'.",4);
    }
    advevent newa = funk ? merge(queue[count(queue)-1],a) : merge(a,new advevent);
@@ -1280,7 +1273,7 @@ boolean enqueue(item i) { return enqueue(get_action(i)); }
 
 // =========== INITIALISE ============
 
-void set_monster(monster elmo) {
+void set_monster(monster elmo) {  // should be called once per BB instance; initializes BB for a specific monster
    m = elmo;
   // monster plurality
    int[monster] pluralm;
@@ -1290,11 +1283,30 @@ void set_monster(monster elmo) {
    if (m == $monster[none] && to_int(vars["unknown_ml"]) == 0)
       vprint("You would like to handle this unknown monster yourself. (unknown_ml is 0)",0);
    maxround = 30;
+  // values for formulas
+   fvars["myhp"] = my_hp();
+   fvars["monsterhp"] = monster_hp();
+   fvars["famgear"] = to_int(equipped_item($slot[familiar]) == familiar_equipment(my_familiar()));
+   fvars["spelldmgpercent"] = 1.0 + (numeric_modifier("Spell Damage Percent")/100.0);
+   fvars["yuletide"] = to_int(have_effect($effect[yuletide mutations]) > 0);
+   fvars["fweight"] = familiar_weight(my_familiar()) + numeric_modifier("Familiar Weight");
+   if (to_int(get_property("fistSkillsKnown")) > 0) fvars["fistskills"] = to_int(get_property("fistSkillsKnown"));
+   if (have_skill($skill[intimidating bellow])) fvars["bellows"] = have_skill($skill[louder bellows]) ? 2 : 1;
+   if (have_skill($skill[kneebutt])) fvars["pantspower"] = (have_skill($skill[tao of the terrapin])) ?
+      get_power(equipped_item($slot[pants]))*2 : get_power(equipped_item($slot[pants]));
+   if (have_skill($skill[headbutt])) fvars["helmetpower"] = (have_skill($skill[tao of the terrapin])) ?
+      get_power(equipped_item($slot[hat]))*2 : get_power(equipped_item($slot[hat]));
+   if (have_skill($skill[shieldbutt])) fvars["shieldpower"] = (item_type(equipped_item($slot[offhand])) == "shield") ? get_power(equipped_item($slot[offhand])) : 0;
+   if (have_equipped($item[staff of queso escusado])) fvars["stinkycheese"] = to_int(get_property("_stinkyCheeseCount"));
+   if (have_equipped($item[mer-kin hookspear])) fvars["monstermeat"] = to_float(my_path() == "Way of the Surprising Fist" ? max(meat_drop(m),12) : meat_drop(m));
+  // initialize effects/gear
+   fxngear();
   // monster resistance
    if (happened("use 5048")) mres = get_resistance($element[cold]);
     else mres = get_resistance(m.defense_element);
    switch (m) {
       case $monster[BRICKO vacuum cleaner]: foreach el in $elements[] mres[el] = 0.1; mres[$element[none]] = 0.1; break;
+	  case $monster[peanut]: foreach el in $elements[] mres[el] = 0.25; break;
       case $monster[gorgolok, the infernal seal (volcanic cave)]:
       case $monster[lumpy, the sinister sauceblob (volcanic cave)]:
       case $monster[somerset lopez, dread mariachi (volcanic cave)]:        // <-- confirm this?? wasn't in the wiki
@@ -1346,6 +1358,8 @@ void set_monster(monster elmo) {
       case $monster[chester]:
       case $monster[mother slime]: remove factors["item"];                     // remove items if impossible
          vprint("You can't use items in this combat.",-6); break;              // note: mother's resistance handled in act()
+      case $monster[your shadow]: foreach te,it,rd in factors                  // delete all damage, then add healing as damage
+	     factors[te,it].dmg = (rd.pdmg.length() > 1 && substring(rd.pdmg,0,1) == "-") ? substring(rd.pdmg,1) : "0"; break;
      // TODO: reanimated skeletons resist everything except pottery
      // detect seals, add catchall resistance in case you don't have a club equipped
       case $monster[broodling seal]:
@@ -1524,7 +1538,7 @@ string act(string action) {
       case $monster[the thorax]: if (contains_text(lastaction,"draws back his big fist") && item_amount($item[clumsiness bark]) > 0)
          return act(throw_item($item[clumsiness bark])); break;
    }
-   if (my_fam() == $familiar[he-boulder] && have_effect($effect[everything looks yellow]) == 0 &&
+   if (my_fam() == $familiar[he-boulder] && have_effect($effect[everything looks yellow]) == 0 && !intheclear() &&
        contains_text(action," yellow eye") && contains_text(to_lower_case(vars["ftf_yellow"]),to_lower_case(m.to_string())))
       return act(use_skill($skill[point at your opponent]));
    return action;
@@ -1570,7 +1584,8 @@ string batround() {
          res.append("if match \"draws back his big fist\"; use 5445; endif; "); break;
    }
    switch (my_fam()) {
-      case $familiar[he-boulder]: if (have_effect($effect[everything looks yellow]) == 0 && contains_text(to_lower_case(vars["ftf_yellow"]),to_lower_case(m.to_string())))
+      case $familiar[he-boulder]: if (have_effect($effect[everything looks yellow]) > 0 || !contains_text(to_lower_case(vars["ftf_yellow"]),to_lower_case(m.to_string()))) break;
+         if (count(custom) > 0 && intheclear()) break;
          res.append("if !haseffect 790 && match \" yellow eye\"; skill 7082; endif; "); break;
    }
    res.append(batround_insert);
@@ -1626,4 +1641,4 @@ string macro(item i) { return macro(get_action(i),"z"); }
 setvar("BatMan_profitforstasis",15.0);       // profit required to enter stasis
 setvar("BatMan_baseSubstatValue",5.0);       // value of a single substat point (mainstat 2*n, attack stat 1.5*n, defstat 1.5*n -- these stack)
 // setvar("BatMan_pessimism",0.5);              // pessimism range -1.0 - 1.0 (1.0 totally pessimistic, 0 exact averages, -1.0 totally optimistic)
-string BBver = check_version("BatBrain","batbrain","1.35",6445);
+string BBver = check_version("BatBrain","batbrain","1.36",6445);

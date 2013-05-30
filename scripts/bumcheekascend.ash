@@ -8524,7 +8524,7 @@ boolean bcascMining() {
 	if (checkStage("mining")) return true;
 	print("about to do mining stage","lime");
 	string trapper = visit_url("place.php?whichplace=mclargehuge&action=trappercabin");
-	if (my_level() >= 8 && !contains_text(trapper, "ore and some consarned goat cheese") && !contains_text(trapper, "ore. Now git")) {
+	if (my_level() >= 8 && !contains_text(trapper, "ore and some consarned goat cheese") && !contains_text(trapper, "fix the lift until you bring me that")) {
 		print("Looks like we're done.", "purple");
 		checkStage("mining", true);
 		return true;
@@ -9226,7 +9226,7 @@ boolean bcascTrapper() {
 		}
 			
 		while (i_a(get_property("trapperOre")) < 3 && !checkStage("mining")) {
-			if ((my_path() != "Way of the Surprising Fist" && my_path() != "Avatar of Boris") && ((i_a("miner's helmet") == 0 || i_a("7-Foot Dwarven mattock") == 0 || i_a("miner's pants") == 0))) {
+			while ((my_path() != "Way of the Surprising Fist" && my_path() != "Avatar of Boris") && ((i_a("miner's helmet") == 0 || i_a("7-Foot Dwarven mattock") == 0 || i_a("miner's pants") == 0))) {
 				set_property("choiceAdventure556", 1);
 				bumAdv($location[Itznotyerzitz Mine], "", "items", "1 miner's helmet, 1 7-Foot Dwarven mattock, 1 miner's pants", "Getting the Mining Outfit", "i");
 				set_property("choiceAdventure556", 2);
@@ -9239,19 +9239,22 @@ boolean bcascTrapper() {
 			}
 		}
 	}
-	while (contains_text(visit_url("place.php?whichplace=mclargehuge&action=trappercabin"), "that cheese") && !is_past(get_property("questL08Trapper"),"step1")) {
+	while (contains_text(visit_url("place.php?whichplace=mclargehuge&action=trappercabin"), "that cheese") && !is_past(get_property("questL08Trapper"),"step1") && i_a("goat cheese")<3) {
 		if (can_interact()) {
 			cli_execute("acquire 3 goat cheese");
 		} else {
 			cli_execute("friars food");
 			string old = get_property("choiceAdventure162");
-			set_property("choiceAdventure162", 3); //Boris hates rocks
+			if(my_path()=="Avatar of Boris")
+				set_property("choiceAdventure162", 3); //Boris hates rocks
 			bumAdv($location[Goatlet], "", "items", "3 goat cheese", "Getting Goat Cheese", "i");
 			set_property("choiceAdventure162", old); //Reset in order to not screw anyone up in a future ascencion
 		}
 		trapper = visit_url("place.php?whichplace=mclargehuge&action=trappercabin");
 		trapper = visit_url("place.php?whichplace=mclargehuge&action=trappercabin");
 	}
+	if(contains_text(visit_url("place.php?whichplace=mclargehuge&action=trappercabin"), "that cheese"))
+		abort("We seem to have failed to get the cheese/ore");
 //	abort("check current value of get_property(questL08Trapper)");
 	//SIMON TRY TO PULL climbing gear
 	if(i_a("ninja rope")<1 && !in_hardcore())
@@ -9333,7 +9336,8 @@ boolean bcascTrapper() {
 	//	if (is_not_yet(get_property("questL08Trapper"),"finished")) {
 			print("BCC: Getting snowboarding outfit.", "purple");
 			set_property("choiceAdventure575", 1);
-			bumadv($location[eXtreme Slope], "", "items", "eXtreme scarf, snowboarder pants, eXtreme mittens", "Getting the eXtreme outfit", "i");
+			while(!have_outfit("eXtreme Cold-Weather Gear"))
+				bumadv($location[eXtreme Slope], "", "items", "eXtreme scarf, snowboarder pants, eXtreme mittens", "Getting the eXtreme outfit", "i");
 			set_property("choiceAdventure575", 2);
 			
 			print("BCC: Doing snowboarding tricks.", "purple");

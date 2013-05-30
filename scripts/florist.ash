@@ -21,7 +21,7 @@ print("checking zone type for "+loc);
 		return 0;
 	
 	//indoor
-	if($locations[Haunted Library, Haunted Conservatory, Haunted Gallery, Haunted Bedroom, Barrrney's Barrr, Haunted Ballroom, Giant's Castle (Ground Floor), Giant's Castle (Top Floor), Belowdecks, Barn, Haunted Pantry, Hey Deze Arena, Belilafs Comedy Club, Haunted Billiards Room] contains loc)
+	if($locations[Haunted Library, Haunted Conservatory, Haunted Gallery, Haunted Bedroom, Barrrney's Barrr, Haunted Ballroom, Giant's Castle (Ground Floor), Giant's Castle (Top Floor), Belowdecks, Barn, Haunted Pantry, Hey Deze Arena, Belilafs Comedy Club, Haunted Billiards Room, Haunted Bathroom] contains loc)
 		return 1;
 	
 	//underground
@@ -293,6 +293,8 @@ void choose_all_plants(string type, location loc)
 	if(contains_text(friar_str,"go scout out an appropriate location for me to plant something"))
 	{
 		print("No current zone");
+		//force mafia to recognise that we quit the choiceadv?
+		visit_url("forestvillage.php");
 		return;
 	}
 	
@@ -315,7 +317,11 @@ void choose_all_plants(string type, location loc)
 	int num_planted=number_planted(friar_str);
 print("num planted="+num_planted);
 	if(num_planted>2)
+	{
+		//force mafia to recognise that we quit the choiceadv?
+		visit_url("forestvillage.php");
 		return;
+	}
 	
 	//load plants map
 	plant[int] plants;
@@ -334,12 +340,18 @@ print("possible plants="+ count(plants));
 		
 		//was anything left useful?
 		if(pli==-1)
+		{
+			//force mafia to recognise that we quit the choiceadv?
+			visit_url("forestvillage.php");
 			return;
+		}
 
 		friar_str = place_plant(plants[pli]);
 		remove plants[pli];
 		num_planted=number_planted(friar_str);
 	}
+	//force mafia to recognise that we quit the choiceadv?
+	visit_url("forestvillage.php");
 }
 
 void main()
