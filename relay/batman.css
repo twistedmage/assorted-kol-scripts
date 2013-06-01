@@ -16,6 +16,50 @@
 }
 .item { color: #620; }
 .skill { color: #007; }
+a img { border: 0; }
+
+/* Bat-tabs  */
+#battab {
+   position: fixed;
+   height: 335px;
+   bottom: 0;
+   left: 0;
+   width: 100%;
+   padding: 0;
+   margin: 0;
+   text-align: center;
+}
+#battab div.panel {
+   background-color: rgba(255,255,255,0.8);
+   margin-top: 0px;
+   padding-top: 0px;
+   height: 300px;
+}			
+#battab ul {
+   height: 18px;
+   padding: 0px;
+   list-style: none;
+   margin-left: 0;
+   margin-bottom: 0;
+   border-bottom: 1px solid #000;
+}  
+#battab ul li {
+   float: left;
+   margin-left: 1em;
+   border: 2px solid #777;
+   border-bottom: 1px solid #000;
+   background-color: #fff;
+}
+#battab ul li a {
+   text-decoration: none;
+   color: #777;
+   font-weight: bold;
+   font-size: 10pt;
+   padding: 7px;
+}
+#battab ul li.active { border-color: #000; border-bottom: 1px solid #fff; }
+#battab ul li.active a { color:#000;}
+#kolformbox, #blacklist, #wikibox { overflow: auto; }
 
 /* Style the rest of the BAT TABLE */
 .dataTable { border-spacing: 0; }
@@ -56,6 +100,31 @@ tr.even { background-color: white; }
    font-size: 0.7em;
 }
 
+/* Blacklist */
+#blacktable {
+   width: 40%;
+   font-size: 0.9em;
+}
+#blacktable  td {
+   padding: 3px;
+   padding-right: 7px;
+}
+#blackformbox {
+   position: fixed;
+   height: 27px;
+   width: 100%;
+   bottom: 0;
+   padding: 5px;
+   border-top: 1px solid black;
+   background-color: rgba(255,255,255,0.8);
+   margin: 0px;
+   text-align: center;
+   display: none;
+}
+#blackformbox input {
+   margin-right: 6px;
+}
+
 /* Action Menu! */
 #actbox {
    position: fixed;
@@ -83,6 +152,7 @@ tr.even { background-color: white; }
    font-size: 0.9em;
    border: 1px solid #222;
    padding: 6px;
+   text-align: left;
 }
 .littlesort {
    font-size: 0.7em;
@@ -147,6 +217,9 @@ tr.even { background-color: white; }
 }
 .clilink:after {
    content: "]";
+}
+.cliimglink {
+   border: 0;
 }
 #undermon {
    font-size: 0.7em;

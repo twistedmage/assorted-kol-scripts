@@ -2737,10 +2737,10 @@ void defaultMood(boolean castMojo) {
 	if(i_a("skeleton")>0 && i_a("skeletal skiff")>0)
 	{
 		//if we can't eat quiche
-		if(my_path() == "zombie slayer" || !can_eat())
+		if(my_path()=="Avatar of Jarlsberg" || my_path() == "zombie slayer" || !can_eat())
 		{
 			//if we can't drink the vodka, use them all
-			if(!can_drink())
+			if(!can_drink() || my_path()=="Avatar of Jarlsberg")
 			{
 				use_skeleton_buddy();
 			} //use until multiple of 5, so we can get vodka
@@ -2750,8 +2750,15 @@ void defaultMood(boolean castMojo) {
 			}
 		}
 		else
-		{
-			//use until ???
+		{	//can eat but can't drink means eat until multiple ofp 3
+			if((!can_drink() || my_path()=="Avatar of Jarlsberg") && i_a("skeleton")%3!=0)
+			{
+				use_skeleton_buddy();
+			} //can eat and can drink
+			else if(i_a("skeleton")%5!=0 && i_a("skeleton")%3!=0)
+			{
+				use_skeleton_buddy();
+			}
 		}
 	}
 	//use some stat buffs
@@ -4278,7 +4285,8 @@ boolean levelMe(int sMox, boolean needBaseStat) {
 
 	print("BCC: levelMe("+sMox+", "+to_string(needBaseStat)+") called.", "fuchsia");
 	if (bcasc_ignoreSafeMoxInHardcore && needBaseStat == false) {
-		buMax();
+		//SIMON: This fucks up our gear etc even if we are about to decide not to level
+		//buMax();
 		print("BCC: But we don't care about safe moxie so we won't bother.", "purple");
 		return true;
 	}		
@@ -4304,11 +4312,13 @@ boolean levelMe(int sMox, boolean needBaseStat) {
 	if (needBaseStat) {
 		if (my_basestat(my_primestat()) >= sMox) return true;
 		print("Need to Level up a bit to get at least "+sMox+" base Primestat", "fuchsia");
-		buMax();
-	} else {		
+		//SIMON: This fucks up our gear etc even if we are about to decide not to level
 		//buMax();
-		setMood("");
-		cli_execute("mood execute");
+	} else {
+		//SIMON: This fucks up our buffs etc even if we are about to decide not to level
+		//buMax();
+		//setMood("");
+		//cli_execute("mood execute");
 
 		int extraMoxieNeeded = sMox - my_buffedstat(my_primestat());
 		if (extraMoxieNeeded <= 0) return true;
@@ -7210,11 +7220,14 @@ boolean bcascLairFirstGate() {
 							cli_execute("pull large box");
 						//if we have a box use it
 						if(available_amount($item[large box])>0)
+						{
 							cli_execute("use * dead mimic; use * large box; use * small box");
+						}
 						else //otherwise get one
 						{
 	
 							//place florist friar plants
+							cli_execute("conditions clear");
 							choose_all_plants("i", $location[dungeons of doom]);
 							
 							bumMiniAdv(1, $location[Dungeons of Doom]);
@@ -7269,35 +7282,40 @@ boolean bcascLairFirstGate() {
 						case "gremlin juice" :
 							if (tryPull(lairitems[x].a))
 								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							else if (bumAdv($location[post-war junkyard], "item", "hebo", "1 gremlin juice", "Getting gremlin juice", "i", "consultHeBo"))
+							else while(i_a("gremlin juice")==0)
+								 (bumAdv($location[post-war junkyard], "item", "hebo", "1 gremlin juice", "Getting gremlin juice", "i", "consultHeBo"));
 								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
 						break;
 						
 						case "wussiness potion" :
 							if (tryPull(lairitems[x].a))
 								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							else if (bumAdv($location[Pandamonium Slums], "item", "hebo", "1 wussiness potion", "Getting a wussiness potion", "+i", "consultHeBo"))
+							else while(i_a("wussiness potion")==0)
+								 (bumAdv($location[Pandamonium Slums], "item", "hebo", "1 wussiness potion", "Getting a wussiness potion", "+i", "consultHeBo"));
 								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
 						break;
 						
 						case "thin black candle" :
 							if (tryPull(lairitems[x].a))
 								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							else if (bumAdv($location[Giant Castle (top floor)], "item", "hebo", "1 thin black candle", "Getting a thin black candle", "-i", "consultHeBo"))
+							else while(i_a("thin black candle")==0)
+								 (bumAdv($location[Giant Castle (top floor)], "item", "hebo", "1 thin black candle", "Getting a thin black candle", "-i", "consultHeBo"));
 								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
 						break;
 						
 						case "Mick's IcyVapoHotness Rub" :
 							if (tryPull(lairitems[x].a))
 								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							else if(bumAdv($location[Giant Castle (top floor)], "item", "hebo", "1 Mick's IcyVapoHotness Rub", "Getting a Mick's IcyVapoHotness Rub", "+i", "consultHeBo"))
+							else while(i_a("Mick's IcyVapoHotness Rub")==0)
+								(bumAdv($location[Giant Castle (top floor)], "item", "hebo", "1 Mick's IcyVapoHotness Rub", "Getting a Mick's IcyVapoHotness Rub", "+i", "consultHeBo"));
 								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
 						break;
 						
 						case "pygmy pygment" :
 							if (tryPull(lairitems[x].a))
 								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							else if (bumAdv($location[Hidden City (encounter)], "item", "hebo", "1 pygmy pygment", "Getting some pygmy pygment", "i", "consultHeBo"))
+							else while(i_a("pygmy pygment")==0)
+								 (bumAdv($location[Hidden City (encounter)], "item", "hebo", "1 pygmy pygment", "Getting some pygmy pygment", "+i", "consultHeBo"));
 								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
 						break;
 						
@@ -7329,35 +7347,40 @@ boolean bcascLairFirstGate() {
 						case "Tasty Fun Good rice candy" :
 							if (tryPull(lairitems[x].a))
 								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							else if (bumAdv((lairitems[x].a == "Angry Farmer Candy" ? $location[Orc Chasm] : $location[Giant Castle (top floor)]), "item", "hebo", "1 " + lairitems[x].a, "Getting " + (lairitems[x].a == "Angry Farmer candy" ? "an" : "a") + lairitems[x].a, "i", "consultHeBo"))
+							else while(i_a("Angry Farmer Candy")==0 && i_a("Tasty Fun Good rice Candy")==0)
+								 (bumAdv((lairitems[x].a == "Angry Farmer Candy" ? $location[Orc Chasm] : $location[Giant Castle (top floor)]), "item", "hebo", "1 " + lairitems[x].a, "Getting " + (lairitems[x].a == "Angry Farmer candy" ? "an" : "a") + lairitems[x].a, "i", "consultHeBo"));
 								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
 						break;
 						
 						case "adder bladder" :
 							if (tryPull(lairitems[x].a))
 								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							else if (bumAdv($location[Black Forest], "item", "hebo", "1 adder bladder", "Getting an adder bladder", "i", "consultHeBo"))
+							else while(i_a("adder bladder")==0)
+								 (bumAdv($location[Black Forest], "item", "hebo", "1 adder bladder", "Getting an adder bladder", "i", "consultHeBo"));
 								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
 						break;
 						
 						case "Black No. 2" :
 							if (tryPull(lairitems[x].a))
 								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							else if (bumAdv($location[Black Forest], "item", "hebo", "1 Black No. 2", "Getting a Black No. 2", "i", "consultHeBo"))
+							else while(i_a("Black No. 2")==0)
+								 (bumAdv($location[Black Forest], "item", "hebo", "1 Black No. 2", "Getting a Black No. 2", "i", "consultHeBo"));
 								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
 						break;
 						
 						case "handsomeness potion" :
 							if (tryPull(lairitems[x].a))
 								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							else if (bumAdv($location[South of the Border], "item", "hebo", "1 handsomeness potion", "Getting a handsomeness potion", "+i", "consultHeBo"))
+							else while(i_a("handsomeness potion")==0)
+								 (bumAdv($location[South of the Border], "item", "hebo", "1 handsomeness potion", "Getting a handsomeness potion", "+i", "consultHeBo"));
 								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
 						break;
 						
 						case "Meleegra pills" :
 							if (tryPull(lairitems[x].a))
 								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							else if (bumAdv($location[South of the Border], "item", "items", "1 Meleegra pills", "Getting some Meelegra pills", "-i"))
+							else while(i_a("Meleegra pills")==0)
+								 (bumAdv($location[South of the Border], "item", "items", "1 Meleegra pills", "Getting some Meelegra pills", "-i"));
 								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
 						break;
 						
@@ -7365,9 +7388,10 @@ boolean bcascLairFirstGate() {
 							if (gnomads_available()) {
 								cli_execute("buy marzipan skull");
 								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							} else if (tryPull(lairitems[x].a))
+							} else if(tryPull(lairitems[x].a))
 								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							else if (bumAdv($location[South of the Border], "item", "hebo", "1 marzipan skull", "Getting a marzipan skull", "-i", "consultHeBo"))
+							else while(i_a("marzipan skull")==0)
+								 (bumAdv($location[South of the Border], "item", "hebo", "1 marzipan skull", "Getting a marzipan skull", "-i", "consultHeBo"));
 								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
 						break;
 						

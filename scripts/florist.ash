@@ -17,7 +17,7 @@ int zone_type(location loc)
 {
 print("checking zone type for "+loc);
 	//outdoor
-	if($locations[wartime sonofa beach, battlefield (hippy uniform), 8-bit realm, pirate cove, Goatlet, eXtreme Slope, F'c'le, Smut Orc Logging Camp, A-Boo Peak, Spooky Forest, Oil Peak, Fantasy Airship, Black Forest, Poop Deck, Palindome, Whitey's Grove, Desert (ultrahydrated), Oasis in the Desert, wartime Frat House, Pond, back 40, Other Back 40, Themthar Hills, Over Where the Old Tires Are, Out By that Rusted-Out Car, Hole in the Sky, outskirts of the knob, Dark Elbow of the Woods, Dark Heart of the Woods, Dark Neck of the Woods, Hippy Camp, Orc Chasm] contains loc)
+	if($locations[wartime sonofa beach, battlefield (hippy uniform), 8-bit realm, pirate cove, Goatlet, eXtreme Slope, F'c'le, Smut Orc Logging Camp, A-Boo Peak, Spooky Forest, Oil Peak, Fantasy Airship, Black Forest, Poop Deck, Palindome, Whitey's Grove, Desert (ultrahydrated), Oasis in the Desert, wartime Frat House, Pond, back 40, Other Back 40, Themthar Hills, Over Where the Old Tires Are, Out By that Rusted-Out Car, Hole in the Sky, outskirts of the knob, Dark Elbow of the Woods, Dark Heart of the Woods, Dark Neck of the Woods, Hippy Camp, Orc Chasm, Next to that Barrel with Something Burning in it, Near an Abandoned Refrigerator, Hidden City (Automatic)] contains loc)
 		return 0;
 	
 	//indoor
@@ -25,7 +25,7 @@ print("checking zone type for "+loc);
 		return 1;
 	
 	//underground
-	if($locations[upper chamber, middle chamber, Cobb's Knob Barracks, Cobb's Knob Kitchens, Defiled Nook, Defiled Alcove, Defiled Cranny, Defiled Niche, Itznotyerzitz Mine, Greater-Than Sign, Dungeons of Doom, Beanbat Chamber, Giant's Castle (Basement), Cobb's Knob Laboratory, Haunted Wine Cellar (Southwest), Haunted Wine Cellar (Southeast), Haunted Wine Cellar (northwest), Haunted Wine Cellar (northeast), Guards' Chamber, Queen's chamber, Bat Hole Entryway, Boss Bat's Lair] contains loc)
+	if($locations[upper chamber, middle chamber, Cobb's Knob Barracks, Cobb's Knob Kitchens, Defiled Nook, Defiled Alcove, Defiled Cranny, Defiled Niche, Itznotyerzitz Mine, Greater-Than Sign, Dungeons of Doom, Beanbat Chamber, Giant's Castle (Basement), Cobb's Knob Laboratory, Haunted Wine Cellar (Southwest), Haunted Wine Cellar (Southeast), Haunted Wine Cellar (northwest), Haunted Wine Cellar (northeast), Guards' Chamber, Queen's chamber, Bat Hole Entryway, Boss Bat's Lair, Feeding Chamber] contains loc)
 		return 2;
 		
 	//underwater
@@ -89,6 +89,8 @@ location mafia_style_zone(string loc)
 		loc="Belilafs Comedy Club";
 	else if(loc=="Valley of Rof L'm Fao")
 		loc="Orc Chasm";
+	else if(loc=="Hidden City")
+		loc="Hidden City (Automatic)";
 	
 	
 		

@@ -17,10 +17,56 @@ import <SmartStasis.ash>
 buffer actbox;
 int[string] stundex;
 int[string] stasdex;
+int[string] rawlist;    // raw blacklist, as compared to BB's supplemented one
+if (!file_to_map("BatMan_blacklist_"+replace_string(my_name()," ","_")+".txt",rawlist)) vprint("Error loading blacklist.",-2);
 string[string] post = form_fields();
 if (post contains "setml") {
    vars["unknown_ml"] = max(0,to_int(post["setml"]));
    updatevars();
+} else if (post contains "black") {                         // handle blacklist
+   switch (post["black"]) {
+      case "add": if (post["id"] == "") break;
+         rawlist[post["id"]] = max(0,to_int(post["amt"]));
+         map_to_file(rawlist,"BatMan_blacklist_"+replace_string(my_name()," ","_")+".txt");
+         build_blacklist();
+         break;
+      case "remove": if (post["id"] == "" || !(rawlist contains post["id"])) break;
+         remove rawlist[post["id"]];
+         map_to_file(rawlist,"BatMan_blacklist_"+replace_string(my_name()," ","_")+".txt");
+         build_blacklist();
+         break;
+   }
+   buffer bbox;
+   m = last_monster();
+   bbox.append("<div style='padding: 3px; float: right'><a href=# title='' class='clilink editblack'>add entry</a> "+
+      "<a href='#' title='' class='clilink refreshblack'>refresh</a></div><center>"+
+      "<img src='/images/itemimages/scroll1.gif' style='vertical-align:middle'> <b>Blacklist</b><br><table id='blacktable'>");
+   foreach action,amt in blacklist {
+      bbox.append("\n<tr><td>");
+	  if (rawlist contains action) bbox.append("<a href='#' class='removeblack' title='"+action+"'><img src='images/itemimages/leftarrow.gif' "+
+         "height='15' width='15' title='Remove this blacklist entry.' border=0></a>");
+      bbox.append("</td><td style='text-align: left'><form name='blacklist_"+action+"' style='display: inline' action=fight.php "+
+         "method=post><input type=hidden name=action value='macro'><input type='hidden' name='macrotext' value='"+batround()+action+
+         "'><input type=submit title='"+action+"' class='buttlink");
+      switch {
+         case (contains_text(action,"use ") && !contains_text(action,";")): item blbl = to_item(excise(action,"use ",""));
+               bbox.append(" item' value=\""+blbl+" ("+item_amount(blbl)+")\""); break;
+         case (contains_text(action,"skill ") && !contains_text(action,";")): bbox.append(" skill' value=\""+to_skill(to_int(excise(action,"skill ","")))+"\""); break;
+         case (action == "attack"): bbox.append("' value='Attack with weapon'"); break;
+         case (action == "jiggle"): bbox.append("' value='Jiggle your chefstaff'"); break;
+         case (action == "pickpocket"): bbox.append("' value='Steal'"); break;
+         default: bbox.append("' value='"+action+"'"); break;
+      }
+      bbox.append(" onclick='return bjilgt(this);'></form></td><td style='text-align: right;'>"+
+         "<a class='editblack hand' title='"+action+"'><b>"+amt+"</b></a></td></tr>");
+   }
+   bbox.append("\n</table><div id='blackformbox'><form id='blackform' method=post action=fight.php><input type=hidden name=black value='add'><span title='Canonical ID of "+
+      "action to blacklist.'><b>Action:</b></span> <input id='blackid' name=id size=18> <span title='Enter 0 to completely blacklist.  Otherwise, number "+
+      "to keep in reserve (items) or maximum casts allowed per combat (skills).'><b>Amount:</b></span> <input id='blackamt' name=amt size=4> <input type=image "+
+      "src='images/itemimages/uparrow.gif' height=20 width=20 title='Add entry'> <img src='images/itemimages/downarrow.gif' height=20 width=20 title='Cancel' "+
+      "onClick=\"$('#blackformbox').slideUp();s\"></form></div></center>");
+   bbox.write();
+   exit;
 }
 
 string quote() {
@@ -209,9 +255,11 @@ string to_html(advevent a, int i, boolean shorty) {
      if (minmax(a.mp,-my_mp(),my_maxmp()-my_mp()) != a.mp) res.append(" <small>("+rnum(minmax(a.mp,-my_mp(),my_maxmp()-my_mp()))+")</small>");
    }
   // Profit
-   res.append("</td><td><span style='color: "+to_htmlcolor(minmax((a.profit+100.0)/200,0,1.0))+"'>"+rnum(a.profit)+"</span></td>");
+   res.append("</td><td><span style='color: "+to_htmlcolor(minmax((a.profit+100.0)/200,0,1.0))+"'>"+rnum(a.profit)+"</span></td><td>");
+  // Add to Blacklist
+   if (!(rawlist contains a.id)) res.append("<a href=# class='addblack' title='"+a.id+"'><img src='images/itemimages/rightarrow.gif' title=\"Send '"+a.id+"' to blacklist.\" height=15 width=15></a>");
   // Hidden Indices
-   res.append("<td>"+rnum(i)+"</td>");                   // attack_action()
+   res.append("</td><td>"+rnum(i)+"</td>");                   // attack_action()
    res.append("<td>"+rnum(stasdex[a.id])+"</td>");       // stasis_action()
    res.append("<td>"+rnum(stundex[a.id])+"</td></tr>");  // stun_action()
    return res.to_string();
@@ -296,7 +344,7 @@ void batman_enhance() {
       "<img src='../images/itemimages/hourglass.gif' height=22 width=22 border=0></a></div>"+
       "<div class='popout' id='again'></div>");
    }
-   string BMRver = check_version("BatMan RE","batmanrelay","1.7",10042);
+   string BMRver = check_version("BatMan RE","batmanrelay","2.0",10042);
    string verstuff;
    void addver(string res) { if (res == "") return; verstuff += "<p>"+res; }
    addver(BBver); addver(SSver); addver(BMRver);
@@ -313,11 +361,12 @@ void batman_enhance() {
    if (!finished()) {
       actbox.append("<table id='battable' width='100%'>\n"+
         "<thead><tr><th>Action</th><th>Damage</th>"+
-        "<th><img src='images/itemimages/nicesword.gif' title='Delevel Attack' height=22 width=22 border=0></th>"+
-        "<th><img src='images/itemimages/whiteshield.gif' title='Delevel Defense' height=22 width=22 border=0></th><th>Stun</th>"+
+        "<th><img src='images/itemimages/nicesword.gif' title='Delevel Attack' height=26 width=26 border=0></th>"+
+        "<th><img src='images/itemimages/whiteshield.gif' title='Delevel Defense' height=26 width=26 border=0></th><th>Stun</th>"+
         "<th><img src='images/itemimages/hp.gif' title='1 HP = "+rnum(meatperhp,3)+"&mu;' border=0></th>"+
         "<th><img src='images/itemimages/mp.gif' title='1 MP = "+rnum(meatpermp,3)+"&mu;' border=0></th>"+
-        "<th><img src='images/itemimages/meatstack.gif' title='Profit' border=0></th><th>A</th><th>...</th><th>S</th></tr></thead>\n<tbody>");
+        "<th><img src='images/itemimages/meatstack.gif' title='Profit' border=0></th>"+
+        "<th><img src='images/itemimages/scroll1.gif' title='Add to Blacklist' height=26 width=26 border=0></th><th>A</th><th>...</th><th>S</th></tr></thead>\n<tbody>");
       foreach i,ev in opts actbox.append(to_html(ev,i));
       actbox.append("\n</tbody></table>\n   ");
   // enhanced Manuel box
