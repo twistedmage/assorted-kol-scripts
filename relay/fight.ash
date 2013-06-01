@@ -23,6 +23,8 @@ float turns_till_goals(boolean usespec) {
    }
    return totalgoalitems / max(has_goal(my_location(),usespec),0.0001);
 }
+
+
 record einclove {
    int[item] yield;   // all items yielded, and their average amounts
    boolean andor;     // in case of multiple item types, whether you get all types (true) or only one type (false)
@@ -52,8 +54,6 @@ string clover_string(location wear) {
    return res.to_string();
 }
 
-
-
 void fight_top_level(buffer results)
 {
 	string[string] post = form_fields();
@@ -70,6 +70,13 @@ void fight_top_level(buffer results)
 		  abox.append("Adventure again at "+my_location()+".");
 		  switch (my_location()) {
 	//         case $location[]: actbox.append(""); break;
+			 case $location[8-bit realm]: if (item_amount($item[digital key]) == 0) {
+				abox.append("<table><tr>"); 
+				foreach i in $items[red pixel, green pixel, blue pixel, white pixel] 
+				   abox.append("<td align=center><img src='/images/itemimages/"+i.image+"' title='"+i+"'><br>"+rnum(item_amount(i))+"</td>");
+				if (creatable_amount($item[digital key]) > 0) abox.append("<a href=# class='cliimglink' title='create 1 digital key'><img src='/images/itemimages/pixelkey.gif'></a>");
+				abox.append("</tr></table>");
+			 } break;
 			 case $location[A-Boo Peak]: if (item_amount($item[a-boo clue]) > 0) abox.append("<p><a href=# class='cliimglink' title='use a-boo clue'><img src='/images/itemimages/map.gif' class=hand></a>"); 
 				abox.append("<p>Hauntedness remaining: <b>"+get_property("booPeakProgress")+"</b>"); break;
 			 case $location[guano junction]: if (item_amount($item[sonar-in-a-biscuit]) > 0) abox.append("<p><a href=# class='cliimglink' title='use sonar-in-a-biscuit'><img src='/images/itemimages/biscuit.gif' class=hand></a>"); break;
@@ -192,19 +199,19 @@ void fight_top_level(buffer results)
 }
 
 void add_features(buffer results) {
+  // add "loading" div
+   results.replace_string("</body>", contains_text(results,"<center><table><a name=\"end\">") ? "<div id='battab'><ul><li><a href='#bat-enhance'>Actions</a>"+
+      "</li><li><a href='#kolformbox' title='Note: non-macro actions are not tracked!'>KoL</a></li><li><a href='#blacklist' class='blacktrigger'>Blacklist</a></li>"+
+	  "<li><a href='#wikibox' class='wickytrigger'>Wiki</a></li></ul>"+
+	  "<div id='bat-enhance' class='panel'><a href='fight.php' border=0><img id='compimg' src='images/adventureimages/3machines.gif'></a><p>Bat-Computer "+
+	  "calculating...</div><div id='kolformbox' class='panel'><center>KoL forms here</center></div><div id='blacklist' class='panel'><p>The "+
+	  "blacklist goes here.</div><div id='wikibox' class='panel'><p><img src='images/itemimages/book5.gif'><p>Consulting the Bat-Monstercyclopedia...</div></div>\n</body>" : 
+      "<div id='bat-enhance'></div>\n</body>");
   // add the CLI box
    results.replace_string("</body>", "<div id='clibox'><span style='float: right'><font size=1>[<a href=# class='cliclose'>close</a>]</font></span>"+
       "Enter a CLI command:<p><form id='cliform' action='fight.ash' method=post>"+
       "<input name=cli type=text size=60></form><p><a href='#' class='clilink'>help</a> <a href='#' class='clilink' "+
       "title='ashwiki CLI Reference'>more help</a></div><div id='clifeedback' class='clisuccess'></div><div id='mask' class='cliclose'></div>\n</body>");
-  // add "loading" div
-   results.replace_string("<body>", contains_text(results,"<center><table><a name=\"end\">") ? "<body>\n<div id='battab'><ul><li><a href='#bat-enhance'>Actions</a>"+
-      "</li><li><a href='#kolformbox' title='Note: non-macro actions are not tracked!'>KoL</a></li><li><a href='#blacklist' class='blacktrigger'>Blacklist</a></li>"+
-	  "<li><a href='#wikibox' class='wickytrigger'>Wiki</a></li></ul>"+
-	  "<div id='bat-enhance' class='panel'><a href='fight.php' border=0><img id='compimg' src='images/adventureimages/3machines.gif'></a><p>Bat-Computer "+
-	  "calculating...</div><div id='kolformbox' class='panel'><center>KoL forms here</center></div><div id='blacklist' class='panel'><p>The "+
-	  "blacklist goes here.</div><div id='wikibox' class='panel'><p><img src='images/itemimages/book5.gif'><p>Consulting the Bat-Monstercyclopedia...</div></div>\n" : 
-      "<body>\n<div id='bat-enhance'></div>");
   // add scripts/stylesheet
    results.replace_string("</head>", "\n<script src='jquery1.7.1.min.js'></script>\n"+
       "<script src='jquery.dataTables.min.js'></script>\n<script src='batman.js'></script>\n"+

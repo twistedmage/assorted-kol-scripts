@@ -344,7 +344,7 @@ void batman_enhance() {
       "<img src='../images/itemimages/hourglass.gif' height=22 width=22 border=0></a></div>"+
       "<div class='popout' id='again'></div>");
    }
-   string BMRver = check_version("BatMan RE","batmanrelay","2.0",10042);
+   string BMRver = check_version("BatMan RE","batmanrelay","2.1",10042);
    string verstuff;
    void addver(string res) { if (res == "") return; verstuff += "<p>"+res; }
    addver(BBver); addver(SSver); addver(BMRver);
