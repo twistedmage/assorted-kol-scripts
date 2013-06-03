@@ -163,12 +163,12 @@ void main()
 	cli_execute("alice.ash");
 	
 	//do elf quest
-//	if(my_inebriety()<=inebriety_limit())
-//		cli_execute("spaaace.ash");
-//	print("spaaace should be done now","lime");
-//	visit_url("spaaace.php?pwd&place=shop3&action=buy&whichitem=5176&quantity=2");
-//	if(item_amount($item[wrecked generator])<2)
-//		abort("spaaace doesn't seem to be done!");
+	if(my_inebriety()<=inebriety_limit())
+		cli_execute("spaaace.ash");
+	print("spaaace should be done now","lime");
+	visit_url("spaaace.php?pwd&place=shop3&action=buy&whichitem=5176&quantity=2");
+	if(item_amount($item[wrecked generator])<2)
+		abort("spaaace doesn't seem to be done!");
 	cli_execute("guild unlock");
 	if(my_adventures()>30 && my_inebriety()<=inebriety_limit())
 	{

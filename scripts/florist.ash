@@ -15,7 +15,6 @@ record plant
 //3 - underwater
 int zone_type(location loc)
 {
-print("checking zone type for "+loc);
 	//outdoor
 	if($locations[wartime sonofa beach, battlefield (hippy uniform), 8-bit realm, pirate cove, Goatlet, eXtreme Slope, F'c'le, Smut Orc Logging Camp, A-Boo Peak, Spooky Forest, Oil Peak, Fantasy Airship, Black Forest, Poop Deck, Palindome, Whitey's Grove, Desert (ultrahydrated), Oasis in the Desert, wartime Frat House, Pond, back 40, Other Back 40, Themthar Hills, Over Where the Old Tires Are, Out By that Rusted-Out Car, Hole in the Sky, outskirts of the knob, Dark Elbow of the Woods, Dark Heart of the Woods, Dark Neck of the Woods, Hippy Camp, Orc Chasm, Next to that Barrel with Something Burning in it, Near an Abandoned Refrigerator, Hidden City (Automatic)] contains loc)
 		return 0;
@@ -112,7 +111,6 @@ location mafia_style_zone(string loc)
 //may be able to use mafia tracking?
 boolean is_unused(plant pl, string html)
 {
-print("checking usage of "+pl.name+" in zone_type "+pl.zone_type);
 //	<td><b>Rabid Dogwood</b>   </td><td class=small>(there's already one of these!)</td><td>
 //	<td><b>Rutabeggar</b>   </td><td class=small><font color=blue><b>+25% Item drops</b></font> (territorial)</td><td>
 	matcher plant_hdr=create_matcher("(<td><b>"+pl.name+"</b>&nbsp;&nbsp;&nbsp;</td><td class=small>)",html);
@@ -160,7 +158,6 @@ int number_planted(string html)
 		num_planted-=1;
 		noplant_idx=index_of(sub_html,"noplant.gif",noplant_idx+11);
 	}
-	print("currently "+num_planted+" plants in the zone","lime");
 	return num_planted;
 }
 
@@ -168,7 +165,6 @@ int number_planted(string html)
 boolean is_usable(plant pl, location loc, string html)
 {
 
-print("checking "+pl.name);
 	return (zone_type(loc)==pl.zone_type) &&
 		is_unused(pl,html) &&
 		!(territorial_placed(html) && pl.territorial) && 
@@ -190,7 +186,6 @@ int choose_best_plant(string type, location loc, plant[int] plants)
 	//first pass checks for exactly what we wanted
 	foreach pli in plants
 	{
-		print("plant "+pli+" of "+count(plants)+" gives "+plants[pli].bonus_type+" and we want "+type);
 		//looking for items?
 		if(plants[pli].bonus_type=="items")
 		{
@@ -213,7 +208,6 @@ int choose_best_plant(string type, location loc, plant[int] plants)
 	{
 		foreach pli in plants
 		{
-			print("plant "+pli+" of "+count(plants)+" gives "+plants[pli].bonus_type+" and we want "+str);
 			if(plants[pli].bonus_type==str)
 				return pli;
 		}
@@ -229,9 +223,7 @@ int choose_best_plant(string type, location loc, plant[int] plants)
 	foreach pli in plants
 	{
 		if(contains_text(plants[pli].bonus_type,"damage"))
-		{ 
-			print("plant "+plants[pli].name+" of "+count(plants)+" gives "+plants[pli].bonus_type+" and we want damage");
-			
+		{ 		
 			if(contains_text(plants[pli].bonus_type,"cold"))
 			{
 				if(loc!=$location[icy peak] && loc!=$location[Ninja Snowmen] && loc!=$location[exposure esplanade] && loc!=$location[Pond])
@@ -311,15 +303,12 @@ void choose_all_plants(string type, location loc)
 		print(friar_str,"red");
 		abort("");
 	}
-	print("Friars zone string="+cur_locm.group(1),"blue");
 	location cur_loc=mafia_style_zone(cur_locm.group(1));
-	print("mafia style loc="+cur_loc,"blue");
 	if(cur_loc!=loc)
 		return;
 	
 	//do we have any space here?
 	int num_planted=number_planted(friar_str);
-print("num planted="+num_planted);
 	if(num_planted>2)
 	{
 		//force mafia to recognise that we quit the choiceadv?
@@ -337,7 +326,6 @@ print("num planted="+num_planted);
 			remove plants[pli];
 	
 	//do the planting 
-print("possible plants="+ count(plants));
 	while(num_planted<3 && count(plants)!=0)
 	{
 		int pli=choose_best_plant(type,loc,plants);

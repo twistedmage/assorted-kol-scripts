@@ -208,9 +208,9 @@ advevent to_event(string id, spread dmg, spread pdmg, string special, int howman
       case "def": res.def = aoe*eval(bittles.group(2),fvars); break;
       case "stun": if ($monsters[clancy] contains m) break;       // immune to all stuns
 	     res.stun = eval(bittles.group(2),fvars);
-     // detect multi-round stun immune monsters here
-         if (res.stun > 1 && $monsters[your shadow, cyrus the virus, queen bee, beebee king, bee thoven, buzzerker, oil tycoon, oil baron, oil cartel, clancy,
-             trophyfish, chester, frosty, ol' scratch, oscus, zombo, hodgman the hoboverlord, stella the demonic turtle poacher] contains m) res.stun = 0;
+        // detect multi-round stun immune monsters here
+         if (res.stun > 1 && $monsters[your shadow, cyrus the virus, queen bee, beebee king, bee thoven, buzzerker, oil tycoon, oil baron, oil cartel, 
+            trophyfish, chester, frosty, ol' scratch, oscus, zombo, hodgman the hoboverlord, stella the demonic turtle poacher] contains m) res.stun = 0;
          break;
       case "mp": if (my_class() == $class[zombie master]) continue;
          res.mp = eval(bittles.group(2),fvars); break;
@@ -655,7 +655,7 @@ float m_hit_chance() {            // monster hit chance
    float stunmod = minmax(merge(baseround(),adj).stun,0,1.0);
    if ($monsters[a.m.c. gremlin, batwinged gremlin, erudite gremlin, spider gremlin, vegetable gremlin, oil tycoon, oil baron, 
                  oil cartel, reanimated baboon skeleton, reanimated bat skeleton, reanimated demon skeleton, reanimated giant spider skeleton,
-                 reanimated serpent skeleton, reanimated wyrm skeleton, your shadow] contains m) return 1.0 - stunmod;
+                 reanimated serpent skeleton, reanimated wyrm skeleton, your shadow, clancy] contains m) return 1.0 - stunmod;
    return (1.0 - stunmod)*minmax(0.55 + (max(monster_stat("att"),0.0) - my_stat("Moxie"))*0.055,my_location() == $location[slime tube] ? 0.8 : 0.06,0.94);
 }
 spread m_regular() {               // damage dealt by monster attack
@@ -958,6 +958,7 @@ void build_items() {                                                // TODO: sph
                fields.special = happened("use 3195") ? "" : "stun 3, once"; fields.dmg = "0";
             } break;
          case 3388: if (get_counters("Zombo's Empty Eye",0,50) != "") continue; break;        // zombo's eye
+         case 4494: if (contains_text(m,"BRICKO")) fields.dmg = "50000"; break;               // bricko reactor
          case 5048: if (have_effect($effect[coldform]) > 0) continue; break;                  // double-ice: don't align monster to cold
          case 5233: if (monster_phylum(m) == $phylum[construct]) fields.dmg = monster_stat("hp")*6; break; // box of hammers
          case 5445: if (m == $monster[bat in the spats]) fields.dmg = "1000"; break;          // clumsiness bark
@@ -1014,17 +1015,15 @@ void build_skillz() {
       0.75*(fvars["fweight"]+numeric_modifier("Familiar Weight"));
    fvars["spelldmg"] = numeric_modifier("Spell Damage");
    int burrowgrub_amt() { return (1+to_int(have_effect($effect[yuletide mutations]) > 0)) * min(my_level(),15); }
-   string skillsbit = excise(page,"select a skill","Use Skill");
-   foreach sk,fields in factors["skill"] {
+   void add_skill(int sk, combat_rec fields) {
+      if (mp_cost(to_skill(sk)) > my_stat("mp")) return;
+      if (contains_text(fields.special,"once") && happened(thisid)) return;
       thisid = "skill "+sk;
       if (blacklist contains thisid) {      // infinite and threshold blacklisting
-	     if (blacklist[thisid] == 0) continue;
-		 if (happened(thisid) && happenings[thisid].done + happenings[thisid].queued >= blacklist[thisid]) continue;
+	     if (blacklist[thisid] == 0) return;
+		 if (happened(thisid) && happenings[thisid].done + happenings[thisid].queued >= blacklist[thisid]) return;
       }
-      if (mp_cost(to_skill(sk)) > my_stat("mp")) continue;
-      if (contains_text(fields.special,"once") && happened(thisid)) continue;
-      if (skillsbit == "" ? !have_skill(to_skill(sk)) : !contains_text(skillsbit,"value=\""+sk+"\"")) continue;    // TODO: needs more permissivity to include possible with +MP
-      if (m == $monster[x bottles of beer on a golem] && is_spell(to_skill(sk))) continue;  // this dude blocks spells
+      if (m == $monster[x bottles of beer on a golem] && is_spell(to_skill(sk))) return;  // this dude blocks spells
       fvars["elembonus"] = spell_elem_bonus(excise(fields.dmg," ",""));
       fvars["mpcost"] = mp_cost(to_skill(sk));
       if (have_skill($skill[intrinsic spiciness])) {
@@ -1034,13 +1033,13 @@ void build_skillz() {
       rate = 0;
       d = to_spread(0);
       switch (sk) {
-        case 55: if (item_amount($item[volcanic ash]) == 0) continue; rate = item_val($item[volcanic ash]); break;  // volcaneometeoric showercanoruptionwhatever
-        case 50: case 51: case 52: if (modifier_eval("zone(volcano)") == 0 && have_item($item[unstoppable banjo]) == 0) continue; break;
+        case 55: if (item_amount($item[volcanic ash]) == 0) return; rate = item_val($item[volcanic ash]); break;  // volcaneometeoric showercanoruptionwhatever
+        case 50: case 51: case 52: if (modifier_eval("zone(volcano)") == 0 && have_item($item[unstoppable banjo]) == 0) return; break;
         case 66: if (fvars["fistskills"] > 1) fields.special = "meat -"+(meatpermp*mp_cost($skill[salamander kata])*have_effect($effect[salamanderenity])/(3*fvars["fistskills"]));
            break;  // flying fire fist costs salamanderenity
         case 70: fields.special = happened($skill[chilled monkey brain]) ? "" : "stun 1"; break;  // monkey only stuns once
         case 7061: fvars["wpnpower"] = get_power(equipped_item($slot[weapon])); break;      // spring raindrop attack
-        case 7074: if (my_maxhp() - my_stat("hp") <= 2*burrowgrub_amt() || my_maxmp() - my_stat("mp") <= burrowgrub_amt()) continue; break;  // skip burrowgrub unless none is wasted
+        case 7074: if (my_maxhp() - my_stat("hp") <= 2*burrowgrub_amt() || my_maxmp() - my_stat("mp") <= burrowgrub_amt()) return; break;  // skip burrowgrub unless none is wasted
         case 7081: fvars["botcharges"] = get_property("bagOTricksCharges").to_int(); break;
         case 7082: if (contains_text(page,"red eye")) {        // point at your opponent (he-boulder rays)
               d = to_spread(((4.5-minmax(have_effect($effect[everything looks red]),0,2))*fvars["fweight"])+" hot");
@@ -1055,20 +1054,20 @@ void build_skillz() {
            } break;
         case 7112: rate = ((have_effect($effect[taste the inferno])-1)/50.0)*item_val($item[nuclear blastball]); break;  // nuclear breath costs a blastball, but should be used
         case 7116: if (m.phylum == $phylum[dude]) fields.special += ", stun 1"; break;
-        case 11006: if (!have_equipped($item[trusty])) continue; break;    // throw trusty needs a trusty
-        case 11010: if (have_effect($effect[foe-splattered]) > 0) continue; break;   // bifurcating blow
+        case 11006: if (!have_equipped($item[trusty])) return; break;    // throw trusty needs a trusty
+        case 11010: if (have_effect($effect[foe-splattered]) > 0) return; break;   // bifurcating blow
         case 12012: if (!happened("skill 12000")) break;         // plague claws could grant MP after bite
         case 12000: if ($phyla[bug,constellation,elemental,construct,plant,slime] contains m.phylum) break;
            fields.special = "!! zombify"; break;                 // set flag for +MP since all regular MP is ignored
         default: if (contains_text(fields.special,"regular")) {
-              if (current_hit_stat() == $stat[moxie] && !($ints[7008,1022,1023,12010] contains sk)) continue;
+              if (current_hit_stat() == $stat[moxie] && !($ints[7008,1022,1023,12010] contains sk)) return;
               switch (sk) {    // dmg formulas too complicated for data file
                 case 2005: case 2105: case 2106: case 2107:      // skip shield skills if no shield
-                   if (fvars["shieldpower"] == 0) continue; d = merge(to_spread(fields.dmg),regular(1)); break;
-                case 11000: if (!have_equipped($item[trusty])) continue;  // axing
+                   if (fvars["shieldpower"] == 0) return; d = merge(to_spread(fields.dmg),regular(1)); break;
+                case 11000: if (!have_equipped($item[trusty])) return;  // axing
                 case 1003: d = regular(2); break;                // ts
                 case 1005: d = regular(3); break;                // lts
-                case 11001: if (!have_equipped($item[trusty])) continue;  // cleave
+                case 11001: if (!have_equipped($item[trusty])) return;  // cleave
                 case 7096: d = regular(5); break;                // bashing slam smash
                 case 7097: d = factor(regular(1),7); break;      // turtle of seven tails = 7 regular attacks
                 case 7132: d = (have_equipped($item[right bear arm]) && have_equipped($item[left bear arm]) ?
@@ -1078,7 +1077,7 @@ void build_skillz() {
                    fields.special = "!! zombify"; break;         // set flag for +MP since all regular MP is ignored
                 case 1022: d[$element[none]] = max(0.5,0.15*get_power(equipped_item($slot[weapon])))+0.5+ceil(square_root(max(0,numeric_modifier("Weapon Damage"))));
                    foreach el in $elements[] d[el] = ceil(square_root(numeric_modifier(el+" Damage"))); break;   // clobber
-                case 1023: if (equipped_item($slot[weapon]) == $item[none]) continue;                            // harpoon!
+                case 1023: if (equipped_item($slot[weapon]) == $item[none]) return;                            // harpoon!
 				   d[$element[none]] = min(800.0,floor(fvars["buffedmus"]/4.0)) + 0.15*get_power(equipped_item($slot[weapon]))+0.5+1.5*max(0,numeric_modifier("Weapon Damage"));
                    foreach el in $elements[] d[el] = 1.5*numeric_modifier(el+" Damage"); break;
                 case 12010: d = merge(factor(to_spread(fullness_limit() - my_fullness()),7),regular(1)); break;  // ravenous pounce
@@ -1093,7 +1092,7 @@ void build_skillz() {
             return to_event("",to_spread(0),to_spread(0),"stun 2");
          return to_event("",factors["bander",which]);
       }
-      if (m == $monster[mother hellseal] && count(d) > 0 && (sk == 1022 || !contains_text(fields.special,"regular"))) continue;
+      if (m == $monster[mother hellseal] && count(d) > 0 && (sk == 1022 || !contains_text(fields.special,"regular"))) return;
       advevent temp = to_event(thisid,d,to_spread(fields.pdmg),fields.special,to_int(sk != 5023));  // 5023 is mistletoe (quick action)
       if (contains_text(fields.special,"regular")) temp = merge(temp,onhit);
        else if (isseal) foreach el,amt in temp.dmg if (temp.dmg[el] > 0) temp.dmg[el] = min(1.0,amt);
@@ -1104,10 +1103,18 @@ void build_skillz() {
          case $familiar[o.a.f.]:
          case $familiar[black cat]: temp = merge(factor(temp,0.70),factor(opts[0],0.30));   // either opts[0] contains regular attack at this point,
             addopt(temp,0,0.7*mp_cost(to_skill(sk)));                                       // or you are in Jarlsberg and can't use familiars
-            continue;
+            return;
       }
       addopt(temp,rate,mp_cost(to_skill(sk)));
    }
+   string skillsbit = excise(page,"select a skill","Use Skill");
+   if (skillsbit.length() > 0) {                                                        // if the page contains a skill dropdown, only consider those skills
+      matcher oneskill = create_matcher("value=\"?(\\d+)",skillsbit); int sdex;
+	  while (oneskill.find()) {
+	     sdex = to_int(oneskill.group(1));
+	     if (factors["skill"] contains sdex) add_skill(sdex,factors["skill",sdex]);
+	  }
+   } else foreach i,f in factors["skill"] if (have_skill(to_skill(i))) add_skill(i,f);  // otherwise add all batfactors skills that you have_skill
 }
 
 void build_options() {
@@ -1221,10 +1228,15 @@ stat which_gays(string aid) {        // determines which gays a given action wil
       return to_skill(to_int(excise(aid,"skill ",""))).class.primestat;  // classy gays
    return $stat[none];     // straight?
 }
+string act(string action);
 
 // TODO: reject excess haiku katana skills
 // adds action to queue, adjusts script state; returns false if unable to enqueue the action
 boolean enqueue(advevent a) {     // handle inserts/auto-funk
+   if (my_fam() == $familiar[he-boulder] && have_effect($effect[everything looks yellow]) == 0 && contains_text(page," yellow eye") && 
+       contains_text(to_lower_case(vars["ftf_yellow"]),to_lower_case(m.to_string())) && (count(custom) == 0 || die_rounds() <= 3)) {
+      act(use_skill($skill[point at your opponent])); return true;
+   }
    if (a.id == "") return vprint("Unable to enqueue empty action.",-8);  // allows if(enqueue())
    if (round + a.rounds > maxround + 3) return vprint("Can't enqueue '"+a.id+"': combat too long.",-8);  // allow to enqueue 3 rounds beyond combat limit
    if (my_stat("mp")+a.mp < 0) return vprint("Unable to enqueue '"+a.id+"': insufficient MP.",-7);  // everybody to the limit
@@ -1538,9 +1550,6 @@ string act(string action) {
       case $monster[the thorax]: if (contains_text(lastaction,"draws back his big fist") && item_amount($item[clumsiness bark]) > 0)
          return act(throw_item($item[clumsiness bark])); break;
    }
-   if (my_fam() == $familiar[he-boulder] && have_effect($effect[everything looks yellow]) == 0 && !intheclear() &&
-       contains_text(action," yellow eye") && contains_text(to_lower_case(vars["ftf_yellow"]),to_lower_case(m.to_string())))
-      return act(use_skill($skill[point at your opponent]));
    return action;
 }
 
@@ -1585,7 +1594,7 @@ string batround() {
    }
    switch (my_fam()) {
       case $familiar[he-boulder]: if (have_effect($effect[everything looks yellow]) > 0 || !contains_text(to_lower_case(vars["ftf_yellow"]),to_lower_case(m.to_string()))) break;
-         if (count(custom) > 0 && intheclear()) break;
+         if (count(custom) > 0 && die_rounds() > 3) break;
          res.append("if !haseffect 790 && match \" yellow eye\"; skill 7082; endif; "); break;
    }
    res.append(batround_insert);
@@ -1641,4 +1650,4 @@ string macro(item i) { return macro(get_action(i),"z"); }
 setvar("BatMan_profitforstasis",15.0);       // profit required to enter stasis
 setvar("BatMan_baseSubstatValue",5.0);       // value of a single substat point (mainstat 2*n, attack stat 1.5*n, defstat 1.5*n -- these stack)
 // setvar("BatMan_pessimism",0.5);              // pessimism range -1.0 - 1.0 (1.0 totally pessimistic, 0 exact averages, -1.0 totally optimistic)
-string BBver = check_version("BatBrain","batbrain","1.36",6445);
+string BBver = check_version("BatBrain","batbrain","1.37",6445);

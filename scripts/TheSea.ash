@@ -70,10 +70,6 @@ void prepare_for(string type,location loc)
 		max_str+=", +outfit mer-kin scholar";
 	if(loc==$location[mer-kin colosseum])
 		max_str+=", +outfit mer-kin gladiator, -ml";
-	if(loc==$location[mer-kin gymnasium]) //placeholder for temple (gladiator)
-		max_str+=", +outfit mer-kin gladiator";
-	if(loc==$location[mer-kin high school]) //placeholder for temple (scholar)
-		max_str+=", +outfit mer-kin scholar";
 	if(get_property("lassoTraining")!= "expertly")
 		max_str+=", +equip sea cowboy hat, +equip sea chaps";
 	//if untrained with gladiator weapons ?
@@ -137,30 +133,41 @@ void prepare_for(string type,location loc)
 	}
 	else if(get_property("lassoTraining")!= "expertly")
 	{
-		if(i_a("sea lasso")<6)
-			buy(6,$item[sea lasso]);
+		if(i_a("sea lasso")<1)
+			buy(1,$item[sea lasso]);
 		set_combat_macro_name("lasso");
 	}
 	else if(loc==$location[mer-kin library])
 	{
-		if(i_a("pulled yellow taffy")<6)
-			buy(6,$item[pulled yellow taffy]);
-		if(get_property("_merkin_word1")=="")
-			set_combat_macro_name("library1");
-		else if(get_property("_merkin_word2")=="")
-			set_combat_macro_name("library2");
-		else
+		if(i_a("pulled yellow taffy")<1)
+			buy(1,$item[pulled yellow taffy]);
+		if(get_property("_merkin_word2")=="")
+		{
+			if(i_a("mer-kin healscroll")<1)
+				buy(1,$item[mer-kin healscroll]);
 			set_combat_macro_name("library3");
+		}
+		else if(get_property("_merkin_word5")=="")
+		{
+			if(i_a("mer-kin killscroll")<1)
+				buy(1,$item[mer-kin killscroll]);
+			set_combat_macro_name("library2");
+		}
+		else
+		{
+			set_combat_macro_name("library1");
+		}
 	}
 	else
 		set_combat_macro_name(false);
 }
 
-string thisver = "1.3.1";
+string thisver = "1.4.2";
 check_version( "TheSea.ash", "TheSea", thisver, 8708 );
 
 string currentquests = visit_url("questlog.php?which=1");
 string completedquests = visit_url("questlog.php?which=2");
+string otherquests = visit_url("questlog.php?which=3");
 location grandpa;
 if (my_primestat() == $stat[Muscle]) grandpa = $location[Anemone Mine];
 else if (my_primestat() == $stat[Mysticality]) grandpa = $location[Marinara Trench];
@@ -198,6 +205,11 @@ setvar("seafloor_grandpaChat", 0);
 // Do you want it to unlock the Trophyfish encounter? This defaults to false, since you'll likely only want to do this once.
 setvar("seafloor_unlockTrophyfish", false);
 boolean TS_UNLOCK_TROPHYFISH = to_boolean(vars["seafloor_unlockTrophyfish"]);
+
+// How do you want to complete the Outfit quest?
+// 0 - Skip. 1 - Violence. 2 - Hatred. 3 - Loathing.
+setvar("seafloor_outfitQuest", 0);
+int TS_OUTFIT_QUEST = to_int(vars["seafloor_outfitQuest"]);
 
 // How do you want to complete the Skate quest?
 // 0 - Skip. 1 - Ice. 2 - Roller. 3 - Board. 4 - Unlock, but don't do the quest.
@@ -294,7 +306,7 @@ void MonkeeQuest()
 			visit_url("oldman.php?action=talk");
 			currentquests = visit_url("questlog.php?which=1");
 		}
-		if (currentquests.contains_text("An Old Guy and The Ocean") && TS_MONKEE_QUEST > 0 && to_int(vars["seafloor_monkeeStep"]) < TS_MONKEE_QUEST)
+		if (TS_MONKEE_QUEST > 0 && to_int(vars["seafloor_monkeeStep"]) < TS_MONKEE_QUEST)
 		{
 			string seafloor = visit_url("seafloor.php");
 			string monkeycastle;
@@ -302,7 +314,9 @@ void MonkeeQuest()
 			{
 				print("Finding Little Brother in the Octopus\'s Garden.");
 				prepare_for("i",$location[dire warren]);
+				cli_execute("use legendary beat");
 				if (TS_FAX_NEPTUNE && get_property("_photocopyUsed") != "false")
+
 				{
 					if(!is_online("faxbot"))
 					{
@@ -344,6 +358,7 @@ void MonkeeQuest()
 				}
 				if (item_amount($item[wriggling flytrap pellet]) < 1)
 				{
+
 					print("You have failed to get the wriggling flytrap pellet by fax.");
 				}
 				else
@@ -380,10 +395,14 @@ void MonkeeQuest()
 				if (originalChoice != "1") set_property("choiceAdventure299", "1");
 				
 				while(!contains_text(visit_url("monkeycastle.php"),"\#brothers\""))
+
 				{
 					print("Finding big brother","lime");
 					prepare_for("-",$location[Wreck of the Edgar Fitzsimmons]);
 					adventure(1,$location[Wreck of the Edgar Fitzsimmons]);
+
+
+
 				}
 				if (originalChoice != "1") set_property("choiceAdventure299", originalChoice);
 				monkeycastle = visit_url("monkeycastle.php");
@@ -458,6 +477,8 @@ void MonkeeQuest()
 				{
 					prepare_for("-i", $location[mer-kin outpost]);
 					adventure(1,$location[mer-kin outpost]);
+
+
 				}
 				if (my_adventures() > 0 && boolean_modifier("Adventure Underwater"))
 				{
@@ -471,6 +492,7 @@ void MonkeeQuest()
 					prepare_for("-", $location[mer-kin outpost]);
 					adventure(my_adventures(), $location[mer-kin outpost]);
 					if (my_adventures() < 2)
+
 					{
 						print("You have run out of adventures. Continue tomorrow.");
 						return;
@@ -704,23 +726,22 @@ void BootQuest()
 			if (available_amount($item[sand dollar]) >= 50)
 			{
 				print("Buying the boot and collecting our well-earned reward.");
-				create(1, $item[damp old boot]);
+				if (available_amount($item[damp old boot]) < 1) create(1, $item[damp old boot]);
 				visit_url("oldman.php?action=talk");
 				switch(TS_BOOT_QUEST)
 				{
 					case 1:
 						visit_url("oldman.php?action=pickreward&whichreward=3609");
-
 						break;
 					case 2:
 						visit_url("oldman.php?action=pickreward&whichreward=6314");
 						break;
 					case 3:
-						visit_url("oldman.php?action=pickreward&whichreward=6313");
+						visit_url("oldman.php?action=pickreward&whichreward=6312");
 						use(1, $item[crate of fish meat]);
 						break;
 					case 4:
-						visit_url("oldman.php?action=pickreward&whichreward=6312");
+						visit_url("oldman.php?action=pickreward&whichreward=6313");
 						use(1, $item[damp old wallet]);
 						break;
 					case 5:
@@ -730,7 +751,7 @@ void BootQuest()
 							visit_url("oldman.php?action=pickreward&whichreward=6314");
 						else
 						{
-							visit_url("oldman.php?action=pickreward&whichreward=6313");
+							visit_url("oldman.php?action=pickreward&whichreward=6312");
 							use(1, $item[crate of fish meat]);
 						}
 						break;
@@ -741,7 +762,7 @@ void BootQuest()
 							visit_url("oldman.php?action=pickreward&whichreward=6314");
 						else
 						{
-							visit_url("oldman.php?action=pickreward&whichreward=6312");
+							visit_url("oldman.php?action=pickreward&whichreward=6313");
 							use(1, $item[damp old wallet]);
 						}
 						break;
@@ -829,6 +850,7 @@ void GetAeratedHelmet()
 				}
 				add_item_condition(1, $item[rusty diving helmet]);
 				if (TS_GET_HELMET == 3 && get_property("_photocopyUsed") != "false")
+
 				{
 					int loopcounter = 0;
 					if(!is_online("faxbot"))
@@ -889,7 +911,6 @@ void deepcity_unlock()
 			// get lockkey
 			if(i_a("mer-kin lockkey")==0)
 			{
-				abort("lin 892 Free grandma one more time so we can get extra sets of mer-kin gear (me + fams");
 				//Set this, to tell us if we find the choiceadv before we think we have a key
 				set_property("choiceAdventure313", 0);
 				set_property("choiceAdventure314", 0);
@@ -990,8 +1011,7 @@ void deepcity_unlock()
 void gladiator_path()
 {
 	//go through colloseum using right weapon for each fight
-	prepare_for("", $location[Mer-Kin colosseum]);
-	while(<>)
+	while(!to_boolean(get_property("_merkin_temple_open")))
 	{
 		prepare_for("", $location[Mer-Kin colosseum]);
 		//equip appropriate weapon
@@ -1021,10 +1041,15 @@ void gladiator_path()
 				set_property("_merkin_colosseum_nextfight","balldodger");
 			else
 				set_property("_merkin_colosseum_nextfight","netdragger");
+				
+			//are we done now?
+			if(contains_text(txt,"the medallion becomes a sigil of liquid fire"))
+				set_property("_merkin_temple_open","true");
 		}
 		else
 			abort("Failed to kill gladiator");
-//		adventure(1,$location[Mer-Kin colosseum]);
+
+		//sometimes we get disarmed and mafia doesn't know, so do this
 		cli_execute("inventory refresh");
 		txt=visit_url("inventory.php?which=2");
 	}
@@ -1044,54 +1069,119 @@ void gladiator_path()
 //scholar path - learn religious words
 void scholar_path()
 {
-	//learn vocabulary
-	if(get_property("merkin_vocab")!=my_ascensions())
+	if(!to_boolean(get_property("_merkin_temple_open")))
 	{
-		buy(10-i_a("mer-kin wordquiz"),$item[mer-kin wordquiz]);
-		buy(10-i_a("mer-kin cheatsheet"),$item[mer-kin cheatsheet]);
-		use(10,$item[mer-kin wordquiz]);
-		cli_execute("inventory refresh");
-		if(i_a("mer-kin wordquiz")!=0)
-			abort("Failed to use wordquizes");
+		//learn vocabulary
+		if(get_property("merkin_vocab")!=my_ascensions())
+		{
+			buy(10-i_a("mer-kin wordquiz"),$item[mer-kin wordquiz]);
+			buy(10-i_a("mer-kin cheatsheet"),$item[mer-kin cheatsheet]);
+			use(10,$item[mer-kin wordquiz]);
+			cli_execute("inventory refresh");
+			if(i_a("mer-kin wordquiz")!=0)
+				abort("Failed to use wordquizes");
+			else
+				set_property("merkin_vocab",my_ascensions());
+		}
+		
+		//figure out special words farming library, using healscroll and killscroll
+		//words 1,6,8
+		while(get_property("_merkin_word1")=="")
+		{
+			if(get_property("_merkin_word8")=="")
+				set_property("choiceAdventure704",1);
+			else if(get_property("_merkin_word6")=="")
+				set_property("choiceAdventure704",2);
+			else if(get_property("_merkin_word1")=="")
+				set_property("choiceAdventure704",3);
+			else
+				abort("Something went wrong, line 1096 thesea.ash");
+			print("learning "+get_property("choiceAdventure704")+"rd library catalog word","green");
+				
+			prepare_for("-", $location[Mer-Kin Library]);
+			abort("Don't currently remember words from choiceadv line 1100");
+			adventure(1,$location[Mer-Kin Library]);
+			if(contains_text(get_property("lastEncounter"),"Playing the Catalog Card"))
+				abort("Remember new word");
+		}
+		
+		//use knucklebone
+		if(get_property("_merkin_word4")=="")
+		{
+			print("learning knucklebone word","green");
+			abort("line 923, visit url to use knucklebone and record word, or wait for mafia support");
+			string html = visit_url("inv_use.php?which=3&whichitem=6357");
+		}
+		
+		//cast Deep Dark Visions
+		while(get_property("_merkin_word3")=="")
+		{
+			print("learning deep-dark-visions word","green");
+			if(have_effect($effect[spookyform])==0)
+				use(1,$item[phial of spookiness]);
+			cli_execute("restore hp; restore mp");
+			if(my_mp()<100 || my_hp()<500)
+				abort("Can't operate with less than 100mp and 500 hp");
+			string html=visit_url("skills.php?pwd&action=Skillz&whichskill=90&skillform=Use+Skill&quantity=1");
+			if(contains_text(html,"of Cards") || contains_text(html,"Blues") || contains_text(html,"Pancakes") || contains_text(html,"Pain"))
+			{
+				print(html,"red");
+				abort("found word! ");
+			}
+		}
+		while(i_a("mer-kin dreadscroll")<1)
+		{
+			print("getting dreadscroll","green");
+			prepare_for("-", $location[Mer-Kin Library]);
+			adventure(1,$location[Mer-Kin Library]);
+		}
+		
+		//fill the dreadscroll
+	#	int pro1,pro2,pro3,pro4,pro5,pro6,pro7,pro8;
+	#	switch(get_property("_merkin_word3"))
+	#	{
+	#		case 
+	#			pro
+	#	}
+		#pro2 = healscroll - 1 starfish. 2 moonfish. 3 sunfish. 4 planetfish.
+	#pro3 = DDV - 1 Cards. 2 Blues. 3 Pancakes. 4 Pain.
+	#pro4 = knucklebone - 1 north. 2 south. 3 east. 4 west.
+	#pro5 = killscroll - 1 red. 2 black. 3 green. 4 yellow.
+	#pro7 = worktea - 1 eel. 2 turtle. 3 shark. 4 whale.
+
+	#pro1 = LIBRARY - 1 LONELY. 2 DOUBLED. 3 THRICE-CURSED. 4 FOURTH.
+	#pro6 = library - 1 blind. 2 giant. 3 finless. 4 two-headed.
+	#pro8 = library - 1 1KSY. 2 22SS. 3 CT. 4 aBNDC.
+	#	abort("line 984 visit_url to fill in dreadscroll?");
+	#		visit_url("inv_use.php?pwd&which=3&whichitem=6353");
+		string html=visit_url("choice.php?pro1=1&pro2=1&pro3=1&pro4=1&pro5=1&pro6=1&pro7=1&pro8=1&whichchoice=703&pwd&option=1");
+	
+		if(contains_text(html,"I guess you're the Mer-kin High Priest now"))
+			set_property("_merkin_temple_open","true");
 		else
-			set_property("merkin_vocab",my_ascensions());
+			abort("Failed to fill in dreadscroll");
 	}
-	
-	//figure out special words farming library, using healscroll and killscroll
-	while(get_property("_merkin_word5")=="")
-	{
-		prepare_for("-", $location[Mer-Kin Library]);
-		adventure(1,$location[Mer-Kin Library]);
-		if(contains_text(get_property("lastEncounter"),"Playing the Catalog Card"))
-			abort("Remember new word");
-	}
-	
-	//use knucklebone
-	if(get_property("_merkin_word6")=="")
-	{
-		abort("line 923, visit url to use knucklebone and record word");
-		visit_url("");
-	}
-	
-	//cast Deep Dark Visions
-	while(get_property("_merkin_word6")=="")
-	{
-		if(have_effect($effect[spookyform])==0)
-			use(1,$item[phial of spookiness]);
-		cli_execute("restore hp");
-		abort("line 933, visit url to cast deep dark visions and recognise word");
-		visit_url("");
-	}
-	abort("line 984 visit_url to fill in dreadscroll?");
-//	<fill in dreadscroll>
 
 	//boss fight?
-	prepare_for("", $location[Mer-Kin high school]); //mafia doesn't recognise temple
+	set_combat_macro_name(false);
+	cli_execute("familiar squamous");
+	cli_execute("uneffect phorcefullness; uneffect incredibly hulking; uneffect reptilian fortitude; uneffect a few extra pounds; uneffect urkel");
 	//reduce hp
-	<>;
-	//get healing items
-	<>;
-	
+	getsome(1, $item[extra-strength red potion]);
+	getsome(1, $item[filthy poultice]);
+	getsome(1, $item[gauze garter]);
+	getsome(1, $item[red pixel potion]);
+	getsome(1, $item[green pixel potion]);
+	getsome(1, $item[red potion]);
+	getsome(1, $item[scented massage oil]);
+	getsome(1, $item[sea lasso]);
+	getsome(1, $item[mer-kin mouthsoap]);
+	getsome(3, $item[mer-kin prayerbeads]);
+	equip($slot[acc1], $item[mer-kin prayerbeads]);
+	equip($slot[acc2], $item[mer-kin prayerbeads]);
+	equip($slot[acc3], $item[mer-kin prayerbeads]);
+	maximize("sea, outfit mer-kin scholar, -acc1, -acc2, -acc3, -1000 hp, 0.1 mainstat", false);
+	cli_execute("restore hp");
 }
 //-----------------------------------------------------
 
@@ -1129,6 +1219,7 @@ void main()
 		}
 		MonkeeQuest();
 		if (TS_SKATE_QUEST > 0) SkateQuest();
+
 		if (TS_BOOT_QUEST!=0) BootQuest();
 		if (TS_GET_SUSHIMAT > 0) GetSushiMat();
 		if (TS_GET_HELMET > 0) GetAeratedHelmet();

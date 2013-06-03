@@ -3650,6 +3650,8 @@ save     [$item[pearl diver's necklace]] = 1;
 save [$item[loadstone]] = 1;
 save [$item[Charity's choker]] = 0;
 save     [$item[enchanted muesli]] = 0;
+save [$item[pulled yellow taffy]] = 0;
+save [$item[beefy fish meat]] = 0;
 
 //stuff to sell later
 save [$item[Mer-kin cheatsheet]] = -1;
