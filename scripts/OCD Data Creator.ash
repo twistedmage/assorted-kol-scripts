@@ -3652,6 +3652,17 @@ save [$item[Charity's choker]] = 0;
 save     [$item[enchanted muesli]] = 0;
 save [$item[pulled yellow taffy]] = 0;
 save [$item[beefy fish meat]] = 0;
+save [$item[sturdy sword hilt]] = 0;
+save [$item[The Snake trading card]] = 1;
+save [$item[strawberry-flavored Hob-O]] = 0;
+save [$item[Jawmaster 2000]] = 1;
+save [$item[sea carrot]] = 0;
+save [$item[sea avocado]] = 0;
+save [$item[glowing syringe]] = 0;
+save [$item[jar of psychoses (Jick)]] = 0;
+save [$item[the kindest cold cut]] = 0;
+save [$item[Mer-kin weaksauce]] = 0;
+
 
 //stuff to sell later
 save [$item[Mer-kin cheatsheet]] = -1;

@@ -161,7 +161,7 @@ void levels() {
 	if(zombie)
 		zombie_dropdown("baleUr_ZombieTarget", "", "Try to recover Horde up to ");
 	else
-	numeric_dropdown("mpAutoRecoveryTarget", "", "Try to recover mana up to ");
+		numeric_dropdown("mpAutoRecoveryTarget", "", "Try to recover mana up to ");
 	writeln("</td></tr>");
 	write("<tr><td align=center>");
 	if(write_button("hp", "Update & Restore HP"))

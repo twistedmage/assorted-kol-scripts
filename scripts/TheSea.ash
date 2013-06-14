@@ -47,7 +47,40 @@ void prepare_for(string type,location loc)
 {
 	if(have_effect($effect[fishy])<1)
 	{
-		abort("ran out of fishy");
+		//if we have rescued big brother and can get a sushi mat
+		//we may well want to eat a bento box sushi with a worktea, to get fishy and a clue
+		if(contains_text(visit_url("monkeycastle.php"),"\#brothers\"")&& get_property("workteaClue")=="")
+		{
+			if(user_confirm("Do you want to eat a Bento Box."))
+			{
+				if(i_a("white rice")<1)
+					create(1,$item[white rice]);
+				if(i_a("seaweed")<1)
+					create(1,$item[seaweed]);
+				if(i_a("beefy fish meat")<1)
+					create(1,$item[beefy fish meat]);
+				if(i_a("glistening fish meat")<1)
+					create(1,$item[glistening fish meat]);
+				if(i_a("slick fish meat")<1)
+					create(1,$item[slick fish meat]);
+				if(i_a("mer-kin lunchbox")<1)
+					create(1,$item[mer-kin lunchbox]);
+				if(i_a("tempura avocado")<1)
+					create(1,$item[tempura avocado]);
+				if(i_a("Mer-kin weaksauce")<1)
+					create(1,$item[Mer-kin weaksauce]);
+				cli_execute("create bento box");
+			}
+		}
+		else if(inebriety_limit() - my_inebriety() > 2 && user_confirm("Do you want to drink a Flaming Caipiranha."))
+		{
+			use_skill(1,$skill[ode to booze]);
+			drink(1,$item[Flaming Caipiranha]);
+		}
+	}
+	if(have_effect($effect[fishy])<1)
+	{
+		abort("ran out of fishy and have full bladder");
 	}
 
 	//--------------------flowers--------------------
@@ -91,13 +124,13 @@ void prepare_for(string type,location loc)
 	//types accepted: -, +, i, 
 	setMood(type);
 	//potions
-	cli_execute("trigger lose_effect, incredibly Hulking, use 1 Ferrigno's Elixir of Power");
-	cli_execute("trigger lose_effect, cock of the walk, use 1 connery's elixir of audacity");
-	cli_execute("trigger lose_effect, Superhuman Sarcasm, use 1 serum of sarcasm");
-	cli_execute("trigger lose_effect, Phorcefullness, use 1 philter of phorce");
-	if(my_primestat()==$stat[mysticality])
-		cli_execute("trigger lose_effect, on the shoulders of giants, use 1 hawking's elixir of brilliance");
-		
+//	cli_execute("trigger lose_effect, incredibly Hulking, use 1 Ferrigno's Elixir of Power");
+//	cli_execute("trigger lose_effect, cock of the walk, use 1 connery's elixir of audacity");
+//	cli_execute("trigger lose_effect, Superhuman Sarcasm, use 1 serum of sarcasm");
+//	cli_execute("trigger lose_effect, Phorcefullness, use 1 philter of phorce");
+//	if(my_primestat()==$stat[mysticality])
+//		cli_execute("trigger lose_effect, on the shoulders of giants, use 1 hawking's elixir of brilliance");
+/*		
 	if(loc==$location[mer-kin colosseum])
 	{
 		boolean tmp=cli_execute("ballpit; telescope high");
@@ -111,9 +144,9 @@ void prepare_for(string type,location loc)
 		
 		cli_execute("trigger lose_effect, Tomato Power, use 1 Tomato juice of powerful power");
 		cli_execute("trigger lose_effect, Chalky Hand, use 1 handful of hand chalk");
-	cli_execute("trigger lose_effect, Gr8tness, use 1 potion of temporary gr8tness ");
+		cli_execute("trigger lose_effect, Gr8tness, use 1 potion of temporary gr8tness ");
 	}
-	
+*/	
 	//lasso / seahorse
 	if(loc==$location[coral corral])
 	{
@@ -162,7 +195,7 @@ void prepare_for(string type,location loc)
 		set_combat_macro_name(false);
 }
 
-string thisver = "1.4.2";
+string thisver = "1.6.2";
 check_version( "TheSea.ash", "TheSea", thisver, 8708 );
 
 string currentquests = visit_url("questlog.php?which=1");
@@ -249,6 +282,7 @@ boolean getsome(int amount, item needed)
 	string originalabpl = get_property("autoBuyPriceLimit");
 	string originalaswm = get_property("autoSatisfyWithMall");
 	string originalaswn = get_property("autoSatisfyWithNPCs");
+	if (item_amount(needed) >= amount) return true;
 	try
 	{
 		set_property("autoBuyPriceLimit", mall_price(needed));
@@ -288,6 +322,75 @@ void GrandpaChat()
 	updatevars();
 }
 
+void prepHatred()
+{
+	print("Preparing for the big fight!");
+	set_combat_macro_name(false);
+	cli_execute("familiar squamous");
+	//reduce hp
+	cli_execute("uneffect phorcefullness; uneffect incredibly hulking; uneffect reptilian fortitude; uneffect a few extra pounds; uneffect urkel");
+	getsome(1, $item[extra-strength red potion]);
+	getsome(1, $item[filthy poultice]);
+	getsome(1, $item[gauze garter]);
+	getsome(1, $item[red pixel potion]);
+	getsome(1, $item[green pixel potion]);
+	getsome(1, $item[red potion]);
+	getsome(1, $item[scented massage oil]);
+	getsome(1, $item[sea lasso]);
+	getsome(1, $item[mer-kin mouthsoap]);
+	getsome(3, $item[mer-kin prayerbeads]);
+	equip($slot[acc1], $item[mer-kin prayerbeads]);
+	equip($slot[acc2], $item[mer-kin prayerbeads]);
+	equip($slot[acc3], $item[mer-kin prayerbeads]);
+	switch (my_primestat())
+	{
+		case $stat[Muscle]:
+			maximize("sea, outfit mer-kin scholar, -acc1, -acc2, -acc3, -1000 hp, mainstat, +melee, +shield, 100 elemental damage", false);
+			break;
+		case $stat[Mysticality]:
+			maximize("sea, outfit mer-kin scholar, -acc1, -acc2, -acc3, -1000 hp, mainstat, spell damage", false);
+			break;
+		case $stat[Moxie]:
+			maximize("sea, outfit mer-kin scholar, -acc1, -acc2, -acc3, -1000 hp, mainstat, -melee, 100 elemental damage", false);
+			break;
+	}
+	cli_execute("restore hp");
+	print("Now go and prosper greatly!");
+}
+
+void smiteHatred()
+{
+	visit_url("sea_merkin.php?action=temple");
+	visit_url("choice.php?pwd&whichchoice=710&option=1&choiceform1=Enter.");
+	visit_url("choice.php?pwd&whichchoice=711&option=1&choiceform1=Drink.");
+	visit_url("choice.php?pwd&whichchoice=712&option=1&choiceform1=I%EF%BF%BD+YOG-URT%21");
+	if (have_skill($skill[ambidextrous funkslinging]))
+	{
+		//simon disabled deleveling
+		//visit_url("fight.php?action=useitem&whichitem=464&whichitem2=4198&useitem=Use+Item%28s%29");
+		//visit_url("fight.php?action=useitem&whichitem=5988&whichitem2=6344&useitem=Use+Item%28s%29");
+		visit_url("fight.php?action=useitem&whichitem=464&whichitem2=0&useitem=Use+Item%28s%29");
+		visit_url("fight.php?action=useitem&whichitem=5988&whichitem2=0&useitem=Use+Item%28s%29");
+		visit_url("fight.php?action=useitem&whichitem=5996&whichitem2=0&useitem=Use+Item%28s%29");
+		visit_url("fight.php?action=useitem&whichitem=2369&whichitem2=0&useitem=Use+Item%28s%29");
+		visit_url("fight.php?action=useitem&whichitem=2402&whichitem2=0&useitem=Use+Item%28s%29");
+		visit_url("fight.php?action=useitem&whichitem=2438&whichitem2=0&useitem=Use+Item%28s%29");
+	}
+	else
+	{
+		visit_url("fight.php?action=useitem&whichitem=464&whichitem2=0&useitem=Use+Item%28s%29");
+		visit_url("fight.php?action=useitem&whichitem=5988&whichitem2=0&useitem=Use+Item%28s%29");
+		visit_url("fight.php?action=useitem&whichitem=5996&whichitem2=0&useitem=Use+Item%28s%29");
+		visit_url("fight.php?action=useitem&whichitem=2369&whichitem2=0&useitem=Use+Item%28s%29");
+		visit_url("fight.php?action=useitem&whichitem=2402&whichitem2=0&useitem=Use+Item%28s%29");
+		visit_url("fight.php?action=useitem&whichitem=2438&whichitem2=0&useitem=Use+Item%28s%29");
+		//simon disabled deleveling
+		//visit_url("fight.php?action=useitem&whichitem=4198&whichitem2=0&useitem=Use+Item%28s%29");
+		//visit_url("fight.php?action=useitem&whichitem=6344&whichitem2=0&useitem=Use+Item%28s%29");
+	}
+	run_combat();
+}
+
 void MonkeeQuest()
 {
 	if (my_level() >= 13)
@@ -315,8 +418,7 @@ void MonkeeQuest()
 				print("Finding Little Brother in the Octopus\'s Garden.");
 				prepare_for("i",$location[dire warren]);
 				cli_execute("use legendary beat");
-				if (TS_FAX_NEPTUNE && get_property("_photocopyUsed") != "false")
-
+				if (TS_FAX_NEPTUNE && !get_property("_photocopyUsed").to_boolean() && item_amount($item[wriggling flytrap pellet]) < 1)
 				{
 					if(!is_online("faxbot"))
 					{
@@ -335,11 +437,8 @@ void MonkeeQuest()
 						wait (60);
 						cli_execute ("fax get");
 					}
-					loopcounter = 0;
-					//SIMON CHANGED THIS, can't fax more than once
-					while (my_adventures() > 0 && loopcounter < 1 && item_amount($item[wriggling flytrap pellet]) < 1)
+					if (my_adventures() > 0 && item_amount($item[wriggling flytrap pellet]) < 1)
 					{
-						loopcounter += 1;
 						if (item_amount($item[photocopied monster]) < 1) cli_execute ("fax get");
 						if (item_amount($item[photocopied monster]) > 0 && !contains_text(to_lower_case(visit_url("desc_item.php?whichitem=835898159")), "neptune flytrap"))
 						{
@@ -348,7 +447,6 @@ void MonkeeQuest()
 						}
 						use (1, $item[photocopied monster]);
 					}
-					loopcounter = 0;
 				}
 				//now the old fashioned way
 				while(i_a("wriggling flytrap pellet")<1)
@@ -372,7 +470,7 @@ void MonkeeQuest()
 				print("You were unable to unlock the many-windowed castle. Try again later.");
 				return;
 			}
-			if (to_int(vars["seafloor_monkeeStep"]) == 0)
+			if (to_int(vars["seafloor_monkeeStep"]) < 1)
 			{
 				visit_url("monkeycastle.php?who=1");
 				vars["seafloor_monkeeStep"] = 1;
@@ -444,7 +542,7 @@ void MonkeeQuest()
 					monkeycastle = visit_url("monkeycastle.php");
 				}
 			}
-			if (to_int(vars["seafloor_monkeeStep"]) == 2 && monkeycastle.contains_text("\#gpa\""))
+			if (to_int(vars["seafloor_monkeeStep"]) < 3 && monkeycastle.contains_text("\#gpa\""))
 			{
 				monkeycastle = visit_url("monkeycastle.php");
 				if (!boolean_modifier("Adventure Underwater") || monkeycastle.contains_text("without some way of breathing underwater"))
@@ -485,21 +583,23 @@ void MonkeeQuest()
 					visit_url("monkeycastle.php?action=grandpastory&topic=note");
 					if(i_a("grandma map")<1)
 						abort("Failed to get grandmas map");
-					if (count(get_goals()) > 0)
+					while (my_adventures() > 1 && boolean_modifier("Adventure Underwater") && monkeycastle.contains_text("\#gpa\""))
 					{
-						cli_execute("conditions clear");
+						if (count(get_goals()) > 0)
+						{
+							cli_execute("conditions clear");
+						}
+						adventure(1, $location[mer-kin outpost]);
+						monkeycastle = visit_url("monkeycastle.php");
 					}
-					prepare_for("-", $location[mer-kin outpost]);
-					adventure(my_adventures(), $location[mer-kin outpost]);
 					if (my_adventures() < 2)
-
 					{
 						print("You have run out of adventures. Continue tomorrow.");
 						return;
 					}
 				}
 			}
-			if (to_int(vars["seafloor_monkeeStep"]) == 3 && monkeycastle.contains_text("\#gfolks\""))
+			if (to_int(vars["seafloor_monkeeStep"]) < 4 && monkeycastle.contains_text("\#gfolks\""))
 			{
 				monkeycastle = visit_url("monkeycastle.php");
 				if (!boolean_modifier("Adventure Underwater") || monkeycastle.contains_text("without some way of breathing underwater"))
@@ -542,7 +642,7 @@ void MonkeeQuest()
 					monkeycastle = visit_url("monkeycastle.php");
 				}
 			}
-			if (monkeycastle.contains_text("\#errybody\""))
+			if (to_int(vars["seafloor_monkeeStep"]) < 5 && monkeycastle.contains_text("\#errybody\""))
 			{
 				vars["seafloor_monkeeStep"] = 5;
 				updatevars();
@@ -706,14 +806,14 @@ void BootQuest()
 {
 	if (my_level() >= 13)
 	{
-		if (currentquests.contains_text("An Old Guy and The Ocean")&& to_int(vars["seafloor_monkeeStep"]) > 1)
+		if (currentquests.contains_text("An Old Guy and The Ocean") && to_int(vars["seafloor_monkeeStep"]) > 1)
 		{
 			print("You need 50 sand dollars to complete this quest.");
 			if (TS_BUY_BOOT && available_amount($item[damp old boot]) < 1)
 			{
 				getsome(50, $item[sand dollar]);
 			}
-			else if (my_adventures() > 0 && available_amount($item[sand dollar]) < 50 && contains_text(visit_url("seafloor.php"),"monkeycastle.gif") && !contains_text(visit_url("monkeycastle.php"),"\#littlebrother\""))
+			else if (available_amount($item[damp old boot]) < 1 && my_adventures() > 0 && available_amount($item[sand dollar]) < 50 && contains_text(visit_url("seafloor.php"),"monkeycastle.gif") && !contains_text(visit_url("monkeycastle.php"),"\#littlebrother\""))
 			{
 				if (count(get_goals()) > 0)
 				{
@@ -723,7 +823,7 @@ void BootQuest()
 				prepare_for("i", $location[octopus garden]);
 				adventure(my_adventures(), $location[octopus garden]);
 			}
-			if (available_amount($item[sand dollar]) >= 50)
+			if (available_amount($item[sand dollar]) > 49 || available_amount($item[damp old boot]) > 0)
 			{
 				print("Buying the boot and collecting our well-earned reward.");
 				if (available_amount($item[damp old boot]) < 1) create(1, $item[damp old boot]);
@@ -809,7 +909,7 @@ void GetSushiMat()
 				prepare_for("i", $location[octopus garden]);
 				adventure(my_adventures(), $location[octopus garden]);
 			}
-			if (available_amount($item[sand dollar]) >= 50)
+			if (available_amount($item[sand dollar]) > 49)
 			{
 				print("Buying a sushi mat for our campsite.");
 				create(1, $item[sushi-rolling mat]);
@@ -1119,7 +1219,7 @@ void scholar_path()
 			print("learning deep-dark-visions word","green");
 			if(have_effect($effect[spookyform])==0)
 				use(1,$item[phial of spookiness]);
-			cli_execute("restore hp; restore mp");
+				
 			if(my_mp()<100 || my_hp()<500)
 				abort("Can't operate with less than 100mp and 500 hp");
 			string html=visit_url("skills.php?pwd&action=Skillz&whichskill=90&skillform=Use+Skill&quantity=1");
@@ -1147,21 +1247,23 @@ void scholar_path()
 	#pro3 = DDV - 1 Cards. 2 Blues. 3 Pancakes. 4 Pain.
 	#pro4 = knucklebone - 1 north. 2 south. 3 east. 4 west.
 	#pro5 = killscroll - 1 red. 2 black. 3 green. 4 yellow.
-	#pro7 = worktea - 1 eel. 2 turtle. 3 shark. 4 whale.
+	#pro7 = worktea - 1 eel. 2 turtle. 3 shark. 4 whale.         - workteaClue
 
 	#pro1 = LIBRARY - 1 LONELY. 2 DOUBLED. 3 THRICE-CURSED. 4 FOURTH.
 	#pro6 = library - 1 blind. 2 giant. 3 finless. 4 two-headed.
 	#pro8 = library - 1 1KSY. 2 22SS. 3 CT. 4 aBNDC.
 	#	abort("line 984 visit_url to fill in dreadscroll?");
 	#		visit_url("inv_use.php?pwd&which=3&whichitem=6353");
-		string html=visit_url("choice.php?pro1=1&pro2=1&pro3=1&pro4=1&pro5=1&pro6=1&pro7=1&pro8=1&whichchoice=703&pwd&option=1");
-	
-		if(contains_text(html,"I guess you're the Mer-kin High Priest now"))
-			set_property("_merkin_temple_open","true");
-		else
-			abort("Failed to fill in dreadscroll");
+//		string html=visit_url("choice.php?pro1=1&pro2=1&pro3=1&pro4=1&pro5=1&pro6=1&pro7=1&pro8=1&whichchoice=703&pwd&option=1");
+//	
+//		if(contains_text(html,"I guess you're the Mer-kin High Priest now"))
+//			set_property("_merkin_temple_open","true");
+//		else
+//			abort("Failed to fill in dreadscroll");
 	}
 
+	prepHatred();
+	smiteHatred();
 	//boss fight?
 	set_combat_macro_name(false);
 	cli_execute("familiar squamous");

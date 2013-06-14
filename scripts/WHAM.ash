@@ -1,4 +1,3 @@
-//simon: not modified
 /***********************************************************************************************************************
 				
 				This script evaluates and performs attacks based on your skills
@@ -160,6 +159,9 @@
 				 Add option to toggle speed to kill as the most important factor (will ignore any savings that a "smarter" attack method may have), WHAM_killit
 				 Don't get stuck in endless loops for deleveling, also make sure to actually perform the deleveling decided upon
 			5.5: Fix bug where the script would abort due to no actions found after BatBrain sets endscombat to true
+		13-06-10:Try to not fire the yellow ray unless we actually want the drops
+				 Force WHAM_killit to true if we are in Fernswarthy's Basement
+				 Add code to handle automating Yog-Urt and Jigguwatt
 ***********************************************************************************************************************/
 import <SmartStasis.ash>;
 
@@ -171,8 +173,7 @@ setvar("WHAM_AlwaysContinue", false);	//If true, will enqueue the best option an
 setvar("WHAM_noitemsplease", false);	//If true will cause the script to skip all items when fighting										
 setvar("WHAM_safetymargin", 0);			//Sets the extra safety margin you want for rounds that the script will not stasis for
 setvar("WHAM_UseSeaLasso", false);		//If true will use the sea lasso in the sea to train the lasso skill, does not currently know when to stop doing this
-setvar("WHAM_killit", false);
-check_version("WHAM","WHAM","5.5",8861);
+setvar("WHAM_killit", false);			//If true will attack the monster with your most powerful option, ignoring cost
 
 record actions
 {
@@ -255,6 +256,8 @@ void set_unknown_ml(monster foe, string pg) {
 		}
 	} else if(!havemanuel && (foe.raw_hp == -1 || foe.raw_attack == -1 || foe.raw_defense == -1))
 		quit("Your unknown_ml is set to 0, handle this unkown monster yourself.");
+	if($monsters[Beast with X Ears, Beast with X Eyes, Ghost of Fernswarthy's Grandfather, X Bottles of Beer on a Golem, X Stone Golem, X-dimensional Horror, X-headed Hydra] contains foe)
+		set_location($location[Fernswarthy's Basement]);
 }
 
 //Calculate number of bees if needed
@@ -390,6 +393,8 @@ boolean ok(advevent a) {
 			case "skill 7063":	//Falling Leaf Whirlwind
 			case "skill 7064":	//Winter's Bite Technique
 				return ((equipped_amount($item[haiku katana]) - (times_happened("skill 7061") + times_happened("skill 7062") + times_happened("skill 7063") + times_happened("skill 7064"))) > 0);
+			case "skill 7082":	//Major and minor He-Boulder rays
+				return spread_to_string(a.dmg) != to_string(monster_stat("hp") * 6);
 			case "skill 7131":
 			case "skill 7132":
 			case "skill 7133":
@@ -471,10 +476,13 @@ boolean has_option(skill whichskill) {
 advevent attack_option() {
 	if (ok(get_action("use 2848")) && !happened($item[gnomitronic hyperspatial demodulizer]) && monster_stat("hp") <= dmg_dealt(get_action("use 2848").dmg))
 		return get_action("use 2848");
+	//if ($items[Mer-kin dragnet, Mer-kin switchblade, Mer-kin dodgeball] contains equipped_item($slot[weapon]) && my_location().zone == "The Sea")
+	//	return get_action("attack");
+		
 	float drnd = max(1.0,die_rounds());   // a little extra pessimistic
 	sort opts by -dmg_dealt(value.dmg);
 	sort opts by -to_profit(value);
-	sort opts by kill_rounds(value.dmg)* (vars["WHAM_killit"] == "true" ? 1 : -(min(value.profit,-1)));
+	sort opts by kill_rounds(value.dmg)* (vars["WHAM_killit"] == "true" || my_location() == $location[Fernswarthy's Basement]? 1 : -(min(value.profit,-1)));
 	
 	foreach i,opt in opts {
 		vprint(opt.id + " does hurt the monster for " + dmg_dealt(opt.dmg) + " and is " + (ok(opt) ? "ok." : "not ok."), "green", 10);
@@ -527,10 +535,12 @@ advevent attack_option() {
 }
 
 //Delevel the monster so we can hit it
-advevent delevel_option() {
+advevent delevel_option(boolean nodmg) {
 	sort opts by -to_profit(value);
 	sort opts by value.att*-(min(value.profit,-1));		
 	foreach i,opt in opts {
+		if(nodmg && dmg_dealt(opt.dmg) != 0)
+			continue;
 		if(opt.att < 0) {
 			vprint("WHAM: Your most profitable deleveling option is " + opt.id + ".", "purple", 8);
 			return opt;
@@ -682,6 +692,60 @@ string special_actions() {
 				wait(20);
 			}
 			break;
+		case "wild seahorse":
+			if(get_property("lassoTraining") == "Expertly" && item_amount($item[sea cowbell]) >= 3 && item_amount($item[sea lasso]) > 0) {
+				enqueue(get_action($item[sea cowbell]));
+				enqueue(get_action($item[sea cowbell]));
+				enqueue(get_action($item[sea cowbell]));
+				enqueue(get_action($item[sea lasso]));
+			} else
+				macro("runaway; repeat;");
+			break;
+		case "Shub-Jigguwatt, Elder God of Violence":
+			if(dmg_dealt(basecache.dmg) > 0)
+				quit("You have a passive damage source active. The fight will be lost if you automate it. I suggest you run away.");
+		case "Yog-Urt, Elder Goddess of Hatred":
+			if(have_effect($effect[More Like a Suckrament]) > 0) {
+				int j;
+				advevent heal;
+				sort opts by dmg_taken(value.pdmg);
+				foreach i, opt in opts {
+					if(-1 * dmg_taken(opt.pdmg) > 0.9 * my_maxhp())
+						j +=1;
+				}
+				if(j < 8 - equipped_amount($item[Mer-kin prayerbeads]))
+					abort("WHAM: You have too few good healing items to fight Yog-Hurt. I suggest you run away.");
+				else if(dmg_dealt(basecache.dmg) > 0)
+					abort("WHAM: You have a passive damage source active. The fight will be lost if you automate it. I suggest you run away.");
+				else if(!have_skill($skill[ambidextrous funkslinging])) {
+					for i from 0 to 7 - equipped_amount($item[Mer-kin prayerbeads]) {
+						sort opts by dmg_taken(value.pdmg);
+						foreach i, opt in opts {
+							if(dmg_taken(opt.pdmg) < 0) {
+								heal = opt;
+								break;
+							}
+						}
+						enqueue(heal);
+					}
+				} else {
+					for i from 0 to 7 - equipped_amount($item[Mer-kin prayerbeads]) {
+						sort opts by dmg_taken(value.pdmg);
+						foreach i, opt in opts {
+							if(dmg_taken(opt.pdmg) < 0) {
+								heal = opt;
+								break;
+							}
+						}
+						enqueue(heal);
+						if(delevel_option(true).id != "")
+							enqueue(delevel_option(true));
+						else
+							macro();
+					}
+				}
+			}
+			break;
 	}
 	
 	//Return options
@@ -754,7 +818,6 @@ actions[int] Calculate_Options(float base_hp) {
 			kill_it[i].options = killer.id;	
 		}
 	} else if(!(can_splash() && die_rounds() > 1 && (my_mp() + 0.25 * mp_cost($skill[Wave of Sauce])) >= mp_cost($skill[Wave of Sauce]) + mp_cost($skill[Saucegeyser]))) {
-
 		while(monster_stat("hp") > 0) {
 			vprint("WHAM: We estimate the round number to currently be " + round + " (loop variable " + i + ")", "purple", 9);
 			if(stun.id != "" && !stun_enqueued) {
@@ -778,7 +841,7 @@ actions[int] Calculate_Options(float base_hp) {
 				}
 				//There is no way of directly killing the mob in our current state, we need to either restore HP, MP or delevel
 				//TODO: Add HP and MP restoration and weight those with deleveling, also make delevelling actually work...
-				delevel = delevel_option();
+				delevel = delevel_option((m == $monster[Shub-Jigguwatt, Elder God of Violence] ? true : false));
 				while(delevel.id != "" && killer.id == "") {
 					if(!enqueue(delevel))
 						break;
@@ -786,11 +849,10 @@ actions[int] Calculate_Options(float base_hp) {
 					kill_it[i].my_hp = my_stat("hp");
 					kill_it[i].profit = (i == 0 ? get_action(killer).profit : kill_it[i-1].profit + get_action(killer).profit);
 					kill_it[i].options = killer.id;					
-					delevel = delevel_option();
+					delevel = delevel_option((m == $monster[Shub-Jigguwatt, Elder God of Violence] ? true : false));
 					killer = attack_option();
 					i += 1;
 					if(my_stat("hp") < m_dpr(0,0) || i >= min(to_int(vars["WHAM_round_limit"]),maxround))
-
 						break;
 				}
 				if(killer.id == "") {
@@ -844,10 +906,6 @@ actions[int] Calculate_Options(float base_hp) {
 				else
 					break;
 			}
-
-
-
-
 		}
 	} else {
 		vprint("WHAM: We can saucesplash and so will do that.", "purple", 8);
@@ -934,7 +992,6 @@ string Perform_Actions() {
 	
 	//Between each cast, make sure we have MP to cast it
 	for n from go to count(cast) - 1 {
-
 		
 		//If we can splash, do so, but not if not one-shotting will kill us
 		if(can_splash() && die_rounds() > 1 && (my_mp() + 0.25 * mp_cost($skill[Wave of Sauce])) >= mp_cost($skill[Wave of Sauce]) + mp_cost($skill[Saucegeyser])) {

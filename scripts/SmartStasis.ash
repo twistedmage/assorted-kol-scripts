@@ -120,7 +120,7 @@ boolean should_siphon() {
    item spirit = get_spirit();
    if (spirit == $item[none]) return false;
    if (is_goal(spirit)) return true;
-   if (can_interact()) return $familiar[happy medium].charges == 3;
+   if (can_interact() || my_path() == "BIG!") return $familiar[happy medium].charges == 3;
    string mainstat_gained() { switch (my_primestat()) {
       case $stat[muscle]: return spirit.muscle;
       case $stat[mysticality]: return spirit.mysticality;
@@ -376,9 +376,9 @@ void enqueue_custom() {
    foreach n,ev in custom {
       if (my_stat("mp") < ev.mp) continue;   // can't cast this skill (yet)
       boolean stunfirst = (adj.stun < 1 && !ev.endscombat && to_profit(merge(stun_action(contains_text(ev.id,"use ")),ev)) > to_profit(ev));  // should we stun?
-      if (!stunfirst && !ev.endscombat && my_stat("hp") - ev.pdmg[$element[none]] < 0) continue;   // you will die
+      if (!stunfirst && !ev.endscombat && !($monsters[guy made of bees, cyrus the virus] contains m) && my_stat("hp") - ev.pdmg[$element[none]] < 0) continue;   // you will die
       vprint("Custom action: "+ev.id+((stunfirst) ? " (stun first with "+buytime.id+")" : " (no stun)"),"purple",5);
-      if (stunfirst) enqueue(buytime);
+      if (stunfirst && buytime.id != ev.id) enqueue(buytime);
       if (enqueue(ev)) remove custom[n];
    }
 }
@@ -549,7 +549,7 @@ setvar("cameraPutty",false);
 setvar("ftf_olfact","blooper, dairy goat, shaky clown, zombie waltzers, goth giant, knott yeti, hellion, violent fungus","list of monster");
 setvar("ftf_grin","procrastination giant","list of monster");
 setvar("ftf_yellow","knob goblin harem girl","list of monster");
-string SSver = check_version("SmartStasis","SS","3.20",1715);
+string SSver = check_version("SmartStasis","SS","3.21",1715);
 
 void main(int initround, monster foe, string pg) {
    act(pg);

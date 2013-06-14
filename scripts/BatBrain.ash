@@ -914,15 +914,15 @@ spread regular(int ts) {  // 1) norm, 2) thrust-smack / axing, 3) lts, 5) bashin
    if (m == $monster[x-dimensional horror]) return res;
    float ltsadj = (ts == 3) ? 1.25 + 0.05*to_int(my_class() == $class[seal clubber]) : (ts == 5) ? 1.4 : 1.0;
    boolean ranged = (weapon_type(equipped_item($slot[weapon])) == $stat[moxie]);
-   float radj = (ranged) ? 0.75 : 1.0;
-   if (equipped_item($slot[weapon]) == $item[none]) radj = 0.25 + 0.75*to_int(ts == 0);
+
+   float radj = (equipped_item($slot[weapon]) == $item[none]) ? 0.25 : (ranged ? 0.75 : 1.0);
    res[$element[none]] = max(0,max(0,floor((ranged ? my_stat("Moxie") : my_stat("Muscle"))*ltsadj*radj) - monster_stat("def")) +
       max(1,numeric_modifier("Weapon Damage") + 0.5) * (critchance()+1.0) * ts +
       to_int(ranged)*numeric_modifier("Ranged Damage")) * (100 + numeric_modifier("Weapon Damage Percent") +
       to_int(ranged)*numeric_modifier("Ranged Damage Percent"))/100;
    if (have_skill($skill[double-fisted]) && to_slot(equipped_item($slot[offhand])) == $slot[weapon])
       res[$element[none]] += 0.15*get_power(equipped_item($slot[offhand])) + 0.5;
-   if (unarmed() && have_skill($skill[master of the surprising fist])) res[$element[none]] += 10;
+
    foreach el in $elements[] if (numeric_modifier(el+" Damage") > 0) res[el] = numeric_modifier(el+" Damage");
    return (have_equipped($item[skeletal scabbard]) && item_type(equipped_item($slot[weapon])) == "sword") ? factor(res,2) : res;
 }
@@ -1038,6 +1038,10 @@ void build_skillz() {
         case 66: if (fvars["fistskills"] > 1) fields.special = "meat -"+(meatpermp*mp_cost($skill[salamander kata])*have_effect($effect[salamanderenity])/(3*fvars["fistskills"]));
            break;  // flying fire fist costs salamanderenity
         case 70: fields.special = happened($skill[chilled monkey brain]) ? "" : "stun 1"; break;  // monkey only stuns once
+        case 84: fvars["wpnpower"] = max(10, get_power(equipped_item($slot[weapon])));            // silent slam
+           if (item_type(equipped_item($slot[weapon])) == "club") fvars["wpnpower"] *= 2; break;
+        case 86: fvars["wpnpower"] = max(10, get_power(equipped_item($slot[weapon])));            // silent slice
+           if (item_type(equipped_item($slot[weapon])) == "knife") fvars["wpnpower"] *= 2; break;
         case 7061: fvars["wpnpower"] = get_power(equipped_item($slot[weapon])); break;      // spring raindrop attack
         case 7074: if (my_maxhp() - my_stat("hp") <= 2*burrowgrub_amt() || my_maxmp() - my_stat("mp") <= burrowgrub_amt()) return; break;  // skip burrowgrub unless none is wasted
         case 7081: fvars["botcharges"] = get_property("bagOTricksCharges").to_int(); break;
@@ -1241,7 +1245,7 @@ boolean enqueue(advevent a) {     // handle inserts/auto-funk
    if (round + a.rounds > maxround + 3) return vprint("Can't enqueue '"+a.id+"': combat too long.",-8);  // allow to enqueue 3 rounds beyond combat limit
    if (my_stat("mp")+a.mp < 0) return vprint("Unable to enqueue '"+a.id+"': insufficient MP.",-7);  // everybody to the limit
   // attract gays
-   boolean have_gays() { foreach i,ev in queue if (which_gays(ev.id) != $stat[none]) return true; return false; }
+   boolean have_gays() { foreach i,ev in queue if (which_gays(ev.id) != $stat[none]) return true; if (which_gays(a.id) != $stat[none]) return true; return false; }
    if (have_equipped($item[juju mojo mask]) && have_effect($effect[gaze of the volcano god]) + have_effect($effect[gaze of the lightning god]) +
        have_effect($effect[gaze of the trickster god]) == 0 && !have_gays() && which_gays(a.id) != my_primestat())
       enqueue(get_action(to_skill(1000*(my_class().to_int()+1))));
@@ -1650,4 +1654,4 @@ string macro(item i) { return macro(get_action(i),"z"); }
 setvar("BatMan_profitforstasis",15.0);       // profit required to enter stasis
 setvar("BatMan_baseSubstatValue",5.0);       // value of a single substat point (mainstat 2*n, attack stat 1.5*n, defstat 1.5*n -- these stack)
 // setvar("BatMan_pessimism",0.5);              // pessimism range -1.0 - 1.0 (1.0 totally pessimistic, 0 exact averages, -1.0 totally optimistic)
-string BBver = check_version("BatBrain","batbrain","1.37",6445);
+string BBver = check_version("BatBrain","batbrain","1.38",6445);

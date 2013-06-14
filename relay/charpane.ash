@@ -1,5 +1,5 @@
 script "Character Info Toolbox";
-#notify Chez;
+notify "Bale";
 import <zlib.ash>
 string chitVersion = "0.8.5";
 /************************************************************************************
@@ -59,6 +59,8 @@ Many thanks to:
 			Restore rollover warning to top of effects pane
 			Lots more improvements and bugfixes
 	0.8.1	Added tracker brick by ckb
+	0.8.4	Updating through SVN!
+			All future changelogs will be on the SVN and will be much more complete.
 	
 ************************************************************************************/
 	
@@ -120,7 +122,6 @@ void checkVersion(string soft, string thisver, int thread) {
 				vprint("You have a current version of "+soft+".","green",1); 
 			} else {
 				string msg = "<font color=red><b>New Version of "+soft+" Available: "+zv[soft].ver+"</b></font>";
-				#msg = msg + "<br><a href='http://kolmafia.us/showthread.php?t="+thread+"' target='_blank'><u>Upgrade from "+thisver+" to "+zv[soft].ver+" here!</u></a><br>";
 				msg = msg + '<br>Upgrade from '+thisver+' to '+zv[soft].ver+' with <font color=blue><u>svn update</u></font> command!<br>';
 				vprint_html(msg,1);
 			}
@@ -135,8 +136,6 @@ void checkVersion(string soft, string thisver, int thread) {
 		result.append('<table id="chit_update" class="chit_brick nospace">');
 		result.append('<thead><tr><th colspan="2">Character Info Toolbox</th></tr>');
 		result.append('</thead><tbody><tr><td class="info">');
-		//result.append('<p>Character Info Toolbox');
-		//result.append('<p>A new version of Character Info Toolbox is available</p>');
 		result.append('<p>(Version ' + thisver + ')</p>');
 		result.append('<p>Version ' + zv[soft].ver + ' is now available');
 		result.append('<br>Click <a href="/KoLmafia/sideCommand?cmd=svn+update&pwd=' + my_hash() + '" title="SVN Update">here</a> to upgrade from SVN</p>');
@@ -777,7 +776,9 @@ void bakeEffects() {
 
 	if (total > 0) {
 		result.append('<table id="chit_effects" class="chit_brick nospace">');
-		result.append('<thead><tr><th colspan="4">Effects</th></tr></thead>');
+		result.append('<thead><tr><th colspan="4"><img src="');
+		result.append(imagePath);
+		result.append('effects.png">Effects</th></tr></thead>');
 		string [int] drawers = split_string(layout, ",");
 		for i from 0 to (drawers.count() - 1) {
 			switch (drawers[i]) {
@@ -799,11 +800,11 @@ void bakeElements() {
 	buffer result;
 	
 	result.append('<table id="chit_elements" class="chit_brick nospace">');
-	result.append('<tr><th>Elements</th></tr>');
+	result.append('<thead><tr><th><img src="');
+	result.append(imagePath);
+	result.append('elements.png">Elements</th></tr></thead>');
 	result.append("<tr><td>");
-	result.append('<img src="' + imagePath + 'Elements2.gif">');
-	result.append("</tr>");
-	result.append("</table>");
+	result.append('<img src="' + imagePath + 'Elements2.gif"></tr></table>');
 	
 	chitBricks["elements"] = result;
 }
@@ -820,7 +821,9 @@ void bakeTrail() {
 	if (find(target)) {
 		url = group(target, 1);
 	}
-	result.append('<tr><th><a class="visit" target="mainpane" href="' + url + '">Last Adventure</a></th></tr>');
+	result.append('<tr><th><a class="visit" target="mainpane" href="' + url + '"><img src="');
+	result.append(imagePath);
+	result.append('trail.png">Last Adventure</a></th></tr>');
 	
 	
 	//Last Adventure
@@ -850,6 +853,14 @@ void pickerStart(buffer picker, string rel, string message) {
 	picker.append('<div id="chit_picker' + rel + '" class="chit_skeleton" style="display:none">');	
 	picker.append('<table class="chit_picker">');
 	picker.append('<tr><th colspan="2">' + message + '</th></tr>');
+}
+
+void pickerStart(buffer picker, string rel, string message, string image) {
+	picker.append('<div id="chit_picker' + rel + '" class="chit_skeleton" style="display:none">');	
+	picker.append('<table class="chit_picker"><tr><th colspan="2"><img src="');
+	picker.append(imagePath + image);
+	picker.append('.png">');
+	picker.append(message + '</th></tr>');
 }
 
 void addLoader(buffer picker, string message) {
@@ -1135,7 +1146,7 @@ void pickerFamiliar(familiar myfam, item famitem, boolean isFed) {
 		}
 	}
 	
-	picker.pickerStart("fam", "Equip Thine Familiar Well");
+	picker.pickerStart("fam", "Equip Thy Familiar Well");
 	
 	//Feeding time
 	string [familiar] feedme;
@@ -1670,6 +1681,13 @@ void bakeFamiliar() {
 	
 }
 
+string currentMood() {
+	matcher pattern = create_matcher(">mood (.*?)</a>", chitSource["mood"]);
+	if(find(pattern))
+		return group(pattern, 1);
+	return "???";
+}
+
 void addCurrentMood(buffer result, boolean picker) {
 	void addPick(buffer prefix) {
 		if(picker)
@@ -1684,10 +1702,7 @@ void addCurrentMood(buffer result, boolean picker) {
 		if(picker) result.append(' Save as Mood');
 		result.append('</a>');
 	} else if(contains_text(source, "mood+execute")) {
-		string moodname = "???";
-		matcher pattern = create_matcher(">mood (.*?)</a>", source);
-		if(find(pattern))
-			moodname = group(pattern, 1);
+		string moodname = currentMood();
 		result.addPick();
 		result.append('title="Execute Mood: ' + moodname + '" href="/KoLmafia/sideCommand?cmd=mood+execute&pwd=' + my_hash() + '">');
 		result.append('<img src="' + imagePath + 'moodplay.png">');
@@ -1709,15 +1724,44 @@ void addCurrentMood(buffer result, boolean picker) {
 }
 
 void pickMood() {
+	boolean mood_plus(string full, string mood) {
+		if(mood == "apathetic") return false;
+		foreach i,m in split_string(full,", ")
+			if(m == mood) return false;
+		return true;
+	}
+
 	buffer picker;
 	picker.pickerStart("mood", "Select New Mood");
 	picker.addLoader("Getting Moody");
-	foreach i,m in get_moods()
-		picker.append('<tr class="pickitem "><td class="info"><a class="visit" href="/KoLmafia/sideCommand?cmd=mood+' + m + '&pwd=' + my_hash() + '">' + m + '</a></td></tr>');
+	string moodname = currentMood();
+	foreach i,m in get_moods() {
+		if(m == "") continue;
+		picker.append('<tr class="pickitem "><td class="info"><a title="Make this your current mood" class="visit" href="/KoLmafia/sideCommand?cmd=mood+');
+		picker.append(m);
+		picker.append('&pwd=');
+		picker.append(my_hash());
+		picker.append('">');
+		picker.append(m);
+		picker.append('</a></td><td>');
+		if(mood_plus(moodname,m)) {
+			picker.append('<a title="ADD this to current mood" href="/KoLmafia/sideCommand?cmd=mood+');
+			picker.append(moodname);
+			picker.append(",+");
+			picker.append(m);
+			picker.append('&pwd=');
+			picker.append(my_hash());
+			picker.append('"><img src="');
+			picker.append(imagePath);
+			picker.append('control_add_blue.png"><a>');
+		} else
+			picker.append('&nbsp;');
+		picker.append('</td></tr>');
+	}
 		
 	// Add link to execute mood unless it's on the toolbar
 	if(vars["chit.toolbar.moods"] != "bonus") {
-		picker.append('<tr><td style="color:white;background-color:blue;font-weight:bold;">Current Mood</td></tr>');
+		picker.append('<tr><th colspan="2">Current Mood</th></tr>');
 		picker.addCurrentMood(true);
 	}
 	
@@ -1840,10 +1884,10 @@ void bakeModifiers() {
 	
 	//Heading
 	result.append('<table id="chit_modifiers" class="chit_brick nospace">');
-	result.append('<thead>');
-	result.append('<tr>');
-	result.append('<th colspan="2">Modifiers</th>');
-	result.append('</tr>');
+	result.append('<thead><tr><th colspan="2"><img src="');
+	result.append(imagePath);
+	result.append('modifiers.png">');
+	result.append('Modifiers</th></tr>');
 	result.append('</thead>');
 
 	result.append('<tbody>');
@@ -2040,7 +2084,9 @@ void bakeSubStats() {
 	result.append('<table id="chit_substats" class="chit_brick nospace">');
 	result.append('<thead>');
 	result.append('<tr>');
-	result.append('<th colspan="'+(to_boolean(vars["chit.stats.showbars"])? 3: 2)+'">Substats</th>');
+	result.append('<th colspan="'+(to_boolean(vars["chit.stats.showbars"])? 3: 2)+'"><img src="');
+	result.append(imagePath);
+	result.append('stats.png">Substats</th>');
 	result.append('</tr>');
 	result.append('</thead>');
 	result.append('<tbody>');
@@ -2076,7 +2122,7 @@ void addMCD(buffer result, boolean bake) {
 			mcdmap[4] = "Boss Bat britches";
 			mcdmap[5] = "Rib of the Bonerdagon";
 			mcdmap[6] = "Horoscope of the Hermit";
-			mcdmap[7] = "Codpiece of the Goblin King";
+			mcdmap[7] = "Codpiece of the King";
 			mcdmap[8] = "Boss Bat bling";
 			mcdmap[9] = "Ratsworth's tophat";
 			mcdmap[10]= "Vertebra of the Bonerdagon";
@@ -2167,7 +2213,9 @@ void addMCD(buffer result, boolean bake) {
 		result.append('<table id="chit_mcd" class="chit_brick nospace">');
 		result.append('<thead>');
 		result.append('<tr>');
-		result.append('<th colspan="2" rel="' + mcdbusy + '"><a href="' + mcdpage + '" target="mainpane" title="' + mcdtitle + '">' + mcdname + '</a></th>');
+		result.append('<th colspan="2" rel="' + mcdbusy + '"><img src="');
+		result.append(imagePath);
+		result.append('mcdon.png"><a href="' + mcdpage + '" target="mainpane" title="' + mcdtitle + '">' + mcdname + '</a></th>');
 		result.append('</tr>');
 		result.append('</thead><tbody>');
 		result.mcdlist(false);
@@ -2232,10 +2280,9 @@ void bakeOrgans() {
 	
 	//Heading
 	result.append('<table id="chit_organs" class="chit_brick nospace">');
-	result.append('<thead>');
-	result.append('<tr>');
-	result.append('<th colspan="3">Consumption</th>');
-	result.append('</tr>');
+	result.append('<thead><tr><th colspan="3"><img src="');
+	result.append(imagePath);
+	result.append('organs.png">Consumption</th></tr>');
 	result.append('</thead>');
 
 	result.addStomach(true);
@@ -2541,6 +2588,27 @@ string fancycurrency(string page) {
 }
 
 void pickOutfit() {
+	string boldit(string o) { return '<div style ="font-weight:600;color:darkred;">'+o+'</div>'; }
+	string topical(string o) {
+		switch(o) {
+		case "Swashbuckling Getup":
+			if($locations[Pirate Cove, Barrrney's Barrr, F'c'le] contains my_location())
+				return boldit(o);
+			break;
+		case "Mining Gear":
+		case "eXtreme Cold-Weather Gear":
+			if(my_location().zone == "McLarge")
+				return boldit(o);
+			break;
+		case "War Hippy Fatigues":
+		case "Frat Warrior Fatigues":
+			if($strings[IsleWar, Island] contains my_location().parent)
+				return boldit(o);
+			break;
+		}
+		return o;
+	}
+
 	buffer picker;
 	picker.pickerStart("outfit", "Select Outfit");
 	
@@ -2551,17 +2619,14 @@ void pickOutfit() {
 			if(is_wearing_outfit(o) && o != "Birthday Suit")
 				picker.append('<tr class="pickitem current"><td class="info">' + o + '</td>');
 			else
-				picker.append('<tr class="pickitem "><td class="info"><a class="change" href="/KoLmafia/sideCommand?cmd=outfit+'+o+'&pwd=' + my_hash() + '">' + o + '</a></td>');
+				picker.append('<tr class="pickitem "><td class="info"><a class="change" href="/KoLmafia/sideCommand?cmd=outfit+'+o+'&pwd=' + my_hash() + '">' + topical(o) + '</a></td>');
 		}
 		
 	picker.append('<tr><td style="color:white;background-color:blue;font-weight:bold;">Custom Outfits</td></tr>');
 	foreach i,o in get_custom_outfits() {
 		if(i != 0)
-#			picker.append('<tr class="pickitem "><td class="info"><a class="change" href="/KoLmafia/sideCommand?cmd=outfit+'+o+'&pwd=' + my_hash() + '"><div style="white-space:nowrap;max-width:175px;overflow-x:hidden;" title="' 
-#			  + o + '">' + o + '</div></a></td>');
-#			picker.append('<tr class="pickitem "><td class="info" style="white-space:nowrap;max-width:180px;overflow:hidden;" title="' + o  // Custom Outfits can have really long names. Crop and title with full name.
-#			  + '"><a class="change" href="/KoLmafia/sideCommand?cmd=outfit+'+o+'&pwd=' + my_hash() + '">' + o + '</a></td>');
 			picker.append('<tr class="pickitem "><td class="info"><a class="change" href="/KoLmafia/sideCommand?cmd=outfit+'+o+'&pwd=' + my_hash() + '">' + o + '</a></td>');
+			#picker.append('<tr class="pickitem "><td class="info"><a class="change" href="/KoLmafia/sideCommand?cmd=outfit+'+o+'&pwd=' + my_hash() + '"><div style="white-space:nowrap;overflow-x:hidden;">' + o + '</div></a></td>');
 	}
 	
 	#picker.append('<tr class="pickitem "><td class="info" style="background-color:lightgray;font-weight:bold;"><a class="change" href="charsheet.php" target="mainpane">Check Character Profile</a></td></tr>');
@@ -2823,8 +2888,10 @@ void bakeQuests() {
 	//result.append('<div id="nudgeblock">');
 	result.append('<table id="nudges" class="chit_brick nospace">');
 
-	result.append('<tr>');
-	result.append('<th><a target="mainpane" href="questlog.php">Current Quests</a></th>');
+	result.append('<tr><th><img src="');
+	result.append(imagePath);
+	result.append('quests.png">');
+	result.append('<a target="mainpane" href="questlog.php">Current Quests</a></th>');
  	result.append('</tr>');
 	
 	if(bugbears != "")
@@ -2968,14 +3035,31 @@ void bakeTracker() {
 		return need;
 	}
 	
+	buffer highlands() {
+		buffer high;
+		high.append("<br>A-boo Peak: ");
+		high.append(item_report(get_property("booPeakProgress") == "0", get_property("booPeakProgress")+'% haunted'));
+		//L9: twin peak
+		high.append("<br>Twin Peak: "+twinPeak());
+		//check 4 stench res, 50% items (no familiars), jar of oil, 40% init
+		//L9: oil peak
+		high.append("<br>Oil Peak: ");
+		high.append(item_report(get_property("oilPeakProgress").to_int() == 0, get_property("oilPeakProgress")+' µB/Hg'));
+		if(high.contains_text(">0% haunt") && high.contains_text("Solved!") && high.contains_text("0.00")) {
+			high.set_length(0);
+			high.append('<br>Return to <a target="mainpane" href="place.php?whichplace=highlands&action=highlands_dude">High Landlord</a>');
+		}
+		return high;
+	}
 	string source = chitSource["quests"]; 
 
 	// Start building our table	
 	buffer result;	
-	result.append('<table id="chit_tracker" class="chit_brick nospace">');
-	result.append('<tr>');
-	result.append('<th><a target="mainpane" href="questlog.php">Quest Tracker</a></th>');
- 	result.append('</tr>');
+	result.append('<table id="chit_tracker" class="chit_brick nospace"><tr><th>');
+	result.append('<img src="');
+	result.append(imagePath);
+	result.append('tracker.png">');
+	result.append('<a target="mainpane" href="questlog.php">Quest Tracker</a></th></tr>');
 
 	//Add Tracker for each available quest
 	//G for Guild. S for Sea. F for Familiar. I for Item. M for Miscellaneous 
@@ -3103,7 +3187,7 @@ void bakeTracker() {
 	//if (get_property("questM12Pirate")!="unstarted" && get_property("questM12Pirate")!="finished") { 
 	//step1, step2, step3, step4 = insults
 	//step5 = fcle
-	if(available_amount($item[pirate fledges])==0 && is_wearing_outfit("Swashbuckling Getup")) {
+	if(item_amount($item[The Big Book of Pirate Insults]) > 0 && !($strings[step5, finished] contains get_property("questM12Pirate"))) {
 		result.append("<tr><td>");
 		//fcle items mizzenmast mop, ball polish, rigging shampoo
 		if (get_property("questM12Pirate")=="step5") {
@@ -3132,7 +3216,6 @@ void bakeTracker() {
 		}
 		result.append("</td></tr>");
 	}
-
 
 	//L8: trapper: 3 ore, 3 goat cheese, questL08Trapper
 	if(started("questL08Trapper")) {
@@ -3175,22 +3258,10 @@ void bakeTracker() {
 			result.append("<br>Bridge Progress: "+(get_property("lastChasmReset") == my_ascensions()? get_property("chasmBridgeProgress"): "0")+"/30");
 		} else {
 			result.append('Explore the <a target="mainpane" href="place.php?whichplace=highlands">Highlands</a>');
-			//L9: A-boo peak
-			result.append("<br>A-boo Peak: ");
-			result.append(item_report(get_property("booPeakProgress") == "0", get_property("booPeakProgress")+'% haunted'));
-			//L9: twin peak
-			result.append("<br>Twin Peak: "+twinPeak());
-			//check 4 stench res, 50% items (no familiars), jar of oil, 40% init
-			//L9: oil peak
-			result.append("<br>Oil Peak: ");
-			result.append(item_report(get_property("oilPeakProgress").to_int() == 0, get_property("oilPeakProgress")+' µB/Hg'));
+			result.append(highlands());
 		}
 		result.append("</td></tr>");
 	}
-	
-
-	
-	
 	
 	//L10: SOCK, Giants Castle, questL10Garbage
 	if(started("questL10Garbage")) { 
@@ -3204,15 +3275,6 @@ void bakeTracker() {
 		}
 		result.append("</td></tr>");
 	}
-
-
-
-
-
-
-
-
-
 
 	//L11: MacGuffin, questL11MacGuffin
 	if (started("questL11MacGuffin")) {
@@ -3228,11 +3290,6 @@ void bakeTracker() {
 		}
 		result.append("</td></tr>");		
 	}
-	
-	
-	
-	
-	
 	
 	//L11: questL11Manor
 	// Open second floor and ballroom early
@@ -3268,11 +3325,6 @@ void bakeTracker() {
 	//wineCellarProgress=3
 	//cellarLayout=1092
 	//lastCellarReset
-	
-
-
-
-
 		
 	//L11: questL11Palindome
 	if (started("questL11Palindome")) {
@@ -3454,8 +3506,6 @@ void bakeTracker() {
 	//sidequestLighthouseCompleted=none
 	//sidequestNunsCompleted=none
 	//sidequestOrchardCompleted=none
-
-	
 	
 	//L13: NS, questL13Final
 	// check for lair items, tower items, wand
@@ -3646,10 +3696,10 @@ void bakeTracker() {
 
 
 	result.append("</table>");
-	
-	if(length(result) != 136) { // 136 is the size of an empty table
+
+	if(length(result) != 172) { // 172 is the size of an empty table
 		chitBricks["tracker"] = result;
-		chitTools["tracker"] = "Tracker|quests.png";
+		chitTools["tracker"] = "Tracker|tracker.png";
 	}
 
 }
@@ -4105,7 +4155,16 @@ buffer modifyPage(buffer source) {
 	setvar("chit.kol.coolimages",true);
 	
 	//Check for updates (once a day)
-	checkVersion("Character Info Toolbox", chitVersion, 7594);
+	if(svn_exists("mafiachit")) {
+		if(get_property("_svnUpdated") == "false" && get_property("_chitUpdated") != "true") {
+			if(!svn_at_head("mafiachit")) {
+				print("Character Info Toolbox has become outdated. Automatically updating from SVN...", "red");
+				cli_execute("svn update mafiachit");
+				print("On ChIT's next invocation it will be up to date.", "green");
+			}
+			set_property("_chitUpdated", "true");
+		}
+	} else checkVersion("Character Info Toolbox", chitVersion, 7594);
 	
 	if( index_of(source, 'alt="Karma" title="Karma"><br>') > 0 ) {
 		inValhalla = true;
@@ -4144,12 +4203,11 @@ buffer modifyPage(buffer source) {
 
 }
 
-void charpane_relay()
-{
+void charpane_relay() {
 	visit_url().modifyPage().write();
 }
 
+
 void main() {
 	charpane_relay();
-
 }

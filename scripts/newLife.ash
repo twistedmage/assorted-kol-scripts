@@ -4,7 +4,7 @@
 script "newLife.ash"
 notify "Bale";
 import "zlib.ash";
-check_version("newLife", "Bale_newLife", "1.14", 2769);
+check_version("newLife", "Bale_newLife", "1.14.3", 2769);
 
 void knife_untinker(item it)
 {
@@ -163,6 +163,12 @@ void set_choice_adventures() {
 		set_choice(182, 1, "Fantasy Airship, Lack of an Encounter: Fight MechaMech for metallic A if you turn up the ML");
 	else
 		set_choice(182, 3, "Fantasy Airship, Lack of an Encounter: Get Stats");
+	// In BIG! There is no need for leveling up
+	if(my_path() == "BIG!") {
+		set_choice("oceanDestination", "ignore", "At the Poop Deck: Skip the wheel");
+	} else {
+		set_choice("oceanDestination", my_primestat().to_lower_case(), "At the Poop Deck: take the Wheel and Sail to "+my_primestat()+" stats");
+	}
 	
 	// Prime Stat specific choices
 	vprint("Setting choice adventures for "+ primestat +" class.", 3);
@@ -171,10 +177,16 @@ void set_choice_adventures() {
 		set_choice(73, 1, "Whitey's Grove: Get Muscle stats");
 		set_choice(74, 2, "Whitey's Grove: Get boxes of wine");
 		set_choice(75, 2, "Whitey's Grove: Get white lightning");
-		set_choice(81, 1, "Library, Fall of the House of Spookyraven: Open Gallery");
+		if(my_path() == "BIG!")  // No need to level up in BIG!
+			set_choice(81, 99, "Library, Fall of the House of Spookyraven: Unlock stairs");
+		else
+			set_choice(81, 1, "Library, Fall of the House of Spookyraven: Open Gallery");
 		set_choice(85, 5, "Bedroom, One Nightstand (Wooden): Get Ballroom key, then fight the Jilted Mistress");
 		set_choice(87, 2, "");
-		set_choice(82, 2, "Bedroom, One Nightstand (White): Get Muscle stats");
+		if(my_path() == "BIG!")
+			set_choice(82, 1, "Bedroom, One Nightstand (White): Get old leather wallet");
+		else
+			set_choice(82, 2, "Bedroom, One Nightstand (White): Get Muscle stats");
 		if(vars["newLife_FightBedstands"] == "true" || my_path() == "Way of the Surprising Fist")
 			set_choice(83, 2, "Bedroom, One Nightstand (Mahogany): Fight!");
 		else 
@@ -186,7 +198,6 @@ void set_choice_adventures() {
 		set_choice(402, 1, "Bathroom, Don't Hold a Grudge: Get Muscle stats");
 		set_choice(141, 2, "Hippies on the Verge of War, Blockin' Out the Scenery: Get rations");
 		set_choice(145, 1, "Frats on the Verge of War, Fratacombs: Get Muscle stats");
-		set_choice("oceanDestination", "muscle", "At the Poop Deck: take the Wheel and Sail to Muscle stats");
 		break;
 	case $stat[mysticality]:
 		set_choice(73, 3, "Whitey's Grove: Get wedding cake and rice");
@@ -198,7 +209,10 @@ void set_choice_adventures() {
 			set_choice(81, 99, "Library, Fall of the House of Spookyraven: Unlock stairs");
 		set_choice(85, 5, "Bedroom, One Nightstand (Wooden): Get Ballroom key, then fight the Jilted Mistress");
 		if(vars["newLife_FightBedstands"] == "true" || my_path() == "Way of the Surprising Fist") {
-			set_choice(82, 3, "Bedroom, One Nightstand (White): Fight!");
+			if(my_path() == "BIG!")
+				set_choice(82, 1, "Bedroom, One Nightstand (White): Get old leather wallet");
+			else
+				set_choice(82, 3, "Bedroom, One Nightstand (White): Fight!");
 			set_choice(83, 2, "Bedroom, One Nightstand (Mahogany): Fight!");
 		} else {
 			set_choice(82, 1, "Bedroom, One Nightstand (White): Get old leather wallet");
@@ -211,7 +225,6 @@ void set_choice_adventures() {
 		set_choice(402, 2, "Bathroom, Don't Hold a Grudge: Get Mysticality stats");
 		set_choice(141, 1, "Hippies on the Verge of War, Blockin' Out the Scenery: Get Mysticality stats");
 		set_choice(145, 2, "Frats on the Verge of War, Fratacombs: Get food");
-		set_choice("oceanDestination", "mysticality", "At the Poop Deck: take the Wheel and Sail to Mysticality stats");
 		break;
 	case $stat[moxie]:
 		set_choice(73, 3, "Whitey's Grove: Get wedding cake and rice");
@@ -221,29 +234,35 @@ void set_choice_adventures() {
 			set_choice(81, 1, "Library, Fall of the House of Spookyraven: Open Gallery for Bugbears");
 		else
 			set_choice(81, 99, "Library, Fall of the House of Spookyraven: Unlock stairs");
-		if(my_path() == "Bees Hate You")
+		if(my_path() == "Bees Hate You" || my_path() == "BIG!")
 			set_choice(85, 5, "Bedroom, One Nightstand (Wooden): Get Ballroom key, then fight the Jilted Mistress");
-		else set_choice(85, 4, "Bedroom, One Nightstand (Wooden): Get Ballroom key, then get Moxie stats");
+		else
+			set_choice(85, 4, "Bedroom, One Nightstand (Wooden): Get Ballroom key, then get Moxie stats");
 		if(vars["newLife_FightBedstands"] == "true" || my_path() == "Way of the Surprising Fist") {
-			set_choice(82, 3, "Bedroom, One Nightstand (White): Fight!");
+			if(my_path() == "BIG!")
+				set_choice(82, 1, "Bedroom, One Nightstand (White): Get old leather wallet");
+			else
+				set_choice(82, 3, "Bedroom, One Nightstand (White): Fight!");
 			set_choice(83, 2, "Bedroom, One Nightstand (Mahogany): Fight!");
 		} else {
 			set_choice(82, 1, "Bedroom, One Nightstand (White): Get old leather wallet");
 			set_choice(83, 1, "Bedroom, One Nightstand (Mahogany): Get old coin purse");
 		}
-		set_choice(90, 2, "Ballroom Curtains: get moxie");
+		if(my_path() == "BIG!")  // No need to level up in BIG!
+			set_choice(90, 3, "Ballroom Curtains: skip adventure");
+		else
+			set_choice(90, 2, "Ballroom Curtains: get moxie");
 		set_choice(184, 1, "That Explains all the Eyepatches in Barrrney's Barrr: fight a pirate");
 		set_choice(186, 3, "A Test of Testarrrsterone in Barrrney's Barrr: get lots of Moxie"); 
 		set_choice(191, 1, "F'c'le, Chatterboxing: get Moxie stats");
 		set_choice(402, 3, "Bathroom, Don't Hold a Grudge: Get Moxie stats");
 		set_choice(141, 2, "Hippies on the Verge of War, Blockin' Out the Scenery: Get rations");
 		set_choice(145, 2, "Frats on the Verge of War, Fratacombs: Get food");
-		set_choice("oceanDestination", "moxie", "At the Poop Deck: take the Wheel and Sail to Moxie stats");
 		break;
 	}
 	if(vars["newLife_SetupGuyMadeOfBees"].to_boolean())
 		set_choice(105, 3, "Bathroom, Having a Medicine Ball: Say, \"Guy made of Bees.\"");
-	else if(primestat == $stat[mysticality])
+	else if(primestat == $stat[mysticality] && my_path() != "BIG!")
 		set_choice(105, 1, "Bathroom, Having a Medicine Ball: Get Mysticality stats");
 	else {
 		set_choice(105, 2, "Bathroom, Having a Medicine Ball: Skip adventure");
@@ -524,7 +543,7 @@ void special(boolean bonus_actions) {
 		if(!good(it)) return false;
 		if(item_amount(it) + equipped_amount(it) > 0)
 			return true;
-		if(storage_amount(it) < 1 || pulls_remaining() < 1 || !good(it))
+		if(storage_amount(it) < 1 || pulls_remaining() < 1)
 			return false;
 		take_storage(1, it);
 		return true;
@@ -535,6 +554,7 @@ void special(boolean bonus_actions) {
 	//if in softcore, pull my set
 	if(!in_hardcore())
 	{
+		<big path>
 		cli_execute("inventory refresh");
 		refresh_stash();
 		//hat
@@ -605,6 +625,8 @@ void special(boolean bonus_actions) {
 			if(available_amount($item[astral shirt]) < 1)
 				pull_and_wear_if_good($item[cane-mail shirt]);
 		pull_and_wear_if_good($item[Camp Scout backpack]);
+		if(available_amount($item[Camp Scout backpack])<1)
+			pull_and_wear_if_good($item[Cloak of Dire Shadows]);
 		//now pull useful stuff
 		if(pull_if_good($item[can of rain-doh]))
 			if(available_amount($item[rain-doh blue balls])==0)
@@ -680,9 +702,9 @@ void start_quests()
 }
 
 void new_ascension() {
-	boolean extra_stuff = my_name() == "twistedmage";  // Do extra stuff if this is true
+	boolean extra_stuff = vars["newLife_Extras"].to_boolean();  // Do extra stuff if this is true
 	set_choice_adventures();
-	campground(!in_hardcore());
+	campground(extra_stuff);
 	get_bugged_balaclava();
 	visit_toot();
 	if(my_turncount() < 1) {
@@ -706,12 +728,12 @@ void new_ascension() {
 }
 
 // These are default values here. To change for each character, edit their vars file in /data direcory or use the zlib commands.
-setvar("newLife_SetupGuyMadeOfBees", FALSE);	// If you like to set up the guy made of bees set this TRUE. 
+setvar("newLife_SetupGuyMadeOfBees", FALSE); // If you like to set up the guy made of bees set this TRUE. 
 setvar("newLife_FightBedstands", FALSE);	// If this is set to TRUE, you'll prefer fighting Bedstands to getting meat. (Note that mainstat is still better than fighting.)
 setvar("newLife_SmashHippyStone", TRUE);	// Smash stone if you want to break it at level 1 for some PvPing!
 setvar("newLife_UseNewbieTent", TRUE);		// Use newbie tent if you don't want togive your clannes a fair shot at bricking you in the face!
 setvar("newLife_SellPorkForStuff", TRUE);	// Sell pork gems to purchase detuned radio, stolen accordion & seal tooth
-
+setvar("newLife_Extras", TRUE); 			// Mixed bag of custom actions. This is personal to me, but maybe someone else will like it also
 void main() {
 	new_ascension();
 }

@@ -101,17 +101,6 @@ stealth mnistletoe will help DB runs a lot?
 [An Octopus's Garden]
 moister oyster (3)
 
----------------------------------SEA------------------
-[Mer-kin Elementary School]
-Mer-kin Teacher (1)
-=================================
-[Mer-kin Colosseum]
-Georgepaul, the Balldodger (1)
-Johnringo, the Netdragger (1)
-Ringogeorge, the Bladeswitcher (1)
-=================================
-
-
 ------------------------------------ascensions----------------
 =================================
 [Bees Hate You]
@@ -166,7 +155,6 @@ Peripatetic Pirate (1)
 Somebody else's butt (3)
 Your butt (3)
 Dad Sea Monkee (3)
-Mer-kin Specter (3)
 Shub-Jigguwatt, Elder God of Violence (1)
 
 
@@ -216,7 +204,6 @@ Sauceror
 
 
 <sword from guord>
-<sword from artist>
 
 [old man]
 +2 foam naval trousers (23-36)
@@ -224,16 +211,11 @@ Sauceror
 
 my magic jick number is 4
 
-
-
-------artist------
-cutter - meat
-cutter - bread
-cutter - batter
-cutter - eggs
-cutter - potatoes
-
-
+smoothie maker/blender
+eat baked beans
+frozen fruit (banana)?
+avocado
+artichoke
 
 
 snow suit vs moveable feast
@@ -243,7 +225,7 @@ down by 1 every 5 combats
 min of 5, after 75 combats
 10% items or mp regen
 3 carrots per day
-total weight = 5*(20+19+18+17+16+15+14+13+12+11+10+9+8+7+6)=975
+total weight = 5*(15+14+13+12+11+10+9+8+7+6+5+4+3+2+1)=600 (ignoring the constant +5 that the feast has too)
 
 ----moveable feast 
 +5 to Familiar Weight

@@ -2,6 +2,13 @@
 				Script to fine tune the usage of items and skills for WHAM
 ************************************************************************************************************************
 	Version 0.1:	Initial release
+			0.2:	Add some comments
+			0.3:	Update to be in line with the new BatMan blacklist.
+					After running the script you can safely delete the WHAM_dontuse data-file (it will be emptied out anyway)
+			0.4:	Don't regenerate an empty data-file just because we can
+			0.4.1:	YEs, really, we do not want to regenerate that file...
+			0.4.2:	Third time's a charm
+		2013-06-10:	Move version checking to SVN
 ***********************************************************************************************************************/
 
 script "WHAM_dontuse";
@@ -9,8 +16,8 @@ notify "Winterbay";
 
 import zlib.ash;
 import htmlform.ash;
-string thisver = "0.1";
 
+int[string] blacklist;
 record dontuse
 {
 	string type;
@@ -20,16 +27,30 @@ record dontuse
 dontuse[int] not_ok;
 
 void build_table() {
-	string current, type, id;
+	string current, type, id, temp;
 	int amount;
+	dontuse[int] empty;
 	
 	//Load the map of items and skills to not use from the file
-	file_to_map("WHAM_dontuse_" + my_name() + ".txt", not_ok);	
+	file_to_map("WHAM_dontuse_" + my_name() + ".txt", not_ok);
+	
+	if(count(not_ok) > 0) {
+			map_to_file(empty, "WHAM_dontuse_" + my_name() + ".txt");
+	}
+	
+	file_to_map("BatMan_blacklist_"+replace_string(my_name()," ","_")+".txt", blacklist);
+	foreach str in blacklist {
+		amount = count(not_ok);
+		not_ok[amount].type = (contains_text(str, "use") ? "use" : "skill");
+		not_ok[amount].id = (contains_text(str, "use") ? substring(str, 4) : substring(str, 6));
+		not_ok[amount].amount = blacklist[str];
+	}
 	
 	writeln("<table border=0>");
 	writeln("<tr><th>Action type</th><th>Skill or Item ID</th><th>Skill or Item name</th><th>Amount of item to save</th><th>Remove listing?</th></tr>");
 
 	for i from 0 to count(not_ok) {
+		//Set up variable names
 		if (i < count(not_ok)) {
 			current = not_ok[i].type + " " + not_ok[i].id;
 			type = not_ok[i].type;
@@ -50,17 +71,23 @@ void build_table() {
 		finish_select();
 		writeln("</td><td>");
 		
+		//Item or Skill number
 		write_field(id, current + "_", "");
 		writeln("</td><td>");
 		
+		//Item or Skill name
 		write_field((type == "use" ? to_string(to_item(to_int(id))) : to_string(to_skill(to_int(id)))), current + "__", ""); //, (type == "use" ? "itemvalidator" : "skillvalidator"));
 		writeln("</td><td>");
 		
+		//Item amount
 		write_field(amount, current + "___", "");
 		writeln("</td><td>");
 		
+		//Delete checkbox
 		write_check(false, current + "____", "");
 		writeln("</td></tr>");
+		
+		//Debug CLI-printout
 		vprint(current + " has been generated with type = " + type + ", id = " + id + ", amount = " + amount + ".", 10);
 	}
 	writeln("</table>");
@@ -68,7 +95,7 @@ void build_table() {
 
 void build_page() {
 //Start buliding the page
-	writeln("Fine tuning of items and skills to disallow from WHAM." + check_version("relay WHAM dontuse","relay WHAM dontuse",thisver,8861) + "<br><br>");
+	writeln("Fine tuning of items and skills to disallow from WHAM.<br><br>");
 	writeln("Instructions for use:<br>");
 	writeln("&nbsp;&nbsp;&nbsp;<b>1)</b> Pick an option in the drop down (use for items and skill for ... ehh... skills).<br>");
 	writeln("&nbsp;&nbsp;&nbsp;<b>2)</b> Enter either the name or number of the item or skill in question, but not both.<br>");
@@ -97,7 +124,11 @@ void main() {
 			}
 			vprint(fie + " = " + fields[fie], 10);
 		}
-		map_to_file(not_ok, "WHAM_dontuse_" + my_name() + ".txt");
+		clear(blacklist);
+		foreach i in not_ok {
+			blacklist[not_ok[i].type + " " + not_ok[i].id] = not_ok[i].amount;
+		}
+		map_to_file(blacklist, "BatMan_blacklist_"+replace_string(my_name()," ","_")+".txt");
 	}
 	
 	write_header();

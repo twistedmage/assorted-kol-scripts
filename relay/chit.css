@@ -1,4 +1,3 @@
-/* Last modified for ChIT v0.8.1 */
 
 /* ckb's simple css lesson
    # = define's an ID, use only on one element, once per page
@@ -120,6 +119,9 @@ table.chit_brick th {
 	vertical-align:middle;
 	background-color: #F0F0F0; 
 	padding:2px;
+}
+table.chit_brick th img {
+	float:left;
 }
 div.chit_skeleton table.chit_brick th {
 	background-color: #F0F0B0; 
@@ -283,7 +285,7 @@ table.chit_brick tr.section td {
 	color:blue;
 }
 #chit_stats.nobars tr td.info {
-	width:auto;
+	width:135px;
 }
 #chit_stats tr td.progress, #chit_substats tr td.progress, #chit_organs tr td.progress {
 	width:100%;
@@ -328,7 +330,7 @@ div.progressbar {height:100%; background-color:blue}
 
 /* MCD Panel + popup */
 #chit_mcd tr th.busy {
-	background-image: url(/images/relayimages/chit/busy.gif);
+	background-image: url(/images/chit/busy.gif);
 	background-position: 5px center;
 	background-repeat: no-repeat;
 }
@@ -520,10 +522,6 @@ table.chit_picker tr.pickitem a:hover {
 }
 
 /* Familiar Panel */
-#chit_pickerfam {
-	max-height:600px;
-	overflow-y:auto;
-}
 #chit_pickerfam tr:hover td {
 	background-color:#F0F0F0;
 }
@@ -544,7 +542,7 @@ div.chit_skeleton table.chit_brick th {
 	cursor:pointer;
 }
 div.chit_skeleton table.chit_brick th:hover {
-	background-image: url(/images/relayimages/chit/collapse.png);
+	background-image: url(/images/chit/collapse.png);
 }
 
 /* Current Quests Panel (#nudges ID matched KOL usage) */
@@ -579,7 +577,7 @@ div.chit_skeleton table.chit_brick th:hover {
 	overflow-x:hidden;
 }
 
-#chit_elements img {
+#chit_elements td img {
 	vertical-align:middle;
 	text-align:center;
 	width:100%;

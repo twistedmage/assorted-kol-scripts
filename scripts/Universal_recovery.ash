@@ -3,7 +3,8 @@
 // http://kolmafia.us/showthread.php?t=1780
 script "Universal_recovery.ash";
 notify "Bale";
-string thisver = "3.10.9";		// This is the script's version!
+string thisver = "3.10.10";		// This is the script's version!
+
 // To use this script, put Universal_recovery in the /script directory. 
 // Then in the Graphical CLI type:
 // 		set recoveryScript = Universal_recovery
@@ -121,7 +122,8 @@ boolean use_herb = contains_text(hpAutoRecoveryItems, "medicinal herb's medicina
 int disco = to_int(have_skill($skill[Disco Nap]))
 	+ 2* to_int(have_skill($skill[Disco Power Nap]))
 	+ to_int(have_skill($skill[Executive Narcolepsy]))
-	+ 10*to_int(have_skill($skill[Food Coma]));
+	+ 10*to_int(have_skill($skill[Food Coma]))
+	+ 3* to_int(have_familiar($familiar[Unconscious Collective]));
 int rest_hp = numeric_modifier("Base Resting HP") * (numeric_modifier("Resting HP Percent")+100) / 100 + numeric_modifier("Bonus Resting HP");
 int rest_mp = numeric_modifier("Base Resting MP") * (numeric_modifier("Resting MP Percent")+100) / 100 + numeric_modifier("Bonus Resting MP");
 	// If the character has properties set to not auto-purhase from mall, then always stay in hardcore mode.
@@ -663,7 +665,7 @@ int mp_to_meat(int amount) {
 }
 
 // This will handle all item based healing outside of ronin/hardcore. 
-// It will heal from the mall using the best vale for restoratives.
+// It will heal from the mall using the best value for restoratives.
 boolean mall_heal(int target, string type) {
 	if(start_type == "MP" && target < mp_autotarget)
 		target = mp_autotarget;

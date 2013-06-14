@@ -9700,7 +9700,7 @@ void bcs12() {
 	boolean doSideQuest(string name) {
 		if (checkStage("warstage_"+name)) return true;
 		print("BCC: Starting SideQuest '"+name+"'", "purple");
-		
+		abort("We aren't doing sidequests this time, get medals manually!");
 		//We have to have these functions outside the switch. 
 		int estimated_advs() { return ceil((100000 - to_float(get_property("currentNunneryMeat"))) / (1000 + (10*meat_drop_modifier()))); }
 		
