@@ -7,20 +7,18 @@
 ## Fearful Fetuccini, Moxious Maneuver and divines, both single and funkslung
 ## Any requests for other skills to be added in should be sent to Alhifar.
 script "slime.ash";
+notify "Alhifar";
 import <htmlform.ash>
 import <zlib.ash>
 
-string version = "2.3.4";
-string download_location = "http://www.insidethepale.org/mafia/scriptlets/";
-
 ## Set run type to either "larva" or "nodule" to automatically set certain settings to the most usual values for those types of runs.
-setvar("SlimeTube_run_type", "nodule");
+setvar("SlimeTube_run_type", "");
 
-setvar("SlimeTube_max_ml_outfit", "ml-slime");
-setvar("SlimeTube_max_ml_familiar", "babby bugged bugbear");
+setvar("SlimeTube_max_ml_outfit", "maxml");
+setvar("SlimeTube_max_ml_familiar", "purse rat");
 
 setvar("SlimeTube_min_ml_outfit", "minml");
-setvar("SlimeTube_min_ml_familiar", "baby sandworm");
+setvar("SlimeTube_min_ml_familiar", "levitating potato");
 
 string run_type = vars["SlimeTube_run_type"];
 
@@ -34,19 +32,19 @@ string min_ml_familiar = vars["SlimeTube_min_ml_familiar"];
 ## Set which_tatter to which tatter-like item to use to escape from combats
 setvar("SlimeTube_use_tatter_like", "false");
 boolean use_tatter_like = vars["SlimeTube_use_tatter_like"].to_boolean();
-setvar("SlimeTube_which_tatter", "divine champagne popper");
+setvar("SlimeTube_which_tatter", "green smoke bomb");
 
 item which_tatter = vars["SlimeTube_which_tatter"].to_item();
 
 ## This CCS is ONLY used if use_tatter_like is set to false, and it is not blank
-setvar("SlimeTube_max_ml_ccs", "maxmlccs");
-setvar("SlimeTube_min_ml_ccs", "maxmlccs");
+setvar("SlimeTube_max_ml_ccs", "");
+setvar("SlimeTube_min_ml_ccs", "");
 
 string max_ml_ccs = vars["SlimeTube_max_ml_ccs"];
 string min_ml_ccs = vars["SlimeTube_min_ml_ccs"];
 
 ## Set this to the amount of rounds you want to add to the number of rounds expected to account for fumbles
-setvar("SlimeTube_fumble_buffer", "1");
+setvar("SlimeTube_fumble_buffer", "0");
 int fumble_buffer = vars["SlimeTube_fumble_buffer"].to_int();
 
 setvar("SlimeTube_use_hottub", "true");
@@ -57,7 +55,7 @@ boolean verbose = vars["SlimeTube_verbose"].to_boolean();
 
 ## Switch between spleen familiars until all spleen items you can get are obtained,
 ## then switch to the familiars in the above settings
-setvar( "SlimeTube_get_spleeners" , "true" );
+setvar( "SlimeTube_get_spleeners" , "false" );
 boolean get_spleeners = vars["SlimeTube_get_spleeners"].to_boolean();
 
 ## End Options 
@@ -121,18 +119,6 @@ int get_bladders()
 	while( m_bladders.find() ) bladders = bladders + 1;
 	return bladders;
 }
-
-boolean check_version()
-{
-	if( get_property( "_slime.ash_ver" ) != "true" )
-	{
-		set_property( "_slime.ash_ver" , "true" );
-		string ver = visit_url( download_location + "slime_ver.txt" );
-		if( ver == "" ) return true;
-		else return ver == version;
-	}
-	return true;
-}
 int expected_rounds_needed()
 {
 	int slime_hp = monster_hp( $monster[slime1] );
@@ -174,14 +160,33 @@ int expected_rounds_needed()
 	boolean mm = false;
 	boolean vts = false;
 	
-	boolean noodles = false;
+	int stun = 0;
 	
 	for i from 0 upto 30
 	{
 		switch ( get_ccs_action( i ) )
 		{
 			case "skill entangling noodles":
-				noodles = true;
+			case "item brick of sand":
+			case "item banana peel":
+			case "item jar of swamp gas":
+			case "item floorboard cruft":
+			case "item sausage bomb":
+			case "item clingfilm tangle":
+			case "item black bricko brick":
+			case "item finger cuffs":
+			case "item d6":
+			case "item rain-doh blue balls":
+				stun += 2;
+				break;
+			case "skill noodles of fire":
+			case "item soggy used band-aid":
+			case "item the lost comb":
+			case "item chinese curse words":
+				stun += 3;
+				break;
+			case "item very large caltrop":
+				stun += 5;
 				break;
 			case "skill lunging thrust-smack":
 				lts_factor = 3;
@@ -303,7 +308,7 @@ int expected_rounds_needed()
 			damage = musc_dam + bonus_damage + ( weapon_damage * lts_factor ) + offhand_damage;
 	}
 	int rounds = ceil( slime_hp.to_float() / damage.to_float() );
-	return max( 1 , rounds + noodles.to_int() );
+	return max( 1 , rounds + stun );
 }
 
 int max_possible_damage()
@@ -372,7 +377,6 @@ int max_mcd()
 	if( run_type == "larva" || mcd < 0 || mcd > max_mcd ) return max_mcd;
 	return mcd;
 }
-
 
 void run_tube( int adv_to_use )
 {
@@ -570,10 +574,6 @@ string get_clan()
 void main() {
 	write_page();
 	writeln( "<center><b><font size=5 color=\"blue\">Slime.ash Relay Version</font></b></center><br>" );
-	if( !check_version() )
-	{
-		writeln( "<center><font size=4 color=\"red\">You do not have the latest version of the script!<br>You can download the latest version from <a href=\"" + download_location + "relay_slime.ash\" >" + download_location + "relay_slime.ash</a>.</font></center>" );
-	}
 	writeln( "<center><font size=4><b>Clan:</b> " + get_clan() + "</font></center><br>" );
 	writeln("<center><table border=0 cellpadding=2>");
 	writeln("<tr><th></th><th align=left>Minimum ML Settings</th><th align=left>Maximal ML Settings</th></tr>");

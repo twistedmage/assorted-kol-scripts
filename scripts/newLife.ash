@@ -558,7 +558,7 @@ void special(boolean bonus_actions) {
 		cli_execute("inventory refresh");
 		refresh_stash();
 		//hat
-		if(my_path()=="Avatar of Boris" || my_path()=="Zombie Slayer" || my_path()=="Avatar of Jarlsberg")
+		if(!good($item[crown of thrones]) || !good("el vibrato Megadrone"))
 		{
 			if(storage_amount($item[Boris's Helm (askew)])>0)
 				pull_and_wear_if_good($item[Boris's Helm (askew)]);
@@ -577,9 +577,11 @@ void special(boolean bonus_actions) {
 			pull_and_wear_if_good($item[crown of thrones]);
 			if(available_amount($item[crown of thrones])>0)
 				if(good("el vibrato Megadrone"))
+				{
 					cli_execute("enthrone El Vibrato Megadrone");
-//					else if(good("Reconstituted Crow"))
-//					cli_execute("enthrone Reconstituted Crow");
+//					else if(good("Li'l Xenomorph"))
+//					cli_execute("enthrone Li'l Xenomorph");
+				}
 				else
 					abort("Don't know what familiar to enthrone for this path");
 		}

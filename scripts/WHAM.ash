@@ -162,6 +162,7 @@
 		13-06-10:Try to not fire the yellow ray unless we actually want the drops
 				 Force WHAM_killit to true if we are in Fernswarthy's Basement
 				 Add code to handle automating Yog-Urt and Jigguwatt
+		13-06-14:Don't try to stasis for so long that we cannot afford to kill the monster
 ***********************************************************************************************************************/
 import <SmartStasis.ash>;
 
@@ -174,6 +175,8 @@ setvar("WHAM_noitemsplease", false);	//If true will cause the script to skip all
 setvar("WHAM_safetymargin", 0);			//Sets the extra safety margin you want for rounds that the script will not stasis for
 setvar("WHAM_UseSeaLasso", false);		//If true will use the sea lasso in the sea to train the lasso skill, does not currently know when to stop doing this
 setvar("WHAM_killit", false);			//If true will attack the monster with your most powerful option, ignoring cost
+//setvar("WHAM_roundcost_aftercore", 50);	//Controls how much you are prepared to pay to save a round in fights in aftercore
+//setvar("WHAM_roundcost_inrun", 5);		//Controls how much you are prepared to pay to save a round in fights in ronin
 
 record actions
 {
@@ -200,6 +203,8 @@ int WHAM_maxround = to_int(vars["WHAM_maxround"]);
 int unknown_ml = to_int(vars["unknown_ml"]);
 float hitchance = to_float(vars["WHAM_hitchance"]);
 int WHAM_safetymargin = to_int(vars["WHAM_safetymargin"]);
+int WHAM_roundcost_aftercore = to_int(vars["WHAM_roundcost_aftercore"]);
+int WHAM_roundcost_inrun = to_int(vars["WHAM_roundcost_inrun"]);
 
 //Load the map of items and skills to not use from the file
 record dontuse
@@ -476,13 +481,14 @@ boolean has_option(skill whichskill) {
 advevent attack_option() {
 	if (ok(get_action("use 2848")) && !happened($item[gnomitronic hyperspatial demodulizer]) && monster_stat("hp") <= dmg_dealt(get_action("use 2848").dmg))
 		return get_action("use 2848");
-	//if ($items[Mer-kin dragnet, Mer-kin switchblade, Mer-kin dodgeball] contains equipped_item($slot[weapon]) && my_location().zone == "The Sea")
+	//if ($items[Mer-kin dragnet, Mer-kin switchblade, Mer-kin dodgeball] contains equipped_item($slot[weapon]) && my_location().zone == "The Sea" && hitchance() > 0.5)
 	//	return get_action("attack");
 		
 	float drnd = max(1.0,die_rounds());   // a little extra pessimistic
 	sort opts by -dmg_dealt(value.dmg);
 	sort opts by -to_profit(value);
 	sort opts by kill_rounds(value.dmg)* (vars["WHAM_killit"] == "true" || my_location() == $location[Fernswarthy's Basement]? 1 : -(min(value.profit,-1)));
+	//sort opts by kill_rounds(value.dmg)* -(min(value.profit-(can_interact() ? WHAM_roundcost_aftercore : WHAM_roundcost_inrun),-1));
 	
 	foreach i,opt in opts {
 		vprint(opt.id + " does hurt the monster for " + dmg_dealt(opt.dmg) + " and is " + (ok(opt) ? "ok." : "not ok."), "green", 10);
@@ -1266,7 +1272,8 @@ string stasis_WHAM() {
 				turns = count(queue) + 1;	//Options that can only be used once, should only be used once before recalculating
 				break;
 			case (contains_text(plink.id, "skill")):
-				int uses = my_mp() / max(1,mp_cost(to_skill(to_int(optid.group(2)))));
+				int mpcost = mp_cost(to_skill(to_int(smacks.id))) *  kill_rounds(smacks);
+				int uses = (my_mp() - mpcost) / max(1,mp_cost(to_skill(to_int(optid.group(2)))));
 				turns = (uses > (maxround - (WHAM_safetymargin + 3)) ? 0 : count(queue) + uses);	//Don't try to stasis for more turns than we have MP for
 				break;																				//Relies on stasis_option to have already removed skills we cannot cast more than once
 			default:
