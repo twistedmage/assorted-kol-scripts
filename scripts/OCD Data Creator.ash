@@ -3662,9 +3662,30 @@ save [$item[glowing syringe]] = 0;
 save [$item[jar of psychoses (Jick)]] = 0;
 save [$item[the kindest cold cut]] = 0;
 save [$item[Mer-kin weaksauce]] = 0;
+save [$item[floral-print skirt]] = 2;
+save [$item[spectral axe]] = 3;
+save [$item[super-strong air freshener]] = 3;
+save [$item[incredible pizza]] = 0;
+save [$item[skeleton quiche]] = 0;
+save [$item[natto marble soda]] = 0;
+save [$item[beer-a-pult]] = 1;
+save [$item[moonberry wine cooler]] = 0;
+save [$item[fine aged cheddarwurst]] = 0;
+save [$item[huge mosquito proboscis]] = 3;
+save [$item[swamp lolly]] = 0;
+save [$item[seegar butt]] = 0;
+save [$item[bottled swamp gas]] = 0;
+save [$item[witch wart]] = 3;
+save [$item[delicious swamp muck]] = 0;
+save [$item[decomposed boot]] = 0;
+save [$item[big dribbly candle]] = 0;
+cli_execute("use * stolen meatpouch");
+save [$item[beaver spear]] = 3;
+save [$item[dilapidated wizard hat]] = 2;
 
 
 //stuff to sell later
+save [$item[gunpowder burrito]] = -1;
 save [$item[Mer-kin cheatsheet]] = -1;
 save     [$item[Mer-kin wordquiz]] = -1;
 save [$item[sea     lasso]] = -1;
