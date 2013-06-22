@@ -163,6 +163,7 @@
 				 Force WHAM_killit to true if we are in Fernswarthy's Basement
 				 Add code to handle automating Yog-Urt and Jigguwatt
 		13-06-14:Don't try to stasis for so long that we cannot afford to kill the monster
+		13-06-15:FIx to_int-problem for the new stasis check x 2
 ***********************************************************************************************************************/
 import <SmartStasis.ash>;
 
@@ -1248,6 +1249,7 @@ string stasis_WHAM() {
 	  (round < maxround - (3 + WHAM_safetymargin) - kill_rounds(smacks) && die_rounds() > kill_rounds(smacks))) {
 		vprint("Top of the stasis loop.",9);
 		matcher optid = create_matcher("(skill |use |jiggle|attack)(?:(\\d+),?(\\d+)?)?",plink.id);
+		matcher smackid = create_matcher("(skill |use |jiggle|attack)(?:(\\d+),?(\\d+)?)?",smacks.id);
 		// special actions
 		enqueue_custom();
 		enqueue_combos();
@@ -1272,7 +1274,7 @@ string stasis_WHAM() {
 				turns = count(queue) + 1;	//Options that can only be used once, should only be used once before recalculating
 				break;
 			case (contains_text(plink.id, "skill")):
-				int mpcost = mp_cost(to_skill(to_int(smacks.id))) *  kill_rounds(smacks);
+				int mpcost = (smackid.find() && smackid.group(1) == "skill" ? mp_cost(to_skill(to_int(smackid.group(2)))) *  kill_rounds(smacks) : 0);
 				int uses = (my_mp() - mpcost) / max(1,mp_cost(to_skill(to_int(optid.group(2)))));
 				turns = (uses > (maxround - (WHAM_safetymargin + 3)) ? 0 : count(queue) + uses);	//Don't try to stasis for more turns than we have MP for
 				break;																				//Relies on stasis_option to have already removed skills we cannot cast more than once

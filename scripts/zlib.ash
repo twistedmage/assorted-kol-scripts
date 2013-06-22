@@ -1,5 +1,3 @@
-//SIMON NOT MODIFIED
-
 /******************************************************************************
                                   ZLib
                     supporting functions for scripts
@@ -8,13 +6,12 @@
    Want to say thanks?  Send me (Zarqon) a bat! (Or bat-related item)
 
    For a list of included functions, check out
-   http://wiki.kolmafia.us/index.php?title=Zlib
+   http://kolmafia.us/showthread.php?t=2072
 
 ******************************************************************************/
 
 // stuff that has to be at the top
-// int abs(int n) { if (n < 0) return -n; return n; }
-float abs(float n) { if (n < 0) return -n; return n; }
+float abs(float n) { return n < 0 ? -n : n; }
 string[string] vars;
 
 //                             STRING ROUTINES
@@ -36,7 +33,7 @@ boolean equals(string s1, string s2) {
    return (length(s1) == length(s2) && contains_text(s1,s2));
 }
 
-// improved print(), prints message depending on vars["verbosity"] setting
+// wraps print(), prints message depending on vars["verbosity"] setting
 // has boolean return value -- replaces { print(message); return t/f; }
 // level == 0: abort error
 // level > 0: prints message if verbosity >= level, returns true
@@ -117,6 +114,7 @@ string rnum(float n) { return rnum(n,2); }
 //                             NUMBER ROUTINES
 
 float minmax(float a, float min, float max) { return max(min(a,max),min); }
+
 void set_avg(float toadd, string whichprop) {
    string initv = get_property(whichprop);
    if (initv == "") { set_property(whichprop,toadd+":1"); return; }
@@ -172,8 +170,31 @@ record {
    string vdate;
 }[string] zv;
 
+string check_version(string soft, string proj, int thread) { buffer msg;
+   if (count(zv) == 0) file_to_map("zversions.txt",zv);
+   if (zv[proj].vdate == today_to_string()) return "";
+   vprint_html("Checking for updates (running <a href='http://kolmafia.us/showthread.php?t="+thread+"' target='_blank'>"+soft+"</a> rev. "+svn_info(proj).revision+")...",1);
+   if (!svn_at_head(proj)) {
+      cli_execute("svn update " + proj);
+      msg.append(soft+" has been updated from r"+zv[proj].ver+" to r"+svn_info(proj).revision+".  The next time it is run, it will be current.");
+   }
+   zv[proj].vdate = today_to_string();
+   if (to_int(zv[proj].ver) == svn_info(proj).revision) { map_to_file(zv,"zversions.txt"); return ""; }
+   if (length(msg) == 0) msg.append(soft+" has been updated from r"+zv[proj].ver+" to r"+svn_info(proj).revision+" since you last ran it.");
+   msg.insert(0,"<big><font color=red><b>"+soft+" Updated!</b></font></big><br>");	  
+   msg.append("<br><a href='http://kolmafia.us/showthread.php?t="+thread+"' target='_blank'><u>Click here "+
+      "for discussion of what's new.</u></a> (<a href='http://kolmafia.us/showthread.php?goto=newpost&t="+thread+"' target='_blank'><u>last post</u></a>)");
+   if (contains_text(svn_info(proj).url,"svn.code.sf.net")) msg.append(" (<a href='"+replace_string(svn_info(proj).url,"svn.code.","")+"/log/' target='_blank'><u>SourceForge</u></a>)");
+   zv[proj].ver = svn_info(proj).revision;
+   map_to_file(zv,"zversions.txt");
+   vprint_html(msg,1);
+   return "<div class='versioninfo'>"+msg+"</div>";
+}
+
 // checks script version once daily, returns empty string, OR div with update message inside
 string check_version(string soft, string prop, string thisver, int thread) { int w = 8; string page; matcher find_ver;
+   if (svn_exists(prop)) { return check_version(soft, prop, thread); }
+   if (count(zv) == 0) file_to_map("zversions.txt",zv);
    boolean sameornewer(string local, string server) {
       if (equals(local,server)) return true;
       string[int] loc = split_string(local,"\\.");
@@ -185,7 +206,6 @@ string check_version(string soft, string prop, string thisver, int thread) { int
       }
       return local == server;
    }
-   if (count(zv) == 0) file_to_map("zversions.txt",zv);
    if (zv[prop].vdate != today_to_string()) {
       vprint("Checking for updates (running "+soft+" ver. "+thisver+")...",1);
       page = visit_url("http://kolmafia.us/showthread.php?t="+thread);
@@ -217,6 +237,7 @@ boolean load_current_map(string fname, aggregate dest) {
    if (zv[key].vdate == today_to_string() && count(dest) > 0) return true;
    zv[key].vdate = today_to_string();
    string rem = visit_url("http://zachbardon.com/mafiatools/autoupdate.php?f="+fname+"&act=getver");
+   if (rem == "") return vprint("There was a problem accessing the Map Manager.",-1);
    if (zv[key].ver == rem && count(dest) > 0) {
       map_to_file(zv,"zversions.txt");
       return vprint("You have the latest "+fname+".txt.  Will not check again today.",3);
@@ -309,6 +330,7 @@ int sell_val(item it) { return sell_val(it,0,false); }
 // return a map of tower items (true if detected by telescope, false if possibly needed)
 boolean[item] tower_items(boolean combatsafe) {
    boolean[item] res;
+   if (to_int(get_property("lastTowerClimb")) == my_ascensions()) return res;
    switch (my_path()) {
       case "Bees Hate You": res[$item[tropical orchid]] = true; return res;
       case "Bugbear Invasion": return res;
@@ -386,11 +408,12 @@ float isxpartof(item child, item ancestor) {
 
 float [item,item] useforitems;
 float has_goal(item whatsit) {                   // chance of getting a goal from an item
-   if (whatsit == to_item(to_int(get_property("currentBountyItem")))) return 1.0;
+//   if (whatsit == to_item(to_int(get_property("currentBountyItem")))) return 1.0;
    if (!goal_exists("item")) return 0;
    float has_goal(item whatsit,int level) {
      if (whatsit == $item[none]) return 0;
-     if (is_goal(whatsit) || whatsit == to_item(to_int(get_property("currentBountyItem")))) return 1.0;
+//     if (is_goal(whatsit) || whatsit == to_item(to_int(get_property("currentBountyItem")))) return 1.0;
+     if (is_goal(whatsit)) return 1.0;
      if (count(useforitems) == 0 && !load_current_map("use_for_items", useforitems)) {
         vprint("Unable to load file \"use_for_items.txt\".",-3); return 0;
      }
@@ -553,7 +576,7 @@ int get_safemox(location wear) {
       high = max(monster_attack(m),high);
    }
    if (high == 0 || high == monster_level_adjustment()) return 0;
-   if (my_location() == $location[barrr] && item_amount($item[book of pirate insults]) > 0) high += 0.3*my_defstat();
+   if (my_location() == $location[barrr] && item_amount($item[the big book of pirate insults]) > 0) high += 0.3*my_defstat();
    return high + 7 - current_mcd();
 }
 
@@ -561,7 +584,7 @@ int get_safemox(location wear) {
 boolean auto_mcd(int safemox) {
    if (!to_boolean(vars["automcd"]) || my_ascensions() < 1 || in_bad_moon()) return true;
    if ((knoll_available() && !retrieve_item(1,$item[detuned radio])) ||
-     (gnomads_available() && item_amount($item[bitchin meatcar]) + item_amount($item[desert bus pass]) +
+     (gnomads_available() && item_amount($item[bitchin' meatcar]) + item_amount($item[desert bus pass]) +
       item_amount($item[pumpkin carriage]) == 0))
       return vprint("MCD: unavailable","olive",5);
    if (safemox == 0) {
@@ -677,18 +700,14 @@ boolean send_gift(string to, string message, int meat, int[item] goodies, string
    int[item] extra;
    foreach i in goodies {
       if (is_tradeable(i) || is_giftable(i)) {
-         j = j+1;
-         if (j < 4)
-           itemstring = itemstring + "&howmany"+j+"="+goodies[i]+"&whichitem"+j+"="+to_int(i);
+         j += 1;
+         if (j < 3)
+           itemstring += "&howmany"+j+"="+goodies[i]+"&whichitem"+j+"="+to_int(i);
          else extra[i] = goodies[i];
       }
    }
-   int shipping = 200;
-   int pnum = 3;
-   if (count(goodies) < 3) {
-      shipping = 50*max(1,count(goodies));
-      pnum = max(1,count(goodies));
-   }
+   int pnum = minmax(count(goodies),1,2);
+   int shipping = 50*pnum;
    if (my_meat() < meat+shipping) return vprint("Not enough meat to send the package.",-2);
   // send gift
    string url = visit_url("town_sendgift.php?pwd=&towho="+to+"&note="+message+"&insidenote="+insidenote+"&whichpackage="+pnum+"&fromwhere=0&sendmeat="+meat+"&action=Yep."+itemstring);
@@ -706,8 +725,8 @@ boolean kmail(string to, string message, int meat, int[item] goodies, string ins
    string[int] itemstrings;
    foreach i in goodies {
       if (is_tradeable(i) || is_giftable(i)) {
-         j = j+1;
-         itemstring = itemstring + "&howmany"+j+"="+goodies[i]+"&whichitem"+j+"="+to_int(i);
+         j += 1;
+         itemstring += "&howmany"+j+"="+goodies[i]+"&whichitem"+j+"="+to_int(i);
          if (j > 10) {
             itemstrings[count(itemstrings)] = itemstring;
             itemstring = '';
@@ -739,13 +758,13 @@ setvar("threshold",4);
 setvar("unknown_ml",170);
 setvar("is_100_run",$familiar[none]);
 setvar("defaultoutfit","current");
-check_version("ZLib","zlib","r37",2072);
+check_version("ZLib","zlib",2072);
 
 void main(string setval) {
    if (!setval.contains_text(" = ")) {
       print_html("<b>Copy/paste/modify/enter any of the following lines in the CLI to edit settings:</b><br>");
       foreach key,val in vars if (setval == "vars" || setval == "" || key.to_lower_case().contains_text(setval.to_lower_case()) || 
-	     val.to_lower_case().contains_text(setval.to_lower_case())) print("zlib "+key+" = "+val);
+         val.to_lower_case().contains_text(setval.to_lower_case())) print("zlib "+key+" = "+val);
       print("(If no values were shown, no settings or values matched your input text. Type \"zlib vars\" to see all.)","gray"); return;
    }
    string n = excise(setval,""," = ");

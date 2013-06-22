@@ -1,4 +1,3 @@
-//sIMON unmodified
 /******************************************************************************
                                 BatBrain
                   supporting functions for combat scripts
@@ -15,8 +14,8 @@ import <zlib.ash>
 // globals
 monster m;
 boolean should_putty, should_olfact, should_pp;
-boolean isseal;
 boolean havemanuel;
+boolean isseal, nostun, nomultistun, nevermiss;  // monster attributes that are checked from a list
 int round, howmanyfoes;
 int maxround = 30;
 int[item] stolen;                // all the items you grab during this combat
@@ -206,12 +205,8 @@ advevent to_event(string id, spread dmg, spread pdmg, string special, int howman
    while (bittles.find()) switch (bittles.group(1)) {
       case "att": res.att = aoe*eval(bittles.group(2),fvars); break;
       case "def": res.def = aoe*eval(bittles.group(2),fvars); break;
-      case "stun": if ($monsters[clancy] contains m) break;       // immune to all stuns
-	     res.stun = eval(bittles.group(2),fvars);
-        // detect multi-round stun immune monsters here
-         if (res.stun > 1 && $monsters[your shadow, cyrus the virus, queen bee, beebee king, bee thoven, buzzerker, oil tycoon, oil baron, oil cartel, 
-            trophyfish, chester, frosty, ol' scratch, oscus, zombo, hodgman the hoboverlord, stella the demonic turtle poacher] contains m) res.stun = 0;
-         break;
+      case "stun": if (nostun || (nomultistun && res.stun > 1)) break;    // immune to all stuns
+	     res.stun = eval(bittles.group(2),fvars); break;
       case "mp": if (my_class() == $class[zombie master]) continue;
          res.mp = eval(bittles.group(2),fvars); break;
       case "meat": res.meat = eval(bittles.group(2),fvars); break;
@@ -494,10 +489,6 @@ if (have_effect($effect[form of...bird]) > 0) {
    remove factors["item"];                     // remove items if impossible
    vprint("You can't use items in this combat.",-6);
 }
-if (have_effect($effect[temporary amnesia]) > 0) {
-   remove factors["skill"];                    // remove skills if impossible
-   vprint("You can't cast any skills with amnesia!",-5);
-}
 if (my_fam() != $familiar[bandersnatch]) remove factors["bander"];    // remove irrelevant batfactors to
 if (my_fam() != $familiar[hatrack]) remove factors["hatrack"];        // save time during the following
 if (my_fam() != $familiar[scarecrow]) remove factors["scare"];
@@ -653,10 +644,7 @@ void fxngear() {
 // ====== MONSTER ======
 float m_hit_chance() {            // monster hit chance
    float stunmod = minmax(merge(baseround(),adj).stun,0,1.0);
-   if ($monsters[a.m.c. gremlin, batwinged gremlin, erudite gremlin, spider gremlin, vegetable gremlin, oil tycoon, oil baron, 
-                 oil cartel, reanimated baboon skeleton, reanimated bat skeleton, reanimated demon skeleton, reanimated giant spider skeleton,
-                 reanimated serpent skeleton, reanimated wyrm skeleton, your shadow, clancy] contains m) return 1.0 - stunmod;
-   return (1.0 - stunmod)*minmax(0.55 + (max(monster_stat("att"),0.0) - my_stat("Moxie"))*0.055,my_location() == $location[slime tube] ? 0.8 : 0.06,0.94);
+   return nevermiss ? 1.0 - stunmod : (1.0 - stunmod)*minmax(0.55 + (max(monster_stat("att"),0.0) - my_stat("Moxie"))*0.055,my_location() == $location[slime tube] ? 0.8 : 0.06,0.94);
 }
 spread m_regular() {               // damage dealt by monster attack
    switch (m) {
@@ -696,6 +684,7 @@ advevent m_event(float att_mod, float stun_mod) {      // monster event -- attac
       case $monster[dr awkward]: res.dmg = to_spread("-25"); break;                  // assuming 50%
       case $monster[quiet healer]: res.pdmg[$element[none]] -= 0.25*17.5; break;     // ... 25% ... ...??
       case $monster[knob goblin mad scientist]: res.mp += 0.25*9; break;             // assuming 25% activation rate??
+      case $monster[pufferfish]: if (round > 0 && adj.stun == 0) res.pdmg[$element[none]] += 2 + 2 ** round; break;  // puffer poison
    }
    if (my_stat("hp") - dmg_taken(res.pdmg) <= 0) res.meat -= beatenup;    // the monster took you out -- and I don't mean to dinner. ouch!
    adj.att -= att_mod;
@@ -713,8 +702,10 @@ float m_dpr(float att_mod, float stun_mod) {
    return dmg_taken(m_event(att_mod,stun_mod).pdmg);
 }
 int kill_rounds(spread s) {       // how many rounds for a given damage spread to kill the monster
+   float biff = dmg_dealt(s);
+   if (biff >= monster_stat("hp")) return 1;
    return ceil(to_float(monster_stat("hp")) /
-               max(dmg_dealt(s) + dmg_dealt(m_event().dmg) + dmg_dealt(baseround().dmg),0.0001));
+               minmax(biff + dmg_dealt(m_event().dmg) + dmg_dealt(baseround().dmg), 0.0001, monster_stat("hp")));
 }
 int kill_rounds(advevent a) { return kill_rounds(a.dmg); }  // how many rounds for a given action to kill the monster
 int die_rounds() {                // how many rounds at the current ML and stun until you die
@@ -846,8 +837,13 @@ string to_html(advevent a) { return to_html(a,true); }
 
 void addopt(advevent a, float meatcost, int mpcost) {
    if (a.id == "") return;
-   if (m == $monster[your shadow] && a.pdmg[$element[none]] >= 0) return;   // don't add non-healing items vs. shadow
-   if (m == $monster[mine crab] && dmg_dealt(a.dmg) > 39) a.pdmg[$element[none]] = 100000;   // sensitive beasties
+   switch (m) {
+      case $monster[your shadow]: if (a.pdmg[$element[none]] >= 0) return; break;   // don't add non-healing items vs. shadow
+	  case $monster[yog-urt elder goddess of hatred]: if (dmg_dealt(a.dmg) > 0 && round + equipped_amount($item[mer-kin prayerbeads]) <= 8) return; break;  // don't kill yourself
+	  case $monster[shub-jigguwatt]: if (count(a.dmg) > 0 && a.id != "attack") return; break;  // don't kill yourself
+      case $monster[mine crab]: if (dmg_dealt(a.dmg) > 39) a.pdmg[$element[none]] = 100000; break;   // sensitive beasties
+   }
+   if (a.id == "skill 3022") a.meat *= 0.33;                    // candyblast only drops candy 33% of the time
    if (happened("skill 5023")) foreach n in $ints[5003,5005,5008,5012,5019]
       if (a.id == "skill "+n) { a.att *= 2.0; a.def *= 2.0; }   // mistletoe doubles DB skill deleveling
   // TODO: add overkilling hobos
@@ -914,7 +910,6 @@ spread regular(int ts) {  // 1) norm, 2) thrust-smack / axing, 3) lts, 5) bashin
    if (m == $monster[x-dimensional horror]) return res;
    float ltsadj = (ts == 3) ? 1.25 + 0.05*to_int(my_class() == $class[seal clubber]) : (ts == 5) ? 1.4 : 1.0;
    boolean ranged = (weapon_type(equipped_item($slot[weapon])) == $stat[moxie]);
-
    float radj = (equipped_item($slot[weapon]) == $item[none]) ? 0.25 : (ranged ? 0.75 : 1.0);
    res[$element[none]] = max(0,max(0,floor((ranged ? my_stat("Moxie") : my_stat("Muscle"))*ltsadj*radj) - monster_stat("def")) +
       max(1,numeric_modifier("Weapon Damage") + 0.5) * (critchance()+1.0) * ts +
@@ -922,7 +917,6 @@ spread regular(int ts) {  // 1) norm, 2) thrust-smack / axing, 3) lts, 5) bashin
       to_int(ranged)*numeric_modifier("Ranged Damage Percent"))/100;
    if (have_skill($skill[double-fisted]) && to_slot(equipped_item($slot[offhand])) == $slot[weapon])
       res[$element[none]] += 0.15*get_power(equipped_item($slot[offhand])) + 0.5;
-
    foreach el in $elements[] if (numeric_modifier(el+" Damage") > 0) res[el] = numeric_modifier(el+" Damage");
    return (have_equipped($item[skeletal scabbard]) && item_type(equipped_item($slot[weapon])) == "sword") ? factor(res,2) : res;
 }
@@ -938,8 +932,9 @@ void build_items() {                                                // TODO: sph
    foreach it,fields in factors["item"] {
       if (is_goal(to_item(it)) || item_amount(to_item(it)) <= blacklist["use "+it] || !be_good(to_item(it))) continue;
 	  if (blacklist contains ("use "+it) && blacklist["use "+it] == 0) continue;
-      if (happened("use "+it) && (contains_text(fields.special,"once") || (!to_item(it).reusable &&
-          happenings["use "+it].queued >= max(0,item_amount(to_item(it)) - blacklist["use "+it])))) continue;
+      if (happened("use "+it) && (contains_text(fields.special,"once") || 
+		     (!to_item(it).reusable && happenings["use "+it].queued >= max(0,item_amount(to_item(it)) - blacklist["use "+it])) ||
+			 m == $monster[yog-urt elder goddess of hatred])) continue;
       rate = item_val(to_item(it))*to_int(!to_item(it).reusable || $monsters[bonerdagon, naughty sorceress] contains m);
       switch (it) {
          case 1397: if (item_amount($item[bottle of tequila]) == 0) continue;                 // toy soldier
@@ -963,6 +958,7 @@ void build_items() {                                                // TODO: sph
          case 5233: if (monster_phylum(m) == $phylum[construct]) fields.dmg = monster_stat("hp")*6; break; // box of hammers
          case 5445: if (m == $monster[bat in the spats]) fields.dmg = "1000"; break;          // clumsiness bark
          case 5557: if (my_meat() < 50) continue; break;                                      // orange agent
+         case 6026: if ($monsters[oil baron, oil slick, oil cartel, oil tycoon] contains m) fields.special = "item bubblin' crude"; break;  // Duskwalker syringe
          case 819: case 820: case 821: case 822: case 823: case 824: case 825: case 826: case 827: // ! potions
             fields = get_bang(get_property("lastBangPotion"+it)); break;
          case 2174: case 2175: case 2176: case 2177:                                          // spheres
@@ -1004,11 +1000,11 @@ void build_items() {                                                // TODO: sph
 boolean is_spell(skill s) {
    if ($classes[pastamancer,sauceror] contains s.class) return true;
    if (s.to_int() > 27 && s.to_int() < 44) return true;   // hobopolis spells
-   return ($skills[noodles of fire,saucemageddon,volcanometeor showeruption] contains s);
+   return ($skills[noodles of fire,saucemageddon,volcanometeor showeruption,wassail,toynado] contains s);
 }
 
 void build_skillz() {
-   if (count(factors["skill"]) == 0 || have_effect($effect[temporary amnesia]) > 0) return;
+   if (count(factors["skill"]) == 0) return;
    spread d;
    string thisid;
    fvars["bonusdb"] = numeric_modifier("DB Combat Damage") + to_int(my_fam() == $familiar[frumious bandersnatch])*
@@ -1064,7 +1060,7 @@ void build_skillz() {
         case 12000: if ($phyla[bug,constellation,elemental,construct,plant,slime] contains m.phylum) break;
            fields.special = "!! zombify"; break;                 // set flag for +MP since all regular MP is ignored
         default: if (contains_text(fields.special,"regular")) {
-              if (current_hit_stat() == $stat[moxie] && !($ints[7008,1022,1023,12010] contains sk)) return;
+              if (have_effect($effect[QWOPped up]) > 0 || (current_hit_stat() == $stat[moxie] && !($ints[1022,1023,12010] contains sk))) return;
               switch (sk) {    // dmg formulas too complicated for data file
                 case 2005: case 2105: case 2106: case 2107:      // skip shield skills if no shield
                    if (fvars["shieldpower"] == 0) return; d = merge(to_spread(fields.dmg),regular(1)); break;
@@ -1149,9 +1145,10 @@ void build_options() {
   // 3. add items
    build_items();
   // 4. add skillz, yo
-   build_skillz();
+   if (have_effect($effect[temporary amnesia]) == 0 && 
+       (have_effect($effect[more like a suckrament]) == 0 || round + equipped_amount($item[mer-kin prayerbeads]) > 8)) build_skillz();
    sort opts by -to_profit(value);
-   sort opts by kill_rounds(value.dmg)*-max(1,value.meat);
+   sort opts by kill_rounds(value.dmg)*-max(1,value.profit);
    vprint("Options built! ("+count(opts)+" actions)",9);
 }
 
@@ -1175,7 +1172,7 @@ advevent attack_action() {  // returns most profitable killing action
       return get_action("use 2848");
    float drnd = max(1.0,die_rounds()-1.0);   // a little extra pessimistic
    sort opts by -dmg_dealt(value.dmg);
-   sort opts by -to_profit(value);
+   sort opts by -value.profit;
    sort opts by kill_rounds(value.dmg)*-(min(value.profit,-1));
    foreach i,opt in opts {
       if (kill_rounds(opt.dmg) > min(maxround - round - 1,drnd)) continue;   // reduce RNG risk for stasisy actions
@@ -1190,7 +1187,7 @@ advevent attack_action() {  // returns most profitable killing action
 }
 advevent stun_action(boolean foritem) {    // returns cheapest stunned rounds, at least one (accounting for funking items)
    if (smack.id == "") attack_action();
-   sort opts by -(to_profit(value)-(value.stun == 0 ? 1000 : 0)+              // cheatily discount non-stunners
+   sort opts by -(value.profit-(value.stun == 0 ? 1000 : 0)+              // cheatily discount non-stunners
       meatperhp*m_dpr(-adj.att,0)*min(kill_rounds(smack.dmg)+count(custom),
         value.stun - 1 + to_int(foritem && have_skill($skill[funkslinging]) && contains_text(value.id,"use "))));
    foreach i,opt in opts {
@@ -1317,6 +1314,14 @@ void set_monster(monster elmo) {  // should be called once per BB instance; init
    if (have_equipped($item[mer-kin hookspear])) fvars["monstermeat"] = to_float(my_path() == "Way of the Surprising Fist" ? max(meat_drop(m),12) : meat_drop(m));
   // initialize effects/gear
    fxngear();
+  // stun immunities
+   nostun = ($monsters[clancy, yog-urt elder goddess of hatred, shub-jigguwatt] contains m);
+   nomultistun = ($monsters[your shadow, cyrus the virus, queen bee, beebee king, bee thoven, buzzerker, oil tycoon, oil baron, oil cartel, 
+            trophyfish, chester, frosty, ol' scratch, oscus, zombo, hodgman the hoboverlord, stella the demonic turtle poacher] contains m);
+  // monsters that always hit
+   nevermiss = ($monsters[a.m.c. gremlin, batwinged gremlin, erudite gremlin, spider gremlin, vegetable gremlin, oil tycoon, oil baron, 
+                 oil cartel, reanimated baboon skeleton, reanimated bat skeleton, reanimated demon skeleton, reanimated giant spider skeleton,
+                 reanimated serpent skeleton, reanimated wyrm skeleton, your shadow, clancy] contains m);
   // monster resistance
    if (happened("use 5048")) mres = get_resistance($element[cold]);
     else mres = get_resistance(m.defense_element);
@@ -1370,7 +1375,9 @@ void set_monster(monster elmo) {  // should be called once per BB instance; init
       case $monster[ancient protector spirit]:
       case $monster[Protector Spectre]:
       case $monster[sexy sorority ghost]:
-      case $monster[ghost miner]: mres[$element[none]] = 1; break;
+      case $monster[ghost miner]: 
+      case $monster[yog-urt, elder goddess of hatred]: mres[$element[none]] = 1; break;
+      case $monster[shub-jigguwatt, elder god of violence]: foreach el in $elements[] mres[el] = 1; break;
       case $monster[chester]:
       case $monster[mother slime]: remove factors["item"];                     // remove items if impossible
          vprint("You can't use items in this combat.",-6); break;              // note: mother's resistance handled in act()
@@ -1553,6 +1560,8 @@ string act(string action) {
          return act(use_skill($skill[sing])); break;
       case $monster[the thorax]: if (contains_text(lastaction,"draws back his big fist") && item_amount($item[clumsiness bark]) > 0)
          return act(throw_item($item[clumsiness bark])); break;
+      case $monster[the server]: if (item_amount($item[strange goggles]) > 0 && contains_text(lastaction,"chrome input ports"))
+         return act(throw_item($item[strange goggles])); break;
    }
    return action;
 }
@@ -1595,6 +1604,8 @@ string batround() {
       case $monster[somerset lopez, demon mariachi]: res.append("if haseffect 721; skill 6025; endif; "); break;   // sing away earworms
       case $monster[the thorax]: if (item_amount($item[clumsiness bark]) > 0)                                      // react to fist-drawing
          res.append("if match \"draws back his big fist\"; use 5445; endif; "); break;
+      case $monster[the server]: if (item_amount($item[strange goggles]) == 0) break;
+         res.append("if match \"chrome input ports\"; use 6118; endif; "); break;
    }
    switch (my_fam()) {
       case $familiar[he-boulder]: if (have_effect($effect[everything looks yellow]) > 0 || !contains_text(to_lower_case(vars["ftf_yellow"]),to_lower_case(m.to_string()))) break;
@@ -1654,4 +1665,4 @@ string macro(item i) { return macro(get_action(i),"z"); }
 setvar("BatMan_profitforstasis",15.0);       // profit required to enter stasis
 setvar("BatMan_baseSubstatValue",5.0);       // value of a single substat point (mainstat 2*n, attack stat 1.5*n, defstat 1.5*n -- these stack)
 // setvar("BatMan_pessimism",0.5);              // pessimism range -1.0 - 1.0 (1.0 totally pessimistic, 0 exact averages, -1.0 totally optimistic)
-string BBver = check_version("BatBrain","batbrain","1.38",6445);
+string BBver = check_version("BatBrain","batbrain",6445);

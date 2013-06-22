@@ -30,7 +30,7 @@
 script "CounterChecker.ash";
 notify Bale;
 import <zlib.ash>
-check_version("CounterChecker", "BaleCC", "1.49998", 2519);
+check_version("CounterChecker", "bale-counterchecker", "1.6", 2519);
 
 // All user configurable variables are stored in a txt file in your /data directory specific to each character. 
 // To change them use notepad and look for vars_<character>.txt, replacing <character> with the character's name.
@@ -68,9 +68,9 @@ item [location] semi_rare;
 	semi_rare[$location[Orc Chasm]] = $item[ASCII shirt];
 	semi_rare[$location[Battlefield (No Uniform)]] = $item[six-pack of New Cloaca-Cola];
 	semi_rare[$location[Batrat and Ratbat Burrow]] = $item[Dogsgotnonoz pills];
-	semi_rare[$location[Giant's Castle (basement)]] = $item[Super Weight-Gain 9000];
-	semi_rare[$location[Giant's Castle (ground floor)]] = $item[possibility potion];
-	semi_rare[$location[Giant's Castle (top floor)]] = $item[Mick's IcyVapoHotness Inhaler];
+	semi_rare[$location[Giant's Castle (Top Floor)]] = $item[Mick's IcyVapoHotness Inhaler];
+	semi_rare[$location[Giant's Castle (Ground Floor)]] = $item[Possibility Potion];
+	semi_rare[$location[Giant's Castle (Basement)]] = $item[Super Weight-Gain 9000];
 	semi_rare[$location[Guano Junction]] = $item[Eau de Guaneau];
 	semi_rare[$location[Laboratory]] = $item[bottle of Mystic Shell];
 	semi_rare[$location[Pre-Cyrpt Cemetary]] = $item[poltergeist-in-the-jar-o];
@@ -99,12 +99,22 @@ int[item] rare_quant;
 	rare_quant[$item[scented massage oil]] = 3;
 
 // I only want to check these once, so I'm making it global
-boolean can_hobo = visit_url("town_clan.php").contains_text("clanbasement.gif") && !visit_url("clan_basement.php?fromabove=1").contains_text("not allowed");
+boolean can_hobo = visit_url("town_clan.php").contains_text("clanbasement.gif")    // Does the clan have a basement?
+	&& !visit_url("clan_basement.php?fromabove=1").contains_text("not allowed")    // Do you have access to that basement?
+	&& !visit_url("clan_hobopolis.php?place=2").contains_text("townsquare26.gif"); // Has Hodgman been killed?
+
+// Not using this anymore, but leaving it for now in case that changes
 string [string] url_check;  // Let's not check plains.php four times or mountains.php twice and so forth
 string unlockedLocations = get_property("unlockedLocations");
 if(unlockedLocations == "" || index_of(unlockedLocations,"--") < 0 || 
   substring(unlockedLocations,0,index_of(unlockedLocations,"--")) != to_string(my_ascensions()))
 	unlockedLocations = my_ascensions()+"--";
+
+string get_url(string url) {
+	if(!(url_check contains url))
+		url_check[url] = visit_url(url);
+	return url_check[url];
+}
 
 // Gear up for 8-bit and Vanya's Chappel
 boolean pixelize(boolean chapel) {
@@ -132,12 +142,6 @@ boolean stinkup(boolean sim) {
 	return maximize("1 max, 1 min, stench resistance, -tie, switch exotic parrot", sim);
 }
 
-string get_url(string url) {
-	if(!(url_check contains url))
-		url_check[url] = visit_url(url);
-	return url_check[url];
-}
-	
 boolean canadv(location loc) {
 		
 	string hobo_zone(location loc) {
@@ -186,10 +190,10 @@ boolean canadv(location loc) {
 		return get_property("questL09Lol") == "finished" || get_property("questL09Lol") == "step1";
 	case $location[Battlefield (No Uniform)]:
 		return my_level() >= 4 && my_level() < 6 && my_ascensions() > 0 && available_amount($item[fernswarthy's letter]) > 0;
-	case $location[Giant's Castle (basement)]:
-	case $location[Giant's Castle (ground floor)]:
-	case $location[Giant's Castle (top floor)]:
-		return item_amount($item[S.O.C.K]) > 0;
+	case $location[Giant's Castle (Top Floor)]:
+	case $location[Giant's Castle (Ground Floor)]:
+	case $location[Giant's Castle (Basement)]:
+		return item_amount($item[S.O.C.K]) + item_amount($item[intragalactic rowboat]) + item_amount($item[steam-powered model rocketship]) > 0;
 	case $location[Guano Junction]:
 		return get_property("questL04Bat") != "unstarted" && stinkup(true);
 	case $location[Batrat and Ratbat Burrow]:
@@ -222,15 +226,16 @@ boolean canadv(location loc) {
 		return get_property("questG02Whitecastle") != "unstarted" 
 		  || $strings[finished, step3, step4] contains get_property("questL11Palindome");
 	case $location[Hippy Camp]:
-		return island() && (get_property("warProgress") == "unstarted" || get_property("sideDefeated") == "fratboys");
+		return island() && (get_property("questL12War") == "unstarted" || get_property("sideDefeated") == "fratboys");
 	case $location[Frat House]:
-		return island() && (get_property("warProgress") == "unstarted" || get_property("sideDefeated") == "hippies");
+		return island() && (get_property("questL12War") == "unstarted" || get_property("sideDefeated") == "hippies");
 	case $location[Pirate Cove]:
-		return island() && get_property("warProgress") != "started";
+		return island() && ($strings[unstarted, finished] contains get_property("questL12War"));
 	case $location[A-Boo Peak]:
-	case $location[Twin Peak]:
 	case $location[Oil Peak]:
 		return get_property("lastChasmReset").to_int() == my_ascensions() && get_property("chasmBridgeProgress") == "30";
+	case $location[Twin Peak]:
+		return false; // This ceases after peak is lit... Hard to test.
 	case $location[The Purple Light District]:
 	case $location[Burnbarrel Blvd]:
 	case $location[Exposure Esplanade]:
@@ -289,7 +294,7 @@ void eat_cookie() {
 	int count_counters() {
 		string counters = get_counters("Fortune Cookie", 0, 200);
 		if(counters == "") return 0;
-		return count(split_string(counters, "/t"));
+		return count(split_string(counters, "\t"));
 	}
 	
 	boolean toEat() {

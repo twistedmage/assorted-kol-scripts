@@ -103,6 +103,8 @@ void prepare_for(string type,location loc)
 		max_str+=", +outfit mer-kin scholar";
 	if(loc==$location[mer-kin colosseum])
 		max_str+=", +outfit mer-kin gladiator, -ml";
+	if(loc==$location[mer-kin gymnasium])
+		max_str+=", +outfit mer-kin gladiator";
 	if(get_property("lassoTraining")!= "expertly")
 		max_str+=", +equip sea cowboy hat, +equip sea chaps";
 	//if untrained with gladiator weapons ?
@@ -124,16 +126,15 @@ void prepare_for(string type,location loc)
 	//types accepted: -, +, i, 
 	setMood(type);
 	//potions
-//	cli_execute("trigger lose_effect, incredibly Hulking, use 1 Ferrigno's Elixir of Power");
-//	cli_execute("trigger lose_effect, cock of the walk, use 1 connery's elixir of audacity");
-//	cli_execute("trigger lose_effect, Superhuman Sarcasm, use 1 serum of sarcasm");
-//	cli_execute("trigger lose_effect, Phorcefullness, use 1 philter of phorce");
-//	if(my_primestat()==$stat[mysticality])
-//		cli_execute("trigger lose_effect, on the shoulders of giants, use 1 hawking's elixir of brilliance");
-/*		
+	cli_execute("trigger lose_effect, incredibly Hulking, use 1 Ferrigno's Elixir of Power");
+	cli_execute("trigger lose_effect, cock of the walk, use 1 connery's elixir of audacity");
+	cli_execute("trigger lose_effect, Superhuman Sarcasm, use 1 serum of sarcasm");
+	cli_execute("trigger lose_effect, Phorcefullness, use 1 philter of phorce");
+	if(my_primestat()==$stat[mysticality])
+		cli_execute("trigger lose_effect, on the shoulders of giants, use 1 hawking's elixir of brilliance");
+		
 	if(loc==$location[mer-kin colosseum])
 	{
-		boolean tmp=cli_execute("ballpit; telescope high");
 		//more potions
 		if(my_primestat()==$stat[muscle])
 			cli_execute("trigger lose_effect, Stabilizing Oiliness, use 1 Oil of stability");
@@ -146,7 +147,7 @@ void prepare_for(string type,location loc)
 		cli_execute("trigger lose_effect, Chalky Hand, use 1 handful of hand chalk");
 		cli_execute("trigger lose_effect, Gr8tness, use 1 potion of temporary gr8tness ");
 	}
-*/	
+	
 	//lasso / seahorse
 	if(loc==$location[coral corral])
 	{
@@ -389,6 +390,33 @@ void smiteHatred()
 		//visit_url("fight.php?action=useitem&whichitem=6344&whichitem2=0&useitem=Use+Item%28s%29");
 	}
 	run_combat();
+}
+
+void smiteViolence()
+{
+	abort("a");
+	visit_url("sea_merkin.php?action=temple");
+	visit_url("choice.php?pwd&whichchoice=706&option=1&choiceform1=Enter+the+Temple");
+	visit_url("choice.php?pwd&whichchoice=707&option=1&choiceform1=Receive+the+Blessing+of+Shub-Jigguwat");
+	visit_url("choice.php?pwd&whichchoice=708&option=1&choiceform1=Summon+Shub-Jigguwat");
+	if (have_skill($skill[ambidextrous funkslinging]))
+	{
+		//simon disabled deleveling
+		visit_url("fight.php?action=useitem&whichitem=5703&whichitem2=5703&useitem=Use+Item%28s%29");
+		visit_url("fight.php?action=useitem&whichitem=5703&whichitem2=5703&useitem=Use+Item%28s%29");
+	}
+	else
+	{
+		visit_url("fight.php?action=useitem&whichitem=5703");
+		visit_url("fight.php?action=useitem&whichitem=5703");
+		visit_url("fight.php?action=useitem&whichitem=5703");
+		visit_url("fight.php?action=useitem&whichitem=5703");
+	}
+	abort("copy end text line 415");
+	string txt=run_combat();
+	//finish up
+	visit_url("<>");
+	visit_url("choice.php?pwd&whichchoice=709&option=1&choiceform1=The+Eyes+Have+It");
 }
 
 void MonkeeQuest()
@@ -1132,6 +1160,9 @@ void gladiator_path()
 		print("Fighting in colosseum","lime");
 		//just like seahorses, macros don't fire here... so force gladiator macro with visit_url
 		string txt = visit_url("adventure.php?snarfblat=210");
+		//are we in round 5?
+		boolean round_5=contains_text(txt,">Round 5");
+		
 		txt=visit_url("fight.php?action=macro&macrotext=&whichmacro=100626&macro=Execute+Macro");
 		if(contains_text(txt,"WINWINWIN"))
 		{
@@ -1148,6 +1179,12 @@ void gladiator_path()
 		}
 		else
 			abort("Failed to kill gladiator");
+			
+		//
+		if(round_5)
+		{
+			boolean tmp=cli_execute("ballpit; telescope high");
+		}
 
 		//sometimes we get disarmed and mafia doesn't know, so do this
 		cli_execute("inventory refresh");
@@ -1163,7 +1200,7 @@ void gladiator_path()
 	if(i_a("crayon shavings")<4)
 		buy(4,$item[crayon shavings]);
 	
-//	<>
+	smiteViolence();
 }
 
 //scholar path - learn religious words

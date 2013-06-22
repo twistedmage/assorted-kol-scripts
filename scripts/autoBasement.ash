@@ -40,6 +40,8 @@ Version History:
 			Also don't use up the fudge wand
 2013-06-13: Clean up the code for coinmaster handling
 			Fix the over-buffing for the Gauntlet for real (hopefully)
+2013-06-14: Remove version checking. Official release of the SVN version
+2013-06-16: Maximize for initiative as well if we use myst as our combat stat
 */
 
 import <zlib.ash>;
@@ -1060,6 +1062,19 @@ void basement(int num_turns)
 				increase_stat(goal, command, combat_stat);
 			}
 			
+			command = "";
+			foreach sl in $slots[] {
+				command = command + ", -" + to_string(sl);
+				if(sl == $slot[familiar])
+					break;
+			}
+			wait(20);
+			goal = 2*ceil(level ** 1.4);
+			float damage = max(1.0,max(0.0,max(goal,0.0) - my_defstat()) + 0.225*max(goal,0.0) - numeric_modifier("Damage Reduction")) * (1 - minmax((square_root(numeric_modifier("Damage Absorption")/10) - 1)/10,0,0.9));
+			increase_stat(damage * 1.1, "hp" + command, combat_stat);
+			print("Estimated damage: " + damage);
+			print("Estimated monster attack: " + goal);
+			
 			if(to_familiar(vars["is_100_run"]) == $familiar[none]) {
 				int mushrooms = (have_familiar($familiar[astral badger]) == true ? to_int(get_property( "_astralDrops" )) : 5);
 				int absinths = (have_familiar($familiar[green pixie]) == true ? to_int(get_property( "_absintheDrops" )) : 5);
@@ -1405,7 +1420,6 @@ void basement(int num_turns)
 	}
 }
 
-check_version("AutoBasement","AutoBasement","3.4",3113);
 void main(int num_turns)
 {
 	basement(num_turns);

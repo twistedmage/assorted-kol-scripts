@@ -2,6 +2,51 @@ scrollwhendone
 
 abort hppercentbelow 20
 
+#repeat either attacks (to train skill) or attack
+mark glad_fight1
+#ball skills
+if hasskill ball sweat && match  "He pauses to wipe the "
+	skill ball sweat
+	goto glad_fight1
+endif
+if hasskill ball sack && match "He pulls a little bottle of oil out of his "
+	skill ball sack
+	goto glad_fight1
+endif
+if hasskill ball bust && match " an especially dope move with his switchblade"
+	skill ball bust
+	goto glad_fight1
+endif
+
+#net skills
+if hasskill net gain && match  "your exposed underbelly and cocks his arm back for a powerful throw"
+	skill net gain
+	goto glad_fight1
+endif
+if hasskill net loss && match  "He gets a crazy look in his eyes"
+	skill net loss
+	goto glad_fight1
+endif
+if hasskill net neutrality && match  "He closes his eyes and begins to meditate"
+	skill net neutrality
+	goto glad_fight1
+endif
+
+#blade skills
+if hasskill blade sling && match  "He starts to fold his net up into some sort of a"
+	skill blade sling 
+	goto glad_fight1
+endif
+if hasskill blade roller && match  "his net up and draws it back like a baseball bat"
+	skill blade roller 
+	goto glad_fight1
+endif
+if hasskill blade runner && match  "He attaches some sharp metal barbs to his net"
+	skill blade runner 
+	goto glad_fight1
+endif
+
+
 #if we don't know the top level skills, use critfish taffy
 if !hasskill Ball Sack && !hasskill Net Neutrality && !hasskill Blade Runner
 	if hasskill ambidextrous funkslinging
@@ -12,49 +57,49 @@ if !hasskill Ball Sack && !hasskill Net Neutrality && !hasskill Blade Runner
 	endif
 endif
 
-#repeat either attacks (to train skill) or attack
+
+mark glad_fight2
 while !missed 2
-mark glad_fight
 	#ball skills
 	if hasskill ball sweat && match  "He pauses to wipe the "
 		skill ball sweat
-		goto glad_fight
+		goto glad_fight2
 	endif
 	if hasskill ball sack && match "He pulls a little bottle of oil out of his "
 		skill ball sack
-		goto glad_fight
+		goto glad_fight2
 	endif
 	if hasskill ball bust && match " an especially dope move with his switchblade"
 		skill ball bust
-		goto glad_fight
+		goto glad_fight2
 	endif
 	
 	#net skills
 	if hasskill net gain && match  "your exposed underbelly and cocks his arm back for a powerful throw"
 		skill net gain
-		goto glad_fight
+		goto glad_fight2
 	endif
 	if hasskill net loss && match  "He gets a crazy look in his eyes"
 		skill net loss
-		goto glad_fight
+		goto glad_fight2
 	endif
 	if hasskill net neutrality && match  "He closes his eyes and begins to meditate"
 		skill net neutrality
-		goto glad_fight
+		goto glad_fight2
 	endif
 	
 	#blade skills
 	if hasskill blade sling && match  "He starts to fold his net up into some sort of a"
 		skill blade sling 
-		goto glad_fight
+		goto glad_fight2
 	endif
 	if hasskill blade roller && match  "his net up and draws it back like a baseball bat"
 		skill blade roller 
-		goto glad_fight
+		goto glad_fight2
 	endif
 	if hasskill blade runner && match  "He attaches some sharp metal barbs to his net"
 		skill blade runner 
-		goto glad_fight
+		goto glad_fight2
 	endif
 	
 	#default

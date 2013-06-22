@@ -2783,7 +2783,7 @@ void defaultMood(boolean castMojo) {
 	}	
 	else {
 		//these are prettyt pointless, only use them when we have too much mana to use
-		if(available_amount($item[crown of thrones])>0 && cli_execute("ash import zlib; be_good($item[crown of thrones])") && have_familiar($familiar[el vibrato megadrone]))
+		if(equipped_amount($item[crown of thrones])>0 && cli_execute("ash import zlib; be_good($item[crown of thrones])") && cli_execute("ash import zlib; be_good($familiar[el vibrato megadrone])"))
 		{
 if(can_interact())
 {
@@ -2814,7 +2814,7 @@ if(can_interact())
 				if (anHero()) {
 		//			if (have_skill($skill[The Power Ballad of the Arrowsmith])) cli_execute("trigger lose_effect, Power Ballad of the Arrowsmith, cast 1 The Power Ballad of the Arrowsmith");
 				} else {
-					if (have_skill($skill[The Moxious Madrigal])) cli_execute("trigger lose_effect, The Moxious Madrigal, cast 1 The Moxious Madrigal");
+					if (castMojo && have_skill($skill[The Moxious Madrigal])) cli_execute("trigger lose_effect, The Moxious Madrigal, cast 1 The Moxious Madrigal");
 				}
 				if (have_skill($skill[Patience of the Tortoise])) cli_execute("trigger lose_effect, Patience of the Tortoise, cast 1 Patience of the Tortoise");
 				if (have_skill($skill[Seal Clubbing Frenzy])) cli_execute("trigger lose_effect, Seal Clubbing Frenzy, cast 1 Seal Clubbing Frenzy");
@@ -2844,7 +2844,7 @@ if(can_interact())
 			break;
 			
 			case $stat[Moxie] :
-				if (have_skill($skill[The Moxious Madrigal])) cli_execute("trigger lose_effect, The Moxious Madrigal, cast 1 The Moxious Madrigal");
+				if (castMojo && have_skill($skill[The Moxious Madrigal])) cli_execute("trigger lose_effect, The Moxious Madrigal, cast 1 The Moxious Madrigal");
 				if (my_level() < 7 && castMojo && have_skill($skill[The Magical Mojomuscular Melody])) cli_execute("trigger lose_effect, The Magical Mojomuscular Melody, cast 1 The Magical Mojomuscular Melody");
 				if (my_level() > 5) { cli_execute("trigger lose_effect, Butt-Rock Hair, use 5 hair spray"); }
 				if (have_skill($skill[snarl of the timberwolf]))
@@ -6072,8 +6072,12 @@ boolean bcascChasm() {
 			//abort("BCC: The bees make you unable to use oil thingies. Please run the peak yourself and burn the shit down.");
 			set_property("choiceAdventure606", 6);
 			set_property("choiceAdventure618", 2);
-			bumAdv($location[twin peak], "", "", "", "We are going to burn down this beeloving mansion!", "+");
-		}
+			while(!contains_text(visit_url("questlog.php?which=2"),"There Can Be Only One Topping"))
+			{
+				bumAdv($location[twin peak], "", "", "", "We are going to burn down this beeloving mansion!", "+");
+				visit_url("place.php?whichplace=highlands&action=highlands_dude");
+			}
+		}		
 	}
 	//If we've arrived here we should've finished the stage
 	if (contains_text(visit_url("place.php?whichplace=highlands"), "fire2.gif") && !checkStage("twinpeak"))
@@ -7755,7 +7759,7 @@ boolean bcascMacguffinFinal() {
 
 	if (contains_text(visit_url("questlog.php?which=1"),"A Pyramid Scheme")) {
 		if (!contains_text(visit_url("beach.php"),"pyramid.php")) visit_url("beach.php?action=woodencity");
-		if (can_interact()) {
+		if (can_interact() && my_path()!="Bees Hate You") {
 			retrieve_item(11, $item[tomb ratchet]);
 		}
 		
@@ -7769,7 +7773,7 @@ boolean bcascMacguffinFinal() {
 		else 
 			cli_execute("swim laps");
 		if (!contains_text(visit_url("pyramid.php"),"pyramid3b.gif")) {
-			if (item_amount($item[tomb ratchet]) > 0) {
+			if (item_amount($item[tomb ratchet]) > 0 && my_path()!="Bees Hate You") {
 				use(1, $item[tomb ratchet]);
 			} else {
 				while (i_a("carved wooden wheel") == 0) bumAdv($location[Upper Chamber], "", "", "carved wooden wheel", "Getting the Carved Wooden Wheel" ,"-");
@@ -7781,7 +7785,7 @@ boolean bcascMacguffinFinal() {
 			boolean pyrstep(string stepname,string posnum) {
 				print("BCC: "+stepname+" (image "+posnum+")", "purple");
 				while (get_property("pyramidPosition") != posnum) {
-					if (can_interact() || item_amount($item[tomb ratchet]) > 0 && my_path() != "Bees Hate You") {
+					if ((can_interact() || item_amount($item[tomb ratchet]) > 0) && my_path() != "Bees Hate You") {
 						use(1, $item[tomb ratchet]);
 					} else {
 						bumAdv($location[Middle Chamber], "", "", "choiceadv", "Getting another choice adventure", "-");
