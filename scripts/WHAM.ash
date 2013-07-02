@@ -164,6 +164,12 @@
 				 Add code to handle automating Yog-Urt and Jigguwatt
 		13-06-14:Don't try to stasis for so long that we cannot afford to kill the monster
 		13-06-15:FIx to_int-problem for the new stasis check x 2
+		13-06-21:Attempt to stasis with attack if we can hit, have a chance to crit and have one of the weapons for the Gladiator path equipped
+				 Skip custom options in our various _option functions since BatBrain will allow them in opts soon
+				 Add two new zlib-settings that control how much we are willing to pay to save a combat round, WHAM_roundcost_aftercore and WHAM_roundcost_ronin.
+				 Also, add that value to the stasis-property so that the higher roundcost-value we have, the more valuable an action need to be to be used in stasis
+				 Also, also, skip funkslinging if we either cannot find a second item to sling or said roundcost value is high enough that it is deemed unprofitable
+		13-06-28:Specifically disallow useage of frosty's iceball until it can be figured out why it keeps using it
 ***********************************************************************************************************************/
 import <SmartStasis.ash>;
 
@@ -176,8 +182,8 @@ setvar("WHAM_noitemsplease", false);	//If true will cause the script to skip all
 setvar("WHAM_safetymargin", 0);			//Sets the extra safety margin you want for rounds that the script will not stasis for
 setvar("WHAM_UseSeaLasso", false);		//If true will use the sea lasso in the sea to train the lasso skill, does not currently know when to stop doing this
 setvar("WHAM_killit", false);			//If true will attack the monster with your most powerful option, ignoring cost
-//setvar("WHAM_roundcost_aftercore", 50);	//Controls how much you are prepared to pay to save a round in fights in aftercore
-//setvar("WHAM_roundcost_inrun", 5);		//Controls how much you are prepared to pay to save a round in fights in ronin
+setvar("WHAM_roundcost_aftercore", 50);	//Controls how much you are prepared to pay to save a round in fights in aftercore
+setvar("WHAM_roundcost_ronin", 5);		//Controls how much you are prepared to pay to save a round in fights in ronin
 
 record actions
 {
@@ -205,7 +211,7 @@ int unknown_ml = to_int(vars["unknown_ml"]);
 float hitchance = to_float(vars["WHAM_hitchance"]);
 int WHAM_safetymargin = to_int(vars["WHAM_safetymargin"]);
 int WHAM_roundcost_aftercore = to_int(vars["WHAM_roundcost_aftercore"]);
-int WHAM_roundcost_inrun = to_int(vars["WHAM_roundcost_inrun"]);
+int WHAM_roundcost_ronin = to_int(vars["WHAM_roundcost_ronin"]);
 
 //Load the map of items and skills to not use from the file
 record dontuse
@@ -284,6 +290,8 @@ advevent mp_option(int target) {
 		return new advevent;
 	sort opts by -to_profit(value);
 	foreach i,opt in opts {
+		if (opt.custom)
+			continue;
 		if (opt.mp <= 0)
 			continue;
 		if (opt.mp + my_stat("mp") >= target) {
@@ -299,6 +307,8 @@ advevent hp_option(int target) {
 		return new advevent;
 	sort opts by -to_profit(value);
 	foreach i,opt in opts {
+		if (opt.custom)
+			continue;	
 		if (dmg_taken(opt.pdmg) >= 0) //Negative pdmg = healing item
 			continue;
 		if (-dmg_taken(opt.pdmg) + my_stat("hp") >= target && -dmg_taken(opt.pdmg) > m_dpr(0,0)) {
@@ -369,6 +379,8 @@ boolean ok(advevent a) {
 		switch(aid.group(1)+aid.group(2)) {
 			case "use 2848":	//Gnomitronic thingamabob
 				return (item_amount($item[gnomitronic hyperspatial demodulizer]) > 0 && !happened($item[gnomitronic hyperspatial demodulizer]));
+			case "use 3391":	//Frosty's Iceball, should not be used but is anyway so disallow it
+				return false;
 			case "skill 66": //Flying Fire Fist
 				if (have_effect($effect[Salamanderenity]) == 0)
 					return true;
@@ -479,17 +491,18 @@ boolean has_option(skill whichskill) {
 	return false;
 }
 
+boolean train_skills() {
+	return ($items[Mer-kin dragnet, Mer-kin switchblade, Mer-kin dodgeball] contains equipped_item($slot[weapon]) && my_location().zone == "The Sea" && hitchance("attack") > hitchance && critchance() > 0);
+}
+
 advevent attack_option() {
 	if (ok(get_action("use 2848")) && !happened($item[gnomitronic hyperspatial demodulizer]) && monster_stat("hp") <= dmg_dealt(get_action("use 2848").dmg))
 		return get_action("use 2848");
-	//if ($items[Mer-kin dragnet, Mer-kin switchblade, Mer-kin dodgeball] contains equipped_item($slot[weapon]) && my_location().zone == "The Sea" && hitchance() > 0.5)
-	//	return get_action("attack");
 		
 	float drnd = max(1.0,die_rounds());   // a little extra pessimistic
 	sort opts by -dmg_dealt(value.dmg);
 	sort opts by -to_profit(value);
-	sort opts by kill_rounds(value.dmg)* (vars["WHAM_killit"] == "true" || my_location() == $location[Fernswarthy's Basement]? 1 : -(min(value.profit,-1)));
-	//sort opts by kill_rounds(value.dmg)* -(min(value.profit-(can_interact() ? WHAM_roundcost_aftercore : WHAM_roundcost_inrun),-1));
+	sort opts by kill_rounds(value.dmg)* -(min(value.profit-(can_interact() ? WHAM_roundcost_aftercore : WHAM_roundcost_ronin),-1));
 	
 	foreach i,opt in opts {
 		vprint(opt.id + " does hurt the monster for " + dmg_dealt(opt.dmg) + " and is " + (ok(opt) ? "ok." : "not ok."), "green", 10);
@@ -498,6 +511,11 @@ advevent attack_option() {
 			return opt;
 		}
 		
+		//Skip custom options in order to not do strange things
+		if (opt.custom) {
+			vprint("Skipping " + opt.id + " since it is marked as a custom action.", "purple", 9);
+			continue;
+		}
 		//Skip options that are indicated as not ok
 		if(!ok(opt)) {
 			vprint("Skipping " + opt.id + " since it is not ok.", "purple", 9);
@@ -548,6 +566,8 @@ advevent delevel_option(boolean nodmg) {
 	foreach i,opt in opts {
 		if(nodmg && dmg_dealt(opt.dmg) != 0)
 			continue;
+		if (opt.custom)
+			continue;			
 		if(opt.att < 0) {
 			vprint("WHAM: Your most profitable deleveling option is " + opt.id + ".", "purple", 8);
 			return opt;
@@ -566,6 +586,8 @@ advevent item_option() {
 	foreach i,opt in opts {
 		if(!ok(opt))
 			continue;
+		if (opt.custom)
+			continue;			
 		if(!contains_text(opt.id, "use"))
 			continue; //Ignore skills (only looking at items for this one)
 		if(hitchance(opt.id) < hitchance)
@@ -583,12 +605,19 @@ advevent item_option() {
 
 advevent stasis_option() {  // returns most profitable lowest-damage option
 	boolean ignoredelevel = (smacks.id != "" && kill_rounds(smacks.dmg) == 1);
+
+	if (train_skills()) {
+		plink = get_action("attack");
+		return plink;
+	}
 	
 	sort opts by -to_profit(value,ignoredelevel);
 	sort opts by -min(kill_rounds(value),max(0,maxround - round - (5 + WHAM_safetymargin)));	
 	foreach i,opt in opts {  // skip multistuns and non-multi-usable items
 		if(!ok(opt))
 			continue;
+		if (opt.custom)
+			continue;			
 		if(hitchance(opt.id) < hitchance)
 			continue;
 		if(opt.stun > 1 || (contains_text(opt.id,"use ") && !to_item(excise(opt.id,"use ","")).reusable))
@@ -615,6 +644,8 @@ advevent stun_option(float rounds, boolean foritem) {
 	foreach i,opt in opts {
 		if(!ok(opt))
 			continue;
+		if (opt.custom)
+			continue;			
 		if (opt.stun < (foritem && have_skill($skill[ambidextrous funkslinging]) && contains_text(opt.id, "use") ? 1 : 2))
 			continue;
 		if (hitchance(opt.id) < hitchance)
@@ -893,7 +924,8 @@ actions[int] Calculate_Options(float base_hp) {
 				if(contains_text(killer.id, "use") && have_skill($skill[ambidextrous funkslinging]) && funking == false) {
 					killer = item_option();
 					funking = true;
-					if(!contains_text(killer.id, "use")) {
+					if(!contains_text(killer.id, "use") || (can_interact() ? WHAM_roundcost_aftercore > abs(to_profit(killer)) : WHAM_roundcost_ronin > abs(to_profit(killer)))) {
+						vprint("WHAM: Skipping funkslinging because " + (!contains_text(killer.id, "use") ? "no killing item was found." : "your WHAM_roundcost-setting is higher than the cost of using the item."), "purple", 8);
 						killer = attack_option();
 						funking = false;
 					}
@@ -1245,7 +1277,7 @@ string stasis_WHAM() {
 		return page;  // avoid teleportitis
 	stasis_option();
 	attack_option();
-	while ((to_profit(plink) > to_float(vars["BatMan_profitforstasis"]) || is_our_huckleberry()) &&
+	while ((to_profit(plink) > to_float(vars["BatMan_profitforstasis"]) + (can_interact() ? WHAM_roundcost_aftercore : WHAM_roundcost_ronin) || is_our_huckleberry() || train_skills()) &&
 	  (round < maxround - (3 + WHAM_safetymargin) - kill_rounds(smacks) && die_rounds() > kill_rounds(smacks))) {
 		vprint("Top of the stasis loop.",9);
 		matcher optid = create_matcher("(skill |use |jiggle|attack)(?:(\\d+),?(\\d+)?)?",plink.id);

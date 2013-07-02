@@ -21,7 +21,6 @@ void adventure_relay()
 	add_features(results);
 	results.write();
 }
-
 void main()
 {
 	adventure_relay();

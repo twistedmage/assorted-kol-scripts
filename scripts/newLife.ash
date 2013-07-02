@@ -514,6 +514,7 @@ boolean pull_if_good(item it)
 {
 	if(good(it))
 	{
+		print("pulling "+it);
 		take_storage(1,it);
 		return true;
 	}
@@ -587,16 +588,16 @@ void special(boolean bonus_actions) {
 		}
 		pull_and_wear_if_good($item[ice sickle]);
 		//myst classes want a pan offhand
-		if(my_primestat()==$stat[mysticality])
+		if(my_primestat()==$stat[mysticality] && my_path()!="Bees Hate You")
 		{
 			//pull whichever
 			if(storage_amount($item[Jarlsberg's pan (Cosmic portal mode)])>0)
 			{
-				pull_if_good($item[Jarlsberg's pan (Cosmic portal mode)]);
+				pull_and_wear_if_good($item[Jarlsberg's pan (Cosmic portal mode)]);
 			}
 			else
 			{
-				pull_if_good($item[Jarlsberg's pan]);
+				pull_and_wear_if_good($item[Jarlsberg's pan]);
 			}
 			//for now we will always use the portal version, might want to change it one day though
 			if(available_amount($item[Jarlsberg's pan])>0)
@@ -606,7 +607,9 @@ void special(boolean bonus_actions) {
 			equip($item[Jarlsberg's pan (Cosmic portal mode)]);
 		}
 		else //others want a shield
+		{
 			pull_and_wear_if_good($item[operation patriot shield]);
+		}
 		pull_and_wear_if_good($item[greatest american pants]);
 		pull_and_wear_if_good($item[juju mojo mask],$slot[acc2]);
 		//if we have no astral belt, wear fangs. Else pull fangs as superclover but dont wear 
@@ -718,6 +721,7 @@ void new_ascension() {
 	check_breakfast();
 	start_quests();
 	cli_execute("outfit save Backup");  // Accidently equiping Backup after ascending cases error. No more oops.
+	cli_execute("outfit save bumcheekascend");  // Accidently equiping Backup after ascending cases error. No more oops.
 	print("Welcome to your new life as a "+myclass+"!", "green");
 	set_property("unlockedLocations",""); 
 	set_property("ready_for_ascension",false);	

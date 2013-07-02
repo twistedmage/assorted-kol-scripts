@@ -13,14 +13,14 @@ import <zlib.ash>
 
 // globals
 monster m;
+boolean isseal, nostun, nomultistun, nomiss, nohit;  // monster attributes not included in proxy records
+int round, howmanyfoes, damagecap, maxround;
+float noitems, noskills, capexp;
+effect dangerpoison;             // threatening poison effect of this monster
 boolean should_putty, should_olfact, should_pp;
 boolean havemanuel;
-boolean isseal, nostun, nomultistun, nevermiss;  // monster attributes that are checked from a list
-int round, howmanyfoes;
-int maxround = 30;
 int[item] stolen;                // all the items you grab during this combat
 string page;                     // most recent page load
-effect dangerpoison;             // threatening poison effect of this monster
 float beatenup;                  // cost of getting beaten up
 int turncount = my_turncount();  // cache this for happenings
 boolean finished() {             // returns true if the combat is over
@@ -51,6 +51,7 @@ record advevent {          // record of changes due to an event
    int rounds;             // rounds consumed
    substats stats;         // substats gained/lost
    boolean endscombat;     // this action ends combat
+   boolean custom;         // this action should not be used in normal automation
    string note;            // user-friendly name or special note
 };
 advevent base;             // happens every round for the rest of combat
@@ -116,6 +117,7 @@ advevent merge(advevent fir, advevent sec) {
    res.rounds = fir.rounds + (autofunk != "" ? 0 : sec.rounds);
    res.stats = merge(fir.stats,sec.stats);
    res.endscombat = fir.endscombat || sec.endscombat;
+   res.custom = fir.custom || sec.custom;
    res.note = fir.note+(sec.note != "" && fir.note != "" ? "; " : "")+sec.note;
    return res;
 }
@@ -201,6 +203,7 @@ advevent to_event(string id, spread dmg, spread pdmg, string special, int howman
       }
       fvars["dmg"] = dmg_dealt(res.dmg);   // this is used for starfish/mosquitos and as a dmg_dealt cache
    } else fvars["dmg"] = 0;
+   res.custom = special.contains_text("custom");
    bittles = create_matcher("([a-z!]+?) (.+?)(?:$|, )",special);
    while (bittles.find()) switch (bittles.group(1)) {
       case "att": res.att = aoe*eval(bittles.group(2),fvars); break;
@@ -241,7 +244,7 @@ advevent to_event(string id, combat_rec src) { return to_event(id,src,0); }
 
 int[string] blacklist;
 void temp_blacklist_inc(string id, int amt) {
-   if (((blacklist contains id) && blacklist[id] == 0) || amt < 1) return;
+   if (((blacklist contains id) && blacklist[id] < 1) || amt < 1) return;
    blacklist[id] += amt;
 }
 void build_blacklist() {
@@ -294,44 +297,11 @@ float dmg_dealt(spread action) {
    float res;
    spread newdeal;
    foreach el,amt in action newdeal[el] = amt < 0 ? amt : max(to_int(amt > 0),amt - mres[el]*amt);  // first, apply monster resistances
-   float softcapped(float orig, float cap, float exponent) {
-      if (orig <= cap) return orig;
-	  return cap + floor((orig - cap)**exponent);
+   float softcapped(float orig) {
+      if (damagecap == 0 || orig <= damagecap) return orig;
+	  return damagecap + floor((orig - damagecap)**capexp);
    }
-   void softcapit(float cap, float exponent) {
-      foreach el,amt in newdeal res += softcapped(amt,cap,exponent);
-   }
-  // apply soft damage caps
-   switch (m) {
-      case $monster[gorgolok, the demonic hellseal]:
-      case $monster[lumpy, the demonic sauceblob]:
-      case $monster[demon of new wave]:
-      case $monster[somerset lopez, demon mariachi]:
-      case $monster[spaghetti demon]: softcapit(75,0.65); break;
-      case $monster[stella, the demonic turtle poacher]: softcapit(50,0.65); break;
-
-      case $monster[gorgolok, the infernal seal (volcanic cave)]:
-      case $monster[lumpy, the sinister sauceblob (volcanic cave)]:
-      case $monster[somerset lopez, dread mariachi (volcanic cave)]:
-      case $monster[spaghetti elemental (volcanic cave)]:
-      case $monster[spirit of new wave (volcanic cave)]:
-      case $monster[stella, the turtle poacher (volcanic cave)]: softcapit(100,0.85); break;
-
-      case $monster[chester]:
-      case $monster[zombo]: softcapit(500,0.65); break;
-      case $monster[gang of hobo muggers]:
-      case $monster[ol' scratch]: softcapit(500,0.7); break;
-      case $monster[oscus]: softcapit(500,0.75); break;
-      case $monster[hodgman, the hoboverlord]: newdeal = factor(newdeal,0.75); softcapit(500,0.85); break;   // if frosty is undefeated: 300+floor((ceiling(0.05*x)-300)^0.75)
-
-      case $monster[BRICKO cathedral]: 
-      case $monster[gargantuchicken]: softcapit(1000,0.2); break;
-      case $monster[groar]: softcapit(50,0.7); break;
-      case $monster[mer-kin raider]: softcapit(400,0.75); break;
-      case $monster[mother slime]: softcapit(200,0.7); break;
-      case $monster[trophyfish]: softcapit(500,0.8); break;
-	  default: foreach el,amt in newdeal res += amt;       // monster has no soft cap
-   }
+   foreach el,amt in newdeal res += softcapped(amt);
    return min(res,monster_stat("hp"));
 }
 
@@ -545,7 +515,6 @@ string deranged(string sane) {
    return sane;
 }
 foreach te,it,rd in factors {                 // remove placeholders, reduce ranges to averages, tune damage
-   if (contains_text(rd.special,"custom")) { remove factors[te,it]; continue; }
    factors[te,it].dmg = deranged(rd.dmg);
    factors[te,it].pdmg = deranged(rd.pdmg);
    factors[te,it].special = deranged(rd.special);
@@ -635,22 +604,18 @@ void fxngear() {
            oncrit = merge(oncrit,aedoh);
          else base = merge(base,aedoh);
    }
-   retal.id = "";
-   onhit.id = "";
-   oncrit.id = "";
-   onwin.id = "";
 }
 
 // ====== MONSTER ======
 float m_hit_chance() {            // monster hit chance
    float stunmod = minmax(merge(baseround(),adj).stun,0,1.0);
-   return nevermiss ? 1.0 - stunmod : (1.0 - stunmod)*minmax(0.55 + (max(monster_stat("att"),0.0) - my_stat("Moxie"))*0.055,my_location() == $location[slime tube] ? 0.8 : 0.06,0.94);
+   return nomiss ? 1.0 - stunmod : (1.0 - stunmod)*minmax(0.55 + (max(monster_stat("att"),0.0) - my_stat("Moxie"))*0.055,my_location() == $location[slime tube] ? 0.8 : 0.06,0.94);
 }
 spread m_regular() {               // damage dealt by monster attack
-   switch (m) {
-      case $monster[naughty sorority nurse]:
-      case $monster[antique database server]: return to_spread(0);        // these monsters have no attack
-      case $monster[your shadow]: return to_spread(95 + (my_maxhp()/6));  // Your Shadow has a unique damage formula
+   if (nohit) return to_spread(0);
+   switch (m) {                    // unique damage formulas
+      case $monster[your shadow]: return to_spread(95 + (my_maxhp()/6));
+	  case $monster[mammon the elephant]: return to_spread(2**(round - 1));
    }
    spread res;
    res[m.attack_element] = max(1.0,max(0.0,max(monster_stat("att"),0.0) - my_defstat(true)) + 0.225*max(monster_stat("att"),0.0) - numeric_modifier("Damage Reduction")) *
@@ -747,7 +712,10 @@ float hitchance(string id) {        // HITCH-nce
    if (have_equipped($item[operation patriot shield]) && happened($skill[throw shield]) && !happened("shieldcrit")) return 1.0;
   // cunctatitis blocks 50% of everything, black cat blocks 50% of items
    float through = 1.0 - 0.5*to_int(have_effect($effect[cunctatitis]) > 0);
-   if (id == "attack") through *= 1.0 - fumble_chance();
+   if (id == "attack") {
+      if (m == $monster[the bat in spats]) return critchance();
+      through *= 1.0 - fumble_chance();
+   }
    if (have_effect($effect[song of battle]) > 0) return through;
    float attack = my_stat(to_string(current_hit_stat())) + (have_skill($skill[sick pythons]) ||
       (have_skill($skill[master of the surprising fist]) && unarmed()) ? 20 : 0);
@@ -756,8 +724,8 @@ float hitchance(string id) {        // HITCH-nce
    matcher aid = create_matcher("(attack|use|skill) ?(\\d+)?",id);
    if (aid.find()) switch (aid.group(1)) {
       case "use": if (my_fam() == $familiar[black cat]) through *= 0.5;
-         return (contains_text(to_string(m),"Naughty Sorceress") || m == $monster[bonerdagon]) ? through*0.75 : through;
-      case "skill": if (contains_text(to_string(m),"Naughty Sorceress") || m == $monster[bonerdagon]) through *= 0.5;
+         return noitems > 0 ? through*(1.0 - noitems) : through;
+      case "skill": if (noskills > 0) through *= 1.0 - noskills;
          switch (to_int(aid.group(2))) {
             case 0001: case 2003: case 7097: break;  // beak, head, turtle*7 tails all have regular hitchance
             case 7010: case 7011: case 7012: case 7013: case 7014: attack = 10 + my_stat("Moxie"); break; // bottle rockets are mox+10
@@ -804,7 +772,7 @@ float to_profit(advevent haps, boolean nodelevel) {    // determines the profit 
           a.meat;                                                       // meat
    return haps.profit;
 }
-float to_profit(advevent haps) { return to_profit(haps,false); }
+float to_profit(advevent haps) { return to_profit(haps,true); }
 
 string to_html(advevent a, boolean table) {
    buffer res;
@@ -843,7 +811,7 @@ void addopt(advevent a, float meatcost, int mpcost) {
 	  case $monster[shub-jigguwatt]: if (count(a.dmg) > 0 && a.id != "attack") return; break;  // don't kill yourself
       case $monster[mine crab]: if (dmg_dealt(a.dmg) > 39) a.pdmg[$element[none]] = 100000; break;   // sensitive beasties
    }
-   if (a.id == "skill 3022") a.meat *= 0.33;                    // candyblast only drops candy 33% of the time
+   if (a.id == "skill 3022") a.meat *= 0.13;                    // candyblast drops candy at 33% rate, plus additional compensation for overvalued candy
    if (happened("skill 5023")) foreach n in $ints[5003,5005,5008,5012,5019]
       if (a.id == "skill "+n) { a.att *= 2.0; a.def *= 2.0; }   // mistletoe doubles DB skill deleveling
   // TODO: add overkilling hobos
@@ -931,11 +899,11 @@ void build_items() {                                                // TODO: sph
    added.clear();
    foreach it,fields in factors["item"] {
       if (is_goal(to_item(it)) || item_amount(to_item(it)) <= blacklist["use "+it] || !be_good(to_item(it))) continue;
-	  if (blacklist contains ("use "+it) && blacklist["use "+it] == 0) continue;
+	  if (blacklist contains ("use "+it) && blacklist["use "+it] < 1) continue;
       if (happened("use "+it) && (contains_text(fields.special,"once") || 
 		     (!to_item(it).reusable && happenings["use "+it].queued >= max(0,item_amount(to_item(it)) - blacklist["use "+it])) ||
 			 m == $monster[yog-urt elder goddess of hatred])) continue;
-      rate = item_val(to_item(it))*to_int(!to_item(it).reusable || $monsters[bonerdagon, naughty sorceress] contains m);
+      rate = item_val(to_item(it))*to_int(!to_item(it).reusable);
       switch (it) {
          case 1397: if (item_amount($item[bottle of tequila]) == 0) continue;                 // toy soldier
             rate += item_val($item[bottle of tequila]); break;
@@ -1016,7 +984,7 @@ void build_skillz() {
       if (contains_text(fields.special,"once") && happened(thisid)) return;
       thisid = "skill "+sk;
       if (blacklist contains thisid) {      // infinite and threshold blacklisting
-	     if (blacklist[thisid] == 0) return;
+	     if (blacklist[thisid] < 1) return;
 		 if (happened(thisid) && happenings[thisid].done + happenings[thisid].queued >= blacklist[thisid]) return;
       }
       if (m == $monster[x bottles of beer on a golem] && is_spell(to_skill(sk))) return;  // this dude blocks spells
@@ -1034,6 +1002,9 @@ void build_skillz() {
         case 66: if (fvars["fistskills"] > 1) fields.special = "meat -"+(meatpermp*mp_cost($skill[salamander kata])*have_effect($effect[salamanderenity])/(3*fvars["fistskills"]));
            break;  // flying fire fist costs salamanderenity
         case 70: fields.special = happened($skill[chilled monkey brain]) ? "" : "stun 1"; break;  // monkey only stuns once
+        case 77: fields.special = (!happened($skill[torment plant]) && (item_drops(m) contains $item[clumsiness bark])) ? "item clumsiness bark" : "phylum plant";
+        case 78: fields.special = (!happened($skill[pinch ghost]) && (item_drops(m) contains $item[jar full of wind])) ? "item jar full of wind" : "!! only affects ghosts";
+        case 79: fields.special = (!happened($skill[tattle]) && (item_drops(m) contains $item[dangerous jerkcicle])) ? "item dangerous jerkcicle" : "att -7, def -12";
         case 84: fvars["wpnpower"] = max(10, get_power(equipped_item($slot[weapon])));            // silent slam
            if (item_type(equipped_item($slot[weapon])) == "club") fvars["wpnpower"] *= 2; break;
         case 86: fvars["wpnpower"] = max(10, get_power(equipped_item($slot[weapon])));            // silent slice
@@ -1135,7 +1106,6 @@ void build_options() {
       opts[0] = merge(opts[0],to_event("",to_spread(0.075*get_power(equipped_item($slot[weapon])),   // glancing blows
          1.0-hitchance("attack")-fumble_chance()),to_spread(0),""));
    }	  
-  // TODO: something for 5/day chefstaffs?
   // 2. get jiggy with it
    if (item_type(equipped_item($slot[weapon])) == "chefstaff" && contains_text(page,"chefstaffform") &&
        !happened("jiggle") && factors["chef"] contains to_int(equipped_item($slot[weapon])) && !(blacklist contains "jiggle")) {
@@ -1143,9 +1113,9 @@ void build_options() {
       addopt(to_event("jiggle",factors["chef",to_int(equipped_item($slot[weapon]))],1),0,0);
    }
   // 3. add items
-   build_items();
+   if (noitems < 1.0) build_items();
   // 4. add skillz, yo
-   if (have_effect($effect[temporary amnesia]) == 0 && 
+   if (noskills < 1.0 && have_effect($effect[temporary amnesia]) == 0 && 
        (have_effect($effect[more like a suckrament]) == 0 || round + equipped_amount($item[mer-kin prayerbeads]) > 8)) build_skillz();
    sort opts by -to_profit(value);
    sort opts by kill_rounds(value.dmg)*-max(1,value.profit);
@@ -1158,8 +1128,8 @@ advevent stasis_action() {  // returns most profitable lowest-damage action
    boolean ignoredelevel = (smack.id != '' && kill_rounds(smack.dmg) == 1);
    sort opts by -to_profit(value,ignoredelevel);
    sort opts by -min(kill_rounds(value),max(0,maxround - round - 5));
-   foreach i,opt in opts {  // skip multistuns and non-multi-usable items
-      if (opt.stun > 1 || (contains_text(opt.id,"use ") && !to_item(excise(opt.id,"use ","")).reusable)) continue;
+   foreach i,opt in opts {  // skip multistuns, custom, and non-multi-usable items
+      if (opt.custom || opt.stun > 1 || (contains_text(opt.id,"use ") && !to_item(excise(opt.id,"use ","")).reusable)) continue;
       vprint("Stasis action chosen: "+opt.id+" (round "+rnum(round)+", profit: "+rnum(opt.profit)+")",8);
       plink = opt;
       return opt;
@@ -1175,7 +1145,7 @@ advevent attack_action() {  // returns most profitable killing action
    sort opts by -value.profit;
    sort opts by kill_rounds(value.dmg)*-(min(value.profit,-1));
    foreach i,opt in opts {
-      if (kill_rounds(opt.dmg) > min(maxround - round - 1,drnd)) continue;   // reduce RNG risk for stasisy actions
+      if (opt.custom || kill_rounds(opt.dmg) > min(maxround - round - 1,drnd)) continue;   // reduce RNG risk for stasisy actions
       if (opt.stun < 1 && opt.profit < -runaway_cost()) continue;  // don't choose actions worse than fleeing
       vprint("Attack action chosen: "+opt.id+" (round "+rnum(round)+", profit: "+rnum(opt.profit)+")",8);
       smack = opt;
@@ -1191,7 +1161,7 @@ advevent stun_action(boolean foritem) {    // returns cheapest stunned rounds, a
       meatperhp*m_dpr(-adj.att,0)*min(kill_rounds(smack.dmg)+count(custom),
         value.stun - 1 + to_int(foritem && have_skill($skill[funkslinging]) && contains_text(value.id,"use "))));
    foreach i,opt in opts {
-      if (opt.stun < 1-to_int(foritem && have_skill($skill[funkslinging]) && contains_text(opt.id,"use "))) continue;
+      if (opt.custom || opt.stun < 1-to_int(foritem && have_skill($skill[funkslinging]) && contains_text(opt.id,"use "))) continue;
       vprint("Stun action chosen: "+opt.id+" (round "+rnum(round)+", profit: "+rnum(opt.profit)+")",8);
       buytime = opt;
       return opt;
@@ -1257,7 +1227,7 @@ boolean enqueue(advevent a) {     // handle inserts/auto-funk
   // Auto-funk!
    boolean funk;
    matcher bob = create_matcher("use (\\d+)\\Z",a.id);
-   if (have_skill($skill[funkslinging]) && bob.find() && count(queue) > 0) {
+   if (have_skill($skill[funkslinging]) && count(queue) > 0 && m != $monster[the thorax] && bob.find()) {
       bob.reset(queue[count(queue)-1].id);
       if (bob.find() && (queue[count(queue)-1].id != a.id || (item_amount(to_item(to_int(bob.group(1)))) > 1 &&
 	      m_dpr(0,-adj.stun)*meatperhp > to_float(vars["BatMan_profitforstasis"]))))
@@ -1288,14 +1258,8 @@ boolean enqueue(item i) { return enqueue(get_action(i)); }
 
 void set_monster(monster elmo) {  // should be called once per BB instance; initializes BB for a specific monster
    m = elmo;
-  // monster plurality
-   int[monster] pluralm;
-   load_current_map("pluralMonsters",pluralm);
-   howmanyfoes = (pluralm contains m) ? pluralm[m] : 1;
-   pluralm.clear();
    if (m == $monster[none] && to_int(vars["unknown_ml"]) == 0)
       vprint("You would like to handle this unknown monster yourself. (unknown_ml is 0)",0);
-   maxround = 30;
   // values for formulas
    fvars["myhp"] = my_hp();
    fvars["monsterhp"] = monster_hp();
@@ -1314,104 +1278,37 @@ void set_monster(monster elmo) {  // should be called once per BB instance; init
    if (have_equipped($item[mer-kin hookspear])) fvars["monstermeat"] = to_float(my_path() == "Way of the Surprising Fist" ? max(meat_drop(m),12) : meat_drop(m));
   // initialize effects/gear
    fxngear();
-  // stun immunities
-   nostun = ($monsters[clancy, yog-urt elder goddess of hatred, shub-jigguwatt] contains m);
-   nomultistun = ($monsters[your shadow, cyrus the virus, queen bee, beebee king, bee thoven, buzzerker, oil tycoon, oil baron, oil cartel, 
-            trophyfish, chester, frosty, ol' scratch, oscus, zombo, hodgman the hoboverlord, stella the demonic turtle poacher] contains m);
-  // monsters that always hit
-   nevermiss = ($monsters[a.m.c. gremlin, batwinged gremlin, erudite gremlin, spider gremlin, vegetable gremlin, oil tycoon, oil baron, 
-                 oil cartel, reanimated baboon skeleton, reanimated bat skeleton, reanimated demon skeleton, reanimated giant spider skeleton,
-                 reanimated serpent skeleton, reanimated wyrm skeleton, your shadow, clancy] contains m);
-  // monster resistance
+  // set default monster attributes
+   nostun = false; nomultistun = false; nomiss = false; nohit = false; isseal = false;
+   howmanyfoes = 1; maxround = 30; damagecap = 0; capexp = 0; noitems = 0; noskills = 0;
    if (happened("use 5048")) mres = get_resistance($element[cold]);
     else mres = get_resistance(m.defense_element);
+  // special monster attributes
+   foreach i,mrec in (factors["monster"]) if (mrec.ufname.to_monster() == m) {
+      matcher monmat = create_matcher("([a-z!]+?)(?: (.+?))?(?:$|, )", mrec.special);
+      while (monmat.find()) switch (monmat.group(1)) {                 // parse other special attributes
+         case "maxround": if (is_integer(monmat.group(2))) maxround = to_int(monmat.group(2)); vprint("This combat may last up to "+rnum(maxround)+" rounds.",8); break;
+         case "group": if (is_integer(monmat.group(2))) howmanyfoes = to_int(monmat.group(2)); vprint("This monster is a group of "+rnum(howmanyfoes)+".",8); break;
+         case "damagecap": if (is_integer(monmat.group(2))) damagecap = to_int(monmat.group(2)); vprint("This monster has a soft damage cap of "+rnum(damagecap)+".",8); break;
+         case "capexp": capexp = to_float(monmat.group(2)); vprint_html("Damage in excess of the damage cap will be reduced to X<sup>"+rnum(capexp)+"</sup>.",8); break;
+         case "nohit": nohit = vprint("This monster has no attack.",8); break;
+         case "nomiss": nomiss = vprint("This monster never misses.",8); break;
+         case "nostun": nostun = vprint("This monster is immune to all stuns.",8); break;
+         case "nomultistun": nomultistun = vprint("This monster is immune to multiple-round stunners.",8); break;
+         case "seal": isseal = vprint("This monster is a seal, and can only be damaged by clubs.",8); break;
+         case "noitems": if (group_count(monmat) == 2) noitems = minmax(to_float(monmat.group(2)),0,1); if (noitems == 0) noitems = 1.0; 
+                         vprint("Items have a "+rnum(noitems*100.0)+"% chance of being blocked.",8); break;
+         case "noskills": if (group_count(monmat) == 2) noskills = minmax(to_float(monmat.group(2)),0,1); if (noskills == 0) noskills = 1.0; 
+                         vprint("Skills have a "+rnum(noskills*100.0)+"% chance of being blocked.",8); break;
+         default: vprint("Unknown keyword found: "+monmat.group(0),-4);
+	  }
+      if (mrec.dmg.length() > 1 || mrec.dmg.to_int() > 0) foreach el,val in to_spread(mrec.dmg) if (val != 0) mres[el] = val;
+	  break;
+   }
    switch (m) {
-      case $monster[BRICKO vacuum cleaner]: foreach el in $elements[] mres[el] = 0.1; mres[$element[none]] = 0.1; break;
-	  case $monster[peanut]: foreach el in $elements[] mres[el] = 0.25; break;
-      case $monster[gorgolok, the infernal seal (volcanic cave)]:
-      case $monster[lumpy, the sinister sauceblob (volcanic cave)]:
-      case $monster[somerset lopez, dread mariachi (volcanic cave)]:        // <-- confirm this?? wasn't in the wiki
-      case $monster[spirit of new wave (volcanic cave)]:
-      case $monster[stella, the turtle poacher (volcanic cave)]:
-	  case $monster[trophyfish]: foreach el in $elements[] mres[el] = 0.25;
-      case $monster[booty crab]:
-      case $monster[war frat kegrider]:
-      case $monster[war frat mobile grill unit]:
-      case $monster[war hippy dread squad]: mres[$element[none]] = 0.25; break;
-	  case $monster[oil tycoon]: foreach el in $elements[hot, stench] mres[el] = 0.25; mres[$element[cold]] = -0.5; break;
-      case $monster[gorgolok, the demonic hellseal]:
-      case $monster[stella, the demonic turtle poacher]:
-      case $monster[spaghetti demon]:
-      case $monster[lumpy, the demonic sauceblob]:
-      case $monster[somerset lopez, demon mariachi]:
-      case $monster[demon of new wave]: foreach el in $elements[] mres[el] = 0.4; mres[$element[none]] = 0.4; break;
-      case $monster[oil baron]: foreach el in $elements[] mres[el] = 0.5;  mres[$element[cold]] = 0; break;
-      case $monster[Crys-Rock]:
-      case $monster[sexy sorority werewolf]:
-      case $monster[queen bee]:
-      case $monster[beebee king]:
-      case $monster[bee thoven]: foreach el in $elements[] mres[el] = 0.5;
-      case $monster[vanya's creature]:
-      case $monster[gargantuchicken]:
-      case $monster[heavy kegtank]:
-      case $monster[mobile armored sweat lodge]: mres[$element[none]] = 0.5; break;
-      case $monster[oil cartel]: foreach el in $elements[] mres[el] = 0.75;  mres[$element[cold]] = 0.5; break;
-      case $monster[the whole kingdom]: maxround = 11; remove factors["item"];
-	  case $monster[don crimbo]:
-      case $monster[cyrus the virus]:
-      case $monster[hulking construct]:
-      case $monster[the landscaper]:
-      case $monster[frosty]: foreach el in $elements[] mres[el] = 1;
-      case $monster[ancient ghost]:
-      case $monster[contemplative ghost]:
-      case $monster[lovesick ghost]:
-      case $monster[battlie knight ghost]:
-      case $monster[claybender sorcerer ghost]:
-      case $monster[dusken raider ghost]:
-      case $monster[space tourist explorer ghost]:
-      case $monster[whatsian commando ghost]:
-      case $monster[snow queen]:
-      case $monster[chalkdust wraith]:
-      case $monster[ancient protector spirit]:
-      case $monster[Protector Spectre]:
-      case $monster[sexy sorority ghost]:
-      case $monster[ghost miner]: 
-      case $monster[yog-urt, elder goddess of hatred]: mres[$element[none]] = 1; break;
-      case $monster[shub-jigguwatt, elder god of violence]: foreach el in $elements[] mres[el] = 1; break;
-      case $monster[chester]:
-      case $monster[mother slime]: remove factors["item"];                     // remove items if impossible
-         vprint("You can't use items in this combat.",-6); break;              // note: mother's resistance handled in act()
-      case $monster[your shadow]: foreach te,it,rd in factors                  // delete all damage, then add healing as damage
-	     factors[te,it].dmg = (rd.pdmg.length() > 1 && substring(rd.pdmg,0,1) == "-") ? substring(rd.pdmg,1) : "0"; break;
      // TODO: reanimated skeletons resist everything except pottery
-     // detect seals, add catchall resistance in case you don't have a club equipped
-      case $monster[broodling seal]:
-      case $monster[centurion of sparky]:
-      case $monster[hermetic seal]:
-      case $monster[spawn of wally]:
-      case $monster[heat seal]:
-      case $monster[navy seal]:
-      case $monster[servant of grodstank]:
-      case $monster[shadow of black bubbles]:
-      case $monster[watertight seal]:
-      case $monster[wet seal]: isseal = true; if (item_type(equipped_item($slot[weapon])) == "club") break;
-      case $monster[zombo]:
-      case $monster[sexy sorority skeleton]:
-      case $monster[spooky hobo]: foreach el in $elements[] mres[el] = 1; break;
-     // long combats
-      case $monster[ghost of fernswarthy grandfather]: mres[$element[none]] = 1; maxround = 50; break;
-      case $monster[x stone golem]: mres[$element[none]] = 0.5;
-      case $monster[beast with x ears]:
-      case $monster[beast with x eyes]:
-      case $monster[x-headed hydra]:
-      case $monster[x bottles of beer on a golem]:
-      case $monster[x-dimensional horror]:
-
-      case $monster[naughty sorceress]:
-      case $monster[naughty sorceress (2)]:
-      case $monster[the man]:
-      case $monster[big wisniewski]: maxround = 50; break;
-     // unchanging special moves/conditions
+      case $monster[your shadow]: foreach te,it,rd in factors                  // delete regular damage, add healing as damage
+	     factors[te,it].dmg = (rd.pdmg.length() > 1 && substring(rd.pdmg,0,1) == "-") ? substring(rd.pdmg,1) : "0"; break;
       case $monster[blackberry bush]:
       case $monster[cactuary]: if (weapon_type(equipped_item($slot[weapon])) != $stat[moxie]) onhit.pdmg[$element[none]] = 5.3; break;
    }

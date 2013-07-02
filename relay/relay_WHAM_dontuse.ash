@@ -9,6 +9,7 @@
 			0.4.1:	YEs, really, we do not want to regenerate that file...
 			0.4.2:	Third time's a charm
 		2013-06-10:	Move version checking to SVN
+		2013-06-25: 0 is the amount to use to avoid an item, not -1
 ***********************************************************************************************************************/
 
 script "WHAM_dontuse";
@@ -100,7 +101,7 @@ void build_page() {
 	writeln("&nbsp;&nbsp;&nbsp;<b>1)</b> Pick an option in the drop down (use for items and skill for ... ehh... skills).<br>");
 	writeln("&nbsp;&nbsp;&nbsp;<b>2)</b> Enter either the name or number of the item or skill in question, but not both.<br>");
 	writeln("&nbsp;&nbsp;&nbsp;<b>3)</b> For items indicate if you want it to be used above a certain amount.<br>");
-	writeln("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The number is the amount to save (or -1 to disregard it completely).<br><br>");
+	writeln("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The number is the amount to save (or 0 to disregard it completely).<br><br>");
 	writeln("You can add one new item or skill at a time, between which you need to press the update&save button.<br><br>");
 	build_table();
 	

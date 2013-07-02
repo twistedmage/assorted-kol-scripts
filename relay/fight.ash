@@ -24,7 +24,6 @@ float turns_till_goals(boolean usespec) {
    return totalgoalitems / max(has_goal(my_location(),usespec),0.0001);
 }
 
-
 record einclove {
    int[item] yield;   // all items yielded, and their average amounts
    boolean andor;     // in case of multiple item types, whether you get all types (true) or only one type (false)
@@ -74,12 +73,13 @@ void fight_top_level(buffer results)
 				abox.append("<table><tr>"); 
 				foreach i in $items[red pixel, green pixel, blue pixel, white pixel] 
 				   abox.append("<td align=center><img src='/images/itemimages/"+i.image+"' title='"+i+"'><br>"+rnum(item_amount(i))+"</td>");
-				if (creatable_amount($item[digital key]) > 0) abox.append("<a href=# class='cliimglink' title='create 1 digital key'><img src='/images/itemimages/pixelkey.gif'></a>");
+				if (creatable_amount($item[digital key]) > 0) abox.append("<td><a href=# class='cliimglink' title='create 1 digital key'><img src='/images/itemimages/pixelkey.gif'></a></td>");
 				abox.append("</tr></table>");
 			 } break;
 			 case $location[A-Boo Peak]: if (item_amount($item[a-boo clue]) > 0) abox.append("<p><a href=# class='cliimglink' title='use a-boo clue'><img src='/images/itemimages/map.gif' class=hand></a>"); 
 				abox.append("<p>Hauntedness remaining: <b>"+get_property("booPeakProgress")+"</b>"); break;
-			 case $location[guano junction]: if (item_amount($item[sonar-in-a-biscuit]) > 0) abox.append("<p><a href=# class='cliimglink' title='use sonar-in-a-biscuit'><img src='/images/itemimages/biscuit.gif' class=hand></a>"); break;
+			 case $location[guano junction]: if (item_amount($item[sonar-in-a-biscuit]) > 0 && !($strings[step3, finished] contains get_property("questL04Bat"))) 
+				abox.append("<p><a href=# class='cliimglink' title='use sonar-in-a-biscuit'><img src='/images/itemimages/biscuit.gif' class=hand></a>"); break;
 			 case $location[Battlefield (Frat Uniform)]: abox.append("<p>Just <b>"+(1000-to_int(get_property("hippiesDefeated")))+"</b> hippies left."); break;
 			 case $location[Battlefield (Hippy Uniform)]: abox.append("<p>Just <b>"+(1000-to_int(get_property("fratboysDefeated")))+"</b> fratboys left."); break;
 			 case $location[twin peak]: // abox.append("<p>Stench resistance (+4 needed): "+rnum(numeric_modifier("Stench Resistance"))+"<br>Item and food drops :");
@@ -213,14 +213,14 @@ void add_features(buffer results) {
       "<input name=cli type=text size=60></form><p><a href='#' class='clilink'>help</a> <a href='#' class='clilink' "+
       "title='ashwiki CLI Reference'>more help</a></div><div id='clifeedback' class='clisuccess'></div><div id='mask' class='cliclose'></div>\n</body>");
   // add scripts/stylesheet
-   results.replace_string("</head>", "\n<script src='jquery1.7.1.min.js'></script>\n"+
+   results.replace_string("</head>", "\n<script src='jquery1.10.1.min.js'></script>\n"+
       "<script src='jquery.dataTables.min.js'></script>\n<script src='batman.js'></script>\n"+
       "<link rel='stylesheet' type='text/css' href='batman.css'>\n</head>");
   // delete KoL's older version of jQuery
    results.replace_string("<script language=Javascript src=\"/images/scripts/jquery-1.3.1.min.js\"></script>","");
   // add doctype to force IE out of quirks mode
-   results.replace_string("<html><head>", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" "+
-      "\"http://www.w3.org/TR/html4/loose.dtd\">\n<html><head>");
+   results.replace_string("<html>", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" "+
+      "\"http://www.w3.org/TR/html4/loose.dtd\">\n<html>");
   // fix KoL's CSS
    results.replace_string("right: 1; top: 2;\" id=\"jumptobot","right: 1px; top: 2px;\" id=\"jumptobot");
   // move KoL combat forms 

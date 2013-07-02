@@ -257,6 +257,13 @@ boolean can_adv(location where, boolean prep) {
   // signs
    case $location[Thugnderdome]: if (!primecheck(25)) return false;
    case $location[Pump Up Moxie]: return (gnomads_available() && can_adv($location[south of the border],prep));
+   case $location[Edge of the Swamp]:
+   case $location[Dark and Spooky Swamp]:
+   case $location[Corpse Bog]:
+   case $location[Ruined Wizard Tower]:
+   case $location[Wildlife Sanctuarrrrrgh]:
+   case $location[Swamp Beaver Territory]:
+   case $location[Weird Swamp Village]:
    case $location[Pump Up Mysticality]:
    case $location[Outskirts of Camp]: return (canadia_available());
    case $location[Camp Logging Camp]: return (canadia_available() && primecheck(30));
@@ -278,10 +285,10 @@ boolean can_adv(location where, boolean prep) {
    case $location[Mysticality Vacation]:
    case $location[Moxie Vacation]: if (my_adventures() < 3) return vprint("Not enough adventures to take a "+where+".",-6); return (perm_urlcheck("main.php","map7beach.gif"));
    case $location[South of the Border]: return (primecheck(10) && perm_urlcheck("main.php","map7beach.gif"));
-   case $location[Defiled Nook]: return (levelcheck(7) && primecheck(40) && visit_url("cyrpt.php").contains_text("cyrpt7d.gif"));
-   case $location[Defiled Cranny]: return (levelcheck(7) && primecheck(40) && visit_url("cyrpt.php").contains_text("cyrpt9d.gif"));
-   case $location[Defiled Alcove]: return (levelcheck(7) && primecheck(40) && visit_url("cyrpt.php").contains_text("cyrpt4d.gif"));
-   case $location[Defiled Niche]: return (levelcheck(7) && primecheck(40) && visit_url("cyrpt.php").contains_text("cyrpt6d.gif"));
+   case $location[Defiled Nook]: return (levelcheck(7) && itemcheck($item[evilometer]) && get_property("cyrptNookEvilness").to_int() > 0); 
+   case $location[Defiled Cranny]: return (levelcheck(7) && itemcheck($item[evilometer]) && get_property("cyrptCrannyEvilness").to_int() > 0); 
+   case $location[Defiled Alcove]: return (levelcheck(7) && itemcheck($item[evilometer]) && get_property("cyrptAlcoveEvilness").to_int() > 0); 
+   case $location[Defiled Niche]: return (levelcheck(7) && itemcheck($item[evilometer]) && get_property("cyrptNicheEvilness").to_int() > 0);  
    case $location[Haert of the Cyrpt]: return (levelcheck(7) && visit_url("questlog.php?which=1").contains_text("extreme Spookiness emanating"));
    case $location[Pre-Cyrpt Cemetary]: return (primecheck(11) && (checkguild() || get_property("questL07Cyrptic") != "unstarted") && !visit_url("questlog.php?which=2").contains_text("defeated the Bonerdagon"));
    case $location[Post-Cyrpt Cemetary]: return (primecheck(40) && perm_urlcheck("questlog.php?which=2","defeated the Bonerdagon"));
@@ -340,6 +347,9 @@ boolean can_adv(location where, boolean prep) {
    case $location[Kegger in the Woods]: return (itemcheck($item[map to the kegger in the woods]));
    case $location[Electric Lemonade Acid Parade]: return (itemcheck($item[map to the magic commune]));
    case $location[Neckback Crick]: return (itemcheck($item[map to ellsbury claim]));
+   case $location[Video Game Level 1]:
+   case $location[Video Game Level 2]:
+   case $location[Video Game Level 3]: return (itemcheck($item[GameInformPowerDailyPro Walkthru]) || itemcheck($item[GameInformPowerDailyPro magazine]));
   // mr. familiar zones
    case $location[Astral Mushroom (Great Trip)]: if (!primecheck(143)) return false;
    case $location[Astral Mushroom (Mediocre Trip)]: if (!primecheck(51)) return false;
@@ -430,6 +440,12 @@ boolean can_adv(location where, boolean prep) {
    case $location[The Dive Bar]: return (candive() && visit_url("seafloor.php").contains_text("divebarb.gif"));
    case $location[The Skate Park]: return (candive() && visit_url("seafloor.php").contains_text("skateparkb.gif"));
    case $location[The Mer-Kin Outpost]: return (candive() && visit_url("seafloor.php").contains_text("outpostb.gif"));
+   case $location[The Coral Corral]: return (candive() && visit_url("seafloor.php").contains_text("corralb.gif"));
+   case $location[The Caliginous Abyss]: return (candive() && visit_url("seafloor.php").contains_text("abyssb.gif"));
+   case $location[Mer-kin Elementary School]:
+   case $location[Mer-kin Gymnasium]: return (candive() && get_property("seahorseName") != "" && outfitcheck("Crappy Mer-kin Disguise"));
+   case $location[Mer-kin Library]: return (candive() && get_property("seahorseName") != "" && outfitcheck("Mer-kin Scholar's Vestments"));
+   case $location[Mer-kin Colosseum]: return (candive() && get_property("seahorseName") != "" && outfitcheck("Mer-kin Gladiatorial Gear"));
   // psychoanalytic jars
    case $location[Anger Man's Level]:
    case $location[Fear Man's Level]:

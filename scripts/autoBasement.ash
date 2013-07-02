@@ -41,7 +41,13 @@ Version History:
 2013-06-13: Clean up the code for coinmaster handling
 			Fix the over-buffing for the Gauntlet for real (hopefully)
 2013-06-14: Remove version checking. Official release of the SVN version
-2013-06-16: Maximize for initiative as well if we use myst as our combat stat
+2013-06-18: Attempt to make sure we have at least 10% more HP than we would be hit for by the next monster if we get hit
+			Add new zlib variable autoBasement_combat_maximizer_string which will augment the choosen combat-stat if wanted
+2013-06-19: Don't continue with the elemental test performing if we have chugged a phial of element, move on to the next maximisation then
+			Don't crash due to malformed maximizer strings when autoBasement_combat_maximizer_string is blank
+2013-06-20: Don't use goofballs unless autoBasement_hop_on_up is true
+2013-06-25: Actually initiate the goofball setting as well
+2013-06-28: Fix order of operations error for the drinking check
 */
 
 import <zlib.ash>;
@@ -73,6 +79,7 @@ setvar("autoBasement_use_dr_lucifer_amount", 1000);
 setvar("autoBasement_eat_to_buff", false);
 setvar("autoBasement_drink_to_buff", false);
 setvar("autoBasement_spleen_to_buff", false);
+setvar("autoBasement_hop_on_up", false);
 
 // If you don't own an item in this list it will be ignored
 // Multiples of the same item can be added by entering the item twice
@@ -80,8 +87,9 @@ setvar("autoBasement_spleen_to_buff", false);
 // This will most likely fail if you have less then the amount you request but more then 0
 setvar("autoBasement_combat_equipment", "navel ring of navel gazing");
 
-// The stat to maximize when entering combat
+// The stat to maximize when entering combat, or a specific string you want to maximize for. If blank the stat will be used instead.
 setvar("autoBasement_combat_stat", "Muscle");
+setvar("autoBasement_combat_maximizer_string", "");
 
 // Whether familiars that drop limited items per day should be used for combats
 setvar("autoBasement_get_familiar_drops", false);
@@ -114,8 +122,10 @@ int use_dr_lucifer_amount = vars["autoBasement_use_dr_lucifer_amount"].to_int();
 boolean autoBasement_eat_to_buff = vars["autoBasement_eat_to_buff"].to_boolean();
 boolean autoBasement_drink_to_buff = vars["autoBasement_drink_to_buff"].to_boolean();
 boolean autoBasement_spleen_to_buff = vars["autoBasement_spleen_to_buff"].to_boolean();
+boolean autoBasement_hop_on_up = vars["autoBasement_hop_on_up"].to_boolean();
 
 string[int] combat_equipment = split_string(vars["autoBasement_combat_equipment"], ", ");
+string autoBasement_combat_maximizer_string = vars["autoBasement_combat_maximizer_string"];
 string combat_stat_string = vars["autoBasement_combat_stat"];
 stat combat_stat;
 switch(char_at(combat_stat_string, 1))
@@ -247,15 +257,17 @@ boolean switch_hand(string tested_outfit)
 boolean ok(item it, string command, effect ef) {
 	if($coinmasters[FDKOL Tent, A. W. O. L. Quartermaster, Fudge Wand] contains it.seller)
 		return false;
-	if(it.fullness > 0 && autoBasement_eat_to_buff == false)
+	if(it.fullness > 0 && autoBasement_eat_to_buff == false)  //Don't eat unless told to
 		return false;
-	if(it.inebriety > 0 && autoBasement_drink_to_buff == false && my_inebriety() + it.inebriety > inebriety_limit())
+	if(it.inebriety > 0 && (autoBasement_drink_to_buff == false || my_inebriety() + it.inebriety > inebriety_limit())) //Don't drink unless told to
 		return false;
-	if(it.spleen > 0 && autoBasement_spleen_to_buff == false)
+	if(it.spleen > 0 && autoBasement_spleen_to_buff == false) //Don't spleen unless told to
 		return false;
-	if(contains_text(command, "gong"))
+	if(it == $item[goofballs] && autoBasement_hop_on_up == false)	//Don't use drugs unless told to
 		return false;
-	if(command == "")
+	if(contains_text(command, "gong"))	//Don't use buffs that take turns to get
+		return false;
+	if(command == "")	//Don't try things that Mafia doesn't think we can do
 		return false;
 	if(!use_percentage_potions && (numeric_modifier(ef, "Maximum HP Percent") > 0 || numeric_modifier(ef, "Maximum MP Percent") > 0 || numeric_modifier(ef, "Moxie Percent") > 0 || numeric_modifier(ef, "Muscle Percent") > 0 || numeric_modifier(ef, "Mysticality Percent") > 0))
 		return false;
@@ -292,6 +304,9 @@ boolean maximize_wrap(string max_string, int goal, int current) {
 			if(contains_text(max_string, "Disembodied Hand") && my_familiar() == $familiar[none])
 				use_familiar($familiar[disembodied hand]);
 
+			if(contains_text(perform[i], "familiar"))
+				cli_execute("refresh inv; refresh equip");
+			
 			cli_execute(perform[i]);
 			if(sum[i] + current >  goal)
 				return true;
@@ -393,7 +408,7 @@ void cache_outfits()
 	familiarCache["MP Regen"].f = my_familiar();
 	familiarCache["MP Regen"].i = familiar_equipped_equipment(my_familiar());
 
-	command = combat_stat.to_string();
+	command = combat_stat.to_string() + (autoBasement_combat_maximizer_string != "" ? ", " + autoBasement_combat_maximizer_string : "");
 	foreach i in combat_equipment
 	{
 		item equipment = combat_equipment[i].to_item();
@@ -476,6 +491,17 @@ boolean increase_stat(int goal, string command, stat s) {
 	if(my_buffedstat(s) >= goal) return true;
 
 	return maximize_wrap(command, goal, my_buffedstat(s));
+}
+
+boolean increase_stat(int goal, string command, string check)
+{
+	switch (check)
+	{
+		case "hp":	if(my_maxhp() > goal) return true; break;
+		case "mp":	if(my_maxmp() > goal) return true; break;
+	}	
+	
+	return maximize_wrap(command, goal, (check == "hp" ? my_maxhp() : my_maxmp()));
 }
 
 int elemental_damage(int level, element elem)
@@ -646,7 +672,7 @@ boolean elemental_test(int level, element elem1, element elem2)
 	}
 	for i from 0 to j-1 {
 		cli_execute("whatif " + perform_whatif[i] + "; quiet");
-		if(elemental_damage(level, elem1) + elemental_damage(level, elem2) < my_maxhp()) {
+		if(elemental_damage(level, elem1) + elemental_damage(level, elem2) < my_maxhp() || contains_text(perform_whatif[i], "phial of")) {
 			cli_execute(perform[i]);
 			vprint(6, "purple", 7);
 			break;
@@ -823,7 +849,7 @@ void basement(int num_turns)
 			cli_execute("stickers wrestler, wrestler, wrestler");
 			
 		cache_outfits();
-		cli_execute("refresh inv"); //Attempt to avoid Mafia getting out of sync by refreshing the inventory between levels
+		//cli_execute("refresh inv"); //Attempt to avoid Mafia getting out of sync by refreshing the inventory between levels
 		//cli_execute("refresh equip");
 
 		if (base_stat != my_basestat(my_primestat()))
@@ -947,6 +973,7 @@ void basement(int num_turns)
 				equip_cached_outfit("Gauntlet");
 			}
 			
+			cli_execute("refresh inv; refresh equip");
 			int damage = ceil( hp * (1 - damage_absorption_percent()/100));
 			
 			float[int] sum;
@@ -1043,6 +1070,7 @@ void basement(int num_turns)
 			}
 
 			int goal = ceil((level ** 1.4) * 1.08);
+			string command;
 
 			if(outfits_cached) {
 				strip_familiar("Damage");
@@ -1050,7 +1078,8 @@ void basement(int num_turns)
 				equip_cached_outfit("Damage");
 				increase_stat(goal, combat_stat);
 			} else {
-				string command = combat_stat.to_string();
+				command = combat_stat.to_string() + (autoBasement_combat_maximizer_string != "" ? ", " + autoBasement_combat_maximizer_string : "");
+					
 				foreach i in combat_equipment
 				{
 					item equipment = combat_equipment[i].to_item();
@@ -1068,12 +1097,11 @@ void basement(int num_turns)
 				if(sl == $slot[familiar])
 					break;
 			}
-			wait(20);
+
 			goal = 2*ceil(level ** 1.4);
 			float damage = max(1.0,max(0.0,max(goal,0.0) - my_defstat()) + 0.225*max(goal,0.0) - numeric_modifier("Damage Reduction")) * (1 - minmax((square_root(numeric_modifier("Damage Absorption")/10) - 1)/10,0,0.9));
-			increase_stat(damage * 1.1, "hp" + command, combat_stat);
-			print("Estimated damage: " + damage);
-			print("Estimated monster attack: " + goal);
+			if(my_maxhp() < damage * 1.1)
+				increase_stat(damage * 1.1, "hp" + command, "hp");
 			
 			if(to_familiar(vars["is_100_run"]) == $familiar[none]) {
 				int mushrooms = (have_familiar($familiar[astral badger]) == true ? to_int(get_property( "_astralDrops" )) : 5);

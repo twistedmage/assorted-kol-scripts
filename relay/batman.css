@@ -55,7 +55,7 @@ a img { border: 0; }
    color: #777;
    font-weight: bold;
    font-size: 10pt;
-   padding: 7px;
+   padding: 1px 7px;
 }
 #battab ul li.active { border-color: #000; border-bottom: 1px solid #fff; }
 #battab ul li.active a { color:#000;}

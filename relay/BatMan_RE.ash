@@ -198,12 +198,12 @@ string to_html(advevent a, int i, boolean shorty) {
    res.append(" <form name='"+a.id+"' style='display: inline' action=fight.php method=post><input type=hidden name=action value='macro'>"+
          "<input type='hidden' name='macrotext' value='"+batround()+a.id+"; call batround'><input type=submit title='"+a.id+"' class='buttlink");
    switch {
-      case (contains_text(a.id,"use ") && !contains_text(a.id,";")): item blbl = to_item(excise(a.id,"use ",""));
-            res.append(" item' value=\""+blbl+" ("+item_amount(blbl)+")\""); break;
       case (contains_text(a.id,"skill ") && !contains_text(a.id,";")): res.append(" skill' value=\""+to_skill(to_int(excise(a.id,"skill ","")))+"\""); break;
       case (a.id == "attack"): res.append("' value='Attack with weapon'"); break;
       case (a.id == "jiggle"): res.append("' value='Jiggle your chefstaff'"); break;
       case (a.id == "pickpocket"): res.append("' value='Steal'"); break;
+      case (contains_text(a.id,"use ") && !contains_text(a.id,";")): item blbl = to_item(excise(a.id,"use ",""));
+            if (blbl != $item[none]) { res.append(" item' value=\""+blbl+" ("+item_amount(blbl)+")\""); break; }
       default: res.append("' value='"+a.id+"'"); break;
    }
    res.append(" onclick='return bjilgt(this);'></form>");
@@ -344,7 +344,7 @@ void batman_enhance() {
       "<img src='../images/itemimages/hourglass.gif' height=22 width=22 border=0></a></div>"+
       "<div class='popout' id='again'></div>");
    }
-   string BMRver = check_version("BatMan RE","batmanrelay","2.1",10042);
+   string BMRver = check_version("BatMan RE","batman-re",10042);
    string verstuff;
    void addver(string res) { if (res == "") return; verstuff += "<p>"+res; }
    addver(BBver); addver(SSver); addver(BMRver);
