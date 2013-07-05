@@ -145,7 +145,6 @@ void stock_hagnks()
 
 void main()
 {
-abort("change pvp to use the cursed microwave + gunpowder burritos");
 	//pull all
 	string catch=visit_url("storage.php?action=pullall&pwd");
 	cli_execute("breakfast");

@@ -4,25 +4,11 @@ void fill_up()
 {
 	while(my_inebriety() <= inebriety_limit())
 	{
-		if(my_meat()<500)
-		{
-			take_stash(5,$item[dense meat stack]);
-			autosell(5,$item[dense meat stack]);
-		}
-		if(item_amount($item[used beer])==0)
-			buy(1,$item[used beer]);
-		overdrink(1,$item[used beer]);
+		overdrink(1,$item[beery blood]);
 	}
 	while(fullness_limit() - my_fullness() > 1)
 	{
-		if(my_meat()<500)
-		{
-			take_stash(5,$item[dense meat stack]);
-			autosell(5,$item[dense meat stack]);
-		}
-		if(item_amount($item[nailswurst])==0)
-			buy(1,$item[nailswurst]);
-		eat(1,$item[nailswurst]);
+		eat(1,$item[gunpowder burrito]);
 	}
 }
 
