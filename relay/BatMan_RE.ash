@@ -79,7 +79,7 @@ string quote() {
          bw[count(bw)] =  "Bruce: \"Milk and cookies, did you say?\"<br>Lisa: \"I made the cookies myself.\"<br>Bruce: \"Man cannot live by crime-fighting alone.\""; break;
       case $monster[normal hobo]: bw[count(bw)] = "\"A reporter's lot is not easy, making exciting stories out of plain, average, ordinary people like Robin and me.\""; break;
       case $monster[clingy pirate]: bw[count(bw)] = "Marsha: \"You mean you're not in love with me?\"<br>Batman: \"I'm not even mildly interested.\""; break;
-      case $monster[dolphin thief]: bw[count(bw)] = "\"There's a method to his misdemeanors.\"";
+      case $monster[rotten dolphin thief]: bw[count(bw)] = "\"There's a method to his misdemeanors.\"";
          bw[count(bw)] = "\"I'm certain this is the first stitch in a large tapestry of crime.\""; break;
       case $monster[suckubus]: bw[count(bw)] = "Olga: \"You find me attractive?\"<br>Batman: \"I'd find you much more attractive if you were on the right side of the law, Olga.\""; break;
       case $monster[beast with x eyes]: bw[count(bw)] = "\"It's staring us right in our masks.\""; break;
@@ -95,20 +95,20 @@ string quote() {
    if (contains_text(to_string(m),"Tooth")) bw[count(bw)] = "Robin: \"Holy molars! Am I ever glad I take good care of my teeth!\"<br>Batman: \"True. You owe your life to dental hygiene.\"";
    switch (my_location()) {
 //      case $location[]: bw[count(bw)] = ""; break;
-      case $location[lower chamber]: bw[count(bw)] = "\"Out of the sarcophagus and back into the saddle.\"";
+      case $location[the lower chambers]: bw[count(bw)] = "\"Out of the sarcophagus and back into the saddle.\"";
          bw[count(bw)] = "\"Oda wabba simba. Six o'clock in our nomenclature. In the 14th dynasty, the hour of the hyena. The time when ancient Egyptian supercriminals invariably struck!\""; break;
       case $location[outside the club]: bw[count(bw)] = "\"At the risk of sounding conceited, young lady, we're not just anyone.\"";
          bw[count(bw)] = "Dick: \"Sorry, I'm not interested in dance lessons.\"<br>Bruce: \"Wait a minute, Dick. The junior prom's coming up, isn't it?\"<br>Dick: \"Yes, but...\"<br>Bruce: \"Well, we don't want you to be a wallflower, do we? Dancing is an integral part of every young man's education.\"<br>Dick: \"Gosh Bruce, you're right.\""; break;
-      case $location[f'c'le]:
+      case $location[the f'c'le]:
       case $location[belowdecks]:
       case $location[poop deck]: bw[count(bw)] = "Barbara: \"I think a ship sailing is one of the most exciting things in the world. Don't you, Bruce?\"<br>Bruce: \"Glamorous, romantic, a sense of mystery and adventure. Hard to beat in this hum-drum world.\""; break;
-      case $location[treasury]: bw[count(bw)] = "\"We just dropped in for that Small Batcave Improvement Loan that you mentioned, but in view of the strange criminal activity that seems to be transpiring here...\"";
+      case $location[cobb's knob treasury]: bw[count(bw)] = "\"We just dropped in for that Small Batcave Improvement Loan that you mentioned, but in view of the strange criminal activity that seems to be transpiring here...\"";
          bw[count(bw)] = "Dick: \"Gosh, Economics is sure a dull subject.\"<br>Bruce: \"Oh, you must be jesting, Dick. Economics dull? The glamour, the romance of commerce... Hmm. It's the very lifeblood of our country's society.\""; break;
-      case $location[hidden temple]: bw[count(bw)] = "\"It looks like we're getting closer to the heart of this criminal artichoke.\""; break;
-      case $location[temple portico]: bw[count(bw)] = "Robin: \"Batman, look! What skinny macaroni!\"<br>Batman: \"No, it's spaghetti, Robin. A variety of alimentary paste, larger then bernachelli but not as tubular as macaroni.\""; break;
+      case $location[the hidden temple]: bw[count(bw)] = "\"It looks like we're getting closer to the heart of this criminal artichoke.\""; break;
+      case $location[the temple portico]: bw[count(bw)] = "Robin: \"Batman, look! What skinny macaroni!\"<br>Batman: \"No, it's spaghetti, Robin. A variety of alimentary paste, larger then bernachelli but not as tubular as macaroni.\""; break;
       case $location[tavern cellar]:
-      case $location[barroom brawl]: bw[count(bw)] = "Robin: \"Let's go!\"<br>Batman: \"Not you, Robin. They have strict licensing laws in this country. A boy of your age is not allowed in a drinking tavern.\""; break;
-      case $location[chasm]: bw[count(bw)] = "Robin: \"You can't get away from Batman that easy!\"<br>Batman: \"Easily.\"<br>Robin: \"Easily.\"<br>Batman: \"Good grammar is essential, Robin.\"<br>Robin: \"Thank you.\"<br>Batman: \"You're welcome.\"";
+      case $location[a barroom brawl]: bw[count(bw)] = "Robin: \"Let's go!\"<br>Batman: \"Not you, Robin. They have strict licensing laws in this country. A boy of your age is not allowed in a drinking tavern.\""; break;
+      case $location[orc chasm]: bw[count(bw)] = "Robin: \"You can't get away from Batman that easy!\"<br>Batman: \"Easily.\"<br>Robin: \"Easily.\"<br>Batman: \"Good grammar is essential, Robin.\"<br>Robin: \"Thank you.\"<br>Batman: \"You're welcome.\"";
          bw[count(bw)] = "\"It's full of misspellings, and I'm full of misgivings.\""; break;
       case $location[south of the border]: bw[count(bw)] = "Batman: \"The green button will turn the car <i>a la izquierda o a la derecha</i>.\"<br>Robin: \"To the left or right. Threw in a little Spanish on me, huh, Batman?\"<br>Batman: \"One should always keep abreast of foreign tongues, Robin.\"";
          bw[count(bw)] = "Batman: \"Let's go Robin, we've nary a second to lose! <i>Vamanos!</i>\"<br>Robin: \"Right <i>amigo!</i>\""; break;
@@ -129,7 +129,7 @@ string quote() {
       case $phylum[penguin]: bw[count(bw)] = "\"It's beddy-bye for you, Penquin.\""; break;
    }
    if (have_effect($effect[temporary blindness]) > 0) bw[count(bw)] = "Robin: \"If we close our eyes, we can't see anything.\"<br>Batman: \"A sound observation, Robin.\"";
-   if (have_effect($effect[form of bird]) > 0) bw[count(bw)] = "Bruce: \"Yes, Dick, your bird calls are close to perfect. If more people practiced them, someday we might have a chance for real communication with our feathered friends.\"<br>Dick: \"In that case I think I'll polish up my ruby-crowned kinglet and my rose-breasted yellow-tailed grouse-beak calls.\"";
+   if (have_effect($effect[form of...bird!]) > 0) bw[count(bw)] = "Bruce: \"Yes, Dick, your bird calls are close to perfect. If more people practiced them, someday we might have a chance for real communication with our feathered friends.\"<br>Dick: \"In that case I think I'll polish up my ruby-crowned kinglet and my rose-breasted yellow-tailed grouse-beak calls.\"";
    if (have_effect($effect[beaten up]) > 0) bw[count(bw)] = "\"The best-laid plans of mice and men oft gong agley.\"";
    if (my_location().zone == "The Sea") bw[count(bw)] = "Robin: \"Where'd you get a live fish, Batman?\"<br>Batman: \"The true crimefighter always carries everything he needs in his utility belt, Robin.\"";
    if (smack.id == "" && !finished()) {
@@ -197,12 +197,15 @@ string to_html(advevent a, int i, boolean shorty) {
    }
    res.append(" <form name='"+a.id+"' style='display: inline' action=fight.php method=post><input type=hidden name=action value='macro'>"+
          "<input type='hidden' name='macrotext' value='"+batround()+a.id+"; call batround'><input type=submit title='"+a.id+"' class='buttlink");
+   matcher funkmatch = create_matcher("use (\\d+),(\\d+)",a.id);
    switch {
-      case (contains_text(a.id,"skill ") && !contains_text(a.id,";")): res.append(" skill' value=\""+to_skill(to_int(excise(a.id,"skill ","")))+"\""); break;
+      case (contains_text(a.id,";")): res.append("' value='"+a.id+"'"); break;
+      case (contains_text(a.id,"skill ")): res.append(" skill' value=\""+to_skill(to_int(excise(a.id,"skill ","")))+"\""); break;
       case (a.id == "attack"): res.append("' value='Attack with weapon'"); break;
       case (a.id == "jiggle"): res.append("' value='Jiggle your chefstaff'"); break;
       case (a.id == "pickpocket"): res.append("' value='Steal'"); break;
-      case (contains_text(a.id,"use ") && !contains_text(a.id,";")): item blbl = to_item(excise(a.id,"use ",""));
+      case (funkmatch.find()): res.append(" item' value=\"Funksling "+to_item(to_int(funkmatch.group(1)))+" / "+to_item(to_int(funkmatch.group(2)))+"\""); break;
+      case (contains_text(a.id,"use ")): item blbl = to_item(excise(a.id,"use ",""));
             if (blbl != $item[none]) { res.append(" item' value=\""+blbl+" ("+item_amount(blbl)+")\""); break; }
       default: res.append("' value='"+a.id+"'"); break;
    }
@@ -306,7 +309,7 @@ void batman_enhance() {
          actbox.append(to_html(plink,0,true)+"<p><span id='stasissort' class='littlesort'><img src='images/itemimages/bgecalendar.gif'> Sort by stasis_action()</span></div>");
       }
      // stun!
-      if (adj.stun < 1 && buytime.stun > to_int(dmg_dealt(buytime.dmg) == 0) && kill_rounds(smack) > 1 &&
+      if (adj.stun < 1 && (buytime.stun > 1 || buytime.profit >= 0) && kill_rounds(smack) > 1 &&
           min(buytime.stun - 1, kill_rounds(smack)-1)*m_dpr(0,0)*meatperhp > buytime.profit) {
          actbox.append("\n   <div class='onemenu'><form name='batstun' style='display: inline' action=fight.php method=post><input type=hidden name=action value='macro'>"+
            "<input type='hidden' name='macrotext' value='"+batround()+buytime.id+"; call batround"+"'><input type=image src='images/itemimages/bananapeel.gif' "+
@@ -316,8 +319,8 @@ void batman_enhance() {
      // attack
       if (smack.id != "") {
          actbox.append("\n   <div class='onemenu'><form name='batattack' style='display: inline' action=fight.php method=post><input type=hidden name=action value='macro'>"+
-           "<input type='hidden' name='macrotext' value='"+batround()+smack.id+"; call batround"+"'><input type=image src='images/itemimages/nicesword.gif' "+
-           "title='"+smack.id+"' height=22 width=22 onclick='return bjilgt(this);'></form></div>\n<div class='popout'>");
+           "<input type='hidden' name='macrotext' value='"+batround()+smack.id+"; call batround"+"'><input type=image src='images/itemimages/"+
+		   (current_hit_stat() == $stat[moxie] ? "crossbow" : "nicesword")+".gif' title='"+smack.id+"' height=22 width=22 onclick='return bjilgt(this);'></form></div>\n<div class='popout'>");
          actbox.append(to_html(smack,0,true)+"<p><span id='attacksort' class='littlesort'><img src='images/itemimages/bgecalendar.gif'> Sort by attack_action()</span></div>");
       }
 	 // siphon
@@ -340,7 +343,7 @@ void batman_enhance() {
 
    } else if (my_location() != $location[none] && my_adventures() > 1 && contains_text(page,"adventure.php")) {
      // adventure again link, includes location info?
-      actbox.append("\n   <div class='onemenu'><a href='"+to_url(my_location())+(my_location() == $location[boss bat lair] ? "&confirm2=on" : "")+"'>"+
+      actbox.append("\n   <div class='onemenu'><a href='"+to_url(my_location())+(my_location() == $location[boss bat's lair] ? "&confirm2=on" : "")+"'>"+
       "<img src='../images/itemimages/hourglass.gif' height=22 width=22 border=0></a></div>"+
       "<div class='popout' id='again'></div>");
    }
