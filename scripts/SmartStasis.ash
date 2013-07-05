@@ -53,17 +53,17 @@ boolean should_summon_ghost() {
 boolean should_mayfly() {                // TODO: make this return an advevent
    if (!have_equipped($item[mayfly bait necklace]) || to_int(get_property("_mayflySummons")) == 30) return false;
    switch (my_location()) {
-      case $location[treasury]:                    // 0-100 meat
-      case $location[slime tube]:                  // free tiny slimy cyst
-      case $location[haunted sorority house]:      // free useful item
-      case $location[town square]: return true;    // free hobo nickel
+      case $location[cobb's knob treasury]:                    // 0-100 meat
+      case $location[the slime tube]:                  // free tiny slimy cyst
+      case $location[the haunted sorority house]:      // free useful item
+      case $location[hobopolis town square]: return true;    // free hobo nickel
       case $location[degrassi knoll]: foreach i in $items[spring, cog, sprocket, empty meat tank] if (has_goal(i) > 0) return true; break;
       case $location[south of the border]: for i from 297 to 300 if (is_goal(to_item(i))) return true; break;   // free gum
-      case $location[fantasy airship]: if (my_level() < 13) return true; break;             // substats
+      case $location[the penultimate fantasy airship]: if (my_level() < 13) return true; break;             // substats
       case $location[hole in the sky]: for i from 657 to 665 if (is_goal(to_item(i))) return true; break;   // free star/line, free runaway
-      case $location[haunted pantry]: 
-      case $location[haunted kitchen]: 
-      case $location[cobb knob kitchen]: foreach i in item_drops(m) if (item_type(i) == "food" && has_goal(i) > 0) return true; break;
+      case $location[the haunted pantry]: 
+      case $location[the haunted kitchen]: 
+      case $location[cobb's knob kitchens]: foreach i in item_drops(m) if (item_type(i) == "food" && has_goal(i) > 0) return true; break;
       case $location[menagerie 1]: if (has_goal($monster[fruit golem]) > 0 &&
 	     m != $monster[knob goblin mutant]) return true; break;  // increase fruit drops, free runaway from BASIC elemental
    }
@@ -73,7 +73,7 @@ boolean should_mayfly() {                // TODO: make this return an advevent
       case $monster[octorok]: 
       case $monster[keese]: if (item_amount($item[digital key]) == 0) return true; break;    // free pixel, free runaway
       case $monster[knob goblin bean counter]: if (my_level() < 10 && item_amount($item[enchanted bean]) == 0) return true; break;  // free enchanted/jumping bean
-      case $monster[swarm of killer bees]: if (has_goal(m) == 0 && has_goal($location[dungeon of doom]) > 0) return true; break;  // free runaway
+      case $monster[swarm of killer bees]: if (has_goal(m) == 0 && has_goal($location[the dungeons of doom]) > 0) return true; break;  // free runaway
       case $monster[whiny pirate]: if (has_goal(m) == 0 && has_goal($location[poop deck]) > 0) return true; break;  // free runaway
    }
    return (my_adventures()/2 - 2 < 30 - to_int(get_property("_mayflySummons")));
@@ -132,11 +132,11 @@ boolean should_siphon() {
 }
 
 void set_autoputtifaction() {
-   if (m == $monster[none] || m.boss || (!have_skill($skill[olfaction]) &&
-       item_amount($item[putty sheet]) + item_amount($item[rain-doh black box]) == 0)) return;
+   if (m == $monster[none] || m.boss || (!have_skill($skill[transcendent olfaction]) &&
+       item_amount($item[spooky putty sheet]) + item_amount($item[rain-doh black box]) == 0)) return;
   // first, transparency with mafia settings
    if (to_monster(excise(get_property("autoOlfact"),"monster ","")) == m) should_olfact = true;
-   if (to_monster(excise(get_property("autoPutty"),"monster ","")) == m || m == $monster[fudgewasps]) should_putty = true;
+   if (to_monster(excise(get_property("autoPutty"),"monster ","")) == m || m == $monster[swarm of fudgewasps]) should_putty = true;
    if (item_drops(m) contains to_item(excise(get_property("autoOlfact"),"item ",""))) should_olfact = true;
    if (item_drops(m) contains to_item(excise(get_property("autoPutty"),"item ",""))) should_putty = true;
    if (m == $monster[lobsterfrogman] && get_property("sidequestLighthouseCompleted") == "none" &&
@@ -182,8 +182,8 @@ void build_custom() {
    void encustom(item which) { advevent toque = get_action(which); encustom(toque); }
    void encustom(skill which) { advevent toque = get_action(which); print("Skill id: "+toque.id); encustom(toque); }
   // stealing! add directly to queue[] rather than custom actions
-   if (should_pp && (intheclear() || has_goal(m) > 0) && contains_text(page,"form name=steal"))
-      enqueue(to_event("pickpocket","",1));
+   if (should_pp && (intheclear() || has_goal(m) > 0) && contains_text(page,"value=\"steal"))
+      enqueue(to_event("pickpocket","once",1));
   // safe salve
    if (have_skill($skill[saucy salve]) && !happened($skill[saucy salve]) && (my_stat("hp") < m_dpr(0,0) ||
        min(round(to_float(get_property("hpAutoRecoveryTarget"))*to_float(my_maxhp())) - my_stat("hp"),12)*meatperhp > mp_cost($skill[saucy salve])*meatpermp))
@@ -219,8 +219,8 @@ void build_custom() {
       encustom(to_event("use "+to_int(copy_item()),to_spread(0),to_spread(to_string(m_dpr(0,0)*(1-m_hit_chance()))),"",1));
    }
   // olfaction
-   if (have_effect($effect[form of bird]) == 0 && have_effect($effect[on the trail]) == 0 &&
-       should_olfact && !happened($skill[olfaction])) encustom($skill[transcendent olfaction]);
+   if (have_effect($effect[form of...bird!]) == 0 && have_effect($effect[on the trail]) == 0 &&
+       should_olfact && !happened($skill[transcendent olfaction])) encustom($skill[transcendent olfaction]);
   // insults
    if (m.phylum == $phylum[pirate] && !($strings[step5, finished] contains get_property("questM12Pirate")) &&
       !($monsters[scary pirate, migratory pirate, ambulatory pirate, peripatetic pirate, black crayon pirate] contains m))
@@ -244,7 +244,7 @@ void build_custom() {
       if (item_amount(to_item(i)) > 0 && get_property("lastStoneSphere"+i) == "" && get_property("autoSphereID") == "true")
          encustom(to_event("use "+i,get_sphere(""),1));
   // release the boots!
-   if (my_familiar() == $familiar[stomping boots] && my_location() != $location[none] && get_property("bootsCharged") == "true" && 
+   if (my_familiar() == $familiar[pair of stomping boots] && my_location() != $location[none] && get_property("bootsCharged") == "true" && 
        count(get_monsters(my_location())) > 1 && !($items[none,gooey paste] contains to_paste(m)) && !m.boss) {
       boolean[item] pastegoals;
       for i from 5198 to 5219 if (is_goal(to_item(i))) pastegoals[to_item(i)] = true;
@@ -297,7 +297,7 @@ void build_custom() {
       case $monster[urchin urchin]: if (is_goal($item[urchin roe]) && item_amount($item[roller skate decoy]) > 0 && !happened($item[roller skate decoy]))
          encustom(to_event("use 4210","item urchin roe",1)); break;
      // boss killers
-      case $monster[gargantulihc]: encustom($item[plus-size phylactery]); break;
+      case $monster[gargantulihc]: encustom($item[plus-sized phylactery]); break;
       case $monster[sexy sorority ghost]: encustom($item[ghost trap]); break;
       case $monster[bugbear scientist]: if (item_amount($item[quantum nanopolymer spider web]) > 0)
          encustom(to_event("use 5686","endscombat",1)); break;
@@ -314,6 +314,7 @@ void build_custom() {
       case $monster[the bat in the spats]: if (item_amount($item[clumsiness bark]) > 9) for i from 1 to 10 encustom($item[clumsiness bark]); break;
       case $monster[the large-bellied snitch]: if (item_amount($item[dangerous jerkcicle]) > 7) for i from 1 to 10 encustom($item[dangerous jerkcicle]); break;
       case $monster[mammon the elephant]: if (item_amount($item[dangerous jerkcicle]) > 5) for i from 1 to 6 encustom($item[dangerous jerkcicle]); break;
+      case $monster[the landscaper]: if (item_amount($item[grass clippings]) > 2) for i from 1 to 3 encustom($item[grass clippings]); break;
      // tower monsters
       case $monster[beer batter]: encustom($item[baseball]); break;
       case $monster[best-selling novelist]: encustom($item[plot hole]); break;
@@ -330,8 +331,8 @@ void build_custom() {
       case $monster[giant desktop globe]: encustom($item[ng]); break;
       case $monster[giant fried egg]: encustom($item[black pepper]); break;
       case $monster[ice cube]: encustom($item[hair spray]); break;
-      case $monster[malevolent crop circle]: encustom($item[bronze locust]); break;
-      case $monster[possessed pipe organ]: encustom($item[powdered organs]); break;
+      case $monster[malevolent crop circle]: encustom($item[bronzed locust]); break;
+      case $monster[possessed pipe-organ]: encustom($item[powdered organs]); break;
       case $monster[pretty fly]: encustom($item[spider web]); break;
       case $monster[darkness]: encustom($item[inkwell]); break;
       case $monster[tyrannosaurus tex]: encustom($item[chaos butterfly]); break;
@@ -342,7 +343,7 @@ void build_custom() {
    }
   // learn rave combos
    advevent unknown_rave() {
-      if (available_amount($item[seegers unstoppable banjo]) == 0 && my_location().zone != "Volcano") return new advevent;
+      if (available_amount($item[seeger's unstoppable banjo]) == 0 && my_location().zone != "Volcano") return new advevent;
       for i from 50 to 52 if (!have_skill(to_skill(i))) return new advevent;
       for i from 50 to 52 for j from 50 to 52 {
          if (j == i) continue;
@@ -382,7 +383,7 @@ advevent[int] combos;
 advevent to_combo(effect which) {
    if (have_effect(which) > 0) return new advevent;
    string ravepref(int i) {
-      return (available_amount($item[seegers unstoppable banjo]) > 0 || my_location().zone == "Volcano") ? get_property("raveCombo"+i) : "";
+      return (available_amount($item[seeger's unstoppable banjo]) > 0 || my_location().zone == "Volcano") ? get_property("raveCombo"+i) : "";
    }
    string seq(effect c) {
       switch (c) {
@@ -486,9 +487,9 @@ boolean is_our_huckleberry() {
             case $monster[pop-and-lock raver]: if (!have_skill($skill[pop and lock it])) return true; break;
             case $monster[running man]: if (!have_skill($skill[run like the wind])) return true;
          } break;
-      case $location[broodling grounds]: if (m == $monster[hellseal pup] && !happened("sealwail")) return true; break;
+      case $location[the broodling grounds]: if (m == $monster[hellseal pup] && !happened("sealwail")) return true; break;
       case $location[chinatown tenement]: if (m == $monster[the server] && item_amount($item[strange goggles]) > 0 && !happened("use 6118")) return true; break;
-      case $location[clumsiness grove]: if (m == $monster[the thorax] && item_amount($item[clumsiness bark]) > 0) return true; break;
+      case $location[the clumsiness grove]: if (m == $monster[the thorax] && item_amount($item[clumsiness bark]) > 0) return true; break;
    }
    if (my_fam() == $familiar[he-boulder] && have_effect($effect[everything looks yellow]) == 0 &&
        contains_text(vars["ftf_yellow"],m.to_string())) return vprint("Monsters in ftf_yellow are your huckleberry.",9);
@@ -551,7 +552,7 @@ void main(int initround, monster foe, string pg) {
          custom[count(custom)] = get_action("use 2562"); break;
       case $monster[giant skeelton]: for i from 1 upto item_amount($item[rusty bonesaw])
          custom[count(custom)] = get_action("use 2563"); break;
-      case $monster[huge ghuol]: for i from 1 upto item_amount($item[can of ghuol-b-gone])
+      case $monster[huge ghuol]: for i from 1 upto item_amount($item[can of Ghuol-B-Gone&trade;])
          custom[count(custom)] = get_action("use 2565"); break;
    }
    if (count(queue) > 0 && queue[0].id == "pickpocket" && my_class() == $class[disco bandit]) try_custom();

@@ -554,7 +554,7 @@ boolean resist(element req, boolean reallydoit) {
 // returns the value of your buffed defense stat, factoring in Hero of the Half-Shell
 int my_defstat(boolean usespec) {
    int mox = usespec ? numeric_modifier("_spec","Buffed Moxie") : my_buffedstat($stat[moxie]);
-   if (have_skill($skill[hero of the half-shell]) && item_type(equipped_item($slot[offhand])) == "shield")
+   if (have_skill($skill[hero of the half-shell]) && item_type(equipped_item($slot[off-hand])) == "shield")
       return max(usespec ? numeric_modifier("_spec","Buffed Muscle") : my_buffedstat($stat[muscle]),mox);
    return mox;
 }
@@ -566,7 +566,7 @@ int get_safemox(location wear) {
    foreach m,r in appearance_rates(wear) {
       switch(m) {
          case $monster[hulking construct]: continue;
-         case $monster[clownlord beelzebozo]: if (get_property("choiceAdventure151") != "1") continue; break;
+         case $monster[the clownlord beelzebozo]: if (get_property("choiceAdventure151") != "1") continue; break;
          case $monster[conjoined zmombie]: if (get_property("choiceAdventure154") != "1") continue; break;
          case $monster[giant skeelton]: if (get_property("choiceAdventure156") != "1") continue; break;
          case $monster[gargantulihc]: if (get_property("choiceAdventure158") != "1") continue; break;
@@ -576,7 +576,7 @@ int get_safemox(location wear) {
       high = max(monster_attack(m),high);
    }
    if (high == 0 || high == monster_level_adjustment()) return 0;
-   if (my_location() == $location[barrr] && item_amount($item[the big book of pirate insults]) > 0) high += 0.3*my_defstat();
+   if (my_location() == $location[barrrney's barrr] && item_amount($item[the big book of pirate insults]) > 0) high += 0.3*my_defstat();
    return high + 7 - current_mcd();
 }
 
@@ -606,7 +606,7 @@ boolean auto_mcd(location place) {                            // automcd for loc
    return auto_mcd(get_safemox(place));
 }
 
-// returns your heaviest familiar of a given type (currently possible: items, meat, produce, stat, delevel)
+// returns your heaviest familiar of a given type (currently possible: items, meat, produce, stat, dodge, delevel, restore hp, restore mp, elemental damage, water)
 familiar best_fam(string ftype) {
    if (to_familiar(vars["is_100_run"]) != $familiar[none]) return to_familiar(vars["is_100_run"]);
    familiar result = $familiar[none];

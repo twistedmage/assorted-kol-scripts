@@ -56,7 +56,7 @@ if(!file_to_map("SrQueue_"+my_name()+".txt", SrQueue)) {}
 item [location] semi_rare;
 	semi_rare[$location[Haunted Billiards Room]] = $item[cube of billiard chalk];
 	semi_rare[$location[Menagerie 2]] = $item[irradiated pet snacks];
-	semi_rare[$location[Outskirts of The Knob]] = $item[Knob Goblin lunchbox];
+	semi_rare[$location[The Outskirts of Cobb's Knob]] = $item[Knob Goblin lunchbox];
 	semi_rare[$location[Limerick Dungeon]] = $item[cyclops eyedrops];
 	semi_rare[$location[Sleazy Back Alley]] = $item[distilled fortified wine];
 	semi_rare[$location[Haunted Pantry]] = $item[tasty tart];
@@ -68,9 +68,9 @@ item [location] semi_rare;
 	semi_rare[$location[Orc Chasm]] = $item[ASCII shirt];
 	semi_rare[$location[Battlefield (No Uniform)]] = $item[six-pack of New Cloaca-Cola];
 	semi_rare[$location[Batrat and Ratbat Burrow]] = $item[Dogsgotnonoz pills];
-	semi_rare[$location[Giant's Castle (Top Floor)]] = $item[Mick's IcyVapoHotness Inhaler];
-	semi_rare[$location[Giant's Castle (Ground Floor)]] = $item[Possibility Potion];
-	semi_rare[$location[Giant's Castle (Basement)]] = $item[Super Weight-Gain 9000];
+	semi_rare[$location[Castle in the Clouds in the Sky (Top Floor)]] = $item[Mick's IcyVapoHotness Inhaler];
+	semi_rare[$location[Castle in the Clouds in the Sky (Ground Floor)]] = $item[Possibility Potion];
+	semi_rare[$location[Castle in the Clouds in the Sky (Basement)]] = $item[Super Weight-Gain 9000];
 	semi_rare[$location[Guano Junction]] = $item[Eau de Guaneau];
 	semi_rare[$location[Laboratory]] = $item[bottle of Mystic Shell];
 	semi_rare[$location[Pre-Cyrpt Cemetary]] = $item[poltergeist-in-the-jar-o];
@@ -163,7 +163,7 @@ boolean canadv(location loc) {
 	}
 
 	switch(loc) {
-	case $location[Outskirts of The Knob]:
+	case $location[The Outskirts of Cobb's Knob]:
 	case $location[Sleazy Back Alley]:
 	case $location[Haunted Pantry]:
 		return true;
@@ -190,9 +190,9 @@ boolean canadv(location loc) {
 		return get_property("questL09Lol") == "finished" || get_property("questL09Lol") == "step1";
 	case $location[Battlefield (No Uniform)]:
 		return my_level() >= 4 && my_level() < 6 && my_ascensions() > 0 && available_amount($item[fernswarthy's letter]) > 0;
-	case $location[Giant's Castle (Top Floor)]:
-	case $location[Giant's Castle (Ground Floor)]:
-	case $location[Giant's Castle (Basement)]:
+	case $location[Castle in the Clouds in the Sky (Top Floor)]:
+	case $location[Castle in the Clouds in the Sky (Ground Floor)]:
+	case $location[Castle in the Clouds in the Sky (Basement)]:
 		return item_amount($item[S.O.C.K]) + item_amount($item[intragalactic rowboat]) + item_amount($item[steam-powered model rocketship]) > 0;
 	case $location[Guano Junction]:
 		return get_property("questL04Bat") != "unstarted" && stinkup(true);
@@ -358,7 +358,7 @@ void get_semirare() {
 		cli_execute("checkpoint");
 		stinkup(false);
 		// fall through to the next section...
-	case $location[Outskirts of The Knob]:
+	case $location[The Outskirts of Cobb's Knob]:
 	case $location[Limerick Dungeon]:
 	case $location[Sleazy Back Alley]:
 	case $location[Haunted Pantry]:

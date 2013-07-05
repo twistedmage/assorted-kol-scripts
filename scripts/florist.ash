@@ -16,15 +16,15 @@ record plant
 int zone_type(location loc)
 {
 	//outdoor
-	if($locations[wartime sonofa beach, battlefield (hippy uniform), 8-bit realm, pirate cove, Goatlet, eXtreme Slope, F'c'le, Smut Orc Logging Camp, A-Boo Peak, Spooky Forest, Oil Peak, Fantasy Airship, Black Forest, Poop Deck, Palindome, Whitey's Grove, Desert (ultrahydrated), Oasis in the Desert, wartime Frat House, Pond, back 40, Other Back 40, Themthar Hills, Over Where the Old Tires Are, Out By that Rusted-Out Car, Hole in the Sky, outskirts of the knob, Dark Elbow of the Woods, Dark Heart of the Woods, Dark Neck of the Woods, Hippy Camp, Orc Chasm, Next to that Barrel with Something Burning in it, Near an Abandoned Refrigerator, Hidden City (Automatic), Twin Peak] contains loc)
+	if($locations[wartime sonofa beach, battlefield (hippy uniform), 8-bit realm, pirate cove, Goatlet, eXtreme Slope, F'c'le, Smut Orc Logging Camp, A-Boo Peak, Spooky Forest, Oil Peak, Fantasy Airship, Black Forest, Poop Deck, Palindome, Whitey's Grove, Desert (ultrahydrated), Oasis in the Desert, wartime Frat House, Pond, mcmillicancuddy's back 40, mcmillicancuddy's other back 40, Themthar Hills, Over Where the Old Tires Are, Out By that Rusted-Out Car, Hole in the Sky, the outskirts of cobb's knob, Dark Elbow of the Woods, Dark Heart of the Woods, Dark Neck of the Woods, Hippy Camp, Orc Chasm, Next to that Barrel with Something Burning in it, Near an Abandoned Refrigerator, Hidden City (Automatic), Twin Peak] contains loc)
 		return 0;
 	
 	//indoor
-	if($locations[Haunted Library, Haunted Conservatory, Haunted Gallery, Haunted Bedroom, Barrrney's Barrr, Haunted Ballroom, Giant's Castle (Ground Floor), Giant's Castle (Top Floor), Belowdecks, Barn, Haunted Pantry, Hey Deze Arena, Belilafs Comedy Club, Haunted Billiards Room, Haunted Bathroom] contains loc)
+	if($locations[Haunted Library, Haunted Conservatory, Haunted Gallery, Haunted Bedroom, Barrrney's Barrr, Haunted Ballroom, Castle in the Clouds in the Sky (Ground Floor), Castle in the Clouds in the Sky (Top Floor), Belowdecks, Barn, Haunted Pantry, Hey Deze Arena, Belilafs Comedy Club, Haunted Billiards Room, Haunted Bathroom] contains loc)
 		return 1;
 	
 	//underground
-	if($locations[Batrat and Ratbat Burrow, Guano Junction, upper chamber, middle chamber, Cobb's Knob Barracks, Cobb's Knob Kitchens, Defiled Nook, Defiled Alcove, Defiled Cranny, Defiled Niche, Itznotyerzitz Mine, Greater-Than Sign, Dungeons of Doom, Beanbat Chamber, Giant's Castle (Basement), Cobb's Knob Laboratory, Haunted Wine Cellar (Southwest), Haunted Wine Cellar (Southeast), Haunted Wine Cellar (northwest), Haunted Wine Cellar (northeast), Guards' Chamber, Queen's chamber, Bat Hole Entryway, Boss Bat's Lair, Feeding Chamber,Cobb's Knob Harem] contains loc)
+	if($locations[Batrat and Ratbat Burrow, Guano Junction, upper chamber, middle chamber, Cobb's Knob Barracks, Cobb's Knob Kitchens, Defiled Nook, Defiled Alcove, Defiled Cranny, Defiled Niche, Itznotyerzitz Mine, Greater-Than Sign, Dungeons of Doom, Beanbat Chamber, Castle in the Clouds in the Sky (Basement), Cobb's Knob Laboratory, Haunted Wine Cellar (Southwest), Haunted Wine Cellar (Southeast), Haunted Wine Cellar (northwest), Haunted Wine Cellar (northeast), Guards' Chamber, Queen's chamber, Bat Hole Entryway, Boss Bat's Lair, Feeding Chamber,Cobb's Knob Harem] contains loc)
 		return 2;
 		
 	//underwater
@@ -46,7 +46,7 @@ location mafia_style_zone(string loc)
 	if(substring(loc,0,4)=="The ")
 		loc=substring(loc,4);
 	//modify text
-	if(loc=="Sonofa Beach")
+/*	if(loc=="Sonofa Beach")
 		loc="wartime sonofa beach";
 	else if(loc=="Obligatory Pirate's Cove")
 		loc="Pirate Cove";
@@ -54,14 +54,6 @@ location mafia_style_zone(string loc)
 		loc="Greater-Than Sign";
 	else if(loc=="Penultimate Fantasy Airship")
 		loc="Fantasy Airship";
-	else if(loc=="Castle in the Clouds in the Sky (Basement)")
-		loc="Giant's Castle (Basement)";
-	else if(loc=="Castle in the Clouds in the Sky (Ground Floor)")
-		loc="Giant's Castle (Ground Floor)";
-	else if(loc=="Castle in the Clouds in the Sky (Top Floor)")
-		loc="Giant's Castle (Top Floor)";
-	else if(loc=="Castle in the Clouds in the Sky (Top Floor)")
-		loc="Giant's Castle (Top Floor)";
 	else if(loc=="Arid, Extra-Dry Desert")
 		loc="Desert (ultrahydrated)";
 	else if(loc=="Orcish Frat House")
@@ -74,23 +66,18 @@ location mafia_style_zone(string loc)
 		loc="Barn";
 	else if(loc=="McMillicancuddy's Pond")
 		loc="Pond";
-	else if(loc=="McMillicancuddy's Back 40")
-		loc="Back 40";
-	else if(loc=="McMillicancuddy's Other Back 40")
-		loc="Other Back 40";
-	else if(loc=="Outskirts of Cobb's Knob")
-		loc="outskirts of the knob";
 	else if(loc=="Bat Hole Entrance")
 		loc="Bat Hole Entryway";
-	else if(loc=="Infernal Rackets Backstage")
-		loc="Hey Deze Arena";
 	else if(loc=="Laugh Floor")
 		loc="Belilafs Comedy Club";
 	else if(loc=="Valley of Rof L'm Fao")
 		loc="Orc Chasm";
-	else if(loc=="Hidden City")
+	else */ if(loc=="Hidden City")
 		loc="Hidden City (Automatic)";
-	
+	else if(loc=="Infernal Rackets Backstage")
+		loc="Hey Deze Arena";
+	else if(loc=="Laugh Floor")
+		loc="Belilafs Comedy Club";
 	
 		
 		
@@ -229,27 +216,27 @@ int choose_best_plant(string type, location loc, plant[int] plants)
 			}
 			else if(contains_text(plants[pli].bonus_type,"hot"))
 			{
-				if(loc!=$location[Burnbarrel Blvd.] && loc!=$location[Back 40] && loc!=$location[dark neck of woods] && loc!=$location[dark heart of woods] && loc!=$location[dark elbow of woods] && loc!=$location[hey deze arena] && loc!=$location[belilafs comedy club] && loc!=$location[pandamonium slums] && loc!=$location[cobb's knob kitchens] && loc!=$location[haunted pantry] && loc!=$location[outskirts of the knob] && loc!=$location[desert (ultrahydrated)])
+				if(loc!=$location[Burnbarrel Blvd.] && loc!=$location[mcmillicancuddy's back 40] && loc!=$location[dark neck of woods] && loc!=$location[dark heart of woods] && loc!=$location[dark elbow of woods] && loc!=$location[hey deze arena] && loc!=$location[belilafs comedy club] && loc!=$location[pandamonium slums] && loc!=$location[cobb's knob kitchens] && loc!=$location[haunted pantry] && loc!=$location[outskirts of the knob] && loc!=$location[desert (ultrahydrated)])
 					return pli;
 			}
 			else if(contains_text(plants[pli].bonus_type,"sleaze"))
 			{
-				if(loc!=$location[Battlefield (Hippy uniform)] && loc!=$location[Frat House (Stone Age)] && loc!=$location[Frat House] && loc!=$location[Hole in Sky] && loc!=$location[Other Back 40] && loc!=$location[purple light district] && loc!=$location[extreme slope] && loc!=$location[fun house] && loc!=$location[ruins] && loc!=$location[Pirate Cove] && loc!=$location[White Citadel]&& loc!=$location[Degrassi Knoll]&& loc!=$location[Anemone Mine]&& loc!=$location[Cobb's Knob Harem])
+				if(loc!=$location[Battlefield (Hippy uniform)] && loc!=$location[Frat House (Stone Age)] && loc!=$location[Frat House] && loc!=$location[Hole in Sky] && loc!=$location[mcmillicancuddy's other back 40] && loc!=$location[purple light district] && loc!=$location[extreme slope] && loc!=$location[fun house] && loc!=$location[ruins] && loc!=$location[Pirate Cove] && loc!=$location[White Citadel]&& loc!=$location[Degrassi Knoll]&& loc!=$location[Anemone Mine]&& loc!=$location[Cobb's Knob Harem])
 					return pli;
 			}
 			else if(contains_text(plants[pli].bonus_type,"stench"))
 			{
-				if(loc!=$location[heap] && loc!=$location[bog] && loc!=$location[hippy camp] && loc!=$location[Hippy Camp (Stone Age)] && loc!=$location[ Battlefield (frat uniform)] && loc!=$location[White Citadel] && loc!=$location[F'c'le] && loc!=$location[eXtreme Slope] && loc!=$location[Haunted Pantry] && loc!=$location[sleazy back alley] && loc!=$location[bugbear pens] && loc!=$location[hatching chamber] && loc!=$location[feeding chamber] && loc!=$location[guards chamber] && loc!=$location[queens chamber])
+				if(loc!=$location[heap] && loc!=$location[mcmillicancuddy's bog] && loc!=$location[hippy camp] && loc!=$location[Hippy Camp (Stone Age)] && loc!=$location[ Battlefield (frat uniform)] && loc!=$location[White Citadel] && loc!=$location[F'c'le] && loc!=$location[eXtreme Slope] && loc!=$location[Haunted Pantry] && loc!=$location[sleazy back alley] && loc!=$location[bugbear pens] && loc!=$location[hatching chamber] && loc!=$location[feeding chamber] && loc!=$location[guards chamber] && loc!=$location[queens chamber])
 					return pli;
 			}
 			else if(contains_text(plants[pli].bonus_type,"spooky"))
 			{
-				if(loc!=$location[ancient hobo burial ground] && loc!=$location[family plot] && loc!=$location[post-cyrpt cemetary] && loc!=$location[pre-cyrpt cemetary] && loc!=$location[Spooky Gravy Barrow] && loc!=$location[bugbear pens] && loc!=$location[haunted library] && loc!=$location[haunted billiards room] && loc!=$location[fun house] && loc!=$location[Marinara Trench] && loc!=$location[Wreck of Edgar Fitzsimmons] && loc!=$location[haunted gallery] && loc!=$location[haunted ballroom] && loc!=$location[Spectral Pickle Factory] && loc!=$location[knob shaft] && loc!=$location[haunted bathroom] && loc!=$location[haunted bedroom] && loc!=$location[haunted conservatory] && loc!=$location[haunted kitchen] && loc!=$location[spooky forest] && loc!=$location[haunted pantry] && loc!=$location[oasis] && loc!=$location[middle chamber] && loc!=$location[upper chamber] && loc!=$location[defiled nook] && loc!=$location[defiled niche] && loc!=$location[defiled cranny] && loc!=$location[defiled alcove])
+				if(loc!=$location[ancient hobo burial ground] && loc!=$location[family plot] && loc!=$location[post-cyrpt cemetary] && loc!=$location[pre-cyrpt cemetary] && loc!=$location[Spooky Gravy Barrow] && loc!=$location[bugbear pens] && loc!=$location[haunted library] && loc!=$location[haunted billiards room] && loc!=$location[fun house] && loc!=$location[Marinara Trench] && loc!=$location[Wreck of Edgar Fitzsimmons] && loc!=$location[haunted gallery] && loc!=$location[haunted ballroom] && loc!=$location[Spectral Pickle Factory] && loc!=$location[the knob shaft] && loc!=$location[haunted bathroom] && loc!=$location[haunted bedroom] && loc!=$location[haunted conservatory] && loc!=$location[haunted kitchen] && loc!=$location[spooky forest] && loc!=$location[haunted pantry] && loc!=$location[oasis] && loc!=$location[middle chamber] && loc!=$location[upper chamber] && loc!=$location[defiled nook] && loc!=$location[defiled niche] && loc!=$location[defiled cranny] && loc!=$location[defiled alcove])
 					return pli;
 			}
 			else if(contains_text(plants[pli].bonus_type,"weapon"))
 			{
-				if(loc!=$location[haunted billiards room] && loc!=$location[knob shaft] && loc!=$location[icy peak] && loc!=$location[ruins])
+				if(loc!=$location[haunted billiards room] && loc!=$location[the knob shaft] && loc!=$location[icy peak] && loc!=$location[ruins])
 					return pli;
 			}
 		}
@@ -275,7 +262,7 @@ void choose_all_plants(string type, location loc)
 	
 	//are we in the location we think we are?
 	//<td>Ah, <b>The Battlefield (Hippy Uniform)</b>! I have a numbe
-	matcher cur_locm = create_matcher("Ah, <b>([,0-9a-zA-Z \\(\\)\\'\\-]*)</b>\\!",friar_str);
+	matcher cur_locm = create_matcher("Ah, <b>([,0-9a-zA-Z \\(\\)\\'\\-\\!]*)</b>\\!",friar_str);
 	if(!cur_locm.find())
 	{
 		print("Couldn't detect location from string ","red");

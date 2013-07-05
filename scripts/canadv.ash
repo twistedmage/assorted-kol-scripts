@@ -223,7 +223,7 @@ boolean can_adv(location where, boolean prep) {
    case $location[Itznotyerzitz Mine]: return (levelcheck(8) && primecheck(53));
    case $location[Black Forest]: return (levelcheck(11) && primecheck(104));
   // key opened
-   case $location[Knob Shaft]:
+   case $location[the Knob Shaft]:
    case $location[Knob Shaft (Mining)]:
    case $location[Knob Laboratory]: return (primecheck(30) && itemcheck($item[lab key]));
    case $location[Menagerie 1]: return (primecheck(35) && itemcheck($item[menagerie key]));
@@ -259,7 +259,7 @@ boolean can_adv(location where, boolean prep) {
    case $location[Pump Up Moxie]: return (gnomads_available() && can_adv($location[south of the border],prep));
    case $location[Edge of the Swamp]:
    case $location[Dark and Spooky Swamp]:
-   case $location[Corpse Bog]:
+   case $location[Corpse bog]:
    case $location[Ruined Wizard Tower]:
    case $location[Wildlife Sanctuarrrrrgh]:
    case $location[Swamp Beaver Territory]:
@@ -386,10 +386,10 @@ boolean can_adv(location where, boolean prep) {
    case $location[Out by that Rusted-Out Car]: return (get_property("warProgress") == "started" && get_property("sidequestJunkyardCompleted") == "none");
    case $location[Barn]:
    case $location[Pond]:
-   case $location[Back 40]:
-   case $location[Other Back 40]:
+   case $location[mcmillicancuddy's back 40]:
+   case $location[mcmillicancuddy's other back 40]:
    case $location[Granary]:
-   case $location[Bog]:
+   case $location[mcmillicancuddy's bog]:
    case $location[Family Plot]:
    case $location[Shady Thicket]: return (get_property("warProgress") == "started" && get_property("sidequestFarmCompleted") == "none");
    case $location[Hippy Camp (Stone Age)]: return (get_property("warProgress") == "finished" && get_property("sideDefeated") != "fratboys");
