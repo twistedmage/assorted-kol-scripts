@@ -1045,7 +1045,7 @@ void bcAutoClancy() {
 //A Barroom Brawl		Encounter: Jackin' the Jukebox
 
 					case "take him to the Knob Shaft"	: 
-							clancyLoop($location[knob shaft]);
+							clancyLoop($location[the knob shaft]);
 							break;
 //cobbsknob.php?action=tolabs	Encounter: A Miner Variation
 
@@ -3383,12 +3383,12 @@ boolean can_adv(location where) {
 	// always open
 	case $location[Sleazy Back Alley]:
 	case $location[Haunted Pantry]:
-	case $location[Outskirts of The Knob]: return true;
+	case $location[the outskirts of cobb's knob]: return true;
 	// level-opened
 	case $location[Spooky Forest]: return (levelcheck(2));
 	case $location[A Barroom Brawl]: return (my_path() != "Zombie Slayer" && levelcheck(3));
 	case $location[8-Bit Realm]: return (primecheck(20));
-	case $location[Bat Hole Entryway]: return (levelcheck(4) && primecheck(13));
+	case $location[the bat hole entrance]: return (levelcheck(4) && primecheck(13));
 	case $location[Guano Junction]: return (levelcheck(4) && primecheck(13) && numeric_modifier("Stench Resistance") > 0);
 	case $location[Batrat and Ratbat Burrow]:
 	case $location[Beanbat Chamber]: if (!primecheck(13)) return false;
@@ -4245,7 +4245,7 @@ location level_location(int value) {
 	if (value < 120) {
 		foreach loc in $locations[Sleazy Back Alley, Haunted Pantry, Outskirts of The Knob, Spooky Forest, A Barroom Brawl, 8-Bit Realm, 
 			Bat Hole Entryway, Guano Junction, Batrat and Ratbat Burrow, Beanbat Chamber, Knob Kitchens, Knob Barracks, Knob Treasury, 
-			Knob Harem, Greater-Than Sign, Dungeons of Doom, Itznotyerzitz Mine, Black Forest, Knob Shaft, Knob Laboratory, Menagerie 1, 
+			Knob Harem, Greater-Than Sign, Dungeons of Doom, Itznotyerzitz Mine, Black Forest, the Knob Shaft, Knob Laboratory, Menagerie 1, 
 			Menagerie 2, Menagerie 3, Hippy Camp, Frat House, Pirate Cove, Hole in the Sky, Haunted Library, Haunted Gallery, 
 			Haunted Ballroom, Palindome, Fernswarthy Ruins, Oasis in the Desert, The Upper Chamber, The Middle Chamber, Thugnderdome, 
 			Outskirts of Camp, Camp Logging Camp, Post-Quest Bugbear Pens, Bugbear Pens, Degrassi Knoll, Fun House, 
@@ -4836,7 +4836,7 @@ boolean bumAdv(location loc, string maxme, string famtype, string goals, string 
 			//Have a quick check for a KGF first. 
 			if (i_a("pumpkin bomb") == 0 && i_a("pumpkin") > 0 && i_a("knob goblin firecracker") == 0) {
 				cli_execute("conditions clear; conditions set 1 knob goblin firecracker");
-				adventure(my_adventures(), $location[Outskirts of the Knob]);
+				adventure(my_adventures(), $location[the outskirts of cobb's knob]);
 			}
 			
 			if (((i_a("pumpkin") > 0 && i_a("knob goblin firecracker") > 0)) || i_a("pumpkin bomb") > 0) {
@@ -5114,7 +5114,7 @@ boolean bcascBats1() {
 			//Check it NOW (i.e. see if we have stench resistance at all, and get an air freshener if you don't.
 			if (!stenchOK()) {
 				while (!have_skill($skill[Diminished Gag Reflex]) && (i_a("Pine-Fresh air freshener") == 0))
-					bumAdv($location[Bat Hole Entryway], "", "items", "1 Pine-Fresh air freshener", "Getting a pine-fresh air freshener.");
+					bumAdv($location[the bat hole entrance], "", "items", "1 Pine-Fresh air freshener", "Getting a pine-fresh air freshener.");
 			}
 			buMax("+1000 stench res");
 			if (!stenchOK()) {
@@ -5623,9 +5623,9 @@ boolean bcascCastle() {
 				{
 	
 					//place florist friar plants
-					choose_all_plants("", $location[giant's castle (basement)]);
+					choose_all_plants("", $location[Castle in the Clouds in the Sky (basement)]);
 					
-					bumMiniAdv(1, $location[Giant's Castle (Basement)]);
+					bumMiniAdv(1, $location[Castle in the Clouds in the Sky (Basement)]);
 				}
 				level = 1;
 			} else if (i_a("titanium assault umbrella") > 0 && my_path() != "Avatar of Boris" && my_path() != "Way of the Surprising Fist") {
@@ -5635,9 +5635,9 @@ boolean bcascCastle() {
 				{
 	
 					//place florist friar plants
-					choose_all_plants("", $location[giant's castle (basement)]);
+					choose_all_plants("", $location[Castle in the Clouds in the Sky (basement)]);
 					
-					bumMiniAdv(1, $location[Giant's Castle (Basement)]);
+					bumMiniAdv(1, $location[Castle in the Clouds in the Sky (Basement)]);
 				}
 				level = 1;					
 			} else {
@@ -5647,9 +5647,9 @@ boolean bcascCastle() {
 				{
 	
 					//place florist friar plants
-					choose_all_plants("", $location[giant's castle (basement)]);
+					choose_all_plants("", $location[Castle in the Clouds in the Sky (basement)]);
 					
-					bumMiniAdv(1, $location[Giant's Castle (Basement)]);
+					bumMiniAdv(1, $location[Castle in the Clouds in the Sky (Basement)]);
 				}
 				level = 1;
 			}
@@ -5658,7 +5658,7 @@ boolean bcascCastle() {
 			set_property("choiceAdventure670", 1);
 			set_property("choiceAdventure671", 4);
 			if(i_a("massive dumbbell") == 0)
-				bumAdv($location[Giant's Castle (Basement)], "item", "itemsnc", "1 choiceadv", "Getting a Massive Dumbbell", "-i");
+				bumAdv($location[Castle in the Clouds in the Sky (Basement)], "item", "itemsnc", "1 choiceadv", "Getting a Massive Dumbbell", "-i");
 			
 			set_property("choiceAdventure669", 1);
 			set_property("choiceAdventure670", 1);
@@ -5667,9 +5667,9 @@ boolean bcascCastle() {
 			{
 	
 				//place florist friar plants
-				choose_all_plants("", $location[giant's castle (basement)]);
+				choose_all_plants("", $location[Castle in the Clouds in the Sky (basement)]);
 				
-				bumMiniAdv(1, $location[Giant's Castle (Basement)]);
+				bumMiniAdv(1, $location[Castle in the Clouds in the Sky (Basement)]);
 			}
 			cli_execute("refresh inv"); //Mafia does not remove the dumbbell yet
 			level = 1;
@@ -5684,9 +5684,9 @@ boolean bcascCastle() {
 		{
 	
 			//place florist friar plants
-			choose_all_plants("", $location[giant's castle (ground floor)]);
+			choose_all_plants("", $location[Castle in the Clouds in the Sky (ground floor)]);
 				
-			bumMiniAdv(1, $location[Giant's Castle (Ground Floor)]);
+			bumMiniAdv(1, $location[Castle in the Clouds in the Sky (Ground Floor)]);
 		}
 		level = 2;
 	}
@@ -5695,9 +5695,9 @@ boolean bcascCastle() {
 			setCastleChoices();
 	
 			//place florist friar plants
-			choose_all_plants("", $location[giant's castle (ground floor)]);
+			choose_all_plants("", $location[Castle in the Clouds in the Sky (ground floor)]);
 				
-			bumAdv($location[Giant's Castle (top floor)], "", "itemsnc", "1 choiceadv", "Finishing the quest (any way we can)", "-");
+			bumAdv($location[Castle in the Clouds in the Sky (top floor)], "", "itemsnc", "1 choiceadv", "Finishing the quest (any way we can)", "-");
 		}
 		visit_url("council.php");
 		set_property("lastCouncilVisit", my_level());
@@ -5711,7 +5711,7 @@ boolean bcascCastle() {
 			set_property("choiceAdventure676", 3);
 			set_property("choiceAdventure677", 2);
 			set_property("choiceAdventure678", 2);
-			bumAdv($location[Giant's Castle (top floor)], "", "itemsnc", "steam-powered model rocketship", "Picking up a steam-powered model rocketship to open up the Hole in the Sky", "-");
+			bumAdv($location[Castle in the Clouds in the Sky (top floor)], "", "itemsnc", "steam-powered model rocketship", "Picking up a steam-powered model rocketship to open up the Hole in the Sky", "-");
 			
 		if(i_a("steam-powered model rocketship") > 0)
 			level=4;
@@ -6623,7 +6623,7 @@ boolean bcascGuild() {
 	location loc;
 	while (!guild_store_available()) {
 		switch (my_primestat()) {
-			case $stat[Muscle] : loc = $location[Outskirts of The Knob]; break;
+			case $stat[Muscle] : loc = $location[the outskirts of cobb's knob]; break;
 			case $stat[Mysticality]: loc = $location[Haunted Pantry]; break;
 			case $stat[Moxie] : 
 				loc = $location[Sleazy Back Alley];
@@ -6950,7 +6950,7 @@ boolean bcascInnaboxen() {
 boolean bcascKnob() {
 	if (checkStage("knob")) return true;
 	while (contains_text(visit_url("plains.php"), "knob1.gif") && item_amount($item[knob goblin encryption key]) == 0) {
-		bumAdv($location[Outskirts of the Knob], "", "", "1 knob goblin encryption key", "Let's get the Encryption Key");
+		bumAdv($location[the outskirts of cobb's knob], "", "", "1 knob goblin encryption key", "Let's get the Encryption Key");
 	}
 	checkStage("knob", true);
 	return true;
@@ -7598,7 +7598,7 @@ void bcascTowerItem() {
 		break;
 		
 		case $item[Knob Goblin firecracker]:
-			bumAdv($location[Outskirts of the Knob], "item", "hebo", "1 Knob Goblin firecracker", "Getting a Knob Goblin firecracker", "i", "consultHeBo");
+			bumAdv($location[the outskirts of cobb's knob], "item", "hebo", "1 Knob Goblin firecracker", "Getting a Knob Goblin firecracker", "i", "consultHeBo");
 		break;
 		
 		case $item[inkwell]:
@@ -9892,17 +9892,17 @@ void bcs12() {
 				{
 		
 					//place florist friar plants
-					choose_all_plants("", $location[back 40]);
+					choose_all_plants("", $location[mcmillicancuddy's back 40]);
 					
-					bumAdv($location[back 40]);
+					bumAdv($location[mcmillicancuddy's back 40]);
 				}
 				while(contains_text(visit_url("bigisland.php?place=farm"), "farm3d.gif"))
 				{
 		
 					//place florist friar plants
-					choose_all_plants("", $location[other back 40]);
+					choose_all_plants("", $location[mcmillicancuddy's other back 40]);
 					
-					bumAdv($location[other back 40]);
+					bumAdv($location[mcmillicancuddy's other back 40]);
 				}
 				
 				cli_execute("outfit "+bcasc_warOutfit);

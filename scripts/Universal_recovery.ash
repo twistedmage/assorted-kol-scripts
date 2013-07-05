@@ -3,7 +3,7 @@
 // http://kolmafia.us/showthread.php?t=1780
 script "Universal_recovery.ash";
 notify "Bale";
-string thisver = "3.10.10";		// This is the script's version!
+string thisver = "3.10.11";		// This is the script's version!
 
 // To use this script, put Universal_recovery in the /script directory. 
 // Then in the Graphical CLI type:
@@ -86,16 +86,16 @@ boolean ignoreStatus = get_property("baleUr_ignoreStatus").to_boolean();
 boolean AlwaysContinue = get_property("baleUr_AlwaysContinue").to_boolean();
 
 // These are the default values to restore hp and mp.
-int hp_autoheal, hp_autotarget, mp_autoheal, mp_autotarget;
+int hp_trigger, hp_target, mp_trigger, mp_target;
 void set_autohealing() {
-	hp_autoheal = floor(my_maxhp() * to_float(get_property("hpAutoRecovery")));
-	hp_autotarget = ceil(my_maxhp() * to_float(get_property("hpAutoRecoveryTarget")));
+	hp_trigger = floor(my_maxhp() * to_float(get_property("hpAutoRecovery")));
+	hp_target = ceil(my_maxhp() * to_float(get_property("hpAutoRecoveryTarget")));
 	if(zombie) {
-		mp_autoheal = floor(get_property("baleUr_ZombieAuto") == ""? -1: to_float(get_property("baleUr_ZombieAuto")));
-		mp_autotarget = get_property("baleUr_ZombieTarget").to_int();
+		mp_trigger = floor(get_property("baleUr_ZombieAuto") == ""? -1: to_float(get_property("baleUr_ZombieAuto")));
+		mp_target = get_property("baleUr_ZombieTarget").to_int();
 	} else {
-		mp_autoheal = floor(my_maxmp() * to_float(get_property("mpAutoRecovery")));
-		mp_autotarget = ceil(my_maxmp() * to_float(get_property("mpAutoRecoveryTarget")));
+		mp_trigger = floor(my_maxmp() * to_float(get_property("mpAutoRecovery")));
+		mp_target = ceil(my_maxmp() * to_float(get_property("mpAutoRecoveryTarget")));
 	}
 } set_autohealing();
 
@@ -667,8 +667,8 @@ int mp_to_meat(int amount) {
 // This will handle all item based healing outside of ronin/hardcore. 
 // It will heal from the mall using the best value for restoratives.
 boolean mall_heal(int target, string type) {
-	if(start_type == "MP" && target < mp_autotarget)
-		target = mp_autotarget;
+	if(start_type == "MP" && target < mp_target)
+		target = mp_target;
 	int amount;
 	item best_item;			// This is the best mall value for healing.
 	float q_item;			// This is the number of that item to use.
@@ -763,7 +763,7 @@ float meatperhp() {
 
 // This will set _meatperhp and _meatpermp, considering the possibility of healing with skills.
 void meatper() {
-	populate_skills(hp_autotarget);
+	populate_skills(hp_target);
 	if(mallcore)
 		best_mall(my_maxmp()*1.25, "MP"); 	// This function will set _meatpermp
 	else set_property("_meatpermp", meatpermp());
@@ -1018,9 +1018,9 @@ boolean purchase_mp(int target) {
 			q = min(q, for_use(best_buy));
 			use(q, best_buy);
 		} else if(fizzy) {
-			// Let's not heal all the way to mp_autotarget if not required -- expensive!
+			// Let's not heal all the way to mp_target if not required -- expensive!
 			if(start_type == "MP")
-				target = objective == 0 ? min(target *.9, mp_autoheal) : objective;
+				target = objective == 0 ? min(target *.9, mp_trigger) : objective;
 				// In the case that objective !=0, target is lowered to original minimum
 			if(target <= my_mp()) return true;
 			galaktik(target - my_mp(), true, "MP");
@@ -1421,10 +1421,10 @@ boolean skill_restore(int target) {
 boolean purchase_hp(int target) {
 	if(!buy_npc) return false;
 	if(objective == 0) {   // Let's not be stubborn. Lets save meat by getting close enough
-		if(target * .9 > hp_autoheal) {
-			if(Verbosity > 0) print("Recovery target reduced to healing trigger ("+hp_autoheal+")to conserve meat.", "#66CC00");
-			target = hp_autoheal + 1;
-		} else target = max(hp_autoheal, target * .9);
+		if(target * .9 > hp_trigger) {
+			if(Verbosity > 0) print("Recovery target reduced to healing trigger ("+hp_trigger+")to conserve meat.", "#66CC00");
+			target = hp_trigger + 1;
+		} else target = max(hp_trigger, target * .9);
 	} else if(target > objective)
 		target = objective;		// In the case that objective !=0, target is lowered to original minimum
 	while(my_meat() >= 60 && my_hp() < target && !zombie)
@@ -1445,35 +1445,18 @@ boolean purchase_hp(int target) {
 }
 
 // This returns true if the character is currently mining, or Unhydrated.
-boolean need_only_1hp() {
+boolean noncom() {
 	switch(my_location()) {
 	case $location[Desert (Unhydrated)]:
-		if(get_property("lastEncounter") == "Let's Make a Deal!" || get_property("lastEncounter") == "No Visible Means of Support"
+		if(get_property("lastEncounter") == "Let's Make a Deal!"
 		  || gameday_to_int() == 34 || gameday_to_int() == 87) // Today is FoB or El Dia. HP will be needed for combats.
 			return false;
-		return (my_familiar() != $familiar[Mini-Hipster]);
+		return $familiars[Artistic Goth Kid, Mini-Hipster] contains my_familiar();
 	#case $location[The Gummi Mine]:
-	case $location[Itznotyerzitz Mine]:
-		return (string_modifier("outfit") == "Mining Gear" || string_modifier("outfit") == "Dwarvish War Uniform");
-	case $location[Knob Shaft]:
-		return (string_modifier("outfit") == "Mining Gear");
-	case $location[Anemone Mine]:
-		return have_equipped($item[Mer-kin digpick]);
-	}
-	return false;
-}
-
-// This returns true if the character is currently mining, or Unhydrated.
-boolean need_nomp() {
-	switch(my_location()) {
-	case $location[Desert (Unhydrated)]:
-		if(get_property("lastEncounter") == "Let's Make a Deal!" || get_property("lastEncounter") == "No Visible Means of Support")
-			return false;
-		return true;
-	case $location[Itznotyerzitz Mine]:
-		return (string_modifier("outfit") == "Mining Gear" || string_modifier("outfit") == "Dwarvish War Uniform");
-	case $location[Knob Shaft]:
-		return (string_modifier("outfit") == "Mining Gear");
+	case $location[Itznotyerzitz Mine (in Disguise)]:
+		if(string_modifier("outfit") == "Dwarvish War Uniform") return true;
+	case $location[Knob Shaft (mining)]:
+		return string_modifier("outfit") == "Mining Gear";
 	case $location[Anemone Mine]:
 		return have_equipped($item[Mer-kin digpick]);
 	}
@@ -1498,11 +1481,11 @@ boolean hp_heal(int target){
 	populate_skills(target);
 	skill cheap_skill = find_cheapest_skill(target);		// What is the cheapest skill to heal HP?
 	// If MP runs low, mixed HP/MP items are frequently used, so check to see if we need MP first.
-	int min_mp = mp_autoheal;
+	int min_mp = mp_trigger;
 	if(cheap_skill != $skill[none]) {
-		if(!need_nomp()) {
+		if(!noncom()) {
 			min_mp = min_mp + skills[cheap_skill].mp;
-			if(min_mp > my_maxmp() *.75 && mp_autoheal < my_maxmp() *.75) {
+			if(min_mp > my_maxmp() *.75 && mp_trigger < my_maxmp() *.75) {
 				min_mp = my_maxmp() * .75;
 			} else if(min_mp > my_maxmp())
 				min_mp = my_maxmp();
@@ -1581,8 +1564,8 @@ boolean hp_heal(int target){
 // This will cure poisoning. It will only fail if the character does not possess an antidote, or can't afford to buy one.
 // It will also attempt to keep a few spare anti-anti-antidotes in inventory, for emergency in-combat use.
 boolean unpoison() {
-	if(zombie)
-		return true; // Zombie Masters don't stay poisoined and cannot purchase antidotes.
+	if(zombie)		 // Zombie Masters don't stay poisoined and cannot purchase antidotes.
+		return true;
 
 	// Am I poisoned?
 	boolean poisoned() {
@@ -1623,7 +1606,7 @@ void cure_status() {
 	boolean skill_pop = false;
 	boolean skill_cure(skill cure) {
 		if(!skill_pop)
-			skill_pop = populate_skills(hp_autotarget);
+			skill_pop = populate_skills(hp_target);
 		return cast(1, cure);
 	}
 	
@@ -1847,21 +1830,25 @@ void manaburn_healing() {
 boolean restore(string type, int amount) {
 	daily_handling(); 	// This will do some stuff on the first run of the day
 	if(Verbosity > 2) print("Calling Universal Recovery "+thisver+" for type="+type+", amount="+amount,"red");
-	// If you are Unhydrated or mining, then only 1 HP is needed and status effects are irrelevant.
-	if(amount == 0) {
+	// If you are Unhydrated or mining, then only 1 HP is needed, no MP necessary and status effects are irrelevant.
+	// If you are Unhydrated or mining, then only 1 HP is needed, no MP necessary and status effects are irrelevant.
+	if(amount == 0 && noncom()) {
 		if(type == "MP") {
-			if(need_nomp())
-				return true;
-		} else if(need_only_1hp()) {
-			if(my_hp() < 1 && hp_autoheal >= 0) {
-				if(Verbosity > 0) print("Restoring only 1 HP since more is irrelevant here", "#66CC00");
-				if(zombie)
-					hp_heal(1);
-				else
-					galaktik(1, true, "HP");
-			}
-			return my_hp() > 0;
+
+			if(Verbosity > 0) print("Restoring no MP since it is irrelevant here", "#66CC00");
+			return true;
+
 		}
+		if(my_hp() < 1 && hp_trigger >= 0) {
+			if(Verbosity > 0) print("Restoring only 1 HP since more is irrelevant here", "#66CC00");
+			if(zombie)
+				hp_heal(1);
+			else
+				galaktik(1, true, "HP");
+
+
+		}
+		return my_hp() > 0;
 	}
 	objective = amount;			// The global variable will inform other procedures of default if == 0.
 	start_type = type; 			// To save me if hp recovery calls mp recovery.
@@ -1870,8 +1857,8 @@ boolean restore(string type, int amount) {
 	reserve_healing();
 	manaburn_healing();
 	if(type == "MP") {
-		if(objective == 0 && mp_autoheal < 0) return true;
-		if(!ignoreStatus && beset($effect[Beaten Up]) && objective == 0 && hp_autoheal >= 0)
+		if(objective == 0 && mp_trigger < 0) return true;
+		if(!ignoreStatus && beset($effect[Beaten Up]) && objective == 0 && hp_trigger >= 0)
 			cure_beatenup(objective);
 		// Check to see if the player needs MP for auto-Olfaction.
 		if(get_property("autoOlfact") != "" && !beset($effect[On the Trail])
@@ -1882,19 +1869,19 @@ boolean restore(string type, int amount) {
 				amount = max(mp_cost($skill[Transcendent Olfaction]), amount);
 			objective = amount;
 		}
-		if(objective == 0 || (objective >0 && amount < mp_autotarget && mp_autoheal > 0))
-			amount = mp_autotarget;
-		if((objective != 0 && my_mp() <= amount) || (objective == 0 && my_mp()<= mp_autoheal))
+		if(objective == 0 || (objective >0 && amount < mp_target && mp_trigger > 0))
+			amount = mp_target;
+		if((objective != 0 && my_mp() <= amount) || (objective == 0 && my_mp()<= mp_trigger))
 			return mp_heal(amount);
 	}
 	else {	// type == "HP"
-		if(objective ==0 && hp_autoheal < 0) return true;
+		if(objective ==0 && hp_trigger < 0) return true;
 		int start_hp = my_hp();
 		if(!ignoreStatus && beset($effect[Beaten Up]))
 			cure_beatenup(objective);
-		if(objective ==0 || (objective >0 && amount > start_hp && amount < hp_autotarget))
-			amount = hp_autotarget;
-	    if((objective != 0 && my_hp() < objective) || (objective == 0 && (start_hp<= hp_autoheal || my_hp() < hp_autoheal)))
+		if(objective ==0 || (objective >0 && amount > start_hp && amount < hp_target))
+			amount = hp_target;
+	    if((objective != 0 && my_hp() < objective) || (objective == 0 && (start_hp<= hp_trigger || my_hp() < hp_trigger)))
 			return hp_heal(amount);
 	}
 	return true;

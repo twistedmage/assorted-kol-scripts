@@ -3,6 +3,10 @@ notify Theraze;
 import <bumcheekascend.ash>;
 import <zlib.ash>;
 
+
+//predeclare
+void GetSushiMat();
+
 //Allows a wider range of macros to be chosen, or falls back on the standard putty / stat macro
 void set_combat_macro_name(string macro)
 {
@@ -54,21 +58,24 @@ void prepare_for(string type,location loc)
 			if(user_confirm("Do you want to eat a Bento Box."))
 			{
 				if(i_a("white rice")<1)
-					create(1,$item[white rice]);
+					buy(1,$item[white rice]);
 				if(i_a("seaweed")<1)
-					create(1,$item[seaweed]);
+					buy(1,$item[seaweed]);
 				if(i_a("beefy fish meat")<1)
-					create(1,$item[beefy fish meat]);
+					buy(1,$item[beefy fish meat]);
 				if(i_a("glistening fish meat")<1)
-					create(1,$item[glistening fish meat]);
+					buy(1,$item[glistening fish meat]);
 				if(i_a("slick fish meat")<1)
-					create(1,$item[slick fish meat]);
+					buy(1,$item[slick fish meat]);
 				if(i_a("mer-kin lunchbox")<1)
-					create(1,$item[mer-kin lunchbox]);
+					buy(1,$item[mer-kin lunchbox]);
 				if(i_a("tempura avocado")<1)
-					create(1,$item[tempura avocado]);
+					buy(1,$item[tempura avocado]);
 				if(i_a("Mer-kin weaksauce")<1)
-					create(1,$item[Mer-kin weaksauce]);
+					buy(1,$item[Mer-kin weaksauce]);
+				if(i_a("Mer-kin worktea")<1)
+					buy(1,$item[Mer-kin worktea]);
+				GetSushiMat();
 				cli_execute("create bento box");
 			}
 		}
@@ -394,7 +401,6 @@ void smiteHatred()
 
 void smiteViolence()
 {
-	abort("a");
 	visit_url("sea_merkin.php?action=temple");
 	visit_url("choice.php?pwd&whichchoice=706&option=1&choiceform1=Enter+the+Temple");
 	visit_url("choice.php?pwd&whichchoice=707&option=1&choiceform1=Receive+the+Blessing+of+Shub-Jigguwat");
@@ -415,7 +421,7 @@ void smiteViolence()
 	abort("copy end text line 415");
 	string txt=run_combat();
 	//finish up
-	visit_url("<>");
+	visit_url("choice.php");
 	visit_url("choice.php?pwd&whichchoice=709&option=1&choiceform1=The+Eyes+Have+It");
 }
 

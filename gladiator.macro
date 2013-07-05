@@ -57,9 +57,8 @@ if !hasskill Ball Sack && !hasskill Net Neutrality && !hasskill Blade Runner
 	endif
 endif
 
-
-mark glad_fight2
 while !missed 2
+mark glad_fight2
 	#ball skills
 	if hasskill ball sweat && match  "He pauses to wipe the "
 		skill ball sweat
@@ -105,3 +104,4 @@ while !missed 2
 	#default
 	attack
 endwhile
+abort "missed a lot"

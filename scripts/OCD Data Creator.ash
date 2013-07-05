@@ -3682,6 +3682,11 @@ save [$item[big dribbly candle]] = 0;
 cli_execute("use * stolen meatpouch");
 save [$item[beaver spear]] = 3;
 save [$item[dilapidated wizard hat]] = 2;
+save [$item[perpendicular guano]] = 0;
+save [$item[leechknife]] = 3;
+save [$item[dusty left fourth rear claw]] = 0;
+save     [$item[shamanic beads]] = 3;
+save [$item[soggy wofl t-shirt]] = 1;
 
 
 //stuff to sell later
