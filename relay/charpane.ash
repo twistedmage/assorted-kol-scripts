@@ -287,7 +287,7 @@ string helperDanceCard() {
 	result.append('<tr>');
 	result.append('<td class="icon"><img src="images/itemimages/guildapp.gif"></td>');
 	result.append('<td class="location">');
-	result.append('<a href="' + to_url($location[Haunted Ballroom]) + '" class="visit" target="mainpane">Haunted Ballroom</a>');
+	result.append('<a href="' + to_url($location[The Haunted Ballroom]) + '" class="visit" target="mainpane">Haunted Ballroom</a>');
 	result.append('You have a date with Matilda');
 	result.append('</td>');
 	result.append('</tr>');
@@ -520,13 +520,13 @@ string helperSemiRare() {
 	//Set up all the locations we support
 	string [location] rewards;
 		rewards[$location[sleazy back alley]] = "wine.gif|Distilled fotified wine (3)|0";
-		rewards[$location[haunted pantry]] = "pie.gif|Tasty tart (3)|0";
-		rewards[$location[limerick dungeon]] = "eyedrops.gif|cyclops eyedrops|21";
-		rewards[$location[orc chasm]] = "scroll2.gif|Fight Bad ASCII Art|68";
+		rewards[$location[The Haunted Pantry]] = "pie.gif|Tasty tart (3)|0";
+		rewards[$location[The Limerick Dungeon]] = "eyedrops.gif|cyclops eyedrops|21";
+		rewards[$location[Orc Chasm]] = "scroll2.gif|Fight Bad ASCII Art|68";
 		rewards[$location[Castle in the Clouds in the Sky (Top Floor)]] = "inhaler.gif|Mick's IcyVapoHotness Inhaler|95";
-		rewards[$location[kitchens]] = "elitehelm.gif|Fight KGE Guard Captain|20";
+		rewards[$location[Cobb's Knob Kitchens]] = "elitehelm.gif|Fight KGE Guard Captain|20";
 		rewards[$location[The Outskirts of Cobb's Knob]] = "lunchbox.gif|Knob Goblin lunchbox|0";
-		rewards[$location[hidden temple]] = "stonewool.gif|Fight Baa'baa'bu'ran|5";
+		rewards[$location[The Hidden Temple]] = "stonewool.gif|Fight Baa'baa'bu'ran|5";
 		
 	int lastCounter = to_int(get_property("semirareCounter"));
 	string lastLocation = lastCounter == 0? "none": get_property("semirareLocation");
@@ -809,6 +809,124 @@ void bakeElements() {
 	chitBricks["elements"] = result;
 }
 
+record plantInfo {
+	int no;
+	string desc;
+	boolean territorial;
+	string terrain;
+};
+plantInfo[string] plantData;
+	plantData[""]=new plantInfo(0,"No Plant",false,"");
+	plantData["Rabid Dogwood"]=new plantInfo(1,"+30 Monster Level",true,"outdoor");
+	plantData["Rutabeggar"]=new plantInfo(2,"+25% Item drops",true,"outdoor");
+	plantData["Rad-ish Radish"]=new plantInfo(3,"+5 Moxie stats per fight",true,"outdoor");
+	plantData["Artichoker"]=new plantInfo(4,"Delevels enemies before combat",false,"outdoor");
+	plantData["Smoke-ra"]=new plantInfo(5,"Prevents enemies from attacking",false,"outdoor");
+	plantData["Skunk Cabbage"]=new plantInfo(6,"Deals Stench damage",false,"outdoor");
+	plantData["Deadly Cinnamon"]=new plantInfo(7,"Deals Hot damage",false,"outdoor");
+	plantData["Celery Stalker"]=new plantInfo(8,"Deals Spooky damage",false,"outdoor");
+	plantData["Lettuce Spray"]=new plantInfo(9,"Restores HP after combat",false,"outdoor");
+	plantData["Seltzer Watercress"]=new plantInfo(10,"Restores MP after combat",false,"outdoor");
+	plantData["War Lily"]=new plantInfo(11,"+30 Monster Level",true,"indoor");
+	plantData["Stealing Magnolia"]=new plantInfo(12,"+25% Item drops",true,"indoor");
+	plantData["Canned Spinach"]=new plantInfo(13,"+5 Muscle stats per fight",true,"indoor");
+	plantData["Impatiens"]=new plantInfo(14,"+25% Combat Initiative",false,"indoor");
+	plantData["Spider Plant"]=new plantInfo(15,"Damages and poisons enemies before combat",false,"indoor");
+	plantData["Red Fern"]=new plantInfo(16,"Delevels enemies during combat",false,"indoor");
+	plantData["BamBOO!"]=new plantInfo(17,"Deals Spooky damage",false,"indoor");
+	plantData["Arctic Moss"]=new plantInfo(18,"Deals Cold damage",false,"indoor");
+	plantData["Aloe Guv'nor"]=new plantInfo(19,"Restores HP after combat",false,"indoor");
+	plantData["Pitcher Plant"]=new plantInfo(20,"Restores MP after combat",false,"indoor");
+	plantData["Blustery Puffball"]=new plantInfo(21,"+30 Monster Level",true,"underground");
+	plantData["Horn of Plenty"]=new plantInfo(22,"+25% Item drops",true,"underground");
+	plantData["Wizard's Wig"]=new plantInfo(23,"+5 Myst stats per fight",true,"underground");
+	plantData["Shuffle Truffle"]=new plantInfo(24,"+25% Combat Initiative",false,"underground");
+	plantData["Dis Lichen"]=new plantInfo(25,"Delevels enemies before combat",false,"underground");
+	plantData["Loose Morels"]=new plantInfo(26,"Deals Sleaze damage",false,"underground");
+	plantData["Foul Toadstool"]=new plantInfo(27,"Deals Stench damage",false,"underground");
+	plantData["Chillterelle"]=new plantInfo(28,"Deals Cold damage",false,"underground");
+	plantData["Portlybella"]=new plantInfo(29,"Restores HP after combat",false,"underground");
+	plantData["Max Headshroom"]=new plantInfo(30,"Restores MP after combat",false,"underground");
+	plantData["Spankton"]=new plantInfo(31,"Delevels enemies before combat",true,"underwater");
+	plantData["Kelptomaniac"]=new plantInfo(32,"+40% Item drops",true,"underwater");
+	plantData["Crookweed"]=new plantInfo(33,"+60% Meat drops",true,"underwater");
+	plantData["Electric Eelgrass"]=new plantInfo(34,"Prevents enemies from attacking",false,"underwater");
+	plantData["Duckweed"]=new plantInfo(35,"You can hide behind it once per fight",false,"underwater");
+	plantData["Orca Orchid"]=new plantInfo(36,"Deals Physical damage",false,"underwater");
+	plantData["Sargassum"]=new plantInfo(37,"Deals Stench damage",false,"underwater");
+	plantData["Sub-Sea Rose"]=new plantInfo(38,"Deals Cold damage",false,"underwater");
+	plantData["Snori"]=new plantInfo(39,"Restores HP and MP after combat",false,"underwater");
+	plantData["Up Sea Daisy"]=new plantInfo(40,"+30 stats per fight",false,"underwater");
+
+string toPlant(int i) {
+ foreach s in plantData if (i == plantData[s].no) return s;
+ return "";
+}
+
+void pickerFlorist(location lastLoc, string[int] planted){
+	int plantsPlanted;
+	string terrain = lastLoc.environment;
+	boolean marked = false;
+	foreach i,s in planted {
+		if (s!="") plantsPlanted+=1;
+		if (plantData[s].territorial) marked = true;
+	}
+	string plantsUsed = get_property("_floristPlantsUsed");
+	boolean[int] plantable;
+	foreach s in plantData if ((plantData[s].terrain == terrain) && (!plantsUsed.contains_text(s)) && (s != ""))
+		plantable[plantData[s].no]= ((planted[0] != s) && (planted[1] != s) && (planted[2] != s));
+	buffer picker;
+	picker.append('<div id="chit_pickerflorist" class="chit_skeleton" style="display:none">');
+	picker.append('<table class="chit_picker">');
+	string color;
+	if (plantsPlanted == 3) {
+		picker.append('<tr><th colspan="2">Pull a Plant</th></tr>');
+		foreach i,s in planted {
+			color = (plantsUsed.contains_text(s)?(plantData[s].territorial?'lightyellow':'lightgray'):(plantData[s].territorial?'lightgreen':'lightblue'));
+			picker.append('<tr style="background-color:' + color + '"><td><img src="http://images.kingdomofloathing.com/itemimages/shovel.gif"></td>');
+			picker.append('<td><a target="mainpane" href="choice.php?option=2&whichchoice=720&pwd='+my_hash()+'&plnti='+i+'">'+ s +'<br>(' + plantData[s].desc + ')</a></td></tr>');
+		}
+		if (count(plantable)>0) {
+			picker.append('<tr><th colspan="2">Remaining Plants</th></tr>');
+			foreach i in plantable {
+				if (!plantable[i]) continue;
+				color = (plantable[i]?(plantData[i.toPlant()].territorial?(marked?"lightyellow":"lightgreen"):"lightblue"):"lightgray");
+				picker.append('<tr style="background-color:' + color + '"><td><img width="21" height="40" src="http://images.kingdomofloathing.com/otherimages/friarplants/plant' + i + '.gif" title="' + i.toPlant() + ' (' + plantData[i.toPlant()].desc + ')"></td>');
+				picker.append('<td>' + i.toPlant() + '<br>(' + plantData[i.toPlant()].desc + ')</td></tr>');
+			}
+		} else picker.append('<tr><th colspan="2">No plants in stock for this area.</th></tr>');
+	} else {
+		picker.append('<tr><th colspan="2">Plant an ' + terrain + ' Herb</th></tr>');
+		if (count(plantable)>0) foreach i in plantable {
+			color = (plantable[i]?(plantData[i.toPlant()].territorial?(marked?"lightyellow":"lightgreen"):"lightblue"):"lightgray");
+			picker.append('<tr style="background-color:' + color + '"><td><img width="21" height="40" src="http://images.kingdomofloathing.com/otherimages/friarplants/plant' + i + '.gif" title="' + i.toPlant() + ' (' + plantData[i.toPlant()].desc + ')"></td>');
+			picker.append('<td><a target="mainpane" href="choice.php?whichchoice=720&pwd=' + my_hash() + '&option=1&plant=' + i + '">' + i.toPlant() + '<br>(' + plantData[i.toPlant()].desc + ')</a></td></tr>');
+		} else picker.append('<tr><td colspan="2">No more plants available to plant here</td></tr>');
+	}
+	picker.append('</table></div>');
+	chitPickers["florist"] = picker;
+}
+
+void bakeFlorist() {
+	buffer result;
+
+	if ((last_location.environment != "none") && florist_available()) {
+		result.append('<table id="chit_florist" class="chit_brick nospace">');
+		result.append('<tr><th><a class="visit" target="mainpane" href="forestvillage.php?action=floristfriar">Florist Friar</a></th></tr>');
+		string[int] plants=get_florist_plants()[last_location];
+		result.append('<tr><td><a class="chit_launcher" rel="chit_pickerflorist" href="#">');
+		foreach i,s in plants if (plantData[s].no>0) result.append('<img style="vertical-align:middle" width="21" height="40" src="http://images.kingdomofloathing.com/otherimages/friarplants/plant'+plantData[s].no+'.gif" title="'+s+' ('+plantData[s].desc+')">');
+		else {
+			result.append('<img style="vertical-align:middle" width="21" height="40" src="http://images.kingdomofloathing.com/otherimages/friarplants/noplant.gif" title="No Plant">');
+			break;
+		}
+		result.append('</a></td></tr></table>');
+		pickerFlorist(last_location, plants);
+	}
+	
+	chitBricks["florist"] = result;
+}
+
 void bakeTrail() {
 	string source = chitSource["trail"];
 	buffer result;
@@ -899,9 +1017,9 @@ void pickerFamiliar(familiar myfam, item famitem, boolean isFed) {
 	generic[10]=$item[snow suit];
 
 	//Mr. Store Foldables
-	generic[100]=$item[2225];	//flaming familiar doppelgänger
-	generic[101]=$item[3194];	//origami "gentlemen's" magazine
-	generic[102]=$item[4924];	//Loathing Legion helicopter
+	generic[100]=$item[flaming familiar doppelg&auml;nger];	//flaming familiar doppelgänger
+	generic[101]=$item[origami &quot;gentlemen's&quot; magazine];	//origami "gentlemen's" magazine
+	generic[102]=$item[Loathing Legion helicopter];
 	
 	//Special items
 	generic[200]=$item[ittah bittah hookah];	
@@ -939,7 +1057,7 @@ void pickerFamiliar(familiar myfam, item famitem, boolean isFed) {
 			return "Doppelshifter";
 		case $item[bugged balaclava]:
 			return "Volleyball, ML +20";
-		case to_item(4577):
+		case $item[bugged b&Atilde;&para;n&plusmn;&Atilde;&copy;t]:
 			return "Fairy: Food, Pants, Candy +5%";
 		}
 		
@@ -1193,7 +1311,7 @@ void pickerFamiliar(familiar myfam, item famitem, boolean isFed) {
 
 	//Bugged Bugbear (Get free equipment from Arena)
 	if (myfam == $familiar[Baby Bugged Bugbear]) {
-		if ((available_amount($item[4575]) + available_amount($item[4576]) + available_amount($item[4577])) == 0) {
+		if ((available_amount($item[bugged beanie]) + available_amount($item[bugged balaclava]) + available_amount($item[bugged b&Atilde;&para;n&plusmn;&Atilde;&copy;t])) == 0) {
 			url = 'arena.php';
 			picker.append('<tr class="pickitem"><td class="action" colspan="2"><a class="done" target="mainpane" href="' + url + '">Visit the Arena</a></tr>');
 		}
@@ -1480,7 +1598,7 @@ void bakeFamiliar() {
 	} else 	if (famitem == $item[moveable feast]) {
 		charges = get_property("_feastUsed") + " / 5";
 		chargeTitle = "Familiars Feasted";
-	} else 	if ( (myfam == $familiar[stomping boots]) && (get_property("bootsCharged") == "true") ) {
+	} else 	if ( (myfam == $familiar[Pair of Stomping Boots]) && (get_property("bootsCharged") == "true") ) {
 		charges = "GO";
 		chargeTitle = "Your Boots are charged and ready for some stomping";
 	}
@@ -2595,7 +2713,7 @@ void pickOutfit() {
 	string topical(string o) {
 		switch(o) {
 		case "Swashbuckling Getup":
-			if($locations[Pirate Cove, Barrrney's Barrr, F'c'le] contains loc)
+			if($locations[The Obligatory Pirate's Cove, Barrrney's Barrr, The F'c'le] contains loc)
 				return boldit(o);
 			break;
 		case "Mining Gear":
@@ -2919,36 +3037,36 @@ void bakeQuests() {
 
 			e = to_int(get_property("cyrptAlcoveEvilness"));
 			if (e > 25) {			
-				evil += '<br>&nbsp;&nbsp;&nbsp;* <a href="' + to_url($location[defiled alcove]) +'" target="mainpane">Alcove:</a> ' + e + ' (+init)';
+				evil += '<br>&nbsp;&nbsp;&nbsp;* <a href="' + to_url($location[The Defiled Alcove]) +'" target="mainpane">Alcove:</a> ' + e + ' (+init)';
 			} else if (e > 0) {			
-				evil += '<br>&nbsp;&nbsp;&nbsp;* <a href="' + to_url($location[defiled alcove]) +'" target="mainpane">Alcove:</a> ' + e + ' (Boss ready)';
+				evil += '<br>&nbsp;&nbsp;&nbsp;* <a href="' + to_url($location[The Defiled Alcove]) +'" target="mainpane">Alcove:</a> ' + e + ' (Boss ready)';
 			} else {
 				evil += '<br>&nbsp;&nbsp;&nbsp;* <s>Alcove</s>';
 			}
 
 			e = to_int(get_property("cyrptCrannyEvilness"));
 			if (e > 25) {			
-				evil += '<br>&nbsp;&nbsp;&nbsp;* <a href="' + to_url($location[defiled cranny]) +'" target="mainpane">Cranny:</a> ' + e + ' (+NC, +ML)';
+				evil += '<br>&nbsp;&nbsp;&nbsp;* <a href="' + to_url($location[The Defiled Cranny]) +'" target="mainpane">Cranny:</a> ' + e + ' (+NC, +ML)';
 			} else if (e > 0) {			
-				evil += '<br>&nbsp;&nbsp;&nbsp;* <a href="' + to_url($location[defiled cranny]) +'" target="mainpane">Cranny:</a> ' + e + ' (Boss ready)';
+				evil += '<br>&nbsp;&nbsp;&nbsp;* <a href="' + to_url($location[The Defiled Cranny]) +'" target="mainpane">Cranny:</a> ' + e + ' (Boss ready)';
 			} else {
 				evil += '<br>&nbsp;&nbsp;&nbsp;* <s>Cranny</s>';
 			}
 
 			e = to_int(get_property("cyrptNicheEvilness"));
 			if (e > 25) {			
-				evil += '<br>&nbsp;&nbsp;&nbsp;* <a href="' + to_url($location[defiled niche]) +'" target="mainpane">Niche:</a> ' + e + ' (sniff dirty old lihc)';
+				evil += '<br>&nbsp;&nbsp;&nbsp;* <a href="' + to_url($location[The Defiled Niche]) +'" target="mainpane">Niche:</a> ' + e + ' (sniff dirty old lihc)';
 			} else if (e > 0) {			
-				evil += '<br>&nbsp;&nbsp;&nbsp;* <a href="' + to_url($location[defiled niche]) +'" target="mainpane">Niche:</a> ' + e + ' (Boss ready)';
+				evil += '<br>&nbsp;&nbsp;&nbsp;* <a href="' + to_url($location[The Defiled Niche]) +'" target="mainpane">Niche:</a> ' + e + ' (Boss ready)';
 			} else {
 				evil += '<br>&nbsp;&nbsp;&nbsp;* <s>Niche</s>';
 			}
 
 			e = to_int(get_property("cyrptNookEvilness"));
 			if (e > 25) {			
-				evil += '<br>&nbsp;&nbsp;&nbsp;* <a href="' + to_url($location[defiled nook]) +'" target="mainpane">Nook:</a> ' + e + ' (+items)';
+				evil += '<br>&nbsp;&nbsp;&nbsp;* <a href="' + to_url($location[The Defiled Nook]) +'" target="mainpane">Nook:</a> ' + e + ' (+items)';
 			} else if (e > 0) {			
-				evil += '<br>&nbsp;&nbsp;&nbsp;* <a href="' + to_url($location[defiled nook]) +'" target="mainpane">Nook:</a> ' + e + ' (Boss ready)';
+				evil += '<br>&nbsp;&nbsp;&nbsp;* <a href="' + to_url($location[The Defiled Nook]) +'" target="mainpane">Nook:</a> ' + e + ' (Boss ready)';
 			} else {
 				evil += '<br>&nbsp;&nbsp;&nbsp;* <s>Nook</s>';
 			}
@@ -3351,7 +3469,7 @@ void bakeTracker() {
 		if(available_amount($item[Talisman o' Nam])==0)
 			result.append('<br>Find the <a target="mainpane" href="cove.php">Talisman o Nam</a>');
 		// have items required: photograph of God, hard rock candy, ketchup hound, hard-boiled ostrich egg 
-		if(item_amount($item["I Love Me, Vol. I"]) == 0) {
+		if(item_amount($item[&quot;I Love Me, Vol. I&quot;]) == 0) {
 			result.append("<br>Obtain: ");
 			result.append(item_report($item[photograph of God]));
 			result.append(", ");
@@ -3419,7 +3537,7 @@ void bakeTracker() {
 			result.append(item_report($item[stone rose], "stone rose, "));
 			result.append(item_report($item[drum machine], "drum machine, "));
 		case "step3":
-			result.append(item_report($item[black paint]));
+			result.append(item_report($item[can of black paint]));
 			if(questL11Pyramid == "step3")
 				result.append("</br>Explore the Desert");
 			break;
@@ -3432,7 +3550,7 @@ void bakeTracker() {
 			break;
 		case "step9":
 			result.append(item_report($item[drum machine], "drum machine, "));
-			result.append(item_report($item[worm riding hooks]));
+			result.append(item_report($item[worm-riding hooks]));
 			break;
 		case "step10":
 			result.append('<a target="mainpane" href="beach.php?action=woodencity&pwd='+my_hash()+'">Ride the Worm !</a>');
@@ -3694,7 +3812,7 @@ void bakeTracker() {
 		biodata[count(biodata)] = new bio("Spooky Forest", "biodataMedbay", 3);
 		biodata[count(biodata)] = new bio("Bat Hole", "biodataSonar", 3);
 		biodata[count(biodata)] = new bio("Knob Laboratory", "biodataScienceLab", 6);
-		biodata[count(biodata)] = new bio("Defiled Nook", "biodataMorgue", 6);
+		biodata[count(biodata)] = new bio("The Defiled Nook", "biodataMorgue", 6);
 		biodata[count(biodata)] = new bio("Ninja Snowmen", "biodataSpecialOps", 6);
 		biodata[count(biodata)] = new bio("Haunted Gallery", "biodataNavigation", 9);
 		biodata[count(biodata)] = new bio("Fantasy Airship", "biodataEngineering", 9);
@@ -3805,9 +3923,9 @@ boolean parsePage(buffer original) {
 		chitSource["trail"] = parse.group(1);
 		source = parse.replace_first("");
 		// Pull out last_location
-		matcher target = create_matcher('target=mainpane href="(.*?)">(.*?)</a><br></font>', source);
-		if(find(target))
-			last_location = target.group(2).to_location();
+		parse = create_matcher('target=mainpane href="(.*?)">(.*?)</a><br></font>', chitSource["trail"]);
+		if(find(parse))
+			last_location = parse.group(2).to_location();
 		// Shorten some unreasonable locations
 		chitSource["trail"] = chitSource["trail"].replace_string("The Castle in the Clouds in the Sky", "Giant's Castle");
 		chitSource["trail"] = chitSource["trail"].replace_string(" Floor)", ")");  // End of Castle
@@ -3994,6 +4112,7 @@ void bakeBricks() {
 						case "character":	bakeCharacter();	break;
 						case "stats":		bakeStats();		break;
 						case "familiar":	bakeFamiliar();		break;
+						case "florist":		bakeFlorist();		break;
 						case "trail":		bakeTrail();		break;
 						case "quests":		bakeQuests();		break;
 						case "effects":		bakeEffects();		break;
@@ -4221,7 +4340,6 @@ buffer modifyPage(buffer source) {
 void charpane_relay() {
 	visit_url().modifyPage().write();
 }
-
 void main() {
 	charpane_relay();
 }

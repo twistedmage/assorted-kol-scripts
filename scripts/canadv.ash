@@ -190,82 +190,82 @@ boolean can_adv(location where, boolean prep) {
    switch (where) {
   // always open
    case $location[Sleazy Back Alley]:
-   case $location[Haunted Pantry]:
-   case $location[Outskirts of The Knob]:
+   case $location[The Haunted Pantry]:
+   case $location[The Outskirts of Cobb's Knob]:
    case $location[Dire Warren]:
    case $location[Noob Cave]: return true;
   // casino
    case $location[Goat Party]: if (my_meat() < 5) return vprint("You need 5 meat to play the Goat Party.",-6);
    case $location[Pirate Party]:
    case $location[Lemon Party]: if (my_meat() < 10) return vprint("You need 10 meat to play the "+where+".",-6);
-   case $location[Roulette Tables]: if (my_meat() < 10) return vprint("You need 10 meat to play the "+where+".",-6);
-   case $location[Poker Room]: if (my_meat() < 30) return vprint("You need 10 meat to play the "+where+".",-6); return (itemcheck($item[casino pass]));
+   case $location[The Roulette Tables]: if (my_meat() < 10) return vprint("You need 10 meat to play the "+where+".",-6);
+   case $location[The Poker Room]: if (my_meat() < 30) return vprint("You need 10 meat to play the "+where+".",-6); return (itemcheck($item[casino pass]));
   // level-opened
-   case $location[Haiku Dungeon]: return (primecheck(5));
+   case $location[The Haiku Dungeon]: return (primecheck(5));
    case $location[Daily Dungeon]: return (primecheck(15));
-   case $location[Limerick Dungeon]: return (primecheck(21));
-   case $location[Spooky Forest]: return (levelcheck(2));
+   case $location[The Limerick Dungeon]: return (primecheck(21));
+   case $location[The Spooky Forest]: return (levelcheck(2));
    case $location[A Barroom Brawl]:
    case $location[Tavern Cellar]: return (levelcheck(3));
    case $location[8-Bit Realm]: return (primecheck(20));
-   case $location[Bat Hole Entryway]: return (levelcheck(4) && primecheck(13));
+   case $location[The Bat Hole Entrance]: return (levelcheck(4) && primecheck(13));
    case $location[Guano Junction]: return (levelcheck(4) && primecheck(13) && resist($element[stench],prep));
    case $location[Batrat and Ratbat Burrow]: if (get_property("questL04Bat").is_not_yet("step1")) { if (prep) use_upto(1, $item[sonar-in-a-biscuit],true); else return (item_amount($item[sonar-in-a-biscuit]) > 0); } return (levelcheck(4) && primecheck(13) && get_property("questL04Bat").is_at_least("step1"));
    case $location[Beanbat Chamber]: if (get_property("questL04Bat").is_not_yet("step2")) { if (prep) use_upto(2 - get_property("questL04Bat").numerify() / 10, $item[sonar-in-a-biscuit],true); else return (item_amount($item[sonar-in-a-biscuit]) >= 2 - get_property("questL04Bat").numerify() / 10); } return (levelcheck(4) && primecheck(13) && get_property("questL04Bat").is_at_least("step2"));
-   case $location[Boss Bat Lair]: if (get_property("questL04Bat").is_not_yet("step3")) { if (prep) use_upto(3 - get_property("questL04Bat").numerify() / 10, $item[sonar-in-a-biscuit],true); else return (item_amount($item[sonar-in-a-biscuit]) >= 3 - get_property("questL04Bat").numerify() / 10); } return (levelcheck(4) && get_property("questL04Bat").is_exactly("step3"));
-   case $location[Knob Kitchens]: if (!primecheck(20)) return false;
-   case $location[Knob Barracks]:
-   case $location[Knob Treasury]:
-   case $location[Knob Harem]: return (levelcheck(5) && perm_urlcheck("cobbsknob.php",to_url(where)));
-   case $location[Greater-Than Sign]: return (primecheck(44) && contains_text(visit_url("da.php"),"Greater"));
-   case $location[Dungeons of Doom]: return (primecheck(44) && perm_urlcheck("da.php","ddoom.gif"));
+   case $location[Boss Bat's Lair]: if (get_property("questL04Bat").is_not_yet("step3")) { if (prep) use_upto(3 - get_property("questL04Bat").numerify() / 10, $item[sonar-in-a-biscuit],true); else return (item_amount($item[sonar-in-a-biscuit]) >= 3 - get_property("questL04Bat").numerify() / 10); } return (levelcheck(4) && get_property("questL04Bat").is_exactly("step3"));
+   case $location[Cobb's Knob Kitchens]: if (!primecheck(20)) return false;
+   case $location[Cobb's Knob Barracks]:
+   case $location[Cobb's Knob Treasury]:
+   case $location[Cobb's Knob Harem]: return (levelcheck(5) && perm_urlcheck("cobbsknob.php",to_url(where)));
+   case $location[Enormous Greater-Than Sign]: return (primecheck(44) && contains_text(visit_url("da.php"),"Greater"));
+   case $location[The Dungeons of Doom]: return (primecheck(44) && perm_urlcheck("da.php","ddoom.gif"));
    case $location[Itznotyerzitz Mine (In Disguise)]:
    case $location[Itznotyerzitz Mine]: return (levelcheck(8) && primecheck(53));
    case $location[Black Forest]: return (levelcheck(11) && primecheck(104));
   // key opened
-   case $location[the Knob Shaft]:
-   case $location[Knob Shaft (Mining)]:
-   case $location[Knob Laboratory]: return (primecheck(30) && itemcheck($item[lab key]));
-   case $location[Menagerie 1]: return (primecheck(35) && itemcheck($item[menagerie key]));
-   case $location[Menagerie 2]: return (primecheck(40) && itemcheck($item[menagerie key]));
-   case $location[Menagerie 3]: return (primecheck(45) && itemcheck($item[menagerie key]));
+   case $location[The Knob Shaft]:
+   case $location[The Knob Shaft (Mining)]:
+   case $location[Cobb's Knob Laboratory]: return (primecheck(30) && itemcheck($item[Cobb's Knob lab key]));
+   case $location[Menagerie 1]: return (primecheck(35) && itemcheck($item[Cobb's Knob menagerie key]));
+   case $location[Menagerie 2]: return (primecheck(40) && itemcheck($item[Cobb's Knob menagerie key]));
+   case $location[Menagerie 3]: return (primecheck(45) && itemcheck($item[Cobb's Knob menagerie key]));
    case $location[Hippy Camp In Disguise]: if (!outfitcheck("filthy hippy disguise")) return false;
    case $location[Hippy Camp]: return ((itemcheck($item[dingy dinghy]) || itemcheck($item[skeletal skiff])) && get_property("warProgress") != "started" && get_property("sideDefeated") != "hippies" && get_property("sideDefeated") != "both" && primecheck(30));
    case $location[Frat House In Disguise]: if (!outfitcheck("frat boy ensemble")) return false;
    case $location[Frat House]: return ((itemcheck($item[dingy dinghy]) || itemcheck($item[skeletal skiff])) && get_property("warProgress") != "started" && get_property("sideDefeated") != "fratboys" && get_property("sideDefeated") != "both" && primecheck(30));
-   case $location[Pirate Cove]: return ((itemcheck($item[dingy dinghy]) || itemcheck($item[skeletal skiff])) && !have_equipped($item[pirate fledges]) && !outfitequipped("swashbuckling getup") && get_property("warProgress") != "started" && primecheck(45));
-   case $location[Giant Castle \(Basement\)]:
-   case $location[Giant Castle \(Ground Floor\)]:
-   case $location[Giant Castle \(Top Floor\)]: return (primecheck(95) && item_amount($item[S.O.C.K]) + item_amount($item[intragalactic rowboat]) > 0);
+   case $location[The Obligatory Pirate's Cove]: return ((itemcheck($item[dingy dinghy]) || itemcheck($item[skeletal skiff])) && !have_equipped($item[pirate fledges]) && !outfitequipped("swashbuckling getup") && get_property("warProgress") != "started" && primecheck(45));
+   case $location[Castle in the Clouds in the Sky \(Basement\)]:
+   case $location[Castle in the Clouds in the Sky \(Ground Floor\)]:
+   case $location[Castle in the Clouds in the Sky \(Top Floor\)]: return (primecheck(95) && itemcheck($item[S.O.C.K.]));
    case $location[Hole in the Sky]: return (primecheck(100) && itemcheck($item[steam-powered model rocketship]));
-   case $location[Haunted Library]: return (primecheck(40) && itemcheck($item[library key]));
-   case $location[Haunted Gallery]: return (itemcheck($item[gallery key]));
-   case $location[Haunted Ballroom]: return (itemcheck($item[ballroom key]));
-   case $location[Palindome]: return (primecheck(65) && equipcheck($item[talisman o'nam],$slot[acc3]));
-   case $location[Fernswarthy Basement]: return (itemcheck($item[fernswarthy letter]) && perm_urlcheck("fernruin.php","basement.php"));
-   case $location[Fernswarthy Ruins]: return (primecheck(11) && itemcheck($item[fernswarthy letter]));
-   case $location[Battlefield (Cloaca Uniform)]: return (levelcheck(4) && my_level() < 6 && my_ascensions() > 0 && itemcheck($item[fernswarthy letter]) && outfitcheck("cloaca-cola uniform"));
+   case $location[The Haunted Library]: return (primecheck(40) && itemcheck($item[Spookyraven library key]));
+   case $location[The Haunted Gallery]: return (itemcheck($item[Spookyraven gallery key]));
+   case $location[The Haunted Ballroom]: return (itemcheck($item[Spookyraven ballroom key]));
+   case $location[Palindome]: return (primecheck(65) && equipcheck($item[talisman o' nam],$slot[acc3]));
+   case $location[Fernswarthy's Basement]: return (itemcheck($item[fernswarthy's letter]) && perm_urlcheck("fernruin.php","basement.php"));
+   case $location[Fernswarthy's Ruins]: return (primecheck(11) && itemcheck($item[fernswarthy's letter]));
+   case $location[Battlefield (Cloaca Uniform)]: return (levelcheck(4) && my_level() < 6 && my_ascensions() > 0 && itemcheck($item[fernswarthy's letter]) && outfitcheck("cloaca-cola uniform"));
    case $location[Battlefield (Dyspepsi Uniform)]: if (!outfitcheck("dyspepsi-cola uniform")) return false;
-   case $location[Battlefield (No Uniform)]: return (levelcheck(4) && my_level() < 6 && my_ascensions() > 0 && itemcheck($item[fernswarthy letter]));
-   case $location[Desert (Ultrahydrated)]: if (!effectcheck($effect[ultrahydrated])) return false;
+   case $location[Battlefield (No Uniform)]: return (levelcheck(4) && my_level() < 6 && my_ascensions() > 0 && itemcheck($item[fernswarthy's letter]));
+   case $location[Desert (Ultrahydrated)]:
    case $location[Desert (Unhydrated)]: return (primecheck(104) && itemcheck($item[your father's macguffin diary]));
-   case $location[Oasis in the Desert]: return (itemcheck($item[your father's macguffin diary]) && perm_nopropcheck("questL11Pyramid","unstarted"));
+   case $location[Oasis in the Desert]: return (itemcheck($item[your father's macguffin diary]) && perm_nopropcheck("questL11Pyramid","started"));
    case $location[The Upper Chamber]:
    case $location[The Middle Chamber]: return (itemcheck($item[staff of ed]));
    case $location[Friar Ceremony Location]: return (itemcheck($item[dodecagram]) && itemcheck($item[box of birthday candles]) && itemcheck($item[eldritch butterknife]));
-   case $location[Sorceress Hedge Maze]: return (levelcheck(13) && (itemcheck($item[hedge maze key]) || contains_text(visit_url("questlog.php?which=1"),"a hedge maze")));
+   case $location[Sorceress' Hedge Maze]: return (levelcheck(13) && (itemcheck($item[hedge maze key]) || contains_text(visit_url("questlog.php?which=1"),"a hedge maze")));
   // signs
    case $location[Thugnderdome]: if (!primecheck(25)) return false;
    case $location[Pump Up Moxie]: return (gnomads_available() && can_adv($location[south of the border],prep));
-   case $location[Edge of the Swamp]:
-   case $location[Dark and Spooky Swamp]:
-   case $location[Corpse bog]:
-   case $location[Ruined Wizard Tower]:
-   case $location[Wildlife Sanctuarrrrrgh]:
+   case $location[The Edge of the Swamp]:
+   case $location[The Dark and Spooky Swamp]:
+   case $location[The Corpse Bog]:
+   case $location[The Ruined Wizard Tower]:
+   case $location[The Wildlife Sanctuarrrrrgh]:
    case $location[Swamp Beaver Territory]:
-   case $location[Weird Swamp Village]:
+   case $location[The Weird Swamp Village]:
    case $location[Pump Up Mysticality]:
-   case $location[Outskirts of Camp]: return (canadia_available());
+   case $location[Outskirts of Camp Logging Camp]: return (canadia_available());
    case $location[Camp Logging Camp]: return (canadia_available() && primecheck(30));
    case $location[Pump Up Muscle]: return (knoll_available() && (checkguild() || get_property("questM01Untinker") != "unstarted") && perm_urlcheck("plains.php","Degrassi Gnoll"));
    case $location[Bugbear Pens]: return (knoll_available() && primecheck(13) && !contains_text(visit_url("questlog.php?which=2"),"You've helped Mayor Zapruder") && contains_text(visit_url("woods.php"),"pen.gif"));
@@ -276,7 +276,7 @@ boolean can_adv(location where, boolean prep) {
 						famcheck($familiar[stinky gravy fairy])));
   // misc
    case $location[Barrel full of Barrels]: return checkguild();
-   case $location[Hidden Temple]: return (levelcheck(2) && primecheck(5) && perm_urlcheck("woods.php","temple.gif"));
+   case $location[The Hidden Temple]: return (levelcheck(2) && primecheck(5) && perm_urlcheck("woods.php","temple.gif"));
    case $location[Degrassi Knoll]: return (!knoll_available() && primecheck(10) && (checkguild() || get_property("questM01Untinker") != "unstarted") && perm_urlcheck("plains.php","knoll1.gif"));
    case $location[Fun House]: return (checkguild() && primecheck(15) && perm_urlcheck("plains.php","funhouse.gif"));
    case $location[Throne Room]: return (levelcheck(5) && !contains_text(visit_url("questlog.php?which=2"),"slain the Goblin King") && outfitcheck("harem girl disguise") &&
@@ -285,21 +285,21 @@ boolean can_adv(location where, boolean prep) {
    case $location[Mysticality Vacation]:
    case $location[Moxie Vacation]: if (my_adventures() < 3) return vprint("Not enough adventures to take a "+where+".",-6); return (perm_urlcheck("main.php","map7beach.gif"));
    case $location[South of the Border]: return (primecheck(10) && perm_urlcheck("main.php","map7beach.gif"));
-   case $location[Defiled Nook]: return (levelcheck(7) && itemcheck($item[evilometer]) && get_property("cyrptNookEvilness").to_int() > 0); 
-   case $location[Defiled Cranny]: return (levelcheck(7) && itemcheck($item[evilometer]) && get_property("cyrptCrannyEvilness").to_int() > 0); 
-   case $location[Defiled Alcove]: return (levelcheck(7) && itemcheck($item[evilometer]) && get_property("cyrptAlcoveEvilness").to_int() > 0); 
-   case $location[Defiled Niche]: return (levelcheck(7) && itemcheck($item[evilometer]) && get_property("cyrptNicheEvilness").to_int() > 0);  
+   case $location[The Defiled Nook]: return (levelcheck(7) && itemcheck($item[evilometer]) && get_property("cyrptNookEvilness").to_int() > 0); 
+   case $location[The Defiled Cranny]: return (levelcheck(7) && itemcheck($item[evilometer]) && get_property("cyrptCrannyEvilness").to_int() > 0); 
+   case $location[The Defiled Alcove]: return (levelcheck(7) && itemcheck($item[evilometer]) && get_property("cyrptAlcoveEvilness").to_int() > 0); 
+   case $location[The Defiled Niche]: return (levelcheck(7) && itemcheck($item[evilometer]) && get_property("cyrptNicheEvilness").to_int() > 0);  
    case $location[Haert of the Cyrpt]: return (levelcheck(7) && visit_url("questlog.php?which=1").contains_text("extreme Spookiness emanating"));
    case $location[Pre-Cyrpt Cemetary]: return (primecheck(11) && (checkguild() || get_property("questL07Cyrptic") != "unstarted") && !visit_url("questlog.php?which=2").contains_text("defeated the Bonerdagon"));
    case $location[Post-Cyrpt Cemetary]: return (primecheck(40) && perm_urlcheck("questlog.php?which=2","defeated the Bonerdagon"));
-   case $location[Goatlet]: return (levelcheck(8) && primecheck(53) && perm_urlcheck("place.php?whichplace=mclargehuge","goatlet.gif"));
-   case $location[Ninja Snowmen]: return (levelcheck(8) && primecheck(53) && perm_urlcheck("place.php?whichplace=mclargehuge","lair.gif"));
+   case $location[The Goatlet]: return (levelcheck(8) && primecheck(53) && perm_urlcheck("place.php?whichplace=mclargehuge","goatlet.gif"));
+   case $location[Lair of the Ninja Snowmen]: return (levelcheck(8) && primecheck(53) && perm_urlcheck("place.php?whichplace=mclargehuge","lair.gif"));
    case $location[eXtreme Slope]: return (levelcheck(8) && perm_urlcheck("place.php?whichplace=mclargehuge","slope.gif"));
    case $location[Mist-Shrouded Peak]: return (levelcheck(8) && primecheck(53) && get_property("questL08Trapper").is_exactly("step3"));
-   case $location[Whitey Grove]: return (levelcheck(7) && primecheck(34) && (checkguild() || get_property("questL11Palindome") == "step3" || get_property("questL11Palindome") == "step4" || get_property("questL11Palindome") == "finished") && perm_urlcheck("woods.php","grove.gif"));
-   case $location[Dark Neck of the Woods]:
-   case $location[Dark Heart of the Woods]:
-   case $location[Dark Elbow of the Woods]: return (levelcheck(6) && primecheck(29) && !have_skill($skill[liver of steel]) && !have_skill($skill[stomach of steel]) &&
+   case $location[Whitey's Grove]: return (levelcheck(7) && primecheck(34) && (checkguild() || get_property("questL11Palindome") == "step3" || get_property("questL11Palindome") == "step4" || get_property("questL11Palindome") == "finished") && perm_urlcheck("woods.php","grove.gif"));
+   case $location[The Dark Neck of the Woods]:
+   case $location[The Dark Heart of the Woods]:
+   case $location[The Dark Elbow of the Woods]: return (levelcheck(6) && primecheck(29) && !have_skill($skill[liver of steel]) && !have_skill($skill[stomach of steel]) &&
                                                    !have_skill($skill[spleen of steel]) && !contains_text(visit_url("questlog.php?which=2"),"cleansed the taint"));
    case $location[Belilafs Comedy Club]:
    case $location[Hey Deze Arena]:
@@ -310,16 +310,16 @@ boolean can_adv(location where, boolean prep) {
    case $location[Twin Peak]: return (levelcheck(9) && perm_propcheck("chasmBridgeProgress","30"));
    case $location[Oil Peak]: return (levelcheck(9) && perm_propcheck("chasmBridgeProgress","30"));
    case $location[Orc Chasm]: return (levelcheck(9) && perm_nopropcheck("questM15Lol","unstarted"));
-   case $location[Fantasy Airship]: return (levelcheck(10) && primecheck(90) && (perm_urlcheck("plains.php","beanstalk.gif") || use(1,$item[enchanted bean])));
+   case $location[The Penultimate Fantasy Airship]: return (levelcheck(10) && primecheck(90) && (perm_urlcheck("plains.php","beanstalk.gif") || use(1,$item[enchanted bean])));
    case $location[White Citadel]: return (!white_citadel_available() && checkguild() && visit_url("woods.php").contains_text("wcroad.gif"));
-   case $location[Haunted Kitchen]: return (primecheck(5) && (itemcheck($item[library key]) || perm_urlcheck("town_right.php","manor.gif")));
-   case $location[Haunted Conservatory]: return (primecheck(6) && perm_urlcheck("town_right.php","manor.gif"));
-   case $location[Haunted Billiards Room]: return (primecheck(10) && perm_urlcheck("town_right.php","manor.gif"));
-   case $location[Haunted Bathroom]: return (primecheck(68) && to_int(get_property("lastSecondFloorUnlock")) == my_ascensions());
-   case $location[Haunted Bedroom]: return (primecheck(85) && to_int(get_property("lastSecondFloorUnlock")) == my_ascensions());
+   case $location[The Haunted Kitchen]: return (primecheck(5) && (itemcheck($item[Spookyraven library key]) || perm_urlcheck("town_right.php","manor.gif")));
+   case $location[The Haunted Conservatory]: return (primecheck(6) && perm_urlcheck("town_right.php","manor.gif"));
+   case $location[The Haunted Billiards Room]: return (primecheck(10) && perm_urlcheck("town_right.php","manor.gif"));
+   case $location[The Haunted Bathroom]: return (primecheck(68) && to_int(get_property("lastSecondFloorUnlock")) == my_ascensions());
+   case $location[The Haunted Bedroom]: return (primecheck(85) && to_int(get_property("lastSecondFloorUnlock")) == my_ascensions());
    case $location[Icy Peak]: return (levelcheck(8) && primecheck(53) && perm_urlcheck("questlog.php?which=2","Trapper"));
    case $location[Barrrney's Barrr]: return ((itemcheck($item[dingy dinghy]) || itemcheck($item[skeletal skiff])) && (equipcheck($item[pirate fledges],$slot[acc3]) || outfitcheck("swashbuckling getup")));
-   case $location[F'c'le]: return (pirate_check("cove3_3x1b.gif"));
+   case $location[The F'c'le]: return (pirate_check("cove3_3x1b.gif"));
    case $location[Poop Deck]: return (pirate_check("cove3_3x3b.gif"));
    case $location[Belowdecks]: return (pirate_check("cove3_5x2b.gif"));
    case $location[Hidden City (automatic)]:
@@ -333,20 +333,20 @@ boolean can_adv(location where, boolean prep) {
    case $location[Convention Hall Lobby]: return (my_class() == $class[sauceror] && primecheck(90) && perm_urlcheck("topmenu.php","volcanoisland.php"));
    case $location[Outside the Club]: return (my_class() == $class[disco bandit] && primecheck(90) && perm_urlcheck("topmenu.php","volcanoisland.php"));
    case $location[The Barracks]: return (my_class() == $class[accordion thief] && primecheck(90) && perm_urlcheck("topmenu.php","volcanoisland.php"));
-   case $location[The Nemesis Lair]: return false;
+   case $location[The Nemesis' Lair]: return false;
   // extraordinary zones
    case $location[El Vibrato Island]: return (itemcheck($item[el vibrato trapezoid]) || contains_text(visit_url("campground.php"),"Portal1.gif"));
    case $location[Dwarven Factory Warehouse]:
-   case $location[Mine Foremens Office]: return (primecheck(100) && outfitcheck("mining gear") && white_citadel_available() && checkguild());
-   case $location[The Red Queen Garden]: return (effectcheck($effect[down the rabbit hole]) || (!prep && itemcheck($item[DRINK ME potion])) || (prep && use(1,$item[DRINK ME potion])));
+   case $location[Mine Foremens' Office]: return (primecheck(100) && outfitcheck("mining gear") && white_citadel_available() && checkguild());
+   case $location[The Red Queen's Garden]: return (effectcheck($effect[down the rabbit hole]) || (!prep && itemcheck($item[&quot;DRINK ME&quot; potion])) || (prep && use(1,$item[&quot;DRINK ME&quot; potion])));
    case $location[A Well-Groomed Lawn]: return (itemcheck($item[antique painting of a landscape]));
    case $location[Small-O-Fier]:
-   case $location[Huge-A-Ma-tron]: return (itemcheck($item[map to Professor Jacking laboratory]));
+   case $location[Huge-A-Ma-tron]: return (itemcheck($item[map to Professor Jacking's laboratory]));
    case $location[Foyer]:
-   case $location[Chapel]: return (itemcheck($item[map to vanya castle]) && equipcheck($item[continuum transfunctioner]));
+   case $location[Chapel]: return (itemcheck($item[map to vanya's castle]) && equipcheck($item[continuum transfunctioner]));
    case $location[Kegger in the Woods]: return (itemcheck($item[map to the kegger in the woods]));
    case $location[Electric Lemonade Acid Parade]: return (itemcheck($item[map to the magic commune]));
-   case $location[Neckback Crick]: return (itemcheck($item[map to ellsbury claim]));
+   case $location[Neckback Crick]: return (itemcheck($item[map to ellsbury's claim]));
    case $location[Video Game Level 1]:
    case $location[Video Game Level 2]:
    case $location[Video Game Level 3]: return (itemcheck($item[GameInformPowerDailyPro Walkthru]) || itemcheck($item[GameInformPowerDailyPro magazine]));
@@ -358,12 +358,12 @@ boolean can_adv(location where, boolean prep) {
    case $location[Mouldering Mansion]:
    case $location[Rogue Windmill]: return (effectcheck($effect[absinthe-minded]) || (!prep && itemcheck($item[tiny bottle of absinthe])) || (prep && use(1,$item[tiny bottle of absinthe])));
    case $location[Mt. Molehill]: return (effectcheck($effect[shape of...mole!]) || (!prep && itemcheck($item[llama lama gong])));
-   case $location[Primordial Soup]:
-   case $location[Jungles of Ancient Loathing]:
+   case $location[The Primordial Soup]:
+   case $location[The Jungles of Ancient Loathing]:
    case $location[Seaside Megalopolis]: return itemcheck($item[empty agua de vida bottle]);
    case $location[Hamburglaris Shield Generator]:
-   case $location[The Domed City of Grimacia]:
-   case $location[The Domed City of Ronaldus]: return (effectcheck($effect[transpondent]) || (!prep && itemcheck($item[transporter transponder])) || (prep && use(1,$item[transporter transponder])));
+   case $location[Domed City of Grimacia]:
+   case $location[Domed City of Ronaldus]: return (effectcheck($effect[transpondent]) || (!prep && itemcheck($item[transporter transponder])) || (prep && use(1,$item[transporter transponder])));
    case $location[The Clumsiness Grove]:
    case $location[The Glacier of Jerks]:
    case $location[The Maelstrom of Lovers]: return (effectcheck($effect[dis abled]) || (!prep && itemcheck($item[devilish folio])) || (prep && use(1,$item[devilish folio])));
@@ -372,29 +372,29 @@ boolean can_adv(location where, boolean prep) {
    case $location[Wartime Hippy Camp]: return (levelcheck(12) && get_property("warProgress") == "unstarted");
    case $location[Wartime Frat House (Hippy Disguise)]: if (!outfitcheck("filthy hippy disguise")) return false;
    case $location[Wartime Frat House]: return (levelcheck(12) && get_property("warProgress") == "unstarted");
-   case $location[Battlefield (Frat Uniform)]: return (get_property("warProgress") == "started" && outfitcheck("frat warrior") && get_property("hippiesDefeated") != "1000");
-   case $location[Battlefield (Hippy Uniform)]: return (get_property("warProgress") == "started" && outfitcheck("war hippy fatigues") && get_property("fratboysDefeated") != "1000");
+   case $location[The Battlefield (Frat Uniform)]: return (get_property("warProgress") == "started" && outfitcheck("frat warrior") && get_property("hippiesDefeated") != "1000");
+   case $location[The Battlefield (Hippy Uniform)]: return (get_property("warProgress") == "started" && outfitcheck("war hippy fatigues") && get_property("fratboysDefeated") != "1000");
    case $location[Themthar Hills]: return (get_property("warProgress") == "started" && get_property("sidequestNunsCompleted") == "none");
    case $location[Hatching Chamber]: return (get_property("warProgress") == "started" && get_property("sidequestOrchardCompleted") == "none");
    case $location[Feeding Chamber]: return (get_property("warProgress") == "started" && get_property("sidequestOrchardCompleted") == "none" && effectcheck($effect[filthworm larva stench]));
-   case $location[Guards Chamber]: return (get_property("warProgress") == "started" && get_property("sidequestOrchardCompleted") == "none" && effectcheck($effect[filthworm drone stench]));
-   case $location[Queen Chamber]: return (get_property("warProgress") == "started" && get_property("sidequestOrchardCompleted") == "none" && effectcheck($effect[filthworm guard stench]));
+   case $location[Guards' Chamber]: return (get_property("warProgress") == "started" && get_property("sidequestOrchardCompleted") == "none" && effectcheck($effect[filthworm drone stench]));
+   case $location[Queen's Chamber]: return (get_property("warProgress") == "started" && get_property("sidequestOrchardCompleted") == "none" && effectcheck($effect[filthworm guard stench]));
    case $location[Wartime Sonofa Beach]: return (get_property("warProgress") == "started" && get_property("sidequestLighthouseCompleted") == "none");
-   case $location[Barrel with Something Burning in it]:
+   case $location[Next to that Barrel with Something Burning in it]:
    case $location[Near an Abandoned Refrigerator]:
    case $location[Over Where the Old Tires Are]:
    case $location[Out by that Rusted-Out Car]: return (get_property("warProgress") == "started" && get_property("sidequestJunkyardCompleted") == "none");
-   case $location[Barn]:
-   case $location[Pond]:
-   case $location[mcmillicancuddy's back 40]:
-   case $location[mcmillicancuddy's other back 40]:
-   case $location[Granary]:
-   case $location[mcmillicancuddy's bog]:
-   case $location[Family Plot]:
-   case $location[Shady Thicket]: return (get_property("warProgress") == "started" && get_property("sidequestFarmCompleted") == "none");
-   case $location[Hippy Camp (Stone Age)]: return (get_property("warProgress") == "finished" && get_property("sideDefeated") != "fratboys");
-   case $location[Frat House (Stone Age)]: return (get_property("warProgress") == "finished" && get_property("sideDefeated") != "hippies");
-   case $location[McMillicancuddy Farm]:
+   case $location[Mcmillicancuddy's Barn]:
+   case $location[Mcmillicancuddy's Pond]:
+   case $location[Mcmillicancuddy's Back 40]:
+   case $location[Mcmillicancuddy's Other Back 40]:
+   case $location[Mcmillicancuddy's Granary]:
+   case $location[Mcmillicancuddy's Bog]:
+   case $location[Mcmillicancuddy's Family Plot]:
+   case $location[Mcmillicancuddy's Shady Thicket]: return (get_property("warProgress") == "started" && get_property("sidequestFarmCompleted") == "none");
+   case $location[The Hippy Camp (Bombed Back to the Stone Age)]: return (get_property("warProgress") == "finished" && get_property("sideDefeated") != "fratboys");
+   case $location[The Frat House (Bombed Back to the Stone Age)]: return (get_property("warProgress") == "finished" && get_property("sideDefeated") != "hippies");
+   case $location[McMillicancuddy's Farm]:
    case $location[Post-War Junkyard]:
    case $location[Post-War Sonofa Beach]: return (levelcheck(12) && get_property("warProgress") == "finished");
   // bugbear-only
@@ -414,9 +414,9 @@ boolean can_adv(location where, boolean prep) {
    case $location[Trick-or-Treating]: return (gameday_to_string() == "Porktember 8" || today_to_string().substring(4, 8) == "1031");
    case $location[Yuletide Bonfire]: return gameday_to_string() == "Dougtember 4";
   // clan basement
-   case $location[Richard Hobo Mysticality]:
-   case $location[Richard Hobo Moxie]:
-   case $location[Richard Hobo Muscle]:
+   case $location[Richard's Hobo Mysticality]:
+   case $location[Richard's Hobo Moxie]:
+   case $location[Richard's Hobo Muscle]:
    case $location[A Maze of Sewer Tunnels]:
    case $location[Hobopolis Town Square]:
    case $location[Burnbarrel Blvd.]:
@@ -431,7 +431,7 @@ boolean can_adv(location where, boolean prep) {
    case $location[The Briny Deeps]:
    case $location[The Brinier Deepers]:
    case $location[The Briniest Deepests]:
-   case $location[An Octopus Garden]: return candive();
+   case $location[An Octopus's Garden]: return candive();
    case $location[The Wreck of the Edgar Fitzsimmons]: return (candive() && visit_url("seafloor.php").contains_text("shipwreckb.gif"));
    case $location[Madness Reef]: return (candive() && visit_url("seafloor.php").contains_text("reefb.gif"));
    case $location[The Marinara Trench]: return (candive() && visit_url("seafloor.php").contains_text("trenchb.gif"));
@@ -466,7 +466,7 @@ boolean can_adv(location where, boolean prep) {
   // never open
    case $location[A Massive Flying Battleship]:
    case $location[A Pile of Old Servers]:
-   case $location[A Skeleton Invasion]:
+   case $location[A Skeleton Invasion!]:
    case $location[A Supply Train]:
    case $location[A Swarm of Yeti-Mounted Skeletons]:
    case $location[Atomic Crimbo Toy Factory]:
@@ -476,29 +476,29 @@ boolean can_adv(location where, boolean prep) {
    case $location[Crimbokutown Toy Factory]:
    case $location[Crimborg Collective Factory]:
    case $location[Elf Alley]:
-   case $location[Don Crimbo Compound]:
    case $location[Fierce Flying Flames]:
-   case $location[Fightin Fire]:
+   case $location[Fightin' Fire]:
    case $location[Fudge Mountain]:
    case $location[Future Market Square]:
    case $location[Future Wrong Side of the Tracks]:
    case $location[Grim Grimacite Site]:
-   case $location[Heartbreaker Hotel]:
+   case $location[Heartbreaker's Hotel]:
    case $location[Icy Peak of the Past]:
    case $location[Lollipop Forest]:
-   case $location[Lord Flameface Castle Belfry]:
-   case $location[Lord Flameface Castle Entryway]:
-   case $location[Lord Flameface Throne Room]:
+   case $location[Lord Flameface's Castle Belfry]:
+   case $location[Lord Flameface's Castle Entryway]:
+   case $location[Lord Flameface's Throne Room]:
    case $location[Mall of the Future]:
    case $location[Old Crimbo Town Toy Factory]:
    case $location[Shivering Timbers]:
    case $location[Simple Tool-Making Cave]:
    case $location[Sinister Dodecahedron]:
    case $location[Spooky Fright Factory]:
-   case $location[Super Intense Mega Grassfire]:
+   case $location[Super-Intense Mega-Grassfire]:
    case $location[The Bonewall]:
    case $location[The Bone Star]:
    case $location[The Cannon Museum]:
+   case $location[The Don's Crimbo Compound]:
    case $location[The Haunted Sorority House]:
    case $location[Spectral Salad Factory]: return vprint(where+" is no longer adventurable.",-9);
    default: vprint("Unknown location: "+where,"olive",-2);

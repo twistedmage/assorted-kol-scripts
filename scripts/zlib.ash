@@ -299,9 +299,9 @@ boolean be_good(string johnny) {
    switch (my_path()) {
       case "Bees Hate You": return johnny.to_lower_case().index_of("b") == -1;
       case "Trendy": return is_trendy(johnny);
-      case "Way of the Surprising Fist": return !($slots[weapon,offhand] contains johnny.to_item().to_slot());
+      case "Way of the Surprising Fist": return !($slots[weapon,off-hand] contains johnny.to_item().to_slot());
       case "Avatar of Boris": if (johnny.to_familiar() != $familiar[none]) return false;
-         return !($slots[weapon,offhand] contains johnny.to_item().to_slot()) || johnny == "Trusty";
+         return !($slots[weapon,off-hand] contains johnny.to_item().to_slot()) || johnny == "Trusty";
    }
    return true;
 }
@@ -600,7 +600,7 @@ boolean auto_mcd(monster mob) {                               // automcd for a s
    return auto_mcd(monster_attack(mob) + 7 - current_mcd());
 }
 boolean auto_mcd(location place) {                            // automcd for locations
-   if ($locations[tavern cellar, boss bat lair, throne room, haert of the cyrpt, slime tube] contains my_location())
+   if ($locations[tavern cellar, boss bat's lair, throne room, haert of the cyrpt, the slime tube] contains my_location())
       return vprint("MCD: Sensitive location, not adjusting.","olive",4);
    if (count(get_monsters(place)) == 0) return vprint("MCD: "+place+" has no known combats.","olive",4);
    return auto_mcd(get_safemox(place));

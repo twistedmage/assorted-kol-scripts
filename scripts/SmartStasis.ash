@@ -147,7 +147,7 @@ void set_autoputtifaction() {
    item ihunt = to_item(to_int(get_property("currentBountyItem")));
    if (ihunt != $item[none]) {
       if (item_drops(m) contains ihunt && (
-          !($locations[fun house,goatlet,ninja snowmen,laboratory] contains my_location()) ||
+          !($locations[fun house,the goatlet,lair of the ninja snowmen,cobb's knob laboratory] contains my_location()) ||
           (contains_text(vars["ftf_olfact"],m.to_string())))) {
          if (ihunt.bounty_count <= to_int(vars["puttybountiesupto"]) && item_amount(ihunt) < ihunt.bounty_count-1) should_putty = true;
          should_olfact = true;
@@ -197,7 +197,7 @@ void build_custom() {
   // flyers
    foreach flyer in $items[jam band flyers, rock band flyers] if (item_amount(flyer) > 0 && get_property("flyeredML").to_int() < 10050 &&
       (to_boolean(vars["flyereverything"]) || m.base_attack.to_int() >= 10050 - get_property("flyeredML").to_int()) && !happened(flyer) &&
-      !($locations[battlefield (hippy uniform), battlefield (frat uniform)] contains my_location()))
+      !($locations[the battlefield (hippy uniform), the battlefield (frat uniform)] contains my_location()))
      encustom(to_event("use "+to_int(flyer),to_spread(0),to_spread(to_string(m_dpr(0,0)*(1-m_hit_chance()))),"!! flyeredML +"+monster_attack(m),1));
   // putty
    set_autoputtifaction();
@@ -224,7 +224,7 @@ void build_custom() {
   // insults
    if (m.phylum == $phylum[pirate] && !($strings[step5, finished] contains get_property("questM12Pirate")) &&
       !($monsters[scary pirate, migratory pirate, ambulatory pirate, peripatetic pirate, black crayon pirate] contains m))
-     foreach i in $items[massive manual of marauder mockery, big book of pirate insults]
+     foreach i in $items[massive manual of marauder mockery, the big book of pirate insults]
        if (item_amount(i) > 0 && !happened(i)) {
           int insultsknown;
           for n from 1 to 8 if (get_property("lastPirateInsult"+n) == "true") insultsknown += 1;
@@ -428,7 +428,7 @@ advevent to_combo(effect which) {
             } else { icount += 1; dcprofit += prev; }
             if (has_goal(rec.drop) > 0) { dcprofit = 9999999; break; }
          }
-         res.meat += which == $effect[none] ? dcprofit/max(1,icount)+to_int($locations[outside the club, haunted house, lollipop forest] contains my_location())*9999999 : dcprofit; break;
+         res.meat += which == $effect[none] ? dcprofit/max(1,icount)+to_int($locations[outside the club, the haunted sorority house, lollipop forest] contains my_location())*9999999 : dcprofit; break;
       case $effect[rave nirvana]: bonus = 0.5;
       case $effect[disco nirvana]: if (m == $monster[dirty thieving brigand] && vars["ocw_nunspeed"] == "false") break;
          res.meat += bonus*to_float(meat_drop(m)); break;

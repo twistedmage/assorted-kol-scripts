@@ -170,6 +170,15 @@
 				 Also, add that value to the stasis-property so that the higher roundcost-value we have, the more valuable an action need to be to be used in stasis
 				 Also, also, skip funkslinging if we either cannot find a second item to sling or said roundcost value is high enough that it is deemed unprofitable
 		13-06-28:Specifically disallow useage of frosty's iceball until it can be figured out why it keeps using it
+		13-06-27:Use the special skills in the Suburbs of Dis.
+				 Try to handle the special bosses in the Suburbs areas
+		13-06-29:Attempt to abort stasising when we learn the last skill for the gladiator weapons, will still try to stasis even if you already know all skills
+				 Only do Gladiator training if the required skills are not known yet
+		13-07-01:Fix WHAM_round to actually add the wanted thing and not just bulid an ever larger string and fix some to_int problems
+		13-07-05:Fix warnings for incorrect typed constants
+				 Move removing of custom options to ok()
+				 Make the learning of Gladiator skills better by using Mafia's tracking
+				 Minor code refactoring for better readability
 ***********************************************************************************************************************/
 import <SmartStasis.ash>;
 
@@ -320,9 +329,9 @@ advevent hp_option(int target) {
 }
 
 //Creates a call to check specific things that batround doesn't do.
-void WHAM_round() {
+void WHAM_round(string extra) {
 	//Don't try to automate longer than the sepcified turnround
-	batround_insert = batround_insert + " if pastround " + (WHAM_maxround - 1) + "; abort \"Stopping fight because it has gone on for too long (set WHAM_maxround to a higher value if you think this was in error)\"; endif; ";
+	batround_insert = " if pastround " + (WHAM_maxround - 1) + "; abort \"Stopping fight because it has gone on for too long (set WHAM_maxround to a higher value if you think this was in error)\"; endif; " + extra;
 	vprint("WHAM: WHAM added the following to BatRound: " + batround_insert,9);
 }
 
@@ -350,10 +359,18 @@ boolean ok(advevent a) {
 	}
 
 	if(m == $monster[Naughty Sorority Nurse] && (dmg_dealt(a.dmg) + (m_hit_chance()*dmg_dealt(retal.dmg) + dmg_dealt(baseround().dmg))) < min(monster_stat("hp"), 90)) {
+		vprint(a.id + " is not OK since the monster heals more than it damages.", "purple", 9);
 		return false;	//These monsters heal too much for this skill
 	}
+	
 	if(a.pdmg[$element[none]] > my_stat("hp")) {
+		vprint(a.id + " is not OK since it will hurt you more than the monster.", "purple", 9);
 		return false;	//Don't use something that would kill us
+	}
+	
+	if(a.custom) {	//Custom actions are per definition not ok unless specifically called
+		vprint(a.id + " is not OK since it is marked as a custom action.", "purple", 9);
+		return false;
 	}
 	
 	matcher aid = create_matcher("(skill |use |attack|jiggle)(?:(\\d+),?(\\d+)?)?",a.id);
@@ -361,8 +378,6 @@ boolean ok(advevent a) {
 	if(aid.find()) {
 		switch(aid.group(1)) {
 			case "use ":	//If the user doesn't want WHAM to use items, don't
-				/*if(vars["WHAM_noitemsplease"] == "true")
-					return false;*/
 				if(historical_price(to_item(to_int(aid.group(2)))) > to_int(get_property("autoBuyPriceLimit")) && to_item(aid.group(2)).reusable == false)
 					return false;
 				break;
@@ -492,10 +507,18 @@ boolean has_option(skill whichskill) {
 }
 
 boolean train_skills() {
-	return ($items[Mer-kin dragnet, Mer-kin switchblade, Mer-kin dodgeball] contains equipped_item($slot[weapon]) && my_location().zone == "The Sea" && hitchance("attack") > hitchance && critchance() > 0);
+	if(my_location().zone == "The Sea" && hitchance("attack") > hitchance && critchance() > 0) {
+		if(equipped_item($slot[weapon]) == $item[Mer-kin dragnet] && to_int(get_property("gladiatorNetMovesKnown")) < 3)
+			return true;
+		if(equipped_item($slot[weapon]) == $item[Mer-kin switchblade] && to_int(get_property("gladiatorBladeMovesKnown")) < 3)
+			return true;
+		if(equipped_item($slot[weapon]) == $item[Mer-kin dodgeball] && to_int(get_property("gladiatorBallMovesKnown")) < 3)
+			return true;
+	}
+	return false;
 }
 
-advevent attack_option() {
+advevent attack_option(boolean noitems) {
 	if (ok(get_action("use 2848")) && !happened($item[gnomitronic hyperspatial demodulizer]) && monster_stat("hp") <= dmg_dealt(get_action("use 2848").dmg))
 		return get_action("use 2848");
 		
@@ -510,12 +533,7 @@ advevent attack_option() {
 			smacks = opt;
 			return opt;
 		}
-		
-		//Skip custom options in order to not do strange things
-		if (opt.custom) {
-			vprint("Skipping " + opt.id + " since it is marked as a custom action.", "purple", 9);
-			continue;
-		}
+
 		//Skip options that are indicated as not ok
 		if(!ok(opt)) {
 			vprint("Skipping " + opt.id + " since it is not ok.", "purple", 9);
@@ -551,12 +569,21 @@ advevent attack_option() {
 			vprint("Skipping " + opt.id + " since the MP-cost is too high.", "purple", 9);
 			continue;
 		}
+		//WE don't want to use items so skip them
+		if(noitems && contains_text(opt.id, "use")) {
+			vprint("Skipping " + opt.id + " since items are dissallowed.", "purple", 9);
+			continue;
+		}
 		vprint("WHAM: Attack option chosen: "+opt.id+" (round "+rnum(round)+", profit: "+rnum(to_profit(opt))+")", "purple", 8);
 		smacks = opt;
 		return opt;
 	}
 	vprint("WHAM: No valid attack options (Best option, '"+opts[0].id+"', not good enough)", "purple", 8);
 	return new advevent;
+}
+
+advevent attack_option() {
+	return attack_option(false);
 }
 
 //Delevel the monster so we can hit it
@@ -566,8 +593,8 @@ advevent delevel_option(boolean nodmg) {
 	foreach i,opt in opts {
 		if(nodmg && dmg_dealt(opt.dmg) != 0)
 			continue;
-		if (opt.custom)
-			continue;			
+		if(!ok(opt))
+			continue;
 		if(opt.att < 0) {
 			vprint("WHAM: Your most profitable deleveling option is " + opt.id + ".", "purple", 8);
 			return opt;
@@ -586,8 +613,6 @@ advevent item_option() {
 	foreach i,opt in opts {
 		if(!ok(opt))
 			continue;
-		if (opt.custom)
-			continue;			
 		if(!contains_text(opt.id, "use"))
 			continue; //Ignore skills (only looking at items for this one)
 		if(hitchance(opt.id) < hitchance)
@@ -607,17 +632,16 @@ advevent stasis_option() {  // returns most profitable lowest-damage option
 	boolean ignoredelevel = (smacks.id != "" && kill_rounds(smacks.dmg) == 1);
 
 	if (train_skills()) {
+		WHAM_round("if match " + (equipped_item($slot[weapon]) == $item[Mer-kin dragnet] ? "\"New Special Move Unlocked: Net Neutrality\"" : (equipped_item($slot[weapon]) == $item[Mer-kin switchblade] ? "\"New Special Move Unlocked: Blade Runner\"" : "\"New Special Move Unlocked: Ball Sack\"")) + "; abort \"BatBrain abort: loogie.\"; endif; ");
 		plink = get_action("attack");
 		return plink;
 	}
-	
+
 	sort opts by -to_profit(value,ignoredelevel);
 	sort opts by -min(kill_rounds(value),max(0,maxround - round - (5 + WHAM_safetymargin)));	
 	foreach i,opt in opts {  // skip multistuns and non-multi-usable items
 		if(!ok(opt))
 			continue;
-		if (opt.custom)
-			continue;			
 		if(hitchance(opt.id) < hitchance)
 			continue;
 		if(opt.stun > 1 || (contains_text(opt.id,"use ") && !to_item(excise(opt.id,"use ","")).reusable))
@@ -644,8 +668,6 @@ advevent stun_option(float rounds, boolean foritem) {
 	foreach i,opt in opts {
 		if(!ok(opt))
 			continue;
-		if (opt.custom)
-			continue;			
 		if (opt.stun < (foritem && have_skill($skill[ambidextrous funkslinging]) && contains_text(opt.id, "use") ? 1 : 2))
 			continue;
 		if (hitchance(opt.id) < hitchance)
@@ -657,140 +679,6 @@ advevent stun_option(float rounds, boolean foritem) {
 	buytime = new advevent;
 	vprint("WHAM: No profitable stun option", "purple", 8);
 	return buytime;
-}
-
-//Function to do special stuff
-string special_actions() {
-	string dummy;
-
-	switch(to_string(m)) {
-		case "rampaging adding machine":
-			if((is_goal($item[668 scroll]) || is_goal($item[31337 scroll]) || is_goal($item[64735 scroll]))) {
-				vprint("WHAM: Fighting a RAM with scrolls set as goal.", "purple", 7);
-				int[item] scrolls;
-				scrolls[$item[334 scroll]] = item_amount($item[334 scroll]);
-				scrolls[$item[668 scroll]] = item_amount($item[668 scroll]);
-				scrolls[$item[30669 scroll]] = item_amount($item[30669 scroll]);
-				scrolls[$item[33398 scroll]] = item_amount($item[33398 scroll]);
-				scrolls[$item[64067 scroll]] = item_amount($item[64067 scroll]);
-				if(is_goal($item[668 scroll]) && scrolls[$item[334 scroll]] >= 2) {
-					if(have_skill($skill[Ambidextrous Funkslinging]))
-						enqueue(merge(get_action($item[334 scroll]), get_action($item[334 scroll])));
-					else {
-						enqueue(get_action($item[334 scroll]));
-						enqueue(get_action($item[334 scroll]));
-					}
-					return macro();	
-				} else if (is_goal($item[31337 scroll]) && ((scrolls[$item[334 scroll]] >= 2 || scrolls[$item[668 scroll]] > 0) && scrolls[$item[30669 scroll]] > 0)) {
-					if(have_skill($skill[Ambidextrous Funkslinging])) {
-						if(scrolls[$item[668 scroll]] == 0) {
-							enqueue(merge(get_action($item[334 scroll]), get_action($item[334 scroll])));
-							dummy = macro();
-						}
-						enqueue(merge(get_action($item[668 scroll]), get_action($item[30669 scroll])));
-					} else {
-						if(scrolls[$item[668 scroll]] == 0) {
-							enqueue(get_action($item[334 scroll]));
-							enqueue(get_action($item[334 scroll]));
-							dummy = macro();
-						}
-						enqueue(get_action($item[668 scroll]));
-						enqueue(get_action($item[30669 scroll]));
-					}
-					return macro();
-				} else if (is_goal($item[64735 scroll]) && ((scrolls[$item[334 scroll]] >= 2 || scrolls[$item[668 scroll]] > 0) && ((scrolls[$item[30669 scroll]] > 0 && scrolls[$item[33398 scroll]] > 0) || (scrolls[$item[64067 scroll]] > 0)))) {
-					if(have_skill($skill[Ambidextrous Funkslinging])) {
-						if(scrolls[$item[668 scroll]] == 0) {
-							enqueue(merge(get_action($item[334 scroll]), get_action($item[334 scroll])));
-							dummy = macro();
-						}
-						if(scrolls[$item[64067 scroll]] == 0) {
-							enqueue(merge(get_action($item[30669 scroll]), get_action($item[33398 scroll])));
-							dummy = macro();
-						}
-						enqueue(merge(get_action($item[668 scroll]), get_action($item[64067 scroll])));
-					} else {
-						if(scrolls[$item[668 scroll]] == 0) {
-							enqueue(get_action($item[334 scroll]));
-							enqueue(get_action($item[334 scroll]));
-							dummy = macro();
-						}
-						if(scrolls[$item[64067 scroll]] == 0) {				
-							enqueue(get_action($item[30669 scroll]));
-							enqueue(get_action($item[33398 scroll]));
-							dummy = macro();
-						}
-						enqueue(get_action($item[668 scroll]));
-						enqueue(get_action($item[64067 scroll]));
-					}
-					return macro();
-				}
-			} else {
-				vprint("WHAM: Fighting a RAM without scrolls set as a goal. We'll just kill it unless you abort in 20 seconds", "purple", 7);
-				wait(20);
-			}
-			break;
-		case "wild seahorse":
-			if(get_property("lassoTraining") == "Expertly" && item_amount($item[sea cowbell]) >= 3 && item_amount($item[sea lasso]) > 0) {
-				enqueue(get_action($item[sea cowbell]));
-				enqueue(get_action($item[sea cowbell]));
-				enqueue(get_action($item[sea cowbell]));
-				enqueue(get_action($item[sea lasso]));
-			} else
-				macro("runaway; repeat;");
-			break;
-		case "Shub-Jigguwatt, Elder God of Violence":
-			if(dmg_dealt(basecache.dmg) > 0)
-				quit("You have a passive damage source active. The fight will be lost if you automate it. I suggest you run away.");
-		case "Yog-Urt, Elder Goddess of Hatred":
-			if(have_effect($effect[More Like a Suckrament]) > 0) {
-				int j;
-				advevent heal;
-				sort opts by dmg_taken(value.pdmg);
-				foreach i, opt in opts {
-					if(-1 * dmg_taken(opt.pdmg) > 0.9 * my_maxhp())
-						j +=1;
-				}
-				if(j < 8 - equipped_amount($item[Mer-kin prayerbeads]))
-					abort("WHAM: You have too few good healing items to fight Yog-Hurt. I suggest you run away.");
-				else if(dmg_dealt(basecache.dmg) > 0)
-					abort("WHAM: You have a passive damage source active. The fight will be lost if you automate it. I suggest you run away.");
-				else if(!have_skill($skill[ambidextrous funkslinging])) {
-					for i from 0 to 7 - equipped_amount($item[Mer-kin prayerbeads]) {
-						sort opts by dmg_taken(value.pdmg);
-						foreach i, opt in opts {
-							if(dmg_taken(opt.pdmg) < 0) {
-								heal = opt;
-								break;
-							}
-						}
-						enqueue(heal);
-					}
-				} else {
-					for i from 0 to 7 - equipped_amount($item[Mer-kin prayerbeads]) {
-						sort opts by dmg_taken(value.pdmg);
-						foreach i, opt in opts {
-							if(dmg_taken(opt.pdmg) < 0) {
-								heal = opt;
-								break;
-							}
-						}
-						enqueue(heal);
-						if(delevel_option(true).id != "")
-							enqueue(delevel_option(true));
-						else
-							macro();
-					}
-				}
-			}
-			break;
-	}
-	
-	//Return options
-	if(count(queue) > 0)
-		return macro();
-	else
-		return page;
 }
 
 //Returns if you can use sauce splash effectively
@@ -1093,8 +981,6 @@ string Evaluate_Options() {
 	if(monster_stat("hp") <= 0)
 		quit("Unable to get monster HP. Fight the battle yourself");
 
-	page = special_actions();	//Perform special stuff that SS doesn't do
-
 	if(finished())
 		return "";
 	kill_it = Calculate_Options(monster_stat("hp")); //Set up the damage dealt
@@ -1131,11 +1017,18 @@ string Evaluate_Options() {
 // Category II: must-do-sometime actions
 void build_custom_WHAM() {
 	vprint("Building custom WHAM actions...",9);
+	string dummy;
+	
+	void encustom(advevent which) {
+		if(which.id != "")
+			custom[count(custom)] = merge(which,new advevent);
+	}
+	
 	//Zombie steal
 	if(should_pp && (intheclear() || has_goal(m) > 0) && has_option($skill[Smash & Graaagh])) {
 		vprint("WHAM: This monster drops a goal item and has_goal(m) = " + has_goal(m), "green", 9);
 		vprint("WHAM: Trying to steal an item with Smash & Graaagh", "purple", 5);
-		enqueue(get_action($skill[Smash & Graaagh]));
+		encustom(get_action($skill[Smash & Graaagh]));
 	} else if (has_option($skill[Smash & Graaagh])) {
 		vprint("WHAM: This monster does not drop a goal item", "red", 9);
 	}
@@ -1143,7 +1036,7 @@ void build_custom_WHAM() {
 	//Zombie infect
 	if(has_option($skill[Infectious Bite]) && (kill_rounds(attack_option().dmg) * my_level() >= monster_hp() * 0.5) && kill_rounds(attack_option().dmg) - 1 < die_rounds()) {
 		vprint("WHAM: Infecting the opponent to try and turn it", "purple", 5);
-		enqueue(get_action($skill[Infectious Bite]));
+		encustom(get_action($skill[Infectious Bite]));
 	}
 	
 	//Should we olfact this bugbear?
@@ -1155,21 +1048,21 @@ void build_custom_WHAM() {
 	
 	//Jarlsbergifaction
 	if(contains_text(vars["ftf_olfact"],to_string(m)) && have_equipped($item[staff of the cream of the cream]) && to_int(get_property("jiggleCream")) < 5 && get_property("_jiggleCreamedMonster") != to_string(m))
-		custom[count(custom)] = to_event("jiggle", "", 1);
+		encustom(get_action($item[staff of the cream of the cream]));
 		
 	if(my_location().zone == "The Sea" && item_amount($item[sea lasso]) > 0 && vars["WHAM_UseSeaLasso"] == "true" && get_property("lassoTraining") != "expertly")
-		custom[count(custom)] = to_event("use 4198", "", 1);
+		encustom(get_action($item[sea lasso]));
 
 	switch (to_string(m)) {
 		//Boss actions
 		case "conjoined zmombie":	for i from 1 upto item_amount($item[half-rotten brain])
-										custom[count(custom)] = to_event("use 2562","",1);
+										encustom(get_action($item[half-rotten brain]));
 									break;
 		case "giant skeelton": 	for i from 1 upto item_amount($item[rusty bonesaw])
-									custom[count(custom)] = to_event("use 2563","",1);
+									encustom(get_action($item[rusty bonesaw]));
 								break;
-		case "huge ghuol":	for i from 1 upto item_amount($item[can of ghuol-b-gone])
-								custom[count(custom)] = to_event("use 2565","",1);
+		case "huge ghuol":	for i from 1 upto item_amount($item[can of Ghuol-B-Gone&trade;])
+								encustom(get_action($item[can of Ghuol-B-Gone&trade;]));
 							break;				
 			
 		//Monsters to be banished as Boris, Zombie or Jarlsberg
@@ -1180,58 +1073,58 @@ void build_custom_WHAM() {
 		case "Senile Lihc":
 		case "Slick Lihc":
 			if(has_goal(m) <= 0) {
-				if(have_skill($skill[banishing shout]) && ok("skill 11020"))
-					custom[count(custom)] = to_event("skill 11020", "", 1);
+				if(has_option(get_action($skill[banishing shout])))
+					encustom(get_action($skill[banishing shout]));
 				else if(has_option(get_action($skill[Howl of the Alpha])))
-					custom[count(custom)] = to_event("skill 12020", "", 1);
+					encustom(get_action($skill[Howl of the Alpha]));
 				else if(equipped_item($slot[weapon]) == $item[Staff of the Standalone Cheese] && to_int(get_property("_jiggleCheese")) < 5)
-					custom[count(custom)] = to_event("jiggle", "", 1);
+					encustom(get_action($item[Staff of the Standalone Cheese]));
 			}
 			break;
 
 		//Bugbears
 		case "bugbear scientist":
 			if(item_amount($item[quantum nanopolymer spider web]) > 0 && my_location() == $location[Science Lab]) {
-				custom[count(custom)] = to_event("use 5686","",1);
+				encustom(get_action($item[quantum nanopolymer spider web]));
 				return;
 			} else if(bugbear_olfact($location[Science Lab],"biodataScienceLab",6))
-				custom[count(custom)] = to_event("skill 19","mp -"+mp_cost($skill[olfaction]),1);
+				encustom(get_action($skill[Transcendent Olfaction]));
 			break;
 		case "Scavenger bugbear":
 			if(bugbear_olfact($location[Waste Processing],"biodataWasteProcessing",3))
-				custom[count(custom)] = to_event("skill 19","mp -"+mp_cost($skill[olfaction]),1);
+				encustom(get_action($skill[Transcendent Olfaction]));
 			break;
 		case "Hypodermic bugbear":
 			if(bugbear_olfact($location[Medbay],"biodataMedbay",3))
-				custom[count(custom)] = to_event("skill 19","mp -"+mp_cost($skill[olfaction]),1);
+				encustom(get_action($skill[Transcendent Olfaction]));
 			break;
 		case "batbugbear":
 			if(bugbear_olfact($location[Sonar],"biodataSonar",3))
-				custom[count(custom)] = to_event("skill 19","mp -"+mp_cost($skill[olfaction]),1);
+				encustom(get_action($skill[Transcendent Olfaction]));
 			break;
 		case "bugaboo":
 			if(bugbear_olfact($location[Morgue],"biodataMorgue",6))
-				custom[count(custom)] = to_event("skill 19","mp -"+mp_cost($skill[olfaction]),1);
+				encustom(get_action($skill[Transcendent Olfaction]));
 			break;
 		case "Black Ops Bugbear":
 			if(bugbear_olfact($location[Special Ops],"biodataSpecialOps",6))
-				custom[count(custom)] = to_event("skill 19","mp -"+mp_cost($skill[olfaction]),1);
+				encustom(get_action($skill[Transcendent Olfaction]));
 			break;
 		case "Battlesuit Bugbear Type":
 			if(bugbear_olfact($location[Engineering],"biodataEngineering",9))
-				custom[count(custom)] = to_event("skill 19","mp -"+mp_cost($skill[olfaction]),1);
+				encustom(get_action($skill[Transcendent Olfaction]));
 			break;
 		case "ancient unspeakable bugbear":
 			if(bugbear_olfact($location[Navigation],"biodataNavigation",9))
-				custom[count(custom)] = to_event("skill 19","mp -"+mp_cost($skill[olfaction]),1);
+				encustom(get_action($skill[Transcendent Olfaction]));
 			break;
 		case "trendy bugbear chef":
 			if(bugbear_olfact($location[Galley],"biodataGalley",9))
-				custom[count(custom)] = to_event("skill 19","mp -"+mp_cost($skill[olfaction]),1);
+				encustom(get_action($skill[Transcendent Olfaction]));
 			break;
 		case "liquid metal bugbear":
 			if(item_amount($item[drone self-destruct chip]) > 0) {
-				custom[count(custom)] = to_event("use 5689", "", 1);
+				encustom(get_action($item[drone self-destruct chip]));
 				return;
 			}
 			break;
@@ -1239,7 +1132,7 @@ void build_custom_WHAM() {
 		case "creepy eye-stalk tentacle monster":
 		case "anesthesiologist bugbear":
 			if(have_skill($skill[Transcendent Olfaction]) && my_stat("mp") > mp_cost($skill[Transcendent Olfaction]) && have_effect($effect[On the Trail]) == 0)
-				custom[count(custom)] = to_event("skill 19","mp -"+mp_cost($skill[olfaction]),1);
+				encustom(get_action($skill[Transcendent Olfaction]));
 			break;
 			
 		//Oil monsters
@@ -1248,12 +1141,171 @@ void build_custom_WHAM() {
 		case "oil slick":
 		case "oil tycoon":
 			if(item_amount($item[Duskwalker syringe]) > 0 && die_rounds() > kill_rounds(smacks) + 2) //Don't use the syringe if it'll kill us
-				custom[count(custom)] = to_event("use 6026", "", 1);
+				encustom(get_action($item[Duskwalker syringe]));
+			break;
+		case "rampaging adding machine":
+			if((is_goal($item[668 scroll]) || is_goal($item[31337 scroll]) || is_goal($item[64735 scroll]))) {
+				vprint("WHAM: Fighting a RAM with scrolls set as goal.", "purple", 7);
+				int[item] scrolls;
+				scrolls[$item[334 scroll]] = item_amount($item[334 scroll]);
+				scrolls[$item[668 scroll]] = item_amount($item[668 scroll]);
+				scrolls[$item[30669 scroll]] = item_amount($item[30669 scroll]);
+				scrolls[$item[33398 scroll]] = item_amount($item[33398 scroll]);
+				scrolls[$item[64067 scroll]] = item_amount($item[64067 scroll]);
+				if(is_goal($item[668 scroll]) && scrolls[$item[334 scroll]] >= 2) {
+					encustom(get_action($item[334 scroll]));
+					encustom(get_action($item[334 scroll]));
+				} else if (is_goal($item[31337 scroll]) && ((scrolls[$item[334 scroll]] >= 2 || scrolls[$item[668 scroll]] > 0) && scrolls[$item[30669 scroll]] > 0)) {
+					if(scrolls[$item[668 scroll]] == 0) {
+						encustom(get_action($item[334 scroll]));
+						encustom(get_action($item[334 scroll]));
+						dummy = macro();
+					}
+					encustom(get_action($item[668 scroll]));
+					encustom(get_action($item[30669 scroll]));
+				} else if (is_goal($item[64735 scroll]) && ((scrolls[$item[334 scroll]] >= 2 || scrolls[$item[668 scroll]] > 0) && ((scrolls[$item[30669 scroll]] > 0 && scrolls[$item[33398 scroll]] > 0) || (scrolls[$item[64067 scroll]] > 0)))) {
+					if(scrolls[$item[668 scroll]] == 0) {
+						encustom(get_action($item[334 scroll]));
+						encustom(get_action($item[334 scroll]));
+						dummy = macro();
+					}
+					if(scrolls[$item[64067 scroll]] == 0) {				
+						encustom(get_action($item[30669 scroll]));
+						encustom(get_action($item[33398 scroll]));
+						dummy = macro();
+					}
+					encustom(get_action($item[668 scroll]));
+					encustom(get_action($item[64067 scroll]));
+				}
+			} else {
+				vprint("WHAM: Fighting a RAM without scrolls set as a goal. We'll just kill it unless you abort in 20 seconds", "purple", 7);
+				wait(20);
+			}
+			break;
+		case "wild seahorse":
+			if(get_property("lassoTraining") == "Expertly" && item_amount($item[sea cowbell]) >= 3 && item_amount($item[sea lasso]) > 0) {
+				encustom(get_action($item[sea cowbell]));
+				encustom(get_action($item[sea cowbell]));
+				encustom(get_action($item[sea cowbell]));
+				encustom(get_action($item[sea lasso]));
+			} else
+				macro("runaway; repeat;");
+			break;
+		case "Shub-Jigguwatt, Elder God of Violence":
+			if(dmg_dealt(basecache.dmg) > 0)
+				quit("You have a passive damage source active. The fight will be lost if you automate it. I suggest you run away.");
+		case "Yog-Urt, Elder Goddess of Hatred":
+			if(have_effect($effect[More Like a Suckrament]) > 0) {
+				int j;
+				advevent heal;
+				sort opts by dmg_taken(value.pdmg);
+				foreach i, opt in opts {
+					if(-1 * dmg_taken(opt.pdmg) > 0.9 * my_maxhp())
+						j +=1;
+				}
+				if(j < 8 - equipped_amount($item[Mer-kin prayerbeads]))
+					abort("WHAM: You have too few good healing items to fight Yog-Hurt. I suggest you run away.");
+				else if(dmg_dealt(basecache.dmg) > 0)
+					abort("WHAM: You have a passive damage source active. The fight will be lost if you automate it. I suggest you run away.");
+				else if(!have_skill($skill[ambidextrous funkslinging])) {
+					for i from 0 to 7 - equipped_amount($item[Mer-kin prayerbeads]) {
+						sort opts by dmg_taken(value.pdmg);
+						foreach i, opt in opts {
+							if(dmg_taken(opt.pdmg) < 0) {
+								heal = opt;
+								break;
+							}
+						}
+						enqueue(heal);
+					}
+				} else {
+					for i from 0 to 7 - equipped_amount($item[Mer-kin prayerbeads]) {
+						sort opts by dmg_taken(value.pdmg);
+						foreach i, opt in opts {
+							if(dmg_taken(opt.pdmg) < 0) {
+								heal = opt;
+								break;
+							}
+						}
+						enqueue(heal);
+						if(delevel_option(true).id != "")
+							enqueue(delevel_option(true));
+						else
+							macro();
+					}
+				}
+			}
+			break;
+		//The Suburbs of Dis
+		case "The Terrible Pinch":
+			vprint("WHAM: Fighting the terrible pinch by alternating between attacking and jars full of wind", "purple", 5);
+			while(monster_stat("hp") > 0) {
+				enqueue(attack_option(true));
+				enqueue($item[jar full of wind]);
+				macro();
+			}
+			break;
+/*		case "Thug 1 and Thug 2":
+			vprint("WHAM: Fighting Thug 1 and Thug 2 by throwing jars full of wind", "purple", 5);
+			if (item_amount($item[jar full of wind]) > 9) {
+				for i from 1 to 10
+					enqueue($item[jar full of wind]);
+				macro();
+			}
+			break;
+		case "the large-bellied snitch":
+			vprint("WHAM: Fighting the large-bellied snitch by throwing dangerous jerkcicles", "purple", 5);		
+			if (item_amount($item[dangerous jerkcicle]) > 7) {
+				for i from 1 to 10
+					enqueue($item[dangerous jerkcicle]);
+				macro(plink, "");
+			}
+			break;
+		case "mammon the elephant":
+			vprint("WHAM: Fighting mammon the elephant by throwing dangerous jerkcicles", "purple", 5);		
+			if (item_amount($item[dangerous jerkcicle]) > 5) {
+				for i from 1 to 6
+					enqueue($item[dangerous jerkcicle]);
+				macro();
+			}
+			break;				
+		case "the bat in the spats":
+			vprint("WHAM: Fighting the bat in the spats by throwing clumsiness bark", "purple", 5);		
+			if (item_amount($item[clumsiness bark]) > 9) {
+				for i from 1 to 10 
+					enqueue($item[clumsiness bark]);
+				macro();
+			}
+			break;*/
+		case "Sorrowful Hickory":
+		case "Suffering Juniper":
+		case "Tormented Baobab":
+		case "Whimpering Willow":
+		case "Woeful Magnolia":
+			if(kill_rounds(smacks.dmg) < die_rounds() && has_option($skill[Torment Plant]))
+				encustom(get_action($skill[Torment Plant]));
+			break;
+		case "Bettie Barulio":
+		case "Marcus Macurgeon":
+		case "Marvin J. Sunny":
+		case "Mortimer Strauss":
+		case "Wonderful Winifred Wongle":
+			if(kill_rounds(smacks.dmg) < die_rounds() && has_option($skill[Pinch Ghost]))
+				encustom(get_action($skill[Pinch Ghost]));
+			break;
+		case "Brock \"Rocky\" Flox":
+		case "Dolores D. Smiley":
+		case "Hugo Von Douchington":
+		case "Vivian Vibrian Vumian Varr":
+		case "Wacky Zack Flacky":
+			if(kill_rounds(smacks.dmg) < die_rounds() && has_option($skill[Tattle]))
+				encustom(get_action($skill[Tattle]));
 			break;
 	}
 
 	vprint("Custom WHAM actions built! ("+count(custom)+" actions)",9);
-	build_custom();
+	if(!finished())
+		build_custom();
 }
 
 string stasis_repeat_WHAM(int turns) {       // the string of repeat conditions for stasising
@@ -1316,6 +1368,10 @@ string stasis_WHAM() {
 		}
 
 		macro(plink, stasis_repeat_WHAM(turns));
+		
+		//Reset batbrain_insert
+		WHAM_round("");		
+		
 		if (finished())
 			break;
 			
@@ -1389,7 +1445,7 @@ void main(int initround, monster foe, string pg) {
 	vprint("WHAM: Monster HP is " + (monster_hp() == 0 ? monster_stat("hp") + monster_hp() : monster_stat("hp")) + (bees(m) > 0 ? " which was increased by " + bees(m) * ceil(0.2 * monster_hp(m)) + " due to bees hating you." : "."), "purple", 4);
 	
 	//Add WHAM-specific stuff to batround
-	WHAM_round();
+	WHAM_round("");
 	
 	 //Set up the available options that we have
 	allMyOptions(hitchance);
