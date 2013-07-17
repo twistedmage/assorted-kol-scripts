@@ -9,7 +9,7 @@ void adventure_relay()
 	   actbox.append("<div id='actbox'>");
 	   if (my_location() != $location[none] && my_adventures() > 1 && contains_text(results,"adventure.php")) {
 		 // adventure again link
-		  actbox.append("\n   <div class='onemenu'><a href='"+to_url(my_location())+(my_location() == $location[boss bat's lair] ?
+		  actbox.append("\n   <div class='onemenu'><a href='"+to_url(my_location())+(my_location() == $location[the boss bat's lair] ?
 		  "&confirm2=on" : "")+"'><img src='../images/itemimages/hourglass.gif' height=22 width=22 border=0></a></div>"+
 		  "<div class='popout' id='again'></div>");
 	   }

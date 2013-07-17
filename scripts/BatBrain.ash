@@ -48,6 +48,7 @@ record advevent {          // record of changes due to an event
    float mp;               // mp gained/lost
    float meat;             // meat gained/lost
    float profit;           // profit cache to avoid recalculating
+//   float runaway;          // the chance that this action will result in a free runaway
    int rounds;             // rounds consumed
    substats stats;         // substats gained/lost
    boolean endscombat;     // this action ends combat
@@ -106,7 +107,8 @@ advevent merge(advevent fir, advevent sec) {
    advevent res;
    string autofunk = (have_skill($skill[ambidextrous funkslinging]) && is_integer(excise(fir.id,"use ","")) &&
                       is_integer(excise(sec.id,"use ",""))) ? fir.id+","+excise(sec.id,"use ","") : "";
-   res.id = (autofunk != "" ? autofunk : fir.id+(sec.id != "" && fir.id != "" ? "; " : "")+sec.id);
+   if (fir.rounds == 0 ^ sec.rounds == 0) res.id = (fir.rounds == 0 ? sec.id : fir.id);
+     else res.id = (autofunk != "" ? autofunk : fir.id+(sec.id != "" && fir.id != "" ? "; " : "")+sec.id);
    res.dmg = merge(fir.dmg,sec.dmg);
    res.pdmg = merge(fir.pdmg,sec.pdmg);
    res.att = fir.att + sec.att;
@@ -750,7 +752,7 @@ float hitchance(string id) {        // HITCH-nce
 
 //===================== BUILD COMBAT OPTIONS =========================
 
-advevent oneround(advevent r) {           // plugs an advevent into the current combat and returns the event
+advevent oneround(advevent r) {           // plugs an advevent into the current combat and returns the summed round event
    advevent a = merge(r,new advevent);
    for i from 1 upto a.rounds a = merge(a,baseround());
    a.pdmg[$element[none]] = max(a.pdmg[$element[none]], my_stat("hp")-my_maxhp());  // cap healing/mp gain BEFORE merging monster event
@@ -1144,7 +1146,7 @@ advevent attack_action() {  // returns most profitable killing action
    float drnd = max(1.0,die_rounds()-1.0);   // a little extra pessimistic
    sort opts by -dmg_dealt(value.dmg);
    sort opts by -value.profit;
-   sort opts by kill_rounds(value.dmg)*-(min(value.profit,-1));
+   sort opts by kill_rounds(value.dmg)*-(min(value.profit,-1) - 5);   // insert arbitrary 5mu round cost
    foreach i,opt in opts {
       if (opt.custom || kill_rounds(opt.dmg) > min(maxround - round - 1,drnd)) continue;   // reduce RNG risk for stasisy actions
       if (opt.stun < 1 && opt.profit < -runaway_cost()) continue;  // don't choose actions worse than fleeing
@@ -1383,6 +1385,7 @@ string act(string action) {
       } else vprint("Look! You found "+n+" "+doodad+" ("+rnum(n*item_val(doodad))+entity_decode("&mu;")+")!","green",5);
    }
    if (contains_text(action,"CRITICAL")) set_happened("crit");
+   if (contains_text(action,"FUMBLE")) set_happened("fumble");
    if (have_equipped($item[operation patriot shield]) && happened($skill[throw shield]) && happened("crit")) set_happened("shieldcrit");
    if (have_equipped($item[bag o' tricks])) switch {
       case (happened($skill[open the bag o' tricks])): set_property("bagOTricksCharges","0"); break;

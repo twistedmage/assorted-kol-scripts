@@ -124,8 +124,8 @@ int expected_rounds_needed()
 	int slime_hp = monster_hp( $monster[slime1] );
 	int weapon_damage = max( 1 , floor( .1 * get_power( equipped_item( $slot[weapon] ) ).to_float() ) );
 	int offhand_damage = 0;
-	if( weapon_type( equipped_item( $slot[offhand] ) ) != $stat[none] )
-		offhand_damage = max( 1 , floor( .1 * get_power( equipped_item( $slot[offhand] ) ).to_float() ) );
+	if( weapon_type( equipped_item( $slot[off-hand] ) ) != $stat[none] )
+		offhand_damage = max( 1 , floor( .1 * get_power( equipped_item( $slot[off-hand] ) ).to_float() ) );
 	int elem_damage = 0;
 	foreach elem in $elements[] 
 	{
@@ -258,7 +258,7 @@ int expected_rounds_needed()
 	}
 	
 	if( weapon_type( equipped_item( $slot[weapon] ) ) == $stat[none] ) musc_dam = musc_dam * .25;
-	if( shieldbutt ) offhand_damage = get_power( equipped_item( $slot[offhand] ) ) * .1;
+	if( shieldbutt ) offhand_damage = get_power( equipped_item( $slot[off-hand] ) ) * .1;
 	spell_per = ( 100 + numeric_modifier( "Spell Damage Percent" ) ) / 100;
 	float elem_spell_damage;
 	foreach elem in $elements[]
@@ -314,9 +314,9 @@ int expected_rounds_needed()
 int max_possible_damage()
 {
 	int def_stat = my_buffedstat( $stat[moxie] );
-	if( have_skill( $skill[Hero of the Halfshell] ) && item_type( equipped_item( $slot[offhand] ) ) == "shield" && my_buffedstat( $stat[muscle] ) > my_buffedstat( $stat[moxie] ) )
+	if( have_skill( $skill[Hero of the Half-Shell] ) && item_type( equipped_item( $slot[off-hand] ) ) == "shield" && my_buffedstat( $stat[muscle] ) > my_buffedstat( $stat[moxie] ) )
 		def_stat = my_buffedstat( $stat[muscle] );
-	int slime_attack = 100 + ( numeric_modifier( "Monster Level" ) * ( my_familiar() != $familiar[O.A.F] ).to_int() );
+	int slime_attack = 100 + ( numeric_modifier( "Monster Level" ) * ( my_familiar() != $familiar[O.A.F.] ).to_int() );
 	int diff = max( 0 , slime_attack - def_stat );
 	float absorb_frac = min( .9 , ( square_root( numeric_modifier( "Damage Absorption" ) / 10.0 ) - 1.0 ) / 10.0 );
 	
@@ -472,9 +472,9 @@ void run_tube( int adv_to_use )
 				## TODO: Fix breakage when you don't have Aria available, have ode available,
 				## and have 3 AT buffs already. Temp fixed by changing abort to print, possibly needs handled better
 				if( have_effect( $effect[Ur-Kel's Aria of Annoyance] ) > 0 && have_skill($skill[Ur-Kel's Aria of Annoyance] ) ) cli_execute("uneffect Ur-kels");
-				if( have_effect( $effect[Ode to Booze]) < 1 && have_skill( $skill[Ode to Booze] ) )
+				if( have_effect( $effect[Ode to Booze]) < 1 && have_skill( $skill[The Ode to Booze] ) )
 				{
-					use_skill( 1 , $skill[Ode to Booze]);
+					use_skill( 1 , $skill[The Ode to Booze]);
 				}
 				if( have_effect( $effect[Ode to Booze] ) > 0 )
 				{
@@ -507,7 +507,7 @@ void run_tube( int adv_to_use )
 			}
 			if( verbose ) print( "Adventure " + ( total_adv - adv_to_use + 1 ) + " out of " + total_adv , "blue" ); 
 
-			adv1($location[slime tube], -1, "");
+			adv1($location[The Slime Tube], -1, "");
 			if( get_property( "lastEncounter" ).contains_text( "Showdown" ) ) abort( "You've reached Mother Slime!" );
 			boolean combat = !( get_property("lastEncounter").contains_text("Engulfed") || get_property("lastEncounter").contains_text("Showdown") ) ;   
 			if( !use_tatter_like )
@@ -519,7 +519,7 @@ void run_tube( int adv_to_use )
 			{
 				set_property( "battleAction" , old_action );
 			}
-			if( ( have_effect( $effect[Ode to Booze] ) > 0 && have_skill( $skill[Ode to Booze] ) ) || ( get_property( "_banderRunaways" ).to_int() >= floor( numeric_modifier( "Familiar Weight" ) + familiar_weight( $familiar[Frumious Bandersnatch] ) ) / 5 ) )
+			if( ( have_effect( $effect[Ode to Booze] ) > 0 && have_skill( $skill[The Ode to Booze] ) ) || ( get_property( "_banderRunaways" ).to_int() >= floor( numeric_modifier( "Familiar Weight" ) + familiar_weight( $familiar[Frumious Bandersnatch] ) ) / 5 ) )
 			{
 				cli_execute( "uneffect Ode to Booze" );
 			}

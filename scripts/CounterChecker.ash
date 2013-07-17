@@ -54,38 +54,38 @@ queue_entry [int] SrQueue;
 if(!file_to_map("SrQueue_"+my_name()+".txt", SrQueue)) {}
 
 item [location] semi_rare;
-	semi_rare[$location[Haunted Billiards Room]] = $item[cube of billiard chalk];
-	semi_rare[$location[Menagerie 2]] = $item[irradiated pet snacks];
+	semi_rare[$location[The Haunted Billiards Room]] = $item[cube of billiard chalk];
+	semi_rare[$location[Cobb's Knob Menagerie\, Level 2]] = $item[irradiated pet snacks];
 	semi_rare[$location[The Outskirts of Cobb's Knob]] = $item[Knob Goblin lunchbox];
-	semi_rare[$location[Limerick Dungeon]] = $item[cyclops eyedrops];
+	semi_rare[$location[The Limerick Dungeon]] = $item[cyclops eyedrops];
 	semi_rare[$location[Sleazy Back Alley]] = $item[distilled fortified wine];
-	semi_rare[$location[Haunted Pantry]] = $item[tasty tart];
-	semi_rare[$location[Harem]] = $item[scented massage oil];
-	semi_rare[$location[Haunted Kitchen]] = $item[freezerburned ice cube];
-	semi_rare[$location[Haunted Library]] = $item[black eyedrops];
-	semi_rare[$location[Goatlet]] = $item[can of spinach];
-	semi_rare[$location[Ninja Snowmen]] = $item[bottle of antifreeze];
-	semi_rare[$location[Orc Chasm]] = $item[ASCII shirt];
+	semi_rare[$location[The Haunted Pantry]] = $item[tasty tart];
+	semi_rare[$location[Cobb's Knob Harem]] = $item[scented massage oil];
+	semi_rare[$location[The Haunted Kitchen]] = $item[freezerburned ice cube];
+	semi_rare[$location[The Haunted Library]] = $item[black eyedrops];
+	semi_rare[$location[The Goatlet]] = $item[can of spinach];
+	semi_rare[$location[Lair of the Ninja Snowmen]] = $item[bottle of antifreeze];
+	semi_rare[$location[The Valley of Rof L'm Fao]] = $item[ASCII shirt];
 	semi_rare[$location[Battlefield (No Uniform)]] = $item[six-pack of New Cloaca-Cola];
-	semi_rare[$location[Batrat and Ratbat Burrow]] = $item[Dogsgotnonoz pills];
-	semi_rare[$location[Castle in the Clouds in the Sky (Top Floor)]] = $item[Mick's IcyVapoHotness Inhaler];
-	semi_rare[$location[Castle in the Clouds in the Sky (Ground Floor)]] = $item[Possibility Potion];
-	semi_rare[$location[Castle in the Clouds in the Sky (Basement)]] = $item[Super Weight-Gain 9000];
+	semi_rare[$location[The Batrat and Ratbat Burrow]] = $item[Dogsgotnonoz pills];
+	semi_rare[$location[The Castle in the Clouds in the Sky (Top Floor)]] = $item[Mick's IcyVapoHotness Inhaler];
+	semi_rare[$location[The Castle in the Clouds in the Sky (Ground Floor)]] = $item[Possibility Potion];
+	semi_rare[$location[The Castle in the Clouds in the Sky (Basement)]] = $item[Super Weight-Gain 9000];
 	semi_rare[$location[Guano Junction]] = $item[Eau de Guaneau];
-	semi_rare[$location[Laboratory]] = $item[bottle of Mystic Shell];
+	semi_rare[$location[Cobb's Knob Laboratory]] = $item[bottle of Mystic Shell];
 	semi_rare[$location[Pre-Cyrpt Cemetary]] = $item[poltergeist-in-the-jar-o];
 	semi_rare[$location[Post-Cyrpt Cemetary]] = $item[poltergeist-in-the-jar-o];
 	semi_rare[$location[South of The Border]] = $item[donkey flipbook];
 	semi_rare[$location[Pandamonium Slums]] = $item[SPF 451 lip balm];
 	semi_rare[$location[Hidden City (encounter)]] = $item[shrinking powder];
 	semi_rare[$location[8-Bit Realm]] = $item[fire flower];
-	semi_rare[$location[Spooky Forest]] = $item[fake blood];
+	semi_rare[$location[The Spooky Forest]] = $item[fake blood];
 	semi_rare[$location[Whitey's Grove]] = $item[bag of lard];
 	semi_rare[$location[Hippy Camp]] = $item[teeny-tiny magic scroll];
 	semi_rare[$location[Frat House]] = $item[bottle of rhinoceros hormones];
-	semi_rare[$location[Pirate Cove]] = $item[bottle of pirate juice];
+	semi_rare[$location[The Obligatory Pirate's Cove]] = $item[bottle of pirate juice];
 	semi_rare[$location[The Purple Light District]] = $item[lewd playing card];
-	semi_rare[$location[Burnbarrel Blvd]] = $item[jar of squeeze];
+	semi_rare[$location[Burnbarrel Blvd.]] = $item[jar of squeeze];
 	semi_rare[$location[Exposure Esplanade]] = $item[bowl of fishysoisse];
 	semi_rare[$location[The Heap]] = $item[concentrated garbage juice];
 	semi_rare[$location[The Ancient Hobo Burial Ground]] = $item[deadly lampshade];
@@ -147,7 +147,7 @@ boolean canadv(location loc) {
 	string hobo_zone(location loc) {
 		int zone() {
 			switch(loc) {
-			case $location[Burnbarrel Blvd]: return 4;
+			case $location[Burnbarrel Blvd.]: return 4;
 			case $location[Exposure Esplanade]: return 5;
 			case $location[The Heap]: return 6;
 			case $location[The Ancient Hobo Burial Ground]: return 7;
@@ -165,38 +165,38 @@ boolean canadv(location loc) {
 	switch(loc) {
 	case $location[The Outskirts of Cobb's Knob]:
 	case $location[Sleazy Back Alley]:
-	case $location[Haunted Pantry]:
+	case $location[The Haunted Pantry]:
 		return true;
-	case $location[Limerick Dungeon]:
+	case $location[The Limerick Dungeon]:
 		return my_buffedstat(my_primestat()) > 20;
-	case $location[Haunted Billiards Room]:
+	case $location[The Haunted Billiards Room]:
 		if(my_buffedstat(my_primestat()) < 10) return false;
-	case $location[Haunted Kitchen]:
+	case $location[The Haunted Kitchen]:
 		return my_buffedstat(my_primestat()) >=5 && get_property("lastManorUnlock").to_int() == my_ascensions();
-	case $location[Haunted Library]:
-		return available_amount($item[library key]) > 0;
-	case $location[Laboratory]:
+	case $location[The Haunted Library]:
+		return available_amount($item[Spookyraven library key]) > 0;
+	case $location[Cobb's Knob Laboratory]:
 		return available_amount($item[Cobb's Knob lab key]) > 0;
-	case $location[Menagerie 2]:
+	case $location[Cobb's Knob Menagerie\, Level 2]:
 		return available_amount($item[Cobb's Knob Menagerie key]) > 0;
-	case $location[Harem]:
+	case $location[Cobb's Knob Harem]:
 		return get_property("questL05Goblin") == "finished" 
 		  || (get_property("questL05Goblin") == "started" && item_amount($item[Cobb's Knob map]) < 1);
-	case $location[Goatlet]:
+	case $location[The Goatlet]:
 		if(get_property("questL08Trapper") == "step2") return true;
-	case $location[Ninja Snowmen]:
+	case $location[Lair of the Ninja Snowmen]:
 		return get_property("questL08Trapper") == "finished" || get_property("questL08Trapper") == "step3";
-	case $location[Orc Chasm]:
+	case $location[The Valley of Rof L'm Fao]:
 		return get_property("questL09Lol") == "finished" || get_property("questL09Lol") == "step1";
 	case $location[Battlefield (No Uniform)]:
 		return my_level() >= 4 && my_level() < 6 && my_ascensions() > 0 && available_amount($item[fernswarthy's letter]) > 0;
-	case $location[Castle in the Clouds in the Sky (Top Floor)]:
-	case $location[Castle in the Clouds in the Sky (Ground Floor)]:
-	case $location[Castle in the Clouds in the Sky (Basement)]:
-		return item_amount($item[S.O.C.K]) + item_amount($item[intragalactic rowboat]) + item_amount($item[steam-powered model rocketship]) > 0;
+	case $location[The Castle in the Clouds in the Sky (Top Floor)]:
+	case $location[The Castle in the Clouds in the Sky (Ground Floor)]:
+	case $location[The Castle in the Clouds in the Sky (Basement)]:
+		return item_amount($item[S.O.C.K.]) + item_amount($item[intragalactic rowboat]) + item_amount($item[steam-powered model rocketship]) > 0;
 	case $location[Guano Junction]:
 		return get_property("questL04Bat") != "unstarted" && stinkup(true);
-	case $location[Batrat and Ratbat Burrow]:
+	case $location[The Batrat and Ratbat Burrow]:
 		return get_property("questL04Bat") != "unstarted" && get_property("questL04Bat") != "started";
 	case $location[South of The Border]:
 		return available_amount($item[bitchin' meatcar]) > 0 || available_amount($item[pumpkin carriage]) > 0 
@@ -206,9 +206,9 @@ boolean canadv(location loc) {
 		  && get_property("questG03Ego") != "unstarted";
 	case $location[Post-Cyrpt Cemetary]:
 		return my_buffedstat(my_primestat()) >= 40 && get_property("questL07Cyrptic") == "finished";
-	case $location[Dark Elbow of the Woods]:
-	case $location[Dark Heart of the Woods]:
-	case $location[Dark Neck of the Woods]:
+	case $location[The Dark Elbow of the Woods]:
+	case $location[The Dark Heart of the Woods]:
+	case $location[The Dark Neck of the Woods]:
 		return get_property("questL06Friar") == "started";
 	case $location[Pandamonium Slums]:
 		return my_buffedstat(my_primestat()) >= 29 && get_property("questL06Friar") == "finished";
@@ -220,7 +220,7 @@ boolean canadv(location loc) {
 	case $location[Chapel]:
 		return available_amount($item[continuum transfunctioner]) > 0 && available_amount($item[map to Vanya's Castle]) > 0
 			&& (available_amount($item[pixel whip]) > 0 || available_amount($item[pixel chain whip]) > 0 || available_amount($item[pixel morning star]) > 0);
-	case $location[Spooky Forest]:
+	case $location[The Spooky Forest]:
 		return get_property("questL02Larva") != "unstarted";
 	case $location[Whitey's Grove]:
 		return get_property("questG02Whitecastle") != "unstarted" 
@@ -229,7 +229,7 @@ boolean canadv(location loc) {
 		return island() && (get_property("questL12War") == "unstarted" || get_property("sideDefeated") == "fratboys");
 	case $location[Frat House]:
 		return island() && (get_property("questL12War") == "unstarted" || get_property("sideDefeated") == "hippies");
-	case $location[Pirate Cove]:
+	case $location[The Obligatory Pirate's Cove]:
 		return island() && ($strings[unstarted, finished] contains get_property("questL12War"));
 	case $location[A-Boo Peak]:
 	case $location[Oil Peak]:
@@ -237,7 +237,7 @@ boolean canadv(location loc) {
 	case $location[Twin Peak]:
 		return false; // This ceases after peak is lit... Hard to test.
 	case $location[The Purple Light District]:
-	case $location[Burnbarrel Blvd]:
+	case $location[Burnbarrel Blvd.]:
 	case $location[Exposure Esplanade]:
 	case $location[The Heap]:
 	case $location[The Ancient Hobo Burial Ground]:
@@ -251,16 +251,16 @@ boolean canadv(location loc) {
 location expensive_semi() {
 	location last_rare = get_property("semirareLocation").to_location();
 	// If ImprovePoolSkills, then play a game of pool at every opportunity!
-	if(vars["BaleCC_ImprovePoolSkills"].to_boolean() && last_rare != $location[Haunted Billiards Room])
-		return $location[Haunted Billiards Room];
+	if(vars["BaleCC_ImprovePoolSkills"].to_boolean() && last_rare != $location[The Haunted Billiards Room])
+		return $location[The Haunted Billiards Room];
 
 	if(!canadv($location[Pandamonium Slums])) {  // Let's make sure the choice is ascension helpful
 		if(available_amount($item[eldritch butterknife]) < 1)
-			semi_rare[$location[Dark Elbow of the Woods]] = $item[SPF 451 lip balm];
+			semi_rare[$location[The Dark Elbow of the Woods]] = $item[SPF 451 lip balm];
 		else if(available_amount($item[box of birthday candles]) < 1)
-			semi_rare[$location[Dark Heart of the Woods]] = $item[SPF 451 lip balm];
+			semi_rare[$location[The Dark Heart of the Woods]] = $item[SPF 451 lip balm];
 		else
-			semi_rare[$location[Dark Neck of the Woods]] = $item[SPF 451 lip balm];
+			semi_rare[$location[The Dark Neck of the Woods]] = $item[SPF 451 lip balm];
 	}
 
 	
@@ -330,7 +330,7 @@ void get_semirare() {
 	familiar start_fam = my_familiar();
 	int closet_clovers = 0;
 	switch(locale) {
-	case $location[Haunted Billiards Room]:
+	case $location[The Haunted Billiards Room]:
 		billiard = get_property("choiceAdventure330");
 		set_property("choiceAdventure330", (vars["BaleCC_ImprovePoolSkills"].to_boolean() ? "1" : "2"));
 		closet_clovers = item_amount($item[ten-leaf clover]);
@@ -344,7 +344,7 @@ void get_semirare() {
 		cli_execute("checkpoint");
 		pixelize(true);
 		break;
-	case $location[Pirate Cove]:
+	case $location[The Obligatory Pirate's Cove]:
 		cli_execute("checkpoint");
 		if(have_equipped($item[pirate fledges]))
 			cli_execute("unequip pirate fledges");
@@ -359,17 +359,17 @@ void get_semirare() {
 		stinkup(false);
 		// fall through to the next section...
 	case $location[The Outskirts of Cobb's Knob]:
-	case $location[Limerick Dungeon]:
+	case $location[The Limerick Dungeon]:
 	case $location[Sleazy Back Alley]:
-	case $location[Haunted Pantry]:
-	case $location[Harem]:
-	case $location[Haunted Kitchen]:
-	case $location[Haunted Library]:
-	case $location[Laboratory]:
+	case $location[The Haunted Pantry]:
+	case $location[Cobb's Knob Harem]:
+	case $location[The Haunted Kitchen]:
+	case $location[The Haunted Library]:
+	case $location[Cobb's Knob Laboratory]:
 	case $location[Pre-Cyrpt Cemetary]:
 	case $location[Post-Cyrpt Cemetary]:
 	case $location[South of The Border]:
-	case $location[Spooky Forest]:
+	case $location[The Spooky Forest]:
 	case $location[Hippy Camp]:
 	case $location[Frat House]:
 		closet_clovers = item_amount($item[ten-leaf clover]);
@@ -390,7 +390,7 @@ void get_semirare() {
 	if(closet_clovers > 0)
 		take_closet(closet_clovers, $item[ten-leaf clover]);
 	switch(locale) {
-	case $location[Haunted Billiards Room]:
+	case $location[The Haunted Billiards Room]:
 		set_property("choiceAdventure330", billiard);
 		break;
 	case $location[Guano Junction]:
@@ -400,7 +400,7 @@ void get_semirare() {
 		break;
 	case $location[8-Bit Realm]:
 	case $location[Chapel]:
-	case $location[Pirate Cove]:
+	case $location[The Obligatory Pirate's Cove]:
 		cli_execute("outfit checkpoint");
 	}
 }
@@ -741,7 +741,7 @@ boolean main(string name, int remain) {
 	case "Wormwood":
 		return do_wormwood();
 	case "Dance Card":
-		(!adventure(1, $location[Ballroom]));
+		(!adventure(1, $location[The Haunted Ballroom]));
 		if(vars["BaleCC_useDanceCards"].to_boolean() && (can_interact() || item_amount($item[dance card])> 0))
 			use(1, $item[dance card]);
 		return true;

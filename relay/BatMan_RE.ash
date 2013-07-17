@@ -108,7 +108,7 @@ string quote() {
       case $location[the temple portico]: bw[count(bw)] = "Robin: \"Batman, look! What skinny macaroni!\"<br>Batman: \"No, it's spaghetti, Robin. A variety of alimentary paste, larger then bernachelli but not as tubular as macaroni.\""; break;
       case $location[tavern cellar]:
       case $location[a barroom brawl]: bw[count(bw)] = "Robin: \"Let's go!\"<br>Batman: \"Not you, Robin. They have strict licensing laws in this country. A boy of your age is not allowed in a drinking tavern.\""; break;
-      case $location[orc chasm]: bw[count(bw)] = "Robin: \"You can't get away from Batman that easy!\"<br>Batman: \"Easily.\"<br>Robin: \"Easily.\"<br>Batman: \"Good grammar is essential, Robin.\"<br>Robin: \"Thank you.\"<br>Batman: \"You're welcome.\"";
+      case $location[The Valley of Rof L'm Fao]: bw[count(bw)] = "Robin: \"You can't get away from Batman that easy!\"<br>Batman: \"Easily.\"<br>Robin: \"Easily.\"<br>Batman: \"Good grammar is essential, Robin.\"<br>Robin: \"Thank you.\"<br>Batman: \"You're welcome.\"";
          bw[count(bw)] = "\"It's full of misspellings, and I'm full of misgivings.\""; break;
       case $location[south of the border]: bw[count(bw)] = "Batman: \"The green button will turn the car <i>a la izquierda o a la derecha</i>.\"<br>Robin: \"To the left or right. Threw in a little Spanish on me, huh, Batman?\"<br>Batman: \"One should always keep abreast of foreign tongues, Robin.\"";
          bw[count(bw)] = "Batman: \"Let's go Robin, we've nary a second to lose! <i>Vamanos!</i>\"<br>Robin: \"Right <i>amigo!</i>\""; break;
@@ -343,7 +343,7 @@ void batman_enhance() {
 
    } else if (my_location() != $location[none] && my_adventures() > 1 && contains_text(page,"adventure.php")) {
      // adventure again link, includes location info?
-      actbox.append("\n   <div class='onemenu'><a href='"+to_url(my_location())+(my_location() == $location[boss bat's lair] ? "&confirm2=on" : "")+"'>"+
+      actbox.append("\n   <div class='onemenu'><a href='"+to_url(my_location())+(my_location() == $location[the boss bat's lair] ? "&confirm2=on" : "")+"'>"+
       "<img src='../images/itemimages/hourglass.gif' height=22 width=22 border=0></a></div>"+
       "<div class='popout' id='again'></div>");
    }

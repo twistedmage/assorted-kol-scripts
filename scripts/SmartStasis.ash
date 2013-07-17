@@ -60,11 +60,11 @@ boolean should_mayfly() {                // TODO: make this return an advevent
       case $location[degrassi knoll]: foreach i in $items[spring, cog, sprocket, empty meat tank] if (has_goal(i) > 0) return true; break;
       case $location[south of the border]: for i from 297 to 300 if (is_goal(to_item(i))) return true; break;   // free gum
       case $location[the penultimate fantasy airship]: if (my_level() < 13) return true; break;             // substats
-      case $location[hole in the sky]: for i from 657 to 665 if (is_goal(to_item(i))) return true; break;   // free star/line, free runaway
+      case $location[the hole in the sky]: for i from 657 to 665 if (is_goal(to_item(i))) return true; break;   // free star/line, free runaway
       case $location[the haunted pantry]: 
       case $location[the haunted kitchen]: 
       case $location[cobb's knob kitchens]: foreach i in item_drops(m) if (item_type(i) == "food" && has_goal(i) > 0) return true; break;
-      case $location[menagerie 1]: if (has_goal($monster[fruit golem]) > 0 &&
+      case $location[Cobb's Knob Menagerie\, Level 1]: if (has_goal($monster[fruit golem]) > 0 &&
 	     m != $monster[knob goblin mutant]) return true; break;  // increase fruit drops, free runaway from BASIC elemental
    }
    switch (m) {
@@ -178,9 +178,10 @@ void set_autoputtifaction() {
 // Custom Actions
 void build_custom() {
    vprint("Building custom actions...",9);
-   void encustom(advevent which) { if (which.id != "") custom[count(custom)] = merge(which,new advevent); }
-   void encustom(item which) { advevent toque = get_action(which); encustom(toque); }
-   void encustom(skill which) { advevent toque = get_action(which); print("Skill id: "+toque.id); encustom(toque); }
+   boolean encustom(advevent which) { if (which.id == "") return false; custom[count(custom)] = merge(which,new advevent); return true; }
+   void encustom(item which, boolean finisher) { advevent toque = get_action(which); if (encustom(toque) && finisher) custom[count(custom)-1].endscombat = true; }
+   void encustom(item which) { encustom(which, false); }
+   void encustom(skill which) { advevent toque = get_action(which); encustom(toque); }
   // stealing! add directly to queue[] rather than custom actions
    if (should_pp && (intheclear() || has_goal(m) > 0) && contains_text(page,"value=\"steal"))
       enqueue(to_event("pickpocket","once",1));
@@ -252,6 +253,8 @@ void build_custom() {
       if (appearance_rates(my_location())[m] > 0 && (is_goal(to_paste(m)) || has_goal(m) == 0))
          encustom($skill[release the boots]);
    }
+  // lassoing
+   if (my_location().zone == "The Sea" && get_property("lassoTraining") != "expertly" && m != $monster[wild seahorse]) encustom($item[sea lasso]);
   // grin/stinkeye
    if (contains_text(vars["ftf_grin"],m.to_string()))
       foreach sk in $skills[creepy grin, give your opponent the stinkeye] encustom(sk);
@@ -291,6 +294,9 @@ void build_custom() {
       case $monster[tomb rat]: encustom($item[tangle of rat tails]); break;            // tomb rat king! (may require safety checks)
       case $monster[clingy pirate]: if (has_goal(m) == 0) encustom($item[cocktail napkin]); break;  // cocktail napkins
       case $monster[hellseal pup]: encustom($item[seal tooth]); break;                 // seal tooth vs. seal pup
+      case $monster[wild seahorse]: if (item_amount($item[sea cowbell]) > 2 && get_property("lassoTraining") == "expertly" && 
+                                        item_amount($item[sea lasso]) > 0) foreach it in $items[sea cowbell, sea cowbell, sea cowbell, sea lasso] encustom(it);
+         encustom(to_event("runaway","endscombat",1)); break;
      // skate decoys for goals
       case $monster[grouper groupie]: if (is_goal($item[grouper fangirl]) && item_amount($item[ice skate decoy]) > 0 && !happened($item[ice skate decoy]))
          encustom(to_event("use 4231","item grouper fangirl",1)); break;
@@ -316,30 +322,30 @@ void build_custom() {
       case $monster[mammon the elephant]: if (item_amount($item[dangerous jerkcicle]) > 5) for i from 1 to 6 encustom($item[dangerous jerkcicle]); break;
       case $monster[the landscaper]: if (item_amount($item[grass clippings]) > 2) for i from 1 to 3 encustom($item[grass clippings]); break;
      // tower monsters
-      case $monster[beer batter]: encustom($item[baseball]); break;
-      case $monster[best-selling novelist]: encustom($item[plot hole]); break;
-      case $monster[big meat golem]: encustom($item[meat vortex]); break;
-      case $monster[bowling cricket]: encustom($item[sonar-in-a-biscuit]); break;
-      case $monster[bronze chef]: encustom($item[leftovers of indeterminate origin]); break;
-      case $monster[concert pianist]: encustom($item[knob goblin firecracker]); break;
-      case $monster[el diablo]: encustom($item[mariachi g-string]); break;
-      case $monster[electron submarine]: encustom($item[photoprotoneutron torpedo]); break;
-      case $monster[endangered inflatable white tiger]: encustom($item[pygmy blowgun]); break;
-      case $monster[fancy bath slug]: encustom($item[fancy bath salts]); break;
-      case $monster[fickle finger of F8]: encustom($item[razor-sharp can lid]); break;
-      case $monster[flaming samurai]: encustom($item[frigid ninja stars]); break;
-      case $monster[giant desktop globe]: encustom($item[ng]); break;
-      case $monster[giant fried egg]: encustom($item[black pepper]); break;
-      case $monster[ice cube]: encustom($item[hair spray]); break;
-      case $monster[malevolent crop circle]: encustom($item[bronzed locust]); break;
-      case $monster[possessed pipe-organ]: encustom($item[powdered organs]); break;
-      case $monster[pretty fly]: encustom($item[spider web]); break;
-      case $monster[darkness]: encustom($item[inkwell]); break;
-      case $monster[tyrannosaurus tex]: encustom($item[chaos butterfly]); break;
-      case $monster[vicious easel]: encustom($item[disease]); break;
-      case $monster[giant bee]: encustom($item[tropical orchid]); break;
-      case $monster[enraged cow]: encustom($item[barbed-wire fence]); break;
-      case $monster[collapsed mineshaft golem]: encustom($item[stick of dynamite]); break;
+      case $monster[beer batter]: encustom($item[baseball],true); break;
+      case $monster[best-selling novelist]: encustom($item[plot hole],true); break;
+      case $monster[big meat golem]: encustom($item[meat vortex],true); break;
+      case $monster[bowling cricket]: encustom($item[sonar-in-a-biscuit],true); break;
+      case $monster[bronze chef]: encustom($item[leftovers of indeterminate origin],true); break;
+      case $monster[concert pianist]: encustom($item[knob goblin firecracker],true); break;
+      case $monster[el diablo]: encustom($item[mariachi g-string],true); break;
+      case $monster[electron submarine]: encustom($item[photoprotoneutron torpedo],true); break;
+      case $monster[endangered inflatable white tiger]: encustom($item[pygmy blowgun],true); break;
+      case $monster[fancy bath slug]: encustom($item[fancy bath salts],true); break;
+      case $monster[fickle finger of F8]: encustom($item[razor-sharp can lid],true); break;
+      case $monster[flaming samurai]: encustom($item[frigid ninja stars],true); break;
+      case $monster[giant desktop globe]: encustom($item[ng],true); break;
+      case $monster[giant fried egg]: encustom($item[black pepper],true); break;
+      case $monster[ice cube]: encustom($item[hair spray],true); break;
+      case $monster[malevolent crop circle]: encustom($item[bronzed locust],true); break;
+      case $monster[possessed pipe-organ]: encustom($item[powdered organs],true); break;
+      case $monster[pretty fly]: encustom($item[spider web],true); break;
+      case $monster[darkness]: encustom($item[inkwell],true); break;
+      case $monster[tyrannosaurus tex]: encustom($item[chaos butterfly],true); break;
+      case $monster[vicious easel]: encustom($item[disease],true); break;
+      case $monster[giant bee]: encustom($item[tropical orchid],true); break;
+      case $monster[enraged cow]: encustom($item[barbed-wire fence],true); break;
+      case $monster[collapsed mineshaft golem]: encustom($item[stick of dynamite],true); break;
    }
   // learn rave combos
    advevent unknown_rave() {

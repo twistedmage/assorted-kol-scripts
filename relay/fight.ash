@@ -88,7 +88,7 @@ string[string] handle_post() {
          case $location[the defiled cranny]:
          case $location[the defiled alcove]:
          case $location[the defiled niche]: abox.append("<p><b>"+get_property("cyrpt"+excise(my_location(),"d ","")+"Evilness")+"</b> evilness left here."); break;
-         case $location[hole in the sky]: abox.append("<p><table style='padding: 0'><tr><th><img src='/images/itemimages/starchart.gif' border=0><br>"+rnum(item_amount($item[star chart]))+
+         case $location[the hole in the sky]: abox.append("<p><table style='padding: 0'><tr><th><img src='/images/itemimages/starchart.gif' border=0><br>"+rnum(item_amount($item[star chart]))+
             "</th><th><img src='/images/itemimages/star.gif' border=0><br>"+rnum(item_amount($item[star]))+"</th><th><img src='/images/itemimages/line.gif' border=0><br>"+rnum(item_amount($item[line]))+"</th></tr>");
             foreach i in $items[richard's star key, star hat, star sword, star crossbow] if (have_item(i) == 0) abox.append("<tr><td>"+
               (creatable_amount(i) > 0 ? "<a href=# class='cliimglink' title=\"create 1 "+i+"\"><img src='/images/itemimages/"+i.image+"' class=hand></a>" : "<img src='/images/itemimages/"+i.image+"' title=\""+i+"\" border=0>")+
@@ -110,6 +110,7 @@ string[string] handle_post() {
                if (have_outfit("Frat Warrior")) abox.append("<p><a href=# class='clilink' title='checkpoint; outfit frat warrior; bigisland.php?action=junkman&pwd=; outfit checkpoint'>visit Yossarian as frat</a>");
                if (have_outfit("War Hippy")) abox.append("<p><a href=# class='clilink' title='checkpoint; outfit war hippy; bigisland.php?action=junkman&pwd=; outfit checkpoint'>visit Yossarian as hippy</a>");
             } break;
+         case $location[The Coral Corral]: if (get_property("lassoTraining") != "expertly") abox.append("<p><img src='/images/itemimages/lasso.gif' height=20 width=20 border=0> "+get_property("lassoTraining")); break;
       }
 	  float[monster] arq = appearance_rates(my_location(),true);
       if (count(arq) > 0) {
@@ -228,7 +229,7 @@ buffer add_features(buffer results) {
    // change runaway to repeat
    results.replace_string("<form name=runaway action=fight.php method=post><input type=hidden name=action value=\"runaway\">",
       "<form name=runaway action=fight.php method=post><input type=hidden name=action value='macro'><input type=hidden name=macrotext value=\"runaway; repeat\">");
-	return results;
+	return results;  
 }
 void fight_relay() {
 	buffer results;
