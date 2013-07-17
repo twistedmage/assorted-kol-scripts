@@ -708,20 +708,10 @@ void set_combat_macro(boolean use_putty)
 				visit_url("account.php?actions[]=autoattack&autoattack=9982715&flag_aabosses=1&pwd&action=Update");
 		break;
 		case $stat[mysticality] :
-			if(my_class() == $class[sauceror])
-			{
-				if(use_putty)
-					visit_url("account.php?actions[]=autoattack&autoattack=9994756&flag_aabosses=1&pwd&action=Update");
-				else
-					visit_url("account.php?actions[]=autoattack&autoattack=9994755&flag_aabosses=1&pwd&action=Update");
-			}
-			else
-			{
 				if(use_putty)
 					visit_url("account.php?actions[]=autoattack&autoattack=9974884&flag_aabosses=1&pwd&action=Update");
 				else
 					visit_url("account.php?actions[]=autoattack&autoattack=9982714&flag_aabosses=1&pwd&action=Update");
-			}
 		break;
 		default:
 			abort("Unrecognised mainstat in set_combat_macro()");
@@ -2711,11 +2701,13 @@ void defaultMood(boolean castMojo) {
 		cli_execute("trigger lose_effect, empathy , cast 1 empathy of the newt");
 	if (have_skill($skill[Leash of Linguini]))
 		cli_execute("trigger lose_effect, Leash of Linguini, cast 1 Leash of Linguini");
-	if (have_skill($skill[Ur-Kel's Aria of Annoyance]))
-			cli_execute("trigger lose_effect, Ur-Kel's Aria of Annoyance, cast 1 Ur-Kel's Aria of Annoyance");
-//	if (have_skill($skill[Drescher's Annoying Noise]))
-	if (have_skill(to_skill(89)))
-			cli_execute("trigger lose_effect, Drescher's Annoying Noise, cast 1 Drescher's Annoying Noise");
+	if(my_path()!="BIG!")
+	{
+		if (have_skill($skill[Ur-Kel's Aria of Annoyance]))
+				cli_execute("trigger lose_effect, Ur-Kel's Aria of Annoyance, cast 1 Ur-Kel's Aria of Annoyance");
+		if (have_skill($skill[Drescher's Annoying Noise]))
+				cli_execute("trigger lose_effect, Drescher's Annoying Noise, cast 1 Drescher's Annoying Noise");
+	}
 	if(familiar_weight(my_familiar())<20)
 		if (have_skill($skill[Curiosity of Br'er Tarrypin]))
 			cli_execute("trigger lose_effect, Curiosity of Br'er Tarrypin, cast 1 Curiosity of Br'er Tarrypin");
@@ -3424,7 +3416,7 @@ boolean can_adv(location where) {
 	case $location[Haunted Gallery]: return (itemcheck($item[gallery key]));
 	case $location[Haunted Ballroom]: return (itemcheck($item[ballroom key]));
 	case $location[Palindome]: return (primecheck(65) && equipcheck($item[talisman o'nam]));
-	case $location[Fernswarthy Ruins]: return (primecheck(11) && itemcheck($item[fernswarthy letter]));
+	case $location[Tower Ruins]: return (primecheck(11) && itemcheck($item[fernswarthy letter]));
 	case $location[Oasis in the Desert]: return (itemcheck($item[your father's macguffin diary]) && perm_urlcheck("beach.php","oasis.gif"));
 	case $location[The Upper Chamber]:
 	case $location[The Middle Chamber]: return (itemcheck($item[staff of ed]));
@@ -4128,7 +4120,7 @@ void setMood(string combat) {
 			print("BCC: Need meat (this will always trigger)!", "purple");
 			if (have_skill($skill[Polka of Plenty])) cli_execute("trigger lose_effect, Polka of Plenty, cast 1 Polka of Plenty");
 		}
-		if (contains_text(combat,"l")) {
+		if (contains_text(combat,"l") && my_path()!="BIG!") {
 			if (willMood()) {
 				print("BCC: Need bigger monsters!", "purple");
 				if (have_skill($skill[Ur-Kel's Aria of Annoyance])) cli_execute("trigger lose_effect, Ur-Kel's Aria of Annoyance, cast 1 Ur-Kel's Aria of Annoyance");
@@ -4247,7 +4239,7 @@ location level_location(int value) {
 			Bat Hole Entryway, Guano Junction, Batrat and Ratbat Burrow, Beanbat Chamber, Knob Kitchens, Knob Barracks, Knob Treasury, 
 			Knob Harem, Greater-Than Sign, Dungeons of Doom, Itznotyerzitz Mine, Black Forest, the Knob Shaft, Knob Laboratory, Menagerie 1, 
 			Menagerie 2, Menagerie 3, Hippy Camp, Frat House, Pirate Cove, Hole in the Sky, Haunted Library, Haunted Gallery, 
-			Haunted Ballroom, Palindome, Fernswarthy Ruins, Oasis in the Desert, The Upper Chamber, The Middle Chamber, Thugnderdome, 
+			Haunted Ballroom, Palindome, Tower Ruins, Oasis in the Desert, The Upper Chamber, The Middle Chamber, Thugnderdome, 
 			Outskirts of Camp, Camp Logging Camp, Post-Quest Bugbear Pens, Bugbear Pens, Degrassi Knoll, Fun House, 
 			Pre-Cyrpt Cemetary, Post-Cyrpt Cemetary, Goatlet, Ninja Snowmen, eXtreme Slope, Whitey Grove, Belilafs Comedy Club, 
 			Hey Deze Arena, Pandamonium Slums, Orc Chasm, Fantasy Airship, White Citadel, Haunted Kitchen, Haunted Conservatory, 
@@ -6142,6 +6134,7 @@ boolean bcascCyrpt() {
 		use(1, $item[evilometer]);
 		
 		while (!stageDone("Nook")) {
+//			abort("nook - get debonair deboners from choiceadv, line 6137");
 			if (item_amount($item[evil eye]) > 0) use(i_a("evil eye"), $item[evil eye]);
 			bumAdv($location[Defiled Nook], "item", "items", "1 evil eye", "Un-Defiling the Nook (1/4)", "i");
 			if (item_amount($item[evil eye]) > 0) use(1, $item[evil eye]);
@@ -9704,7 +9697,7 @@ void bcs12() {
 	boolean doSideQuest(string name) {
 		if (checkStage("warstage_"+name)) return true;
 		print("BCC: Starting SideQuest '"+name+"'", "purple");
-		abort("We aren't doing sidequests this time, get medals manually!");
+		
 		//We have to have these functions outside the switch. 
 		int estimated_advs() { return ceil((100000 - to_float(get_property("currentNunneryMeat"))) / (1000 + (10*meat_drop_modifier()))); }
 		
@@ -9925,8 +9918,8 @@ void bcs12() {
 					visit_yossarian(true);
 				visit_yossarian(false);
 				while (get_property("currentJunkyardTool") != "" && available_amount(to_item(get_property("currentJunkyardTool")))<1) {
-					cli_execute("maximize mox, +DA, +10DR, -ml, "
-							+(my_path() == "Way of the Surprising Fist" ? "" : " -melee ")
+					cli_execute("maximize "+my_primestat()+", +DA, +10DR, -ml, "
+							+(my_primestat() == $stat[moxie] ? " -melee " : "+melee ")
 							+(available_amount($item[greatest american pants])==0 ? "" : " +equip greatest american pants "));
 						//Force to 0 in Junkyard
 					

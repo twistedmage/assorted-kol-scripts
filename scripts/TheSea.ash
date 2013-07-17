@@ -10,26 +10,27 @@ void GetSushiMat();
 //Allows a wider range of macros to be chosen, or falls back on the standard putty / stat macro
 void set_combat_macro_name(string macro)
 {
+	print("requested combat macro \""+macro+"\"","lime");
 	switch(macro)
 	{
 		case "lasso" :
 			visit_url("account.php?actions[]=autoattack&autoattack=9999547&flag_aabosses=1&pwd&action=Update");
-		break;
+			break;
 		case "seahorse" :
 			visit_url("account.php?actions[]=autoattack&autoattack=99100629&flag_aabosses=1&pwd&action=Update");
-		break;
+			break;
 		case "gladiator" :
 			visit_url("account.php?actions[]=autoattack&autoattack=99100626&flag_aabosses=1&pwd&action=Update");
-		break;
+			break;
 		case "library1" :
 			visit_url("account.php?actions[]=autoattack&autoattack=99100627&flag_aabosses=1&pwd&action=Update");
-		break;
+			break;
 		case "library2" :
 			visit_url("account.php?actions[]=autoattack&autoattack=99100628&flag_aabosses=1&pwd&action=Update");
-		break;
+			break;
 		case "library3" :
 			visit_url("account.php?actions[]=autoattack&autoattack=99100630&flag_aabosses=1&pwd&action=Update");
-		break;
+			break;
 		default:
 			set_combat_macro();
 	}
@@ -53,7 +54,7 @@ void prepare_for(string type,location loc)
 	{
 		//if we have rescued big brother and can get a sushi mat
 		//we may well want to eat a bento box sushi with a worktea, to get fishy and a clue
-		if(contains_text(visit_url("monkeycastle.php"),"\#brothers\"")&& get_property("workteaClue")=="")
+		if(contains_text(visit_url("monkeycastle.php"),"\#brothers\"")&& get_property("workteaClue")=="" && (fullness_limit() - my_fullness() > 4))
 		{
 			if(user_confirm("Do you want to eat a Bento Box."))
 			{
@@ -418,9 +419,10 @@ void smiteViolence()
 		visit_url("fight.php?action=useitem&whichitem=5703");
 		visit_url("fight.php?action=useitem&whichitem=5703");
 	}
-	abort("copy end text line 415");
 	string txt=run_combat();
 	//finish up
+	if(!contains_text(txt,"WINWINWIN"))
+		abort("Failed to kill boss: "+txt);
 	visit_url("choice.php");
 	visit_url("choice.php?pwd&whichchoice=709&option=1&choiceform1=The+Eyes+Have+It");
 }
@@ -560,12 +562,10 @@ void MonkeeQuest()
 			{
 				print("Finding Grandpa in the "+grandpa.to_string()+".");
 			}
-			loopcounter = 0;
-			while (my_adventures() > 0 && monkeycastle.contains_text("\#brothers\"") && loopcounter < 5 && boolean_modifier("Adventure Underwater"))
+			while (my_adventures() > 0 && monkeycastle.contains_text("\#brothers\"") && !monkeycastle.contains_text("\#gpa\"") && boolean_modifier("Adventure Underwater"))
 			{
 				print("Searching for grandpa","lime");
 				prepare_for("-",grandpa);
-				loopcounter += 1;
 				if (!obtain(1,"choiceadv",grandpa))
 				{
 					print("You have run out of adventures. Continue tomorrow.");
@@ -1038,7 +1038,7 @@ void GetAeratedHelmet()
 //---------------------------simons quest extensions
 void deepcity_unlock()
 {
-	if(get_property("deepcity_unlocked")!=my_ascensions())
+	if(get_property("seahorseName")=="")
 	{
 		if(get_property("corral_unlocked")!=my_ascensions() && !contains_text(visit_url("seafloor.php"),"corrala.gif"))
 		{
@@ -1125,7 +1125,8 @@ void deepcity_unlock()
 			adventure(1,$location[The Brinier Deepers]);
 		}
 		//get seahorse
-		while(contains_text(visit_url("seafloor.php?action=currents"),"far too strong for you to swim against"))
+		//while(contains_text(visit_url("seafloor.php?action=currents"),"far too strong for you to swim against"))
+		while(get_property("seahorseName")=="")
 		{
 			prepare_for("i", $location[Coral Corral]);
 			//macros don't seem to fire for seahorses so we have to do it this way
@@ -1134,9 +1135,8 @@ void deepcity_unlock()
 			
 			//adventure(1,$location[Coral Corral]);
 		}
-		if(!contains_text(visit_url("seafloor.php?action=currents"),"far too strong for you to swim against"))
-			set_property("deepcity_unlocked",my_ascensions());
-		else
+		//if(!contains_text(visit_url("seafloor.php?action=currents"),"far too strong for you to swim against"))
+		if(get_property("seahorseName")=="")
 			abort("failed to open deepcity");
 	}
 }
@@ -1144,6 +1144,29 @@ void deepcity_unlock()
 //gladiator path - beat colloseum
 void gladiator_path()
 {
+	//farm the first 2 gladiator skills
+	while(get_property("gladiatorBallMovesKnown").to_int()<2)
+	{
+		print("learning dodgeball attacks","lime");
+		prepare_for("", $location[Mer-Kin colosseum]);
+		equip($item[mer-kin dodgeball]);
+		adventure(1,$location[briniest deepests]);
+	}
+	while(get_property("gladiatorBladeMovesKnown").to_int()<2)
+	{
+		print("learning switchblade attacks","lime");
+		prepare_for("", $location[Mer-Kin colosseum]);
+		equip($item[mer-kin switchblade]);
+		adventure(1,$location[briniest deepests]);
+	}
+	while(get_property("gladiatorNetMovesKnown").to_int()<2)
+	{
+		print("learning dragnet attacks","lime");
+		prepare_for("", $location[Mer-Kin colosseum]);
+		equip($item[mer-kin dragnet]);
+		adventure(1,$location[briniest deepests]);
+	}
+
 	//go through colloseum using right weapon for each fight
 	while(!to_boolean(get_property("_merkin_temple_open")))
 	{
@@ -1176,15 +1199,15 @@ void gladiator_path()
 				set_property("_merkin_colosseum_nextfight","bladeswitcher");
 			else if(next_fight=="bladeswitcher")
 				set_property("_merkin_colosseum_nextfight","balldodger");
-			else
+			else //balldodger
 				set_property("_merkin_colosseum_nextfight","netdragger");
 				
 			//are we done now?
 			if(contains_text(txt,"the medallion becomes a sigil of liquid fire"))
 				set_property("_merkin_temple_open","true");
 		}
-		else
-			abort("Failed to kill gladiator");
+		else if(!contains_text(txt,"past the guards outside the"))
+			abort("Failed to kill gladiator. String="+txt);
 			
 		//
 		if(round_5)
@@ -1307,28 +1330,26 @@ void scholar_path()
 
 	prepHatred();
 	smiteHatred();
-	//boss fight?
-	set_combat_macro_name(false);
-	cli_execute("familiar squamous");
-	cli_execute("uneffect phorcefullness; uneffect incredibly hulking; uneffect reptilian fortitude; uneffect a few extra pounds; uneffect urkel");
-	//reduce hp
-	getsome(1, $item[extra-strength red potion]);
-	getsome(1, $item[filthy poultice]);
-	getsome(1, $item[gauze garter]);
-	getsome(1, $item[red pixel potion]);
-	getsome(1, $item[green pixel potion]);
-	getsome(1, $item[red potion]);
-	getsome(1, $item[scented massage oil]);
-	getsome(1, $item[sea lasso]);
-	getsome(1, $item[mer-kin mouthsoap]);
-	getsome(3, $item[mer-kin prayerbeads]);
-	equip($slot[acc1], $item[mer-kin prayerbeads]);
-	equip($slot[acc2], $item[mer-kin prayerbeads]);
-	equip($slot[acc3], $item[mer-kin prayerbeads]);
-	maximize("sea, outfit mer-kin scholar, -acc1, -acc2, -acc3, -1000 hp, 0.1 mainstat", false);
-	cli_execute("restore hp");
 }
 //-----------------------------------------------------
+
+void dad_path()
+{
+	outfit("cloathing of loathing");
+//	cli_execute("maximize +sea, +equip Goggles of Loathing, +equip Stick-Knife of Loathing, +equip Scepter of Loathing, +equip Jeans of Loathing, +equip Belt of Loathing, +equip Treads of Loathing, +100 hp, +spell damage");
+	cli_execute("maximize +sea, +equip Goggles of Loathing, +equip Stick-Knife of Loathing, +equip Scepter of Loathing, +equip Jeans of Loathing, +equip Belt of Loathing, +equip Pocket Square of Loathing, +100 hp, +spell damage");
+	
+	//<no point in buffs>
+	clear_combat_macro();
+	cli_execute("restore hp; restore mp");
+	abort("line 1339 choiceadv sequence for dad sea monkey");
+	visit_url("sea_merkin.php?action=temple");
+	visit_url("choice.php?pwd&whichchoice=714&option=1&choiceform1=Go+Inside");
+	visit_url("choice.php?pwd&whichchoice=715&option=1&choiceform1=Eat");
+	visit_url("choice.php?pwd&whichchoice=716&option=1&choiceform1=Go+Inside");
+	//<fight>
+}
+
 
 void main()
 {
@@ -1368,6 +1389,7 @@ void main()
 		if (TS_BOOT_QUEST!=0) BootQuest();
 		if (TS_GET_SUSHIMAT > 0) GetSushiMat();
 		if (TS_GET_HELMET > 0) GetAeratedHelmet();
+		
 		//simons quests
 		deepcity_unlock();
 		
@@ -1375,9 +1397,20 @@ void main()
 		if(get_property("_merkin_path_to_take")=="")
 		{
 			if(user_confirm("Do you want to take the gladiator path this time?"))
+			{
 				set_property("_merkin_path_to_take","gladiator");
+			}
 			else
-				set_property("_merkin_path_to_take","scholar");
+			{
+				if(user_confirm("Do you want to take the \"dad\" path this time?"))
+				{
+					set_property("_merkin_path_to_take","dad");
+				}
+				else
+				{
+					set_property("_merkin_path_to_take","scholar");
+				}
+			}
 		}
 		
 		//do the chosen path
@@ -1389,6 +1422,10 @@ void main()
 		else if(path=="scholar")
 		{
 			scholar_path();
+		}
+		else if(path=="dad")
+		{
+			dad_path();
 		}
 		else
 			abort("Unrecognised path variable "+path);

@@ -96,29 +96,9 @@ stealth mnistletoe will help DB runs a lot?
 
 
 
---------------------------------SEMIRARES--------------------------
 =================================
 [An Octopus's Garden]
 moister oyster (3)
-
-------------------------------------ascensions----------------
-=================================
-[Bees Hate You]
-Bee Swarm (3)
-Bee Thoven (3)
-Beebee Gunners (3)
-Beebee King (3)
-Beebee Queue (3)
-Buzzerker (3)
-Moneybee (3)
-Mumblebee (3)
-Queen Bee (3)
-
-=================================
-[Haunted Bathroom]
-Guy Made of Bees (1)
-
--------------------------------------------OTHERS-------------------
 =================================
 [Battlefield (Dyspepsi Uniform)]
 Cloaca-Cola Catapult Engineer (3)
@@ -126,22 +106,18 @@ Cloaca-Cola Footsoldier (3)
 Cloaca-Cola Soldier (3)
 =================================
 [Battlefield (Frat Uniform)]
-C.A.R.N.I.V.O.R.E. Operative (3)
-Glass of Orange Juice (3)
-Neil (3)
-Slow Talkin' Elliot (3)
+C.A.R.N.I.V.O.R.E. Operative (2)
+Glass of Orange     Juice (3)
+Neil (2)
+Slow Talkin' Elliot (2)
 Zim Merman (2)
 =================================
 [Battlefield (Hippy Uniform)]
 War Frat Mobile Grill Unit (3)
-War Frat Streaker (3)
-Brutus, the Toga-Clad Lout (3)
-Danglin' Chad (3)
-Monty Basingstoke-Pratt, IV (3)
-Next-Generation Frat Boy (3)
-=================================
-
-
+War Frat     Streaker (2)
+Brutus, the Toga-Clad Lout (1)
+Danglin' Chad (2)
+Next-Generation     Frat Boy (1)
 =================================
 [BRICKO]
 BRICKO Airship (2)
@@ -152,20 +128,37 @@ BRICKO Gargantuchicken (2)
 Peripatetic Pirate (1)
 =================================
 [Unsorted]
+Dad Sea Monkee (3)
 Somebody else's butt (3)
 Your butt (3)
-Dad Sea Monkee (3)
-Shub-Jigguwatt, Elder God of Violence (1)
+
+apye9
+
+---sausages---
+south of the border noncom
+from fernswarthys ghost
+from skeletal cat
+guano junction noncom
+wooden one nightstand noncom
+click jackass plumber once per day
+rest to get dog item
+duffel noncom on extreme slope
+menagerie 1 quickbasic elemental
+
+The video game hot dog unlocker comes from the Jackass Plumber coin slot in the Game Grid Arcade. You can check it once per day; this costs no turns. The Arcade must be unlocked by clicking the wrong side of the tracks while you have a Game Grid token or ticket in your inventory.
+The unlocker in the Haunted Bedroom comes from a new choice that is added to the WOODEN nightstand noncombat adventure. On any given day, a given character account will either have the new choice or not. If you see the NC and it doesn't have the new choice, you can stop looking there.
+The unlocker in the eXtreme Slope comes from a new choice that is added to the Duffel Bag noncombat adventure. Same deal as the wooden nightstand -- if it's not there, stop looking.
+The unlocker in the Defiled Nook (northwest corner, the +item one) works the same way. Either you get a new choice in the NC, or you don't.
+The unlocker in the Cake Arena comes from a 1/4 or 1/5 roll on each (5*n)th win with a familiar that has NO equipment whatsoever (the wiki has a list).
+The unlocker in Menagerie 1 appears to be from an ultra-rare monster, using whatever mechanisms UR monsters use.
+The unlocker in Fern's Basement comes from the great great great ... grandfather ghost, with a very low drop rate. I have no idea whether +item helps or not.
+The unlocker in the Haunted Conservatory is a rare drop from the skeletal cat (sniff it!). No idea whether +item helps.
+The unlocker from resting probably has some ridiculously low rate of occurrence. You can get it from your daily free rests only if you don't have an Unconscious Collective familiar. If you have one of those, you can't get it from free rests; just from turn-costing rests.
+The others... I don't know.
+-----------------------------
 
 
-still need bitter
-bartles and braaains - salty
-flaming caip - sweet
-dusty pinot - sour
-port - umami
 
-hand carved bokken - 2(+1)
-hand carved staff - 1
 -----underwater-----
 tattoos
 2 crappy mer kin mask
@@ -202,10 +195,11 @@ Sauceror
 2 gladiator
 2-1 priest
 
+have first set of cloathing of loathing
+need 1 more goggles of loathing
+need 1 more jeans of loathing
+need 2 more Stick-Knife of Loathing
 
-
-
-<sword from guord>
 
 [old man]
 +2 foam naval trousers (23-36)

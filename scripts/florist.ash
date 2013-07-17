@@ -24,7 +24,7 @@ int zone_type(location loc)
 		return 1;
 	
 	//underground
-	if($locations[Batrat and Ratbat Burrow, Guano Junction, upper chamber, middle chamber, Cobb's Knob Barracks, Cobb's Knob Kitchens, Defiled Nook, Defiled Alcove, Defiled Cranny, Defiled Niche, Itznotyerzitz Mine, Greater-Than Sign, Dungeons of Doom, Beanbat Chamber, Castle in the Clouds in the Sky (Basement), Cobb's Knob Laboratory, Haunted Wine Cellar (Southwest), Haunted Wine Cellar (Southeast), Haunted Wine Cellar (northwest), Haunted Wine Cellar (northeast), Guards' Chamber, Queen's chamber, Bat Hole Entryway, Boss Bat's Lair, Feeding Chamber,Cobb's Knob Harem] contains loc)
+	if($locations[Batrat and Ratbat Burrow, Guano Junction, upper chamber, middle chamber, Cobb's Knob Barracks, Cobb's Knob Kitchens, Defiled Nook, Defiled Alcove, Defiled Cranny, Defiled Niche, Itznotyerzitz Mine, Greater-Than Sign, Dungeons of Doom, Beanbat Chamber, Castle in the Clouds in the Sky (Basement), Cobb's Knob Laboratory, Haunted Wine Cellar (Southwest), Haunted Wine Cellar (Southeast), Haunted Wine Cellar (northwest), Haunted Wine Cellar (northeast), Guards' Chamber, Queen's chamber, Bat Hole Entryway, Boss Bat's Lair, Feeding Chamber,Cobb's Knob Harem,Degrassi Knoll,The hatching chamber] contains loc)
 		return 2;
 		
 	//underwater
@@ -54,10 +54,6 @@ location mafia_style_zone(string loc)
 		loc="Greater-Than Sign";
 	else if(loc=="Penultimate Fantasy Airship")
 		loc="Fantasy Airship";
-	else if(loc=="Arid, Extra-Dry Desert")
-		loc="Desert (ultrahydrated)";
-	else if(loc=="Orcish Frat House")
-		loc="wartime Frat House";
 	else if(loc=="Royal Guard Chamber")
 		loc="Guards' Chamber";
 	else if(loc=="Filthworm Queen's Chamber")
@@ -70,14 +66,18 @@ location mafia_style_zone(string loc)
 		loc="Bat Hole Entryway";
 	else if(loc=="Laugh Floor")
 		loc="Belilafs Comedy Club";
-	else if(loc=="Valley of Rof L'm Fao")
-		loc="Orc Chasm";
 	else */ if(loc=="Hidden City")
 		loc="Hidden City (Automatic)";
 	else if(loc=="Infernal Rackets Backstage")
 		loc="Hey Deze Arena";
 	else if(loc=="Laugh Floor")
 		loc="Belilafs Comedy Club";
+	else if(loc=="Arid, Extra-Dry Desert")
+		loc="Desert (ultrahydrated)";
+	else if(loc=="Orcish Frat House")
+		loc="wartime Frat House";
+	else if(loc=="Valley of Rof L'm Fao")
+		loc="Orc Chasm";
 	
 		
 		
@@ -271,7 +271,10 @@ void choose_all_plants(string type, location loc)
 	}
 	location cur_loc=mafia_style_zone(cur_locm.group(1));
 	if(cur_loc!=loc)
+	{
+		visit_url("forestvillage.php");
 		return;
+	}
 	
 	//do we have any space here?
 	int num_planted=number_planted(friar_str);
@@ -301,6 +304,7 @@ void choose_all_plants(string type, location loc)
 		{
 			//force mafia to recognise that we quit the choiceadv?
 			visit_url("forestvillage.php");
+			visit_url("main.php");
 			return;
 		}
 
@@ -310,6 +314,7 @@ void choose_all_plants(string type, location loc)
 	}
 	//force mafia to recognise that we quit the choiceadv?
 	visit_url("forestvillage.php");
+	visit_url("main.php");
 }
 
 void main()

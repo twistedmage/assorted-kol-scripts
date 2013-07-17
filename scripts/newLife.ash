@@ -555,7 +555,6 @@ void special(boolean bonus_actions) {
 	//if in softcore, pull my set
 	if(!in_hardcore())
 	{
-		<big path>
 		cli_execute("inventory refresh");
 		refresh_stash();
 		//hat
@@ -586,9 +585,8 @@ void special(boolean bonus_actions) {
 				else
 					abort("Don't know what familiar to enthrone for this path");
 		}
-		pull_and_wear_if_good($item[ice sickle]);
 		//myst classes want a pan offhand
-		if(my_primestat()==$stat[mysticality] && my_path()!="Bees Hate You")
+		if(my_primestat()==$stat[mysticality] && my_path()!="Bees Hate You" && my_path()!="BIG!")
 		{
 			//pull whichever
 			if(storage_amount($item[Jarlsberg's pan (Cosmic portal mode)])>0)
@@ -611,15 +609,7 @@ void special(boolean bonus_actions) {
 			pull_and_wear_if_good($item[operation patriot shield]);
 		}
 		pull_and_wear_if_good($item[greatest american pants]);
-		pull_and_wear_if_good($item[juju mojo mask],$slot[acc2]);
-		//if we have no astral belt, wear fangs. Else pull fangs as superclover but dont wear 
-		if(available_amount($item[astral belt])<1)
-			pull_and_wear_if_good($item[plastic vampire fangs],$slot[acc3]);
-		else
-		{
-			pull_if_good($item[plastic vampire fangs]);
-			equip($slot[acc3],$item[astral belt]);
-		}
+		
 		boolean screw=pull_if_good($item[loathing legion universal screwdriver]);
 		if(my_path()!="Avatar of Boris" && my_path()!="Avatar of Jarlsberg")
 		{
@@ -660,12 +650,42 @@ void special(boolean bonus_actions) {
 				}
 			}
 		}
-		if(screw)
+		
+		if(my_path()=="BIG!")
 		{
-			cli_execute("fold loathing legion necktie");
-			if(good($item[loathing legion necktie]))
-				equip($slot[acc1],$item[loathing legion necktie]);
+			 if(my_primestat()==$stat[moxie])
+				pull_and_wear_if_good($item[bottle-rocket crossbow]);
+			else
+				pull_and_wear_if_good($item[haiku katana]);
+				
+			pull_and_wear_if_good($item[v for vivala mask],$slot[acc2]);
+			pull_and_wear_if_good($item[mr. accessory jr.],$slot[acc1]);
+			if(available_amount($item[astral mask])>0)
+				equip($slot[acc3],$item[astral mask]);
+			else
+				pull_and_wear_if_good($item[mr. accessory jr.],$slot[acc3]);
 		}
+		else //not big
+		{
+			pull_and_wear_if_good($item[ice sickle]);
+			pull_and_wear_if_good($item[juju mojo mask],$slot[acc2]);
+			//if we have no astral belt, wear fangs. Else pull fangs as superclover but dont wear 
+			if(available_amount($item[astral belt])<1)
+				pull_and_wear_if_good($item[plastic vampire fangs],$slot[acc3]);
+			else
+			{
+				pull_if_good($item[plastic vampire fangs]);
+				equip($slot[acc3],$item[astral belt]);
+			}
+			if(screw)
+			{
+				cli_execute("fold loathing legion necktie");
+				if(good($item[loathing legion necktie]))
+					equip($slot[acc1],$item[loathing legion necktie]);
+			}
+		}
+		
+		
 		//14 pulls
 //			pull_if_good($item[v for vivala mask]);
 //			if(storage_amount($item[stinky cheese eye])>0)
