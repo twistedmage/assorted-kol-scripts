@@ -210,7 +210,7 @@ advevent to_event(string id, spread dmg, spread pdmg, string special, int howman
    while (bittles.find()) switch (bittles.group(1)) {
       case "att": res.att = aoe*eval(bittles.group(2),fvars); break;
       case "def": res.def = aoe*eval(bittles.group(2),fvars); break;
-      case "stun": if (nostun || (nomultistun && res.stun > 1)) break;    // immune to all stuns
+      case "stun": if (nostun || (nomultistun && eval(bittles.group(2),fvars) > 1)) break;    // stun immunities mean 0
 	     res.stun = eval(bittles.group(2),fvars); break;
       case "mp": if (my_class() == $class[zombie master]) continue;
          res.mp = eval(bittles.group(2),fvars); break;
@@ -517,6 +517,7 @@ string deranged(string sane) {
    return sane;
 }
 foreach te,it,rd in factors {                 // remove placeholders, reduce ranges to averages, tune damage
+   if (contains_text(rd.special,"underwater") && my_location().zone != "The Sea") { remove factors[te,it]; continue; }
    factors[te,it].dmg = deranged(rd.dmg);
    factors[te,it].pdmg = deranged(rd.pdmg);
    factors[te,it].special = deranged(rd.special);
@@ -620,6 +621,7 @@ spread m_regular() {               // damage dealt by monster attack
       case $monster[mammon the elephant]: return to_spread(2**(round - 1));
       case $monster[the landscaper]: return to_spread(my_maxhp()*0.49);
       case $monster[vanya's creature]: return to_spread(my_maxhp()*0.125);
+      case $monster[pufferfish]: return to_spread(2 + 2**round);
    }
    spread res;
    res[m.attack_element] = max(1.0,max(0.0,max(monster_stat("att"),0.0) - my_defstat(true)) + 0.225*max(monster_stat("att"),0.0) - numeric_modifier("Damage Reduction")) *
@@ -650,10 +652,12 @@ advevent m_event(float att_mod, float stun_mod) {      // monster event -- attac
       case $monster[gaunt ghuol]:
       case $monster[gluttonous ghuol]: res.dmg = to_spread("-1.65"); break;          // 30% chance to heal 1-10 HP
       case $monster[huge ghuol]: res.dmg = to_spread("-1.65"); break;                // 30% chance to heal 1-10 HP
-      case $monster[dr. awkward]: res.dmg = to_spread("-25"); break;                  // assuming 50%
+      case $monster[dr. awkward]: res.dmg = to_spread("-25"); break;                 // assuming 50%
       case $monster[quiet healer]: res.pdmg[$element[none]] -= 0.25*17.5; break;     // ... 25% ... ...??
       case $monster[knob goblin mad scientist]: res.mp += 0.25*9; break;             // assuming 25% activation rate??
-      case $monster[pufferfish]: if (round > 0 && adj.stun == 0) res.pdmg[$element[none]] += 2 + 2 ** round; break;  // puffer poison
+      case $monster[mer-kin raider]:                                                 // assuming 50% rate healing 250HP
+      case $monster[mer-kin burglar]:
+      case $monster[mer-kin healer]: res.dmg = to_spread(-min(125,monster_hp(m)+monster_level_adjustment()-monster_stat("hp")),max(0,1.0 - adj.stun)); break;
    }
    if (my_stat("hp") - dmg_taken(res.pdmg) <= 0) res.meat -= beatenup;    // the monster took you out -- and I don't mean to dinner. ouch!
    adj.att -= att_mod;
@@ -678,6 +682,10 @@ int kill_rounds(spread s) {       // how many rounds for a given damage spread t
 }
 int kill_rounds(advevent a) { return kill_rounds(a.dmg); }  // how many rounds for a given action to kill the monster
 int die_rounds() {                // how many rounds at the current ML and stun until you die
+   switch (m) {
+      case $monster[mammon the elephant]:
+      case $monster[pufferfish]: int tdmg; for i from round to 100 { tdmg += 2**i; if (tdmg >= my_stat("hp")) return i - round + adj.stun; } return 3;
+   }
    return ceil(my_stat("hp") / max(m_dpr(0,-adj.stun),0.0001)) + adj.stun;
 }
 boolean intheclear() {            // returns true if you will outlive the combat
@@ -765,12 +773,13 @@ advevent oneround(advevent r) {           // plugs an advevent into the current 
 
 float to_profit(advevent haps, boolean nodelevel) {    // determines the profit of an action in the current combat
    advevent a = oneround(haps);
+   boolean ignorerestore = contains_text(haps.note,"restore");
    haps.profit = minmax(-dmg_taken(a.pdmg),                             // hp
                         min(0,max(-dmg_taken(a.pdmg),-my_stat("hp"))+max(0,my_stat("hp")-max(0,my_maxhp()-numeric_modifier("_spec","HP Regen Min")))),
-                        max(0,my_maxhp()-my_stat("hp")-numeric_modifier("_spec","HP Regen Min")))*meatperhp +
+                        ignorerestore ? 0 : max(0,my_maxhp()-my_stat("hp")-numeric_modifier("_spec","HP Regen Min")))*meatperhp +
           minmax(a.mp,                                                  // mp
                  min(0,max(a.mp,-my_stat("mp"))+max(0,my_stat("mp")-max(0,my_maxmp()-numeric_modifier("_spec","MP Regen Min")))),
-                 max(0,my_maxmp()-my_stat("mp")-numeric_modifier("_spec","MP Regen Min")))*meatpermp +
+                 ignorerestore ? 0 : max(0,my_maxmp()-my_stat("mp")-numeric_modifier("_spec","MP Regen Min")))*meatpermp +
           (nodelevel ? 0 : (a.att == 0 ? 0 : (m_dpr(0,0) - m_dpr(a.att,0))*meatperhp)) +  // delevel
           stat_value(a.stats)+                                          // substats
           a.meat;                                                       // meat
@@ -884,7 +893,8 @@ spread regular(int ts) {  // 1) norm, 2) thrust-smack / axing, 3) lts, 5) bashin
    boolean ranged = (weapon_type(equipped_item($slot[weapon])) == $stat[moxie]);
    float radj = (equipped_item($slot[weapon]) == $item[none]) ? 0.25 : (ranged ? 0.75 : 1.0);
    res[$element[none]] = max(0,max(0,floor((ranged ? my_stat("Moxie") : my_stat("Muscle"))*ltsadj*radj) - monster_stat("def")) +
-      max(1,numeric_modifier("Weapon Damage") + 0.5) * (critchance()+1.0) * ts +
+      (unarmed() ? 1 : max(1,get_power(equipped_item($slot[weapon]))*0.15 + 0.5) * (critchance()+1.0) * ts) + 
+      numeric_modifier("Weapon Damage") - get_power(equipped_item($slot[weapon]))*0.15 + 
       to_int(ranged)*numeric_modifier("Ranged Damage")) * (100 + numeric_modifier("Weapon Damage Percent") +
       to_int(ranged)*numeric_modifier("Ranged Damage Percent"))/100;
    if (have_skill($skill[double-fisted skull smashing]) && to_slot(equipped_item($slot[off-hand])) == $slot[weapon])
@@ -949,6 +959,7 @@ void build_items() {                                                // TODO: sph
             addopt(temp,0.7*rate,0);
             continue;
       }
+      if (contains_text(item_type(to_item(it)),"restore")) temp.note += (temp.note == "" ? "restore" : " (restore)");
       addopt(temp,rate,0);
       added[to_item(it)] = false;
    }
@@ -985,7 +996,6 @@ void build_skillz() {
    int burrowgrub_amt() { return (1+to_int(have_effect($effect[yuletide mutations]) > 0)) * min(my_level(),15); }
    void add_skill(int sk, combat_rec fields) {
       if (mp_cost(to_skill(sk)) > my_stat("mp")) return;
-      if (contains_text(fields.special,"once") && happened(thisid)) return;
       thisid = "skill "+sk;
       if (blacklist contains thisid) {      // infinite and threshold blacklisting
 	     if (blacklist[thisid] < 1) return;
@@ -1060,6 +1070,7 @@ void build_skillz() {
               }
            }
       }
+      if (contains_text(fields.special,"once") && happened(thisid)) return;
       if (dmg_dealt(d) == 0) d = to_spread(fields.dmg);
       advevent bander(int which) {
          if (!happened("smusted") && factors["bander",which].special.contains_text("smust"))
@@ -1103,10 +1114,10 @@ void build_options() {
    fvars["myhp"] = my_stat("hp");
    fvars["mymp"] = my_stat("mp");
   // 1. add regular
-   if (!(blacklist contains "attack")) {
+   if (!(blacklist contains "attack") && (have_effect($effect[more like a suckrament]) == 0 || round + equipped_amount($item[mer-kin prayerbeads]) > 8)) {
       addopt(merge(to_event("attack",regular(1),to_spread(0),"",1),onhit),0,0);
       opts[0] = merge(opts[0],factor(fumble(),fumble_chance()),factor(oncrit,critchance()));         // fumble and crit not factored by hitchance
-      opts[0] = merge(opts[0],to_event("",to_spread(0.075*get_power(equipped_item($slot[weapon])),   // glancing blows
+      opts[0] = merge(opts[0],to_event("",to_spread(max(1,0.075*get_power(equipped_item($slot[weapon]))),   // glancing blows
          1.0-hitchance("attack")-fumble_chance()),to_spread(0),""));
    }	  
   // 2. get jiggy with it

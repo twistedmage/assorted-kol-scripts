@@ -89,7 +89,6 @@ import "fight.ash"
 import "adventure.ash"
 import "BatMan_RE.ash"
 import "questlog.ash"
-import "game.ash"
 
 string ashVersion = "1.04";
 
@@ -5642,6 +5641,5 @@ void main() {
 		case "fight.php": fight_relay(); break;
 		case "adventure.php" : adventure_relay(); break;
 		case "BatMan_RE.ash" : batman_enhance(); break;
-		case "game.php" : game_relay(); break;
 	}
 }

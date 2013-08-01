@@ -1182,15 +1182,6 @@ void build_custom_WHAM() {
 				wait(20);
 			}
 			break;
-		case "wild seahorse":
-			if(get_property("lassoTraining") == "Expertly" && item_amount($item[sea cowbell]) >= 3 && item_amount($item[sea lasso]) > 0) {
-				encustom(get_action($item[sea cowbell]));
-				encustom(get_action($item[sea cowbell]));
-				encustom(get_action($item[sea cowbell]));
-				encustom(get_action($item[sea lasso]));
-			} else
-				macro("runaway; repeat;");
-			break;
 		case "Shub-Jigguwatt, Elder God of Violence":
 			if(dmg_dealt(basecache.dmg) > 0)
 				quit("You have a passive damage source active. The fight will be lost if you automate it. I suggest you run away.");

@@ -58,7 +58,7 @@ item [location] semi_rare;
 	semi_rare[$location[Cobb's Knob Menagerie\, Level 2]] = $item[irradiated pet snacks];
 	semi_rare[$location[The Outskirts of Cobb's Knob]] = $item[Knob Goblin lunchbox];
 	semi_rare[$location[The Limerick Dungeon]] = $item[cyclops eyedrops];
-	semi_rare[$location[Sleazy Back Alley]] = $item[distilled fortified wine];
+	semi_rare[$location[The Sleazy Back Alley]] = $item[distilled fortified wine];
 	semi_rare[$location[The Haunted Pantry]] = $item[tasty tart];
 	semi_rare[$location[Cobb's Knob Harem]] = $item[scented massage oil];
 	semi_rare[$location[The Haunted Kitchen]] = $item[freezerburned ice cube];
@@ -164,7 +164,7 @@ boolean canadv(location loc) {
 
 	switch(loc) {
 	case $location[The Outskirts of Cobb's Knob]:
-	case $location[Sleazy Back Alley]:
+	case $location[The Sleazy Back Alley]:
 	case $location[The Haunted Pantry]:
 		return true;
 	case $location[The Limerick Dungeon]:
@@ -360,7 +360,7 @@ void get_semirare() {
 		// fall through to the next section...
 	case $location[The Outskirts of Cobb's Knob]:
 	case $location[The Limerick Dungeon]:
-	case $location[Sleazy Back Alley]:
+	case $location[The Sleazy Back Alley]:
 	case $location[The Haunted Pantry]:
 	case $location[Cobb's Knob Harem]:
 	case $location[The Haunted Kitchen]:

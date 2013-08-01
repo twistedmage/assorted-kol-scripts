@@ -189,11 +189,11 @@ boolean can_adv(location where, boolean prep) {
       return (levelcheck(11) && itemcheck($item[your father's macguffin diary]) && perm_urlcheck("manor.php","sm8b.gif"));
    switch (where) {
   // always open
-   case $location[Sleazy Back Alley]:
+   case $location[The Sleazy Back Alley]:
    case $location[The Haunted Pantry]:
    case $location[The Outskirts of Cobb's Knob]:
-   case $location[Dire Warren]:
-   case $location[Noob Cave]: return true;
+   case $location[The Dire Warren]:
+   case $location[The Noob Cave]: return true;
   // casino
    case $location[Goat Party]: if (my_meat() < 5) return vprint("You need 5 meat to play the Goat Party.",-6);
    case $location[Pirate Party]:
@@ -311,7 +311,7 @@ boolean can_adv(location where, boolean prep) {
    case $location[Oil Peak]: return (levelcheck(9) && perm_propcheck("chasmBridgeProgress","30"));
    case $location[The Valley of Rof L'm Fao]: return (levelcheck(9) && perm_nopropcheck("questM15Lol","unstarted"));
    case $location[The Penultimate Fantasy Airship]: return (levelcheck(10) && primecheck(90) && (perm_urlcheck("plains.php","beanstalk.gif") || use(1,$item[enchanted bean])));
-   case $location[White Citadel]: return (!white_citadel_available() && checkguild() && visit_url("woods.php").contains_text("wcroad.gif"));
+   case $location[The Road to White Citadel]: return (!white_citadel_available() && checkguild() && visit_url("woods.php").contains_text("wcroad.gif"));
    case $location[The Haunted Kitchen]: return (primecheck(5) && (itemcheck($item[Spookyraven library key]) || perm_urlcheck("town_right.php","manor.gif")));
    case $location[The Haunted Conservatory]: return (primecheck(6) && perm_urlcheck("town_right.php","manor.gif"));
    case $location[The Haunted Billiards Room]: return (primecheck(10) && perm_urlcheck("town_right.php","manor.gif"));
@@ -320,7 +320,7 @@ boolean can_adv(location where, boolean prep) {
    case $location[Icy Peak]: return (levelcheck(8) && primecheck(53) && perm_urlcheck("questlog.php?which=2","Trapper"));
    case $location[Barrrney's Barrr]: return ((itemcheck($item[dingy dinghy]) || itemcheck($item[skeletal skiff])) && (equipcheck($item[pirate fledges],$slot[acc3]) || outfitcheck("swashbuckling getup")));
    case $location[The F'c'le]: return (pirate_check("cove3_3x1b.gif"));
-   case $location[Poop Deck]: return (pirate_check("cove3_3x3b.gif"));
+   case $location[The Poop Deck]: return (pirate_check("cove3_3x3b.gif"));
    case $location[Belowdecks]: return (pirate_check("cove3_5x2b.gif"));
    case $location[Hidden City (automatic)]:
    case $location[Hidden City (encounter)]: return (levelcheck(11) && itemcheck($item[your father's macguffin diary]) && perm_urlcheck("woods.php","hiddencity.php"));
@@ -332,7 +332,7 @@ boolean can_adv(location where, boolean prep) {
    case $location[The Temple Portico]: return (my_class() == $class[pastamancer] && primecheck(90) && perm_urlcheck("topmenu.php","volcanoisland.php"));
    case $location[Convention Hall Lobby]: return (my_class() == $class[sauceror] && primecheck(90) && perm_urlcheck("topmenu.php","volcanoisland.php"));
    case $location[Outside the Club]: return (my_class() == $class[disco bandit] && primecheck(90) && perm_urlcheck("topmenu.php","volcanoisland.php"));
-   case $location[The Barracks]: return (my_class() == $class[accordion thief] && primecheck(90) && perm_urlcheck("topmenu.php","volcanoisland.php"));
+   case $location[The Island Barracks]: return (my_class() == $class[accordion thief] && primecheck(90) && perm_urlcheck("topmenu.php","volcanoisland.php"));
    case $location[The Nemesis' Lair]: return false;
   // extraordinary zones
    case $location[El Vibrato Island]: return (itemcheck($item[el vibrato trapezoid]) || contains_text(visit_url("campground.php"),"Portal1.gif"));
@@ -340,12 +340,12 @@ boolean can_adv(location where, boolean prep) {
    case $location[Mine Foremens' Office]: return (primecheck(100) && outfitcheck("mining gear") && white_citadel_available() && checkguild());
    case $location[The Red Queen's Garden]: return (effectcheck($effect[down the rabbit hole]) || (!prep && itemcheck($item[&quot;DRINK ME&quot; potion])) || (prep && use(1,$item[&quot;DRINK ME&quot; potion])));
    case $location[A Well-Groomed Lawn]: return (itemcheck($item[antique painting of a landscape]));
-   case $location[Small-O-Fier]:
-   case $location[Huge-A-Ma-tron]: return (itemcheck($item[map to Professor Jacking's laboratory]));
+   case $location[Professor Jacking's Small-O-Fier]:
+   case $location[Professor Jacking's Huge-A-Ma-tron]: return (itemcheck($item[map to Professor Jacking's laboratory]));
    case $location[Foyer]:
    case $location[Chapel]: return (itemcheck($item[map to vanya's castle]) && equipcheck($item[continuum transfunctioner]));
    case $location[Kegger in the Woods]: return (itemcheck($item[map to the kegger in the woods]));
-   case $location[Electric Lemonade Acid Parade]: return (itemcheck($item[map to the magic commune]));
+   case $location[The Electric Lemonade Acid Parade]: return (itemcheck($item[map to the magic commune]));
    case $location[Neckback Crick]: return (itemcheck($item[map to ellsbury's claim]));
    case $location[Video Game Level 1]:
    case $location[Video Game Level 2]:
@@ -428,6 +428,11 @@ boolean can_adv(location where, boolean prep) {
                                                    contains_text(visit_url("clan_basement.php?fromabove=1"), "not allowed")) return false;
                                               return true;
    case $location[The Slime Tube]: return (visit_url("clan_slimetube.php").contains_text("thebucket.gif"));
+   case $location[Dreadsylvanian Woods]:
+   case $location[Dreadsylvanian Village]:
+   case $location[Dreadsylvanian Castle]: if (!contains_text(visit_url("town_clan.php"), "clanbasement.gif") ||
+                                                   contains_text(visit_url("clan_basement.php?fromabove=1"), "not allowed")) return false;
+                                              return true;
   // sea
    case $location[The Briny Deeps]:
    case $location[The Brinier Deepers]:

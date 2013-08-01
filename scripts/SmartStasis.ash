@@ -65,7 +65,7 @@ boolean should_mayfly() {                // TODO: make this return an advevent
       case $location[the haunted kitchen]: 
       case $location[cobb's knob kitchens]: foreach i in item_drops(m) if (item_type(i) == "food" && has_goal(i) > 0) return true; break;
       case $location[Cobb's Knob Menagerie\, Level 1]: if (has_goal($monster[fruit golem]) > 0 &&
-	     m != $monster[knob goblin mutant]) return true; break;  // increase fruit drops, free runaway from BASIC elemental
+         m != $monster[knob goblin mutant]) return true; break;  // increase fruit drops, free runaway from BASIC elemental
    }
    switch (m) {
       case $monster[zol]: 
@@ -74,7 +74,7 @@ boolean should_mayfly() {                // TODO: make this return an advevent
       case $monster[keese]: if (item_amount($item[digital key]) == 0) return true; break;    // free pixel, free runaway
       case $monster[knob goblin bean counter]: if (my_level() < 10 && item_amount($item[enchanted bean]) == 0) return true; break;  // free enchanted/jumping bean
       case $monster[swarm of killer bees]: if (has_goal(m) == 0 && has_goal($location[the dungeons of doom]) > 0) return true; break;  // free runaway
-      case $monster[whiny pirate]: if (has_goal(m) == 0 && has_goal($location[poop deck]) > 0) return true; break;  // free runaway
+      case $monster[whiny pirate]: if (has_goal(m) == 0 && has_goal($location[the poop deck]) > 0) return true; break;  // free runaway
    }
    return (my_adventures()/2 - 2 < 30 - to_int(get_property("_mayflySummons")));
 }
@@ -178,7 +178,8 @@ void set_autoputtifaction() {
 // Custom Actions
 void build_custom() {
    vprint("Building custom actions...",9);
-   boolean encustom(advevent which) { if (which.id == "") return false; custom[count(custom)] = merge(which,new advevent); return true; }
+   boolean encustom(advevent which) { if (which.id == "" || (blacklist contains which.id && blacklist[which.id] == 0)) return false; 
+      custom[count(custom)] = merge(which,new advevent); return true; }
    void encustom(item which, boolean finisher) { advevent toque = get_action(which); if (encustom(toque) && finisher) custom[count(custom)-1].endscombat = true; }
    void encustom(item which) { encustom(which, false); }
    void encustom(skill which) { advevent toque = get_action(which); encustom(toque); }
@@ -197,7 +198,7 @@ void build_custom() {
       encustom(to_event("skill 7117","stun 1, item "+get_spirit(),1));
   // flyers
    foreach flyer in $items[jam band flyers, rock band flyers] if (item_amount(flyer) > 0 && get_property("flyeredML").to_int() < 10050 &&
-      (to_boolean(vars["flyereverything"]) || m.base_attack.to_int() >= 10050 - get_property("flyeredML").to_int()) && !happened(flyer) &&
+      (to_boolean(vars["flyereverything"]) || m.base_attack.to_int() >= 10000 - get_property("flyeredML").to_int()) && !happened(flyer) &&
       !($locations[the battlefield (hippy uniform), the battlefield (frat uniform)] contains my_location()))
      encustom(to_event("use "+to_int(flyer),to_spread(0),to_spread(to_string(m_dpr(0,0)*(1-m_hit_chance()))),"!! flyeredML +"+monster_attack(m),1));
   // putty
@@ -253,8 +254,14 @@ void build_custom() {
       if (appearance_rates(my_location())[m] > 0 && (is_goal(to_paste(m)) || has_goal(m) == 0))
          encustom($skill[release the boots]);
    }
-  // lassoing
-   if (my_location().zone == "The Sea" && get_property("lassoTraining") != "expertly" && m != $monster[wild seahorse]) encustom($item[sea lasso]);
+  // under the sea
+   if (my_location().zone == "The Sea") {
+      if (get_property("lassoTraining") != "expertly" && m != $monster[wild seahorse]) encustom($item[sea lasso]);
+      if (item_amount($item[Mer-kin dreadscroll]) > 0 && to_int(get_property("merkinVocabularyMastery")) > 89) { 
+         if (get_property("dreadScroll5") == "0") encustom($item[Mer-kin killscroll]);
+         if (get_property("dreadScroll2") == "0") encustom($item[Mer-kin healscroll]);
+      }
+   }
   // grin/stinkeye
    if (contains_text(vars["ftf_grin"],m.to_string()))
       foreach sk in $skills[creepy grin, give your opponent the stinkeye] encustom(sk);
@@ -303,17 +310,15 @@ void build_custom() {
       case $monster[urchin urchin]: if (is_goal($item[urchin roe]) && item_amount($item[roller skate decoy]) > 0 && !happened($item[roller skate decoy]))
          encustom(to_event("use 4210","item urchin roe",1)); break;
      // boss killers
-      case $monster[gargantulihc]: encustom($item[plus-sized phylactery]); break;
-      case $monster[sexy sorority ghost]: encustom($item[ghost trap]); break;
-      case $monster[bugbear scientist]: if (item_amount($item[quantum nanopolymer spider web]) > 0)
-         encustom(to_event("use 5686","endscombat",1)); break;
-      case $monster[liquid metal bugbear]: if (item_amount($item[drone self-destruct chip]) > 0)
-         encustom(to_event("use 5689","endscombat",1)); break;
+      case $monster[gargantulihc]: encustom($item[plus-sized phylactery],true); break;
+      case $monster[sexy sorority ghost]: encustom($item[ghost trap],true); break;
+      case $monster[bugbear scientist]: encustom($item[quantum nanopolymer spider web],true); break;
+      case $monster[liquid metal bugbear]: encustom($item[drone self-destruct chip],true); break;
       case $monster[guy made of bees]: encustom($item[antique hand mirror]);
          encustom(to_event("runaway","endscombat",1)); break;
       case $monster[cyrus the virus]: for i from 4011 to 4016
           if (item_amount(to_item(i)) > 0 && !contains_text(get_property("usedAgainstCyrus"),to_item(i))) {
-             encustom(to_event("use "+i,"endscombat",1)); break;
+             encustom(to_item(i),true); break;
           }
          encustom(to_event("runaway","endscombat",1)); break;
       case $monster[thug 1 and thug 2]: if (item_amount($item[jar full of wind]) > 9) for i from 1 to 10 encustom($item[jar full of wind]); break;
@@ -420,6 +425,7 @@ advevent to_combo(effect which) {
       case $effect[rave concentration]: float dcprofit,prev,icount; boolean skipped;
          foreach num,rec in item_drops_array(m) {
             if (!skipped && stolen contains rec.drop) { skipped = true; continue; }
+            if (rec.rate == 0) continue;
             switch (rec.type) {
                case "p": continue;
                case "c": if (item_type(rec.drop) == "shirt" && !have_skill($skill[torso awaregness])) continue;
@@ -447,6 +453,7 @@ advevent to_combo(effect which) {
 void build_combos() {
    if (my_class() != $class[disco bandit]) return;
    void encombo(effect c) { advevent thec = to_combo(c); if (thec.id != "") combos[count(combos)] = thec; }
+   vprint("Building disco combos...",9);
    if (meat_drop(m) > 0) {
       encombo($effect[disco nirvana]);
       encombo($effect[rave nirvana]);
@@ -459,6 +466,7 @@ void build_combos() {
       encombo($effect[rave concentration]);
    }
    sort combos by -to_profit(value);
+   vprint("Combos built! ("+count(combos)+" combos)",9);
 }
 
 void enqueue_combos() {

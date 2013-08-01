@@ -193,7 +193,6 @@ string check_version(string soft, string proj, int thread) { buffer msg;
 
 // checks script version once daily, returns empty string, OR div with update message inside
 string check_version(string soft, string prop, string thisver, int thread) { int w = 8; string page; matcher find_ver;
-   if (svn_exists(prop)) { return check_version(soft, prop, thread); }
    if (count(zv) == 0) file_to_map("zversions.txt",zv);
    boolean sameornewer(string local, string server) {
       if (equals(local,server)) return true;
@@ -220,6 +219,7 @@ string check_version(string soft, string prop, string thisver, int thread) { int
       map_to_file(zv,"zversions.txt");
    }
    if (sameornewer(thisver,zv[prop].ver)) { vprint("Running "+soft+" version: "+thisver+" (current)","gray",w); return ""; }
+   if (svn_exists(prop)) { return check_version(soft, prop, thread); }
    string msg = "<big><font color=red><b>New Version of "+soft+" Available: "+zv[prop].ver+"</b></font></big>"+
       "<br><a href='http://kolmafia.us/showthread.php?t="+thread+"' target='_blank'><u>Upgrade from "+thisver+" to "+zv[prop].ver+" here!</u></a><br>";
    find_ver = create_matcher("\\[requires revision (.+?)\\]",page);
@@ -600,7 +600,7 @@ boolean auto_mcd(monster mob) {                               // automcd for a s
    return auto_mcd(monster_attack(mob) + 7 - current_mcd());
 }
 boolean auto_mcd(location place) {                            // automcd for locations
-   if ($locations[tavern cellar, boss bat's lair, throne room, haert of the cyrpt, the slime tube] contains my_location())
+   if ($locations[tavern cellar, the boss bat's lair, throne room, haert of the cyrpt, the slime tube] contains my_location())
       return vprint("MCD: Sensitive location, not adjusting.","olive",4);
    if (count(get_monsters(place)) == 0) return vprint("MCD: "+place+" has no known combats.","olive",4);
    return auto_mcd(get_safemox(place));

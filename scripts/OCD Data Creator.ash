@@ -3696,6 +3696,11 @@ save [$item[muddy pirate hat]] = 2;
 save [$item[Mer-kin lunchbox]] = 0;
 save [$item[ornate ancient cursed chest]] = 0;
 save [$item[tempura avocado]] = 0;
+save [$item[Enchanted Flyswatter]] = 0;
+save [$item[vicious spiked collar]] = 1;
+save [$item[chlorophyll paste]] = 0;
+
+
 
 //stuff to sell later
 save [$item[gunpowder burrito]] = -1;
