@@ -56,6 +56,7 @@ if !hasskill Ball Sack && !hasskill Net Neutrality && !hasskill Blade Runner
 		use pulled blue taffy
 	endif
 endif
+attack
 
 while !missed 2
 mark glad_fight2

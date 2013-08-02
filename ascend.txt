@@ -139,17 +139,17 @@ south of the border noncom
 from fernswarthys ghost
 from skeletal cat
 guano junction noncom
-wooden one nightstand noncom
 click jackass plumber once per day
 rest to get dog item
-duffel noncom on extreme slope
 menagerie 1 quickbasic elemental
+
+wooden one nightstand noncom
+duffel noncom on extreme slope
 
 The video game hot dog unlocker comes from the Jackass Plumber coin slot in the Game Grid Arcade. You can check it once per day; this costs no turns. The Arcade must be unlocked by clicking the wrong side of the tracks while you have a Game Grid token or ticket in your inventory.
 The unlocker in the Haunted Bedroom comes from a new choice that is added to the WOODEN nightstand noncombat adventure. On any given day, a given character account will either have the new choice or not. If you see the NC and it doesn't have the new choice, you can stop looking there.
 The unlocker in the eXtreme Slope comes from a new choice that is added to the Duffel Bag noncombat adventure. Same deal as the wooden nightstand -- if it's not there, stop looking.
 The unlocker in the Defiled Nook (northwest corner, the +item one) works the same way. Either you get a new choice in the NC, or you don't.
-The unlocker in the Cake Arena comes from a 1/4 or 1/5 roll on each (5*n)th win with a familiar that has NO equipment whatsoever (the wiki has a list).
 The unlocker in Menagerie 1 appears to be from an ultra-rare monster, using whatever mechanisms UR monsters use.
 The unlocker in Fern's Basement comes from the great great great ... grandfather ghost, with a very low drop rate. I have no idea whether +item helps or not.
 The unlocker in the Haunted Conservatory is a rare drop from the skeletal cat (sniff it!). No idea whether +item helps.
@@ -203,7 +203,6 @@ need 2 more Stick-Knife of Loathing
 
 [old man]
 +2 foam naval trousers (23-36)
-+1 miniature deck cannon  (23-36)
 
 my magic jick number is 4
 

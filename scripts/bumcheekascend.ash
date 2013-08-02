@@ -495,6 +495,14 @@ string bcParseOptions(string inputString, string validOptions) {
 	return outputString;
 }
 
+void eat_hot_dog(string dog,location loc)
+{
+	if(get_property("_hotdogcheck_"+loc)=="")
+	{
+		set_property("_hotdogcheck_"+loc,"true");
+		abort("maybe eat a "+dog);
+	}
+}
 
 string avatarOptions  = bcParseOptions(get_property("bcasc_borisSkills"),"0123");		
 if (avatarOptions != "") avatarOptions += "0"; // if we run out of options, default to manual stop 
@@ -3570,7 +3578,7 @@ boolean innerSetFamiliar(string famtype) {
 	}
 
 	//organ grinder
-	if(contains_text(get_property("pieStuffing"),"boss"))
+	if((contains_text(get_property("pieStuffing"),"fish") || contains_text(get_property("pieStuffing"),"boss")) && get_property("_pieDrops").to_int() < 3)
 	{
 		print("finishing off a badass pie. Pie contents="+get_property("pieStuffing"),"blue");
 		use_familiar($familiar[Knob Goblin Organ Grinder]);
@@ -5042,6 +5050,8 @@ boolean bcascAirship() {
 			cli_execute("swim sprints");
 		else 
 			cli_execute("swim laps");
+		if(combat_rate_modifier() > -25.0)
+			eat_hot_dog("Ghost dog",$location[The Penultimate Fantasy Airship]);
 	while (i_a("S.O.C.K.")<1) {
 		if(i_a("model airship")<1)
 			set_property("choiceAdventure182", "4"); //airship
@@ -5607,6 +5617,9 @@ boolean bcascCastle() {
 			
 			if(i_a("amulet of extreme plot significance") > 0 && i_a("titanium assault umbrella") > 0 && my_path() != "Avatar of Boris" && my_path() != "Way of the Surprising Fist") {
 				buMax("+equip amulet of extreme plot significance, +equip titanium assault umbrella");
+				//force muscle combat macro since using a muscle weapon
+				if(my_primestat()==$stat[moxie])
+					visit_url("account.php?actions[]=autoattack&autoattack=9982716&flag_aabosses=1&pwd&action=Update");
 				print("BCC: Opening up the Ground Floor (both special items).", "purple");
 				while(!contains_text(get_property("lastEncounter"), "The Fast and the Furry-ous") && !contains_text(get_property("lastEncounter"), "You Don't Mess Around with Gym"))
 				{
@@ -5619,6 +5632,9 @@ boolean bcascCastle() {
 				level = 1;
 			} else if (i_a("titanium assault umbrella") > 0 && my_path() != "Avatar of Boris" && my_path() != "Way of the Surprising Fist") {
 				buMax("+equip titanium assault umbrella");
+				//force muscle combat macro since using a muscle weapon
+				if(my_primestat()==$stat[moxie])
+					visit_url("account.php?actions[]=autoattack&autoattack=9982716&flag_aabosses=1&pwd&action=Update");
 				print("BCC: Opening up the Ground Floor (titanium umbrella).", "purple");
 				while(!contains_text(get_property("lastEncounter"), "The Fast and the Furry-ous") && !contains_text(get_property("lastEncounter"), "Arise!"))
 				{
@@ -5642,6 +5658,7 @@ boolean bcascCastle() {
 				}
 				level = 1;
 			}
+			set_combat_macro();
 		} else {
 			set_property("choiceAdventure669", 1);
 			set_property("choiceAdventure670", 1);
@@ -6141,12 +6158,14 @@ boolean bcascCyrpt() {
 		}
 		while (!stageDone("Alcove")) {	//Kill modern zmobies (+initiative) to decrease evil
 			setFamiliar("init");
+			eat_hot_dog("Wet dog",$location[The Defiled Alcove]);
 			bumAdv($location[The Defiled Alcove], "init", "init", "", "Un-Defiling the Alcove (2/4)", "n");
 		}
 		if(!stageDone("Cranny"))
 			cli_execute("swim laps");
 		while (!stageDone("Cranny")) {	//Kill swarms of ghuol welps (+NC, +ML) to decrease evil
 			set_property("choiceAdventure523",4);
+			eat_hot_dog("chilly dog",$location[The Defiled Cranny]);
 			bumAdv($location[The Defiled Cranny], "", "ml", "", "Un-Defiling the Cranny (3/4)", "-l");
 		}
 		while (!stageDone("Niche")) bumAdv($location[The Defiled Niche], "", "", "", "Un-Defiling the Niche (4/4)");
@@ -6429,6 +6448,8 @@ boolean bcascFriars() {
 		cli_execute("mood execute");
 		if(combat_rate_modifier() > -25.0)
 			cli_execute("swim sprints");
+		if(combat_rate_modifier() > -25.0)
+			eat_hot_dog("Ghost dog",$location[The Dark Elbow of the Woods]);
 		print("BCC: Gotta get the Friars' Items", "purple");
 		while (item_amount($item[eldritch butterknife]) == 0)
 			bumAdv($location[The Dark Elbow of the Woods], "", "", "1 eldritch butterknife", "Getting butterknife from the Elbow (1/3)", "-");
@@ -6582,6 +6603,7 @@ boolean bcascFriarsSteel() {
 	
 		//Adventure in Belilafs Comedy Club until you encounter Larry of the Field of Signs. Equip the observational glasses and Talk to Mourn. 
 		print("BCC: Getting Azazel's lollipop", "purple");
+		eat_hot_dog("Video Games Hot dog",$location[The Laugh Floor]);
 		while (i_a($item[observational glasses]) == 0) bumAdv($location[The Laugh Floor], "", "items", "1 observational glasses, 5 imp air", "Getting the Observational Glasses", "i");
 		if (my_path() != "Avatar of Boris") cli_execute("unequip weapon");
 		if (my_path() != "Way of the Surprising Fist" && my_path() != "Avatar of Boris") tryThis($item[Victor, the Insult Comic Hellhound Puppet], "insult");
@@ -7237,7 +7259,9 @@ boolean bcascLairFirstGate() {
 						if(!in_hardcore())
 							cli_execute("pull "+bangPotionWeNeed());
 						else 
-							bumAdv($location[The Dungeons of Doom], "", "", "1 "+bangPotionWeNeed(), "Farming bang potion", "+");
+						{
+							bumAdv($location[The Dungeons of Doom], "", "", "1 "+bangPotionWeNeed(), "Farming bang potion", "+i");
+						}
 					}
 				}
 				
@@ -7770,6 +7794,8 @@ boolean bcascMacguffinFinal() {
 			cli_execute("swim sprints");
 		else 
 			cli_execute("swim laps");
+		if(combat_rate_modifier() > -25.0)
+			eat_hot_dog("Ghost dog",$location[The Middle Chamber]);
 		if (!contains_text(visit_url("pyramid.php"),"pyramid3b.gif")) {
 			if (item_amount($item[tomb ratchet]) > 0 && my_path()!="Bees Hate You") {
 				use(1, $item[tomb ratchet]);
@@ -8145,7 +8171,7 @@ boolean bcascMacguffinPrelim() {
 		use(1, $item[your father's MacGuffin diary]);
 	}
 	
-	while (!contains_text(visit_url("beach.php"),"The Oasis.gif")) {
+	while (!contains_text(visit_url("beach.php"),"oasis.gif")) {
 		print("BCC: Revealing The Oasis", "purple");
 		bumAdv($location[desert (unhydrated)], "", "hipster", "1 choiceadv", "Revealing The Oasis");
 	}
@@ -8376,12 +8402,12 @@ boolean bcascManorBedroom() {
 		set_property("choiceAdventure82", "2"); //White=Muscle
 		set_property("choiceAdventure83", "1"); //Mahog=Coin Purse (We don't want to fight or get nothing from under the nightstand)
 		set_property("choiceAdventure84", "3"); //Ornate=Spectacles
-		set_property("choiceAdventure85", "5"); //Wooden=Key
+		set_property("choiceAdventure85", "5"); //Wooden=hotdog / Key
 	} else {
 		set_property("choiceAdventure82", "2"); //White=Muscle
 		set_property("choiceAdventure83", "1"); //Mahog=Coin Purse
 		set_property("choiceAdventure84", "3"); //Ornate=Spectacles
-		set_property("choiceAdventure85", "5"); //Wooden=Key
+		set_property("choiceAdventure85", "5"); //Wooden=hotdog / Key
 	}
 	if (contains_text(visit_url("manor2.php"), "?place=ballroom")) {
 		while (i_a("Spookyraven ballroom key") == 0 && my_buffedstat(my_primestat()) >= 85) {
@@ -8721,7 +8747,7 @@ boolean bcascMirror() {
 	if(my_path() != "Bees Hate You") return false;
 	if(checkStage("mirror")) return true;
 
-	set_property("choiceAdventure85", 3);
+	set_property("choiceAdventure85", 5); //hotdog / key / combat
 	while(i_a("antique hand mirror") == 0) {
 		bumAdv($location[The Haunted Bedroom], "", "itemsnc", "antique hand mirror", "Getting an anqique hand mirror to tackle the end boss.", "-i");
 	}
@@ -8978,6 +9004,7 @@ boolean bcascPirateFledges() {
 	}
 	
 	while (i_a("pirate fledges") == 0) {
+		eat_hot_dog("Junkyard dog",$location[The F'C'le]);
 		bumAdv($location[The F'c'le], "+outfit swashbuckling getup", "items", "1 pirate fledges", "Getting the Pirate Fledges, finally!", "+i");
 	}
 	checkStage("piratefledges", true);
@@ -9366,7 +9393,7 @@ boolean bcascTrapper() {
 		if(!contains_text(visit_url("place.php?whichplace=mclargehuge"),"cloudypeak2")){
 	//	if (is_not_yet(get_property("questL08Trapper"),"finished")) {
 			print("BCC: Getting snowboarding outfit.", "purple");
-			set_property("choiceAdventure575", 1);
+			set_property("choiceAdventure575", 2); //hotdog
 			while(!have_outfit("eXtreme Cold-Weather Gear"))
 			{
 				setMood("i");
@@ -9376,7 +9403,7 @@ boolean bcascTrapper() {
 			
 				bumadv($location[The eXtreme Slope], "", "items", "eXtreme scarf, snowboarder pants, eXtreme mittens", "Getting the eXtreme outfit", "i");
 			}
-			set_property("choiceAdventure575", 2);
+			set_property("choiceAdventure575", 2); //hotdog
 			
 			print("BCC: Doing snowboarding tricks.", "purple");
 			buMax("+outfit eXtreme Cold-Weather Gear");
@@ -9783,6 +9810,7 @@ void bcs12() {
 	
 							//place florist friar plants
 							choose_all_plants("l", $location[The Hole in the Sky]);
+							eat_hot_dog("chilly dog",$location[The Hole in the Sky]);
 				
 							bumMiniAdv(1,$location[The Hole in the Sky]);
 						}
@@ -9791,6 +9819,7 @@ void bcs12() {
 	
 							//place florist friar plants
 							choose_all_plants("l", $location[The Middle Chamber]);
+							eat_hot_dog("chilly dog",$location[The Middle Chamber]);
 							
 							bumMiniAdv(1,$location[the middle chamber]);
 						}
@@ -9816,6 +9845,7 @@ void bcs12() {
 					}
 					if(have_effect($effect[silent running])<1)
 						cli_execute("uneffect silent running");
+					eat_hot_dog("Junkyard dog",$location[Sonofa Beach]);
 					bumAdv($location[Sonofa Beach], "", "", "5 barrel of gunpowder", "Getting the Barrels of Gunpowder", "+");
 //					//SIMON CHANGED
 //					if(i_a("barrel of gunpowder") < 5)
@@ -10034,6 +10064,7 @@ void bcs12() {
 					while (have_effect($effect[Filthworm Guard Stench]) == 0) {
 						while (have_effect($effect[Filthworm Drone Stench]) == 0) {
 							while (have_effect($effect[Filthworm Larva Stench]) == 0) {
+								eat_hot_dog("Video Games Hot dog",$location[The Hatching Chamber]);
 								bumAdv($location[The Hatching Chamber], "", "items", "1 filthworm hatchling scent gland", "Getting the Hatchling Gland (1/3)", "iorchard");
 								if(i_a("filthworm hatchling scent gland")>0)
 									use(1, $item[filthworm hatchling scent gland]);

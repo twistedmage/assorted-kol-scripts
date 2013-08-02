@@ -1,8 +1,47 @@
 import <improve.ash>;
 import <zlib.ash>;
 import <alt_farm.ash>;
-import <sims_lib.ash>;
+//import <sims_lib.ash>;
 import <pvp.ash>;
+
+void stock_hotdog(string html, string ingredient, int req_ing, int desired_dogs)
+{
+	matcher hotdog_mtch = create_matcher("title=\\\""+ingredient+"\\\"></td><td><b>x "+req_ing+"</b></td><td class=tiny>\\((.d*) in stock\\)",html);
+	if(hotdog_mtch.find())
+	{
+		int in_stock= hotdog_mtch.group(1).to_int();
+		int more_needed=desired_dogs - in_stock;
+		if(more_needed<1)
+			return;
+		//restock
+		int needed_ingredients=more_needed*req_ing;
+		buy(needed_ingredients - item_amount(to_item(ingredient)),to_item(ingredient));
+		abort("stocking url, line 19");
+		visit_url(""+needed_ingredients+""+to_int(to_item(ingredient));
+	}
+	else
+	{
+		print("Not unlocked hotdog requiring "+ingredient,"red");
+	}
+}
+
+void stock_hotdogs()
+{
+	//title="furry fur"></td><td><b>x 10</b></td><td class=tiny>(0 in stock)
+	abort("hotdog vendor url, line 31");
+	string hotdog_str=visit_url("");
+	stock_hotdog(hotdog_str,"furry fur",10,5);
+	stock_hotdog(hotdog_str,"handul of cranberries",10,5);
+	stock_hotdog(hotdog_str,"skeleton bone",10,5);
+	stock_hotdog(hotdog_str,"hot wad",25,5);
+	stock_hotdog(hotdog_str,"cold wad",25,5);
+	stock_hotdog(hotdog_str,"spooky wad",25,5);
+	stock_hotdog(hotdog_str,"stench wad",25,5);
+	stock_hotdog(hotdog_str,"sleaze wad",25,5);
+	stock_hotdog(hotdog_str,"tattered scap of paper",25,5);
+	stock_hotdog(hotdog_str,"guaze hammock",10,5);
+	stock_hotdog(hotdog_str,"issue of GameInformPowerDailyPro magazine",3,5);
+}
 
 void buy_item(item it, int num)
 {
@@ -163,12 +202,16 @@ void main()
 	cli_execute("alice.ash");
 	
 	//do elf quest
-	if(my_inebriety()<=inebriety_limit())
+	if(my_adventures()> 40 && my_inebriety()<=inebriety_limit())
+	{
 		cli_execute("spaaace.ash");
-	print("spaaace should be done now","lime");
-	visit_url("spaaace.php?pwd&place=shop3&action=buy&whichitem=5176&quantity=2");
-	if(item_amount($item[wrecked generator])<2)
-		abort("spaaace doesn't seem to be done!");
+		print("spaaace should be done now","lime");
+		int prev_wg=item_amount($item[wrecked generator])<2;
+		visit_url("spaaace.php?pwd&place=shop3&action=buy&whichitem=5176&quantity=2");
+		int new_wg=item_amount($item[wrecked generator])<2;
+		if(new_wg - prev_wg < 2)
+			abort("spaaace doesn't seem to be done!");
+	}
 	cli_execute("guild unlock");
 	if(my_adventures()>30 && my_inebriety()<=inebriety_limit())
 	{

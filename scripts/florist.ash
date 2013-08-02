@@ -68,18 +68,10 @@ location mafia_style_zone(string loc)
 		loc="The Laugh Floor";
 	else */ if(loc=="Hidden City")
 		loc="Hidden City (Automatic)";
-	else if(loc=="Infernal Rackets Backstage")
-		loc="Infernal Rackets Backstage";
-	else if(loc=="Laugh Floor")
-		loc="The Laugh Floor";
-	else if(loc=="Arid, Extra-Dry Desert")
+	else if(loc=="The Arid, Extra-Dry Desert")
 		loc="Desert (ultrahydrated)";
-	else if(loc=="Orcish Frat House")
+	else if(loc=="The Orcish Frat House")
 		loc="wartime Frat House";
-	else if(loc=="Valley of Rof L'm Fao")
-		loc="The Valley of Rof L'm Fao";
-	else if(loc=="knob shaft")
-		loc="the knob shaft";
 	
 		
 		

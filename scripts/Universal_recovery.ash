@@ -3,7 +3,7 @@
 // http://kolmafia.us/showthread.php?t=1780
 script "Universal_recovery.ash";
 notify "Bale";
-string thisver = "3.10.11";		// This is the script's version!
+string thisver = "3.10.12";		// This is the script's version!
 
 // To use this script, put Universal_recovery in the /script directory. 
 // Then in the Graphical CLI type:
@@ -578,7 +578,7 @@ item best_mall(int amount, string type) {
 		switch(key) { 	// Need to check some special cases
 		case $item[Delicious shimmering moth]:
 		case $item[plump juicy grub]:
-			if(!beset($effect[Form of...Bird]))
+			if(!beset($effect[Form of...Bird!]))
 				continue;		// Only use moths and grubs if currently in birdform.
 			break;
 		case $item[Medicinal Herb's medicinal herbs]:
@@ -833,7 +833,7 @@ boolean visit_nuns(int target, string type) {
 boolean hot_tub() {
 	if(DontUseHotTub || (in_bad_moon() && get_property("kingLiberated") == "false") 
 	  || available_amount($item[Clan VIP Lounge key]) == 0 || to_int(get_property("_hotTubSoaks")) >4
-	   || my_location() == $location[slime tube])
+	   || my_location() == $location[The Slime Tube])
 		return false;
 	if(item_amount($item[Clan VIP Lounge key]) < 1)
 		retrieve_item(1, $item[Clan VIP Lounge key]);
@@ -884,7 +884,7 @@ item [int] choose_inventory(string type) {
 			case $item[scroll of drastic healing]:
 				break;		// Don't count full healing items. They're accounted for later.
 			case $item[plump juicy grub]: 
-				if(beset($effect[Form of...Bird]) && item_amount(key) > 0)
+				if(beset($effect[Form of...Bird!]) && item_amount(key) > 0)
 					options[count(options)] = key;
 				break;
 			case $item[tiny house]:
@@ -909,7 +909,7 @@ item [int] choose_inventory(string type) {
 			case $item[personal massager]: 	// personal massagers won't work if you aren't beaten up.
 				break;
 			case $item[Delicious shimmering moth]:
-				if(beset($effect[Form of...Bird]) && item_amount(key) > 0)
+				if(beset($effect[Form of...Bird!]) && item_amount(key) > 0)
 					options[count(options)] = key;
 				break;
 			case $item[tiny house]: 	// Save unbeaters if character lacks a tongue skill
@@ -966,7 +966,7 @@ int max_heal(item [int] options) {
 // Restore mp from items in inventory.
 boolean inv_mp_restore(int target) {
 	if(Verbosity > 1) print("Try to heal MP from inventory.", "blue");
-	if(beset($effect[Form of...Bird]) && item_amount($item[Delicious shimmering moth]) > 0 
+	if(beset($effect[Form of...Bird!]) && item_amount($item[Delicious shimmering moth]) > 0 
 	  && heal[$item[Delicious shimmering moth]].avemp* BirdThreshold + my_mp() <= my_maxmp())
   		use(inv_quant($item[Delicious shimmering moth], target- my_mp(), "MP").max(1), $item[Delicious shimmering moth]);
 	if(my_mp() >= target) return true;
@@ -1124,7 +1124,7 @@ boolean mp_heal(int target){
 	if(item_amount($item[Oscus's neverending soda])>0 && get_property("oscusSodaUsed") == "false"
 	  && (my_mp()+300 <= my_maxmp() || my_mp() < my_maxmp()/8.0) && contains_text(mpAutoRecoveryItems, "neverending soda"))
 		use(1, $item[Oscus's neverending soda]);
-	if(beset($effect[Form of...Bird]) && !mallcore && item_amount($item[Delicious shimmering moth]) > 0 
+	if(beset($effect[Form of...Bird!]) && !mallcore && item_amount($item[Delicious shimmering moth]) > 0 
 	  && heal[$item[Delicious shimmering moth]].avemp* BirdThreshold + my_mp() <= my_maxmp())
   		use(inv_quant($item[Delicious shimmering moth], target- my_mp(), "MP").max(1), $item[Delicious shimmering moth]);
 	if(contains_text(mpAutoRecoveryItems, "free disco rest") 
@@ -1169,7 +1169,7 @@ boolean fullheal() {
 	int galaktik_price = galaktik(my_maxhp() - my_hp(), false, "HP");
 	string select_method() {
 		switch {
-		case beset($effect[Form of...Bird]) && item_amount($item[plump juicy grub]) > 0 
+		case beset($effect[Form of...Bird!]) && item_amount($item[plump juicy grub]) > 0 
 		  && heal[$item[plump juicy grub]].avehp + my_hp() >= my_maxhp() && !bees:
 			return use(1, $item[plump juicy grub]);
 		case use_herb && my_spleen_use() < (spleenfam? (spleen_limit()%4): spleen_limit())
@@ -1205,7 +1205,7 @@ boolean inv_hp_restore(int target, item [int] options) {
 	if(Verbosity > 1) print("Try to heal HP from inventory.", "blue");
 	if(my_hp() < ceil(my_maxhp() / 6.0) || max_heal(options) < target - my_hp())
 		if(fullheal()) return true;
-	if(beset($effect[Form of...Bird]) && item_amount($item[plump juicy grub]) > 0  && !bees
+	if(beset($effect[Form of...Bird!]) && item_amount($item[plump juicy grub]) > 0  && !bees
 	  && heal[$item[plump juicy grub]].avehp * BirdThreshold + my_hp() <= my_maxhp())
   		use(inv_quant($item[plump juicy grub], target- my_hp(), "HP").max(1), $item[plump juicy grub]);
 	if(my_hp()>=target) return true;
@@ -1455,7 +1455,7 @@ boolean noncom() {
 	#case $location[The Gummi Mine]:
 	case $location[Itznotyerzitz Mine (in Disguise)]:
 		if(string_modifier("outfit") == "Dwarvish War Uniform") return true;
-	case $location[Knob Shaft (mining)]:
+	case $location[The Knob Shaft (Mining)]:
 		return string_modifier("outfit") == "Mining Gear";
 	case $location[Anemone Mine]:
 		return have_equipped($item[Mer-kin digpick]);
@@ -1471,7 +1471,7 @@ boolean hp_heal(int target){
 		target = my_maxhp();
 	if(Verbosity > 0) print("Restoring HP! Currently at "+ my_hp()+ " of " + my_maxhp()+ " HP, "+ my_mp()+ " of " + my_maxmp()+ " MP, current meat: "+my_meat()+" ... Target HP = "+ target+ ".", "#66CC00");
 	// First line of defense is plump juicy grubs. If ONE will do the job then do it!
-	if(!mallcore && beset($effect[Form of...Bird]) && item_amount($item[plump juicy grub]) > 0 
+	if(!mallcore && beset($effect[Form of...Bird!]) && item_amount($item[plump juicy grub]) > 0 
 	  && heal[$item[plump juicy grub]].avehp + my_hp() >= my_maxhp()  && !bees
 	  && heal[$item[plump juicy grub]].avehp * BirdThreshold + my_hp() <= my_maxhp()) {
 		use(1, $item[plump juicy grub]);
@@ -1830,14 +1830,12 @@ void manaburn_healing() {
 boolean restore(string type, int amount) {
 	daily_handling(); 	// This will do some stuff on the first run of the day
 	if(Verbosity > 2) print("Calling Universal Recovery "+thisver+" for type="+type+", amount="+amount,"red");
-	// If you are Unhydrated or mining, then only 1 HP is needed, no MP necessary and status effects are irrelevant.
+	// If you are Unhydrated or mining, then only 1 HP is needed and status effects are irrelevant.
 	// If you are Unhydrated or mining, then only 1 HP is needed, no MP necessary and status effects are irrelevant.
 	if(amount == 0 && noncom()) {
 		if(type == "MP") {
-
 			if(Verbosity > 0) print("Restoring no MP since it is irrelevant here", "#66CC00");
 			return true;
-
 		}
 		if(my_hp() < 1 && hp_trigger >= 0) {
 			if(Verbosity > 0) print("Restoring only 1 HP since more is irrelevant here", "#66CC00");
@@ -1845,8 +1843,6 @@ boolean restore(string type, int amount) {
 				hp_heal(1);
 			else
 				galaktik(1, true, "HP");
-
-
 		}
 		return my_hp() > 0;
 	}

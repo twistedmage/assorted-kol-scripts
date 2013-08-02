@@ -587,7 +587,25 @@ void advise_food()
 		cli_execute("use * Giant jar of protein powder");
 		if(available_amount($item[giant grain of protein powder])>0)
 			add_food(con_map,"- giant grains of protein powder ",2.5,0,1);
+		if(!get_property("_fancyHotDogEaten").to_boolean())
+		{
+			if(my_primestat()==$stat[muscle])
+				add_food(con_map,"- Hot Dog (Savage Macho Dog) ",7,0,2);
+			else if(my_primestat()==$stat[mysticality])
+				add_food(con_map,"- Hot Dog (One With Everything) ",7,0,2);
+			else
+				add_food(con_map,"- Hot Dog (Sly Dog) ",7,0,2);
+			add_food(con_map,"- Hot Dog (Devil Dog) ",13,0,3); //pvp
+			add_food(con_map,"- Hot Dog (Chilly Dog) ",12,0,3); //ml
+			add_food(con_map,"- Hot Dog (Ghost Dog) ",12,0,3); //-combat
+			add_food(con_map,"- Hot Dog (Junkyard Dog) ",12,0,3); //+combat
+			add_food(con_map,"- Hot Dog (Wet Dog) ",12,0,3); //init
+			add_food(con_map,"- Hot Dog (Optimal Dog) - forces semirare",4.5,0,1); //semirare
+			add_food(con_map,"- Hot Dog (Sleeping Dog) ",9.5,0,2); //free rests
+			add_food(con_map,"- Hot Dog (Video Games Hot Dog) ",13,0,3); //pixels items meat
+		}
 	}
+	
 	//sort map
 	sort con_map by -value.efficiency;
 	//display results

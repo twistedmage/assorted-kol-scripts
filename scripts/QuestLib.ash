@@ -395,7 +395,7 @@ void set_bedroom_choices()
 	// One Nightstand (Wooden): Fight the remains of a jilted mistress if we already have the ballroom key.
 	// Mafia will figure out the ballroom key adventures for us, but not the mirror.
 	if (available_amount($item[Spookyraven ballroom key]) == 1)
-		set_property("choiceAdventure85", "3");
+		set_property("choiceAdventure85", "5"); //hotdog / key / combat
 }
 
 void set_bathroom_choices()

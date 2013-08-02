@@ -2,6 +2,10 @@ import awake.ash
 
 void fill_up()
 {
+	if(!get_property("_fancyHotDogEaten").to_boolean() && fullness_limit() - my_fullness() > 1)
+	{
+		abort("Eat a devil dog");
+	}
 	while(my_inebriety() <= inebriety_limit())
 	{
 		overdrink(1,$item[beery blood]);
