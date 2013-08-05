@@ -288,11 +288,11 @@ void MonkeeQuest()
 						}
 						use (1, $item[photocopied monster]);
 					}
-					if (item_amount($item[wriggling flytrap pellet]) < 1)
-					{
-						print("You have failed to get the wriggling flytrap pellet in 15 attempts, or ran out of adventures.");
-						return;
-					}
+#					if (item_amount($item[wriggling flytrap pellet]) < 1)
+#					{
+#						print("You have failed to get the wriggling flytrap pellet in 15 attempts, or ran out of adventures.");
+#						return;
+#					}
 				}
 				if (obtain(1,"wriggling flytrap pellet",$location[An Octopus's Garden]))
 				{

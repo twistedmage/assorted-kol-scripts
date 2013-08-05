@@ -101,7 +101,7 @@ string quote() {
          bw[count(bw)] = "Dick: \"Sorry, I'm not interested in dance lessons.\"<br>Bruce: \"Wait a minute, Dick. The junior prom's coming up, isn't it?\"<br>Dick: \"Yes, but...\"<br>Bruce: \"Well, we don't want you to be a wallflower, do we? Dancing is an integral part of every young man's education.\"<br>Dick: \"Gosh Bruce, you're right.\""; break;
       case $location[the f'c'le]:
       case $location[belowdecks]:
-      case $location[poop deck]: bw[count(bw)] = "Barbara: \"I think a ship sailing is one of the most exciting things in the world. Don't you, Bruce?\"<br>Bruce: \"Glamorous, romantic, a sense of mystery and adventure. Hard to beat in this hum-drum world.\""; break;
+      case $location[the poop deck]: bw[count(bw)] = "Barbara: \"I think a ship sailing is one of the most exciting things in the world. Don't you, Bruce?\"<br>Bruce: \"Glamorous, romantic, a sense of mystery and adventure. Hard to beat in this hum-drum world.\""; break;
       case $location[cobb's knob treasury]: bw[count(bw)] = "\"We just dropped in for that Small Batcave Improvement Loan that you mentioned, but in view of the strange criminal activity that seems to be transpiring here...\"";
          bw[count(bw)] = "Dick: \"Gosh, Economics is sure a dull subject.\"<br>Bruce: \"Oh, you must be jesting, Dick. Economics dull? The glamour, the romance of commerce... Hmm. It's the very lifeblood of our country's society.\""; break;
       case $location[the hidden temple]: bw[count(bw)] = "\"It looks like we're getting closer to the heart of this criminal artichoke.\""; break;
@@ -362,6 +362,7 @@ void batman_enhance() {
       "<input name=setml type=text size=4 value='"+vars["unknown_ml"]+"'>.</form></div>");
   // Actions table
    if (!finished()) {
+      reset_queue();
       actbox.append("<table id='battable' width='100%'>\n"+
         "<thead><tr><th>Action</th><th>Damage</th>"+
         "<th><img src='images/itemimages/nicesword.gif' title='Delevel Attack' height=26 width=26 border=0></th>"+
@@ -390,7 +391,7 @@ void batman_enhance() {
          rnum(to_float(my_path() == "Way of the Surprising Fist" ? max(meat_drop(m),12) : meat_drop(m)) * (max(0,meat_drop_modifier()+100))/100.0)
          +" meat + "+rnum(stat_value(m_stats()))+" in substats + item drops'></td>"+
          "<td width=50 valign=center align=left><b><span style='font-size: 1.2em; color: green;'>"+rnum(monstervalue())+"&mu;</span></b></td></tr>");
-      actbox.append("</table></div>");
+      actbox.append("</table></div>\n");
    }
    actbox.write();
 }

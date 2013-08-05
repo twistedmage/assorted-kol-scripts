@@ -56,6 +56,20 @@ string clover_string(location wear) {
 string[string] handle_post() {
    string[string] post = form_fields();
    if (count(post) == 0) return post;
+   int wskils(item w) { switch (w) {
+      case $item[mer-kin dodgeball]: return to_int(get_property("gladiatorBallMovesKnown"));
+      case $item[mer-kin dragnet]: return to_int(get_property("gladiatorNetMovesKnown"));
+      case $item[mer-kin switchblade]: return to_int(get_property("gladiatorBladeMovesKnown"));
+   } return 0; }
+   item next_w() {   // order: balldodger (dragnet), netdragger (switchblade), bladeswitcher (dodgeball)
+      string[int] ms = split_string($location[mer-kin colosseum].combat_queue,"; ");
+      if (ms.count() < 1) return $item[mer-kin dragnet];
+	  switch (to_monster(ms[ms.count()-1])) {
+	     case $monster[mer-kin balldodger]: case $monster[Georgepaul, the Balldodger]: return $item[mer-kin switchblade];
+	     case $monster[mer-kin bladeswitcher]: case $monster[Ringogeorge, the Bladeswitcher]: return $item[mer-kin dragnet];
+	     case $monster[mer-kin netdragger]: case $monster[Johnringo, the Netdragger]: return $item[mer-kin dodgeball];
+	  } return $item[none];
+   }
    if (post contains "cli") {                              // execute CLI commands
       if (post["cli"] == "") { write("Nothing successfully accomplished!"); exit; }
       write(cli_execute(post["cli"]) ? (post["cli"] == "help" ? "A complete list of CLI commands has been printed in the CLI." :
@@ -95,7 +109,8 @@ string[string] handle_post() {
 			  "</td><td align=center>"+get_ingredients(i)[$item[star]]+"</td><td align=center>"+get_ingredients(i)[$item[line]]+"</td></tr>");
             abox.append("</table>"); break;		 
          case $location[smut orc logging camp]: int planktot; for i from 5782 to 5784 planktot += item_amount(to_item(i));
-		    abox.append("<p>You have <b>"+planktot+"</b> of <b>"+rnum(30 - to_int(get_property("chasmBridgeProgress")))+"</b> needed planks."); break;
+		    abox.append("<p>You have <b>"+planktot+"</b> of <b>"+rnum(30 - to_int(get_property("chasmBridgeProgress")))+"</b> needed planks."); 
+			if (item_amount($item[smut orc keepsake box]) > 0) abox.append("<p><a href=# class='cliimglink' title='use smut orc keepsake box'><img src='/images/itemimages/keepsakebox.gif' class=hand></a>"); break;
 		 case $location[barrrney's barrr]: int insultsknown; for n from 1 to 8 if (get_property("lastPirateInsult"+n) == "true") insultsknown += 1;
             if (insultsknown < 8) abox.append("<p>You know <b>"+insultsknown+"</b> insults."); break;
          case $location[the dungeons of doom]: abox.append("<p>"); for i from 819 to 827 abox.append(to_item(i)+(item_amount(to_item(i)) > 0 ? " ("+item_amount(to_item(i))+")" : "")+": "+
@@ -111,6 +126,20 @@ string[string] handle_post() {
                if (have_outfit("War Hippy")) abox.append("<p><a href=# class='clilink' title='checkpoint; outfit war hippy; bigisland.php?action=junkman&pwd=; outfit checkpoint'>visit Yossarian as hippy</a>");
             } break;
          case $location[The Coral Corral]: if (get_property("lassoTraining") != "expertly") abox.append("<p><img src='/images/itemimages/lasso.gif' height=20 width=20 border=0> "+get_property("lassoTraining")); break;
+         case $location[mer-kin colosseum]: if (have_item(next_w()) > 0 && !have_equipped(next_w()))
+            abox.append("<p><b>Prepare</b> for next monster: <a href=# class='clilink'>equip "+next_w()+"</a>"); break;
+      }
+      if (my_location().zone == "The Sea") {
+	     if (get_property("dolphinItem") != "") abox.append("<p><img src='/images/itemimages/"+to_item(get_property("dolphinItem")).image+"' title='"+
+            to_item(get_property("dolphinItem"))+" ("+rnum(sell_val(to_item(get_property("dolphinItem"))))+"&mu;)' height=23 width=23 border=0> <a href=# class='clilink'>use dolphin whistle</a>");
+         boolean popped;
+		 foreach w in $items[mer-kin dodgeball, mer-kin dragnet, mer-kin switchblade] if (have_equipped(w) && wskils(w) < 3) {
+		    popped = true; abox.append("<p>You have learned <b>"+wskils(w)+"</b> of <b>3</b> "+w+" skills."); break;
+		 }
+         if (!popped) foreach w in $items[mer-kin dodgeball, mer-kin dragnet, mer-kin switchblade] if (!have_equipped(w) && wskils(w) < 3) {
+            if (!popped) { abox.append("<p>"); popped = true; }
+            abox.append(" <a href=# class='clilink'>equip "+w+"</a>");
+         }
       }
 	  float[monster] arq = appearance_rates(my_location(),true);
       if (count(arq) > 0) {
@@ -146,13 +175,19 @@ string[string] handle_post() {
           float gturns = turns_till_goals(false);
           abox.append("<p><b>Goals remaining"+(gturns < 9999 ? " (satisfied in <b>~"+rnum(max(1.0,gturns))+"</b> turns)" : "")+":</b>"+
              " <a href=# class='clilink' title='conditions clear'>clear</a>\n<ul>");
-          foreach i,g in get_goals() abox.append("<li>"+g+" <a href=# class='clilink' title=\"conditions remove "+g+"\">remove</a></li>");
+          foreach i,g in get_goals() abox.append("<li>"+g+" <a href=# class='clilink' title=\"conditions remove "+g+"\">remove</a> "+
+		     (is_goal(to_item(excise(g," ",""))) && creatable_amount(to_item(excise(g," ",""))) > 0 ? "<a href=# class='clilink' title=\"create 1 "+to_item(excise(g," ",""))+"\">create</a>" : "")+"</li>");
           abox.append("</ul>");
-          if (goal_exists("item")) foreach i in get_inventory() if (can_equip(i) && numeric_modifier(i,"Item Drop") > 0) {
-             if (numeric_modifier(i,"Item Drop") <= numeric_modifier(equipped_item(to_slot(i)),"Item Drop")) continue;
-             cli_execute("whatif equip "+i+"; quiet");
-             float newturns = turns_till_goals(true);
-             if (newturns < gturns) {
+          if (goal_exists("item")) {
+             item[slot] itgarb;
+			 foreach s in $slots[] itgarb[s] = equipped_item(s);
+             foreach i in get_inventory() if (can_equip(i) && numeric_modifier(i,"Item Drop") > numeric_modifier(itgarb[to_slot(i)],"Item Drop")) 
+			    itgarb[to_slot(i)] = i;
+             foreach s,i in itgarb {
+                if (equipped_item(s) == i || (i.to_int() > 3508 && i.to_int() < 3515)) continue;
+                cli_execute("whatif equip "+i+"; quiet");
+                float newturns = turns_till_goals(true);
+                if (newturns >= gturns) continue;
                 abox.append("<br><a href=# class='clilink' title=\"equip "+i+"\">Save "+rnum(gturns-newturns)+" turns by equipping "+i+".</a>");
                 if (i.to_slot() == $slot[acc1]) for j from 1 to 3 abox.append(" <a href=# class='clilink' title=\"equip acc"+j+" "+i+"\">"+j+"</a>");
              }
@@ -229,7 +264,7 @@ buffer add_features(buffer results) {
    // change runaway to repeat
    results.replace_string("<form name=runaway action=fight.php method=post><input type=hidden name=action value=\"runaway\">",
       "<form name=runaway action=fight.php method=post><input type=hidden name=action value='macro'><input type=hidden name=macrotext value=\"runaway; repeat\">");
-	return results;  
+	return results;
 }
 void fight_relay() {
 	buffer results;
