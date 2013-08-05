@@ -1,4 +1,3 @@
-//simon unmodified
 script "missingManuel.ash";
 notify turing;
 
@@ -31,6 +30,8 @@ notify turing;
 #ver 1.11: Hide Ultra-Rare Pooltergeist.
 #ver 1.12: Remove a couple of monsters no longer in mafia.
 #ver 1.13: Undo previous change.  Whee!
+#ver 1.14: Remove QB Elemental
+#          Remove warnings.
 
 int[monster] factoids;
 boolean[location] blockedAreas;
@@ -42,7 +43,7 @@ string[string] postAreas;
 boolean[string][monster] extraAreas;
 boolean[string] processedExtraAreas;
 
-string thisver = "1.13";
+string thisver = "1.14";
 
 //CheckVersion by Bale.
 string CheckVersion() {
@@ -98,7 +99,7 @@ void loadData()
 {
 	blockedAreas = $locations[Grim Grimacite Site, The Cannon Museum, CRIMBCO cubicles, Atomic Crimbo Toy Factory, Old Crimbo Town Toy Factory, Simple Tool-Making Cave, Spooky Fright Factory, Crimborg Collective Factory];
 	blockedMonsters = $monsters[
-		Hockey Elemental, Count Bakula, Infinite Meat Bug, The Master of Thieves, Crazy Bastard, Baiowulf, Hypnotist of Hey Deze, The Temporal Bandit, Knott Slanding, Pooltergeist (Ultra-Rare),
+		Hockey Elemental, Count Bakula, Infinite Meat Bug, The Master of Thieves, Crazy Bastard, Baiowulf, Hypnotist of Hey Deze, The Temporal Bandit, Knott Slanding, Pooltergeist (Ultra-Rare), QuickBASIC Elemental,
 		Cyrus the Virus, The Whole Kingdom,
 		Don Crimbo, Edwing Abbidriel, Crys-Rock, Trollipop, The Colollilossus, The Fudge Wizard, The Abominable Fudgeman, Uncle Hobo, Underworld Tree,
 		Arc-welding Elfborg, Ribbon-cutting Elfborg, Decal-applying Elfborg, Weapons-assembly Elfborg,
@@ -156,15 +157,15 @@ void loadData()
 	extraAreas["Surprising Fist"] = $monsters[Wu Tang the Betrayer];
 	extraAreas["Avatar of Boris"] = $monsters[The Avatar of Sneaky Pete, The Luter];
 	extraAreas["Bugbear Invasion"] = $monsters[Ancient Unspeakable Bugbear, Anesthesiologist Bugbear, Angry Cavebugbear, Batbugbear, Battlesuit Bugbear Type, Black Ops Bugbear, Bugaboo, Bugbear Captain, Bugbear Drone, Bugbear Mortician, Bugbear Robo-Surgeon, Bugbear Scientist, Creepy Eye-Stalk Tentacle Monster, Grouchy Furry Monster, Hypodermic Bugbear, Liquid Metal Bugbear, N-space Virtual Assistant, Scavenger Bugbear, Spiderbugbear, Trendy Bugbear Chef];
-	extraAreas["Zombie Slayer"] = $monsters[Angry Space Marine, Charity the Zombie Hunter, Deputy Nick Soames & Earl, Father McGruber, Father Nikolai Ravonovich, Hank North Photojournalist, Herman East Relivinator, Norville Rogers, Peacannon, Rag-tag band of survivors, Scott the Miner, Special Agent Wallace Burke Corrigan, The Free Man, Wesley J. "Wes" Campbell, Zombie-huntin' feller, Rene C. Corman];
+	extraAreas["Zombie Slayer"] = $monsters[Angry Space Marine, Charity the Zombie Hunter, Deputy Nick Soames & Earl, Father McGruber, Father Nikolai Ravonovich, Hank North\, Photojournalist, Herman East\, Relivinator, Norville Rogers, Peacannon, Rag-tag band of survivors, Scott the Miner, Special Agent Wallace Burke Corrigan, The Free Man, Wesley J. "Wes" Campbell, Zombie-huntin' feller, Rene C. Corman];
 	extraAreas["Avatar of Jarlsberg"] = $monsters[Clancy, The Avatar of Boris];
 	extraAreas["Naughty Sorceress' Tower"] = $monsters[Beer Batter, Best-Selling Novelist, Big Meat Golem, Bowling Cricket, Bronze Chef, Collapsed Mineshaft Golem, Concert Pianist, El Diablo, Electron Submarine, Endangered Inflatable White Tiger, Enraged Cow, Fancy Bath Slug, Flaming Samurai, Giant Bee, Giant Desktop Globe, Giant Fried Egg, Ice Cube, Malevolent Crop Circle, Possessed Pipe-Organ, Pretty Fly, Darkness, Fickle Finger of F8, Naughty Sorceress, Naughty Sorceress (2), Naughty Sorceress (3), Tyrannosaurus Tex, Vicious Easel, Your Shadow];
 	extraAreas["Mini-Hipster"] = $monsters[angry bassist, blue-haired girl, evil ex-girlfriend, peeved roommate, random scenester];
 	extraAreas["Black Crayon"] = $monsters[Black Crayon Beast, Black Crayon Beetle, Black Crayon Constellation, Black Crayon Crimbo Elf, Black Crayon Demon, Black Crayon Elemental, Black Crayon Fish, Black Crayon Flower, Black Crayon Frat Orc, Black Crayon Goblin, Black Crayon Golem, Black Crayon Hippy, Black Crayon Hobo, Black Crayon Man, Black Crayon Manloid, Black Crayon Mer-kin, Black Crayon Penguin, Black Crayon Pirate, Black Crayon Shambling Monstrosity, Black Crayon Slime, Black Crayon Spiraling Shape, Black Crayon Undead Thing];
 	extraAreas["BRICKO"] = $monsters[BRICKO Airship, BRICKO Bat, BRICKO Cathedral, BRICKO Elephant, BRICKO Gargantuchicken, BRICKO Octopus, BRICKO Ooze, BRICKO Oyster, BRICKO Python, BRICKO Turtle, BRICKO Vacuum Cleaner];
 	extraAreas["Infernal Seals"] = $monsters[broodling seal, Centurion of Sparky, heat seal, hermetic seal, navy seal, Servant of Grodstank, shadow of Black Bubbles, Spawn of Wally, watertight seal, wet seal];
-	extraAreas["Nemesis Assassins"] = $monsters[Argarggagarg the Dire Hellseal, B&eacute;arnaise zombie, Evil Spaghetti Cult Assassin, Flock of seagulls, Heimandatz Nacho Golem, Hunting Seal, Jocko Homo, Mariachi Bandolero, Menacing Thug, Mob Penguin hitman, Safari Jack Small-Game Hunter, The Mariachi With No Name, Turtle trapper, Yakisoba the Executioner];
-	extraAreas["Nemeses"] = $monsters[Gorgolok the Demonic Hellseal, Gorgolok the Infernal Seal (The Nemesis' Lair), Gorgolok the Infernal Seal (Volcanic Cave), Lumpy the Demonic Sauceblob, Lumpy the Sinister Sauceblob (The Nemesis' Lair), Lumpy the Sinister Sauceblob (Volcanic Cave), Somerset Lopez Demon Mariachi, Somerset Lopez Dread Mariachi (The Nemesis' Lair), Somerset Lopez Dread Mariachi (Volcanic Cave), Stella the Demonic Turtle Poacher, Stella the Turtle Poacher (The Nemesis' Lair), Stella the Turtle Poacher (Volcanic Cave), Demon of New Wave, Spaghetti Demon, Spaghetti Elemental (Inner Sanctum), Spaghetti Elemental (The Nemesis' Lair), Spaghetti Elemental (Volcanic Cave), Spirit of New Wave (The Nemesis' Lair), Spirit of New Wave (Volcanic Cave)];
+	extraAreas["Nemesis Assassins"] = $monsters[Argarggagarg the Dire Hellseal, B&eacute;arnaise zombie, Evil Spaghetti Cult Assassin, Flock of seagulls, Heimandatz\, Nacho Golem, Hunting Seal, Jocko Homo, Mariachi Bandolero, Menacing Thug, Mob Penguin hitman, Safari Jack\, Small-Game Hunter, The Mariachi With No Name, Turtle trapper, Yakisoba the Executioner];
+	extraAreas["Nemeses"] = $monsters[Gorgolok\, the Demonic Hellseal, Gorgolok\, the Infernal Seal (The Nemesis' Lair), Gorgolok\, the Infernal Seal (Volcanic Cave), Lumpy\, the Demonic Sauceblob, Lumpy\, the Sinister Sauceblob (The Nemesis' Lair), Lumpy\, the Sinister Sauceblob (Volcanic Cave), Somerset Lopez\, Demon Mariachi, Somerset Lopez\, Dread Mariachi (The Nemesis' Lair), Somerset Lopez\, Dread Mariachi (Volcanic Cave), Stella\, the Demonic Turtle Poacher, Stella\, the Turtle Poacher (The Nemesis' Lair), Stella\, the Turtle Poacher (Volcanic Cave), Demon of New Wave, Spaghetti Demon, Spaghetti Elemental (Inner Sanctum), Spaghetti Elemental (The Nemesis' Lair), Spaghetti Elemental (Volcanic Cave), Spirit of New Wave (The Nemesis' Lair), Spirit of New Wave (Volcanic Cave)];
 	extraAreas["Feast of Boris"] = $monsters[Candied Yam Golem, Malevolent Tofurkey, Possessed Can of Cranberry Sauce, Stuffing Golem];
 	extraAreas["Día de los Muertos Borrachos"] = $monsters[Novio Cad&aacute;ver, Padre Cad&aacute;ver, Novia Cad&aacute;ver, Persona Inocente Cad&aacute;ver];
 	extraAreas["TLAPD"] = $monsters[Ambulatory Pirate, Migratory Pirate, Peripatetic Pirate];
@@ -176,7 +177,7 @@ void loadData()
 	extraAreas["CLEESH"] = $monsters[Frog, Newt, Salamander];
 	extraAreas["Summoning Chamber"] = $monsters[Lord Spookyraven];
 	extraAreas["Grey Goo"] = $monsters[enormous blob of gray goo, largish blob of gray goo, little blob of gray goo];
-	extraAreas["Taco Elves"] = $monsters[sign-twirling Crimbo elf, taco-clad Crimbo elf, tacobuilding elf];
+	extraAreas["Taco Elves"] = $monsters[sign-twirling Crimbo elf, taco-clad Crimbo elf, Tacobuilding Crimbo Elf];
 	extraAreas["Crimbokutown Toy Factory"] = $monsters[Circuit-Soldering Animelf, Plastic-Extruding Animelf, Quality Control Animelf, Tiny-Screwing Animelf, Toy Assembling Animelf];
 	extraAreas["The Gourd"] = $monsters[canned goblin conspirator, Fnord the Unspeakable, goblin conspirator, spider conspirator, spider-goblin conspirator, tin can conspirator, tin spider conspirator];
 	//extraAreas[""] = $monsters[];

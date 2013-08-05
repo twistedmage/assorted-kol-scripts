@@ -17,7 +17,7 @@ void stock_hotdog(string html, string ingredient, int req_ing, int desired_dogs)
 		int needed_ingredients=more_needed*req_ing;
 		buy(needed_ingredients - item_amount(to_item(ingredient)),to_item(ingredient));
 		abort("stocking url, line 19");
-		visit_url(""+needed_ingredients+""+to_int(to_item(ingredient));
+		visit_url(""+needed_ingredients+""+to_int(to_item(ingredient)));
 	}
 	else
 	{
@@ -206,9 +206,9 @@ void main()
 	{
 		cli_execute("spaaace.ash");
 		print("spaaace should be done now","lime");
-		int prev_wg=item_amount($item[wrecked generator])<2;
+		int prev_wg=item_amount($item[wrecked generator]);
 		visit_url("spaaace.php?pwd&place=shop3&action=buy&whichitem=5176&quantity=2");
-		int new_wg=item_amount($item[wrecked generator])<2;
+		int new_wg=item_amount($item[wrecked generator]);
 		if(new_wg - prev_wg < 2)
 			abort("spaaace doesn't seem to be done!");
 	}
