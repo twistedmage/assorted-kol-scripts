@@ -172,7 +172,7 @@ void main(string sheets)
 			{
 				x_boozers = ceil((desired_sheets - current_sheets).to_float() / boozers[best_boozer].to_float());
 				print("Feeding "+x_boozers+" "+to_string(best_boozer)+" ("+(best_price*x_boozers)+" meat, "+(boozers[best_boozer]*x_boozers)+" sheets, ~"+(best_price/boozers[best_boozer])+" meat per sheet).","blue");
-				wait(5);
+				//wait(5);
 				if (my_meat() < x_boozers * best_price)
 					abort("Not enough meat! This dose of booze costs "+(x_boozers*best_price)+" meat.");
 				haz_boozers = item_amount(best_boozer);

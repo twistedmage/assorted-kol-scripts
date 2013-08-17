@@ -338,7 +338,16 @@ boolean[item] tower_items(boolean combatsafe) {
    if (get_property("lastTelescopeReset").to_int() < my_ascensions() && !combatsafe)         // tower_items() contains X : >0% chance
       visit_url("campground.php?action=telescopelow");                                       // tower_items(X) == true : 100% chance
    item[string] t;
-   t["catch a glimpse of a flaming katana"] = $item[frigid ninja stars];
+   t["an armchair"] = $item[pygmy pygment];                                 // door
+   t["a cowardly-looking man"] = $item[wussiness potion];
+   t["a banana peel"] = $item[gremlin juice];
+   t["a coiled viper"] = $item[adder bladder];
+   t["a rose"] = $item[angry farmer candy];
+   t["a glum teenager"] = $item[thin black candle];
+   t["a hedgehog"] = $item[super-spiky hair gel];
+   t["a raven"] = $item[Black No. 2];
+   t["a smiling man smoking a pipe"] = $item[Mick's IcyVapoHotness Rub];
+   t["catch a glimpse of a flaming katana"] = $item[frigid ninja stars];    // tower proper
    t["catch a glimpse of a translucent wing"] = $item[spider web];
    t["see a fancy-looking tophat"] = $item[sonar-in-a-biscuit];
    t["see a flash of albumen"] = $item[black pepper];
@@ -362,10 +371,10 @@ boolean[item] tower_items(boolean combatsafe) {
    t["see a pair of horns"] = $item[barbed-wire fence];
    t["see a formidable stinger"] = $item[tropical orchid];
    t["see a wooden beam"] = $item[stick of dynamite];
-   for i from 1 upto get_property("telescopeUpgrades").to_int()
+   for i from 0 upto get_property("telescopeUpgrades").to_int()
       if (t contains get_property("telescope"+i)) res[t[get_property("telescope"+i)]] = true;
-   if (count(res) < 6) foreach s,it in t if (!res[it]) res[it] = false;
-     else if (count(res) < 7) foreach i in $items[barbed-wire fence, stick of dynamite, tropical orchid] if (!res[i]) res[i] = false;
+   if (count(res) < 5) foreach s,it in t { if (!res[it]) res[it] = false; }
+     else if (count(res) < 6) foreach i in $items[barbed-wire fence, stick of dynamite, tropical orchid] res[i] = false;
    return res;
 }
 boolean[item] tower_items() { return tower_items(false); }
@@ -373,6 +382,12 @@ boolean[item] tower_items() { return tower_items(false); }
 // returns how many of an item you have ONLY in inventory and equipped
 int have_item(string tolookup) {
    return item_amount(to_item(tolookup)) + equipped_amount(to_item(tolookup));
+}
+
+// returns true if a given stat is a goal (from setting "level X" or "<stat> X" as a condition)
+boolean is_goal(stat gstat) {
+   foreach i,g in get_goals() if (create_matcher("\\d+ "+to_lower_case(gstat),g).find()) return true;
+   return false;
 }
 
 float[item,item] pieces;
@@ -408,11 +423,9 @@ float isxpartof(item child, item ancestor) {
 
 float [item,item] useforitems;
 float has_goal(item whatsit) {                   // chance of getting a goal from an item
-//   if (whatsit == to_item(to_int(get_property("currentBountyItem")))) return 1.0;
    if (!goal_exists("item")) return 0;
    float has_goal(item whatsit,int level) {
      if (whatsit == $item[none]) return 0;
-//     if (is_goal(whatsit) || whatsit == to_item(to_int(get_property("currentBountyItem")))) return 1.0;
      if (is_goal(whatsit)) return 1.0;
      if (count(useforitems) == 0 && !load_current_map("use_for_items", useforitems)) {
         vprint("Unable to load file \"use_for_items.txt\".",-3); return 0;
@@ -600,7 +613,7 @@ boolean auto_mcd(monster mob) {                               // automcd for a s
    return auto_mcd(monster_attack(mob) + 7 - current_mcd());
 }
 boolean auto_mcd(location place) {                            // automcd for locations
-   if ($locations[tavern cellar, the boss bat's lair, throne room, haert of the cyrpt, the slime tube] contains my_location())
+   if ($locations[tavern cellar, oil peak, the boss bat's lair, throne room, haert of the cyrpt, the slime tube] contains my_location())
       return vprint("MCD: Sensitive location, not adjusting.","olive",4);
    if (count(get_monsters(place)) == 0) return vprint("MCD: "+place+" has no known combats.","olive",4);
    return auto_mcd(get_safemox(place));

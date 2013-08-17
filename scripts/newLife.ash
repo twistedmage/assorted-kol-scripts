@@ -4,7 +4,12 @@
 script "newLife.ash"
 notify "Bale";
 import "zlib.ash";
-check_version("newLife", "Bale_newLife", "1.14.3", 2769);
+
+if(check_version("newLife", "bale-new-life", "1.14.4", 2769) != "" 
+  && user_confirm("The script has just been updated!\nWould you like to quit now and manually resume execution so that you can use the current version?")) {
+	print("New Life aborted to complete update. Please run newLife.ash to finish setting up your current ascension.", "red");
+	exit;
+}
 
 void knife_untinker(item it)
 {
@@ -370,10 +375,12 @@ void visit_toot() {
 	visit_url("tutorial.php?action=toot&pwd");
 	if(item_amount($item[letter from King Ralph XI]) > 0 && good($item[letter from King Ralph XI]))
 		use(1, $item[letter from King Ralph XI]);
-	if(item_amount($item[pork elf goodies sack]) > 0 && good($item[pork elf goodies sack]))
-		use(1, $item[pork elf goodies sack]);
-	if(item_amount($item[baconstone]) + item_amount($item[hamethyst]) + item_amount($item[porquoise]) > 0 && vars["newLife_SellPorkForStuff"].to_boolean())
-		buy_stuff();
+	if(vars["newLife_SellPorkForStuff"].to_boolean()) {
+		if(item_amount($item[pork elf goodies sack]) > 0 && good($item[pork elf goodies sack]))
+			use(1, $item[pork elf goodies sack]);
+		if(item_amount($item[baconstone]) + item_amount($item[hamethyst]) + item_amount($item[porquoise]) > 0)
+			buy_stuff();
+	}
 }
 
 boolean use_shield() {
@@ -385,13 +392,30 @@ boolean use_shield() {
 }
 
 familiar start_familiar() {
+	void set_bcca(string f) {
+		if(get_property("bcasc_lastCouncilVisit") == "") return;
+		// Only set this if BCCAscend has actually been run by this player
+		set_property("bcasc_100familiar", f); 
+		set_property("bcasc_defaultFamiliar", f); 
+	}
+	// Check for the zlib variable "is_100_run"
+	familiar f100 = vars["is_100_run"].to_familiar();
+	if(f100 == $familiar[none]) {
+		set_bcca("");
+	} else {
+		set_bcca(vars["is_100_run"]);
+		return f100;
+	}
+	
 	if(my_path() == "Zombie Slayer" && have_familiar($familiar[Hovering Skull]))
 		return $familiar[Hovering Skull];
+	
 	foreach f in $familiars[He-Boulder, Frumious Bandersnatch, Baby Bugged Bugbear, Bloovian Groose, Gluttonous Green Ghost, 
 	  Spirit Hobo, Fancypants Scarecrow, Ancient Yuletide Troll, Cheshire Bat, Cymbal-Playing Monkey, Nervous Tick, 
 	  Hunchbacked Minion, Uniclops, Chauvinist Pig, Dramatic Hedgehog, Blood-Faced Volleyball, Reagnimated Gnome, 
 	  Jill-O-Lantern, Hovering Sombrero]
 		if(have_familiar(f) && good(f)) return f;
+	
 	return $familiar[none];
 }
 
@@ -496,8 +520,6 @@ void path_skills(boolean always_learn) {
 		break;
 	case "Avatar of Jarlsberg":
 		string jarl = visit_url("da.php?place=gate2");
-		// Count assigned skills & unassigned skills, in case the script gets aborted midway
-		#int assigned = count(split_string(jarl, "border140")) - 1;
 		matcher unassigned = create_matcher("have (\\d+) skill points", jarl);
 		if(unassigned.find() && unassigned.group(1).to_int() > 31) {
 			foreach sk in $skills[Boil, Conjure Eggs, Conjure Dough, Fry, Coffeesphere, Egg Man, Early Riser, The Most Important Meal,

@@ -167,6 +167,8 @@ tr.even { background-color: white; }
    margin-right: 0;
    padding-right: 0;
 }
+.clilink { font-size: 0.7em; }
+
 .versioninfo {
    background-color: #ddd;
    border: 1px solid #bbb;
@@ -180,47 +182,6 @@ tr.even { background-color: white; }
    padding: 12px;
 }
 
-/* CLI box! */
-#mask {
-  position:fixed; left:0; top:0; width: 100%; height: 100%;
-  display:none;
-  z-index: 999;
-  background-color:#222;
-}
-#clibox, #clifeedback {
-   position: fixed;
-   display: none;
-   border-width: 2px;
-   border-style: solid;
-   background-color: white;
-   font-size: 0.9em;
-   padding: 10px;
-   z-index: 1000;
-}
-#clifeedback {
-   top: 40px;
-   right: 10px;
-}
-.clisuccess {
-   border-color: #080;
-   color: #080;
-}
-.clierror {
-   border-color: #800;
-   color: #800;
-}
-.clilink {
-   font-size: 0.7em;
-}
-.clilink:before {
-   content: "[";
-}
-.clilink:after {
-   content: "]";
-}
-.cliimglink {
-   border: 0;
-}
 #undermon {
    font-size: 0.7em;
    color: #888;

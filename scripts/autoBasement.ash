@@ -48,6 +48,7 @@ Version History:
 2013-06-20: Don't use goofballs unless autoBasement_hop_on_up is true
 2013-06-25: Actually initiate the goofball setting as well
 2013-06-28: Fix order of operations error for the drinking check
+2013-08-09: Don't ignore the value of items in inventory
 */
 
 import <zlib.ash>;
@@ -272,6 +273,8 @@ boolean ok(item it, string command, effect ef) {
 	if(!use_percentage_potions && (numeric_modifier(ef, "Maximum HP Percent") > 0 || numeric_modifier(ef, "Maximum MP Percent") > 0 || numeric_modifier(ef, "Moxie Percent") > 0 || numeric_modifier(ef, "Muscle Percent") > 0 || numeric_modifier(ef, "Mysticality Percent") > 0))
 		return false;
 	if(!use_absolute_potions && (numeric_modifier(ef, "Maximum HP") > 0 || numeric_modifier(ef, "Maximum MP") > 0 || numeric_modifier(ef, "Moxie") > 0 || numeric_modifier(ef, "Muscle") > 0 || numeric_modifier(ef, "Mysticality") > 0))
+		return false;
+	if(historical_price(it) > max_potion_price)	//Even if we have the item, it has a worth and we shoudl respect that
 		return false;
 	return true;
 }

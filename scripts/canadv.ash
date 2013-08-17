@@ -278,7 +278,7 @@ boolean can_adv(location where, boolean prep) {
    case $location[Barrel full of Barrels]: return checkguild();
    case $location[The Hidden Temple]: return (levelcheck(2) && primecheck(5) && perm_urlcheck("woods.php","temple.gif"));
    case $location[Degrassi Knoll]: return (!knoll_available() && primecheck(10) && (checkguild() || get_property("questM01Untinker") != "unstarted") && perm_urlcheck("plains.php","knoll1.gif"));
-   case $location[Fun House]: return (checkguild() && primecheck(15) && perm_urlcheck("plains.php","funhouse.gif"));
+   case $location[The Fun House]: return (checkguild() && primecheck(15) && perm_urlcheck("plains.php","funhouse.gif"));
    case $location[Throne Room]: return (levelcheck(5) && !contains_text(visit_url("questlog.php?which=2"),"slain the Goblin King") && outfitcheck("harem girl disguise") &&
                                   (effectcheck($effect[knob goblin perfume]) || (!prep && itemcheck($item[knob goblin perfume])) || (prep && use(1,$item[knob goblin perfume]))));
    case $location[Muscle Vacation]:
@@ -337,9 +337,9 @@ boolean can_adv(location where, boolean prep) {
   // extraordinary zones
    case $location[El Vibrato Island]: return (itemcheck($item[el vibrato trapezoid]) || contains_text(visit_url("campground.php"),"Portal1.gif"));
    case $location[Dwarven Factory Warehouse]:
-   case $location[Mine Foremens' Office]: return (primecheck(100) && outfitcheck("mining gear") && white_citadel_available() && checkguild());
+   case $location[The Mine Foremens' Office]: return (primecheck(100) && outfitcheck("mining gear") && white_citadel_available() && checkguild());
    case $location[The Red Queen's Garden]: return (effectcheck($effect[down the rabbit hole]) || (!prep && itemcheck($item[&quot;DRINK ME&quot; potion])) || (prep && use(1,$item[&quot;DRINK ME&quot; potion])));
-   case $location[A Well-Groomed Lawn]: return (itemcheck($item[antique painting of a landscape]));
+   case $location[The Landscaper's Lair]: return (itemcheck($item[antique painting of a landscape]));
    case $location[Professor Jacking's Small-O-Fier]:
    case $location[Professor Jacking's Huge-A-Ma-tron]: return (itemcheck($item[map to Professor Jacking's laboratory]));
    case $location[Foyer]:
@@ -413,7 +413,7 @@ boolean can_adv(location where, boolean prep) {
    case $location[Arrrboretum]: return gameday_to_string() == "Petember 4";
    case $location[Generic Summer Holiday Swimming!]: return gameday_to_string() == "Bill 3";
    case $location[Trick-or-Treating]: return (gameday_to_string() == "Porktember 8" || today_to_string().substring(4, 8) == "1031");
-   case $location[Yuletide Bonfire]: return gameday_to_string() == "Dougtember 4";
+   case $location[The Yuletide Bonfire]: return gameday_to_string() == "Dougtember 4";
   // clan basement
    case $location[Richard's Hobo Mysticality]:
    case $location[Richard's Hobo Moxie]:

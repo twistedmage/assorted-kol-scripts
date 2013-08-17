@@ -1,9 +1,8 @@
-//SIMON : my version is modified!!!!
 // Bale's all purpose Universal recovery script
 // http://kolmafia.us/showthread.php?t=1780
 script "Universal_recovery.ash";
 notify "Bale";
-string thisver = "3.10.12";		// This is the script's version!
+string thisver = "3.10.16";		// This is the script's version!
 
 // To use this script, put Universal_recovery in the /script directory. 
 // Then in the Graphical CLI type:
@@ -405,7 +404,14 @@ boolean purchase(int q, item it) {
 	default:
 		price = historical_price(it);
 	}
-	if(buy(q- for_use(it), it, min(ceil(price*1.25),get_property("autoBuyPriceLimit").to_int())) > 0 || for_use(it) > 0)
+	// Stores with limits are a bitch
+	int buyit(int x, item doodad, int limit) {
+		int bought = buy(x, it, limit);
+		if(bought > 0 || x == 1)
+			return bought;
+		return buy(1, it, limit);
+	}
+	if(buyit(q- for_use(it), it, min(ceil(price*1.25),get_property("autoBuyPriceLimit").to_int())) > 0 || for_use(it) > 0)
 		return true; 	// for_use() needs to be checked both before and after that purchase ;)
 	return false;
 }
@@ -1619,7 +1625,7 @@ void cure_status() {
 	  Turned Into a Skeleton, Sleepy, Apathy, All Covered In Whatsit, Flared Nostrils, Socialismydia]))
 		skill_cure($skill[Bite Minion]);
 	
-	if(beset($effects[Apathy, Easily Embarrassed, Flared Nostrils, Prestidigysfunction, Tenuous Grip on Reality, 
+	if(beset($effects[Apathy, Easily Embarrassed, Prestidigysfunction, Tenuous Grip on Reality, 
 	  The Colors...])
 	  && !use_hot_tub() && have_skill($skill[Disco Power Nap]))
 		skill_cure($skill[Disco Power Nap]);

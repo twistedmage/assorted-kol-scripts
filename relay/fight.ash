@@ -23,6 +23,7 @@ float turns_till_goals(boolean usespec) {
    }
    return totalgoalitems / max(has_goal(my_location(),usespec),0.0001);
 }
+buffer results;
 
 record einclove {
    int[item] yield;   // all items yielded, and their average amounts
@@ -53,9 +54,10 @@ string clover_string(location wear) {
    return res.to_string();
 }
 
-string[string] handle_post() {
-   string[string] post = form_fields();
-   if (count(post) == 0) return post;
+string[string] post;
+void handle_post() {
+   post = form_fields();
+   if (count(post) == 0) return;
    int wskils(item w) { switch (w) {
       case $item[mer-kin dodgeball]: return to_int(get_property("gladiatorBallMovesKnown"));
       case $item[mer-kin dragnet]: return to_int(get_property("gladiatorNetMovesKnown"));
@@ -69,12 +71,6 @@ string[string] handle_post() {
 	     case $monster[mer-kin bladeswitcher]: case $monster[Ringogeorge, the Bladeswitcher]: return $item[mer-kin dragnet];
 	     case $monster[mer-kin netdragger]: case $monster[Johnringo, the Netdragger]: return $item[mer-kin dodgeball];
 	  } return $item[none];
-   }
-   if (post contains "cli") {                              // execute CLI commands
-      if (post["cli"] == "") { write("Nothing successfully accomplished!"); exit; }
-      write(cli_execute(post["cli"]) ? (post["cli"] == "help" ? "A complete list of CLI commands has been printed in the CLI." :
-         "Command '"+post["cli"]+"' executed.") : "Error executing '"+post["cli"]+"'.");
-      exit;
    }
    if (post contains "dashi") switch (post["dashi"]) {     // build Adventure Again info box
      case "annae":
@@ -97,7 +93,11 @@ string[string] handle_post() {
          case $location[The Battlefield (Hippy Uniform)]: abox.append("<p>Just <b>"+(1000-to_int(get_property("fratboysDefeated")))+"</b> fratboys left."); break;
          case $location[twin peak]: // abox.append("<p>Stench resistance (+4 needed): "+rnum(numeric_modifier("Stench Resistance"))+"<br>Item and food drops :");
             if (item_amount($item[rusty hedge trimmers]) > 0) abox.append("<p><a href=# class='cliimglink' title='use rusty hedge trimmers'><img src='/images/itemimages/hedgeclippers.gif' class=hand></a>"); break;
-         case $location[oil peak]: abox.append("<p>Pressure remaining: <b>"+get_property("oilPeakProgress")+"</b> ("+ceil(to_float(get_property("oilPeakProgress"))/6.34)+" slicks)"); break;
+         case $location[oil peak]: abox.append("<p>Pressure remaining: <b>"+get_property("oilPeakProgress")+"</b> ("+ceil(to_float(get_property("oilPeakProgress"))/6.34)+" slicks)"); 
+            if (item_amount($item[dress pants]) > 0 && !have_equipped($item[dress pants]) && be_good($item[dress pants]) && can_equip($item[dress pants])) 
+               abox.append("<p><a href=# class='clilink'>equip dress pants</a>");
+            if (item_amount($item[jar of oil]) == 0 && creatable_amount($item[jar of oil]) > 0 && (to_int(get_property("twinPeakProgress")) & 4) == 0)
+               abox.append("<p><a href=# class='cliimglink' title='create 1 jar of oil'><img src='/images/itemimages/oiljar.gif' class=hand></a>"); break;
          case $location[the defiled nook]: if (item_amount($item[evil eye]) > 0) abox.append("<p><a href=# class='cliimglink' title='use * evil eye'><img src='/images/itemimages/zomboeye.gif' class=hand></a>");
          case $location[the defiled cranny]:
          case $location[the defiled alcove]:
@@ -222,10 +222,9 @@ string[string] handle_post() {
       vars["unknown_ml"] = max(0,to_int(post["setml"]));
       updatevars();
    }
-   return post;
 }
 
-buffer add_features(buffer results) {
+void add_features() {
   // add "loading" div
    results.replace_string("</body>", contains_text(results,"<center><table><a name=\"end\">") ? "<div id='battab'><ul><li><a href='#bat-enhance'>Actions</a>"+
       "</li><li><a href='#kolformbox' title='Note: non-macro actions are not tracked!'>KoL</a></li><li><a href='#blacklist' class='blacktrigger'>Blacklist</a></li>"+
@@ -241,7 +240,7 @@ buffer add_features(buffer results) {
       "title='ashwiki CLI Reference'>more help</a></div><div id='clifeedback' class='clisuccess'></div><div id='mask' class='cliclose'></div>\n</body>");
   // add scripts/stylesheet
    results.replace_string("</head>", "\n<script src='jquery1.10.1.min.js'></script>\n"+
-      "<script src='jquery.dataTables.min.js'></script>\n<script src='batman.js'></script>\n"+
+      "<script src='jquery.dataTables.min.js'></script>\n<script src='clilinks.js'></script>\n<script src='batman.js'></script>\n"+
       "<link rel='stylesheet' type='text/css' href='batman.css'>\n</head>");
   // delete KoL's older version of jQuery
    results.replace_string("<script language=Javascript src=\"/images/scripts/jquery-1.3.1.min.js\"></script>","");
@@ -264,11 +263,9 @@ buffer add_features(buffer results) {
    // change runaway to repeat
    results.replace_string("<form name=runaway action=fight.php method=post><input type=hidden name=action value=\"runaway\">",
       "<form name=runaway action=fight.php method=post><input type=hidden name=action value='macro'><input type=hidden name=macrotext value=\"runaway; repeat\">");
-	return results;
 }
-void fight_relay() {
-	buffer results;
-   string[string] post = handle_post();
+void main() {
+   handle_post();
   // 100% run enforcement
    if (to_familiar(vars["is_100_run"]) != $familiar[none] && my_familiar() != to_familiar(vars["is_100_run"]))
       use_familiar(to_familiar(vars["is_100_run"]));
@@ -276,11 +273,7 @@ void fight_relay() {
    if (post contains "runcombat" && post["runcombat"] == "heckyes") results.append(run_combat());
     else results.append(visit_url());
   // enhance it
-   results=add_features(results);
+   add_features();
   // write it
    results.write();
-}
-void main()
-{
-	fight_relay();
 }

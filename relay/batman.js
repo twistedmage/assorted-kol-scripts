@@ -30,7 +30,24 @@ function bjilgt(doug) {
    return false;
 }
 
-jQuery(document).ready(function($){
+  // functions for (re)loading various sections of the page: Adventure Again box, Blacklist tab, and Wiki tab, respectively
+   function refresh_again() {
+	   $('#again').load('fight.ash', {dashi: 'annae'});
+   }
+   function refresh_blacklist(data) {
+      if (!data) data = {black: 'get'};
+      $('#blacklist').load('BatMan_RE.ash', data);
+   }
+   function load_wicky() {
+      if ($('#wikibox div').length == 0) $('#wikibox').load('fight.ash', {dashi: 'wicky'});
+   }
+   cliComplete = function(cmd) {                                    // extend cliComplete to refresh the Again box when done
+      var ret = oldComplete.apply(this, arguments);
+	  refresh_again();
+      return ret;
+   };
+
+jQuery(function($){
   // show old combat form (for CAB-enabled users)
    $('#fightform').removeClass("hideform").show();
 
@@ -63,18 +80,6 @@ jQuery(document).ready(function($){
       mouseleave: function(){ tfadeOut($(this)); }
    },".popout");
 
-  // functions for loading various sections of the page: Adventure Again box, Blacklist tab, and Wiki tab, respectively
-   function refresh_again() {
-      $('#again').load('fight.ash', {dashi: 'annae'});
-   }
-   function refresh_blacklist(data) {
-      if (!data) data = {black: 'get'};
-      $('#blacklist').load('BatMan_RE.ash', data);
-   }
-   function load_wicky() {
-      if ($('#wikibox div').length == 0) $('#wikibox').load('fight.ash', {dashi: 'wicky'});
-   }
-
   // initialize/enable tabs
    if ($('#battab').length != 0) {
       $('body').css('margin-bottom','300px');
@@ -93,45 +98,6 @@ jQuery(document).ready(function($){
          return false;
       });
    }
-
-  // CLI Empowerment!
-   function cliPopup(prepop) {                                    // open CLI box
-     $('#mask').css({'width':$(window).width(),'height':$(document).height()});
-     $('#clibox').css('top',  $(window).height()/2 - $('#clibox').height()/2);
-     $('#clibox').css('left', $(window).width()/2 - $('#clibox').width()/2);
-     $('#mask').fadeTo(0,0.1).fadeIn(1000).fadeTo("slow",0.6);
-     $('#clibox').show();
-     $('#cliform input:text').focus().val(prepop);
-     return false;
-   }
-   function cliPopdown() {                                        // close CLI box
-     $('#mask').hide();
-     $('#clibox').fadeOut('fast');
-     return false;
-   }
-   function cli_execute(cmd) {
-     $.ajax({
-        url: 'fight.ash',
-        data: {cli: cmd},
-        success: function(data) {                                 // build and show success/failure
-          $('#clifeedback').html(data).removeClass("clierror").addClass("clisuccess");
-          $("#clifeedback:contains('Error')").removeClass("clisuccess").addClass("clierror");
-          $('#clifeedback').fadeIn('fast').fadeOut(4000);
-          refresh_again();
-        }
-     });
-     return cliPopdown();
-   }
-   $('#cliform').submit(function(e) { return cli_execute($('#cliform input:text').val()); });
-   $('.cliclose').click(function () { return cliPopdown(); });
-   $(document).on('click','.clilink, .cliimglink', function(event) {  // enable CLI links; use title if present, otherwise use link text
-     var cmd = ($(this).attr('title') == undefined) ? $(this).text() : $(this).attr('title');
-     if ($(this).hasClass('edit')) return cliPopup(cmd+' ');      // if 'edit' class, pop up the CLI box prepopulated with cmd
-     return cli_execute(cmd);                                     // otherwise, execute cmd
-   });
-   $(document).on('click','.refreshblack', function(event) {      // enable links to reload blacklist
-     return refresh_blacklist();  
-   });
 
    function slide_actbox() {
       $('#actbox').show(0).animate({ left: -10 },600);     // side menu reveal on ajax load
@@ -196,6 +162,9 @@ jQuery(document).ready(function($){
       $(document).on('submit','#blackform', function() {
          refresh_blacklist($('#blackform').serialize());
 		 return false;
+      });
+      $(document).on('click','.refreshblack', function(event) {        // enable links to reload blacklist
+        return refresh_blacklist();  
       });
 	  
      // enhance Manuel

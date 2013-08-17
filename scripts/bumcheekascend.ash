@@ -513,6 +513,8 @@ if (bcasc_doWarAs == "frat") {
 	bcasc_warOutfit = "frat warrior";
 } else if (bcasc_doWarAs == "hippy") {
 	bcasc_warOutfit = "war hippy";
+} else if (bcasc_doWarAs == "abort") {
+	bcasc_warOutfit = "abort";
 } else {
 	//abort("Please specify whether you would like to do the war as a frat or hippy by downloading the relay script at http://kolmafia.us/showthread.php?t=5470 and setting the settings for the script.");
 	bcasc_doWarAs = "frat";
@@ -2645,7 +2647,7 @@ string consultJunkyard(int round, string opp, string text) {
 			print("BCC: The script is trying to use the moly magnet. This may be the cause of the NULL errors here.", "purple");
 			return "item molybdenum magnet";
 		} else {
-			if (my_hp() < 50 || round > 25) {
+			if (my_hp() < 50 || round > 15) {
 				//print("BCC: Let's cast bandages to heal you.", "purple");
 				return ((my_primestat() == $stat[Mysticality] && in_hardcore()) ? consultMyst(round, opp, text) : get_ccs_action(round)); 
 				//For some reason, this doesn't work at all and I can't work out why. 
@@ -3419,7 +3421,7 @@ boolean can_adv(location where) {
 	case $location[Cobb's Knob Menagerie\, Level 3]: return (primecheck(45) && itemcheck($item[Cobb's Knob Menagerie key]));
 	case $location[Hippy Camp]: return (itemcheck($item[dingy dinghy]) && get_property("warProgress") != "started" && get_property("sideDefeated") != "hippies" && get_property("sideDefeated") != "both" && primecheck(30));
 	case $location[Frat House]: return (itemcheck($item[dingy dinghy]) && get_property("warProgress") != "started" && get_property("sideDefeated") != "fratboys" && get_property("sideDefeated") != "both" && primecheck(30));
-	case $location[The Obligatory Pirate's Cove]: return (itemcheck($item[dingy dinghy]) && !have_equipped($item[pirate fledges]) && get_property("warProgress") != "started" && primecheck(45));
+	case $location[The Obligatory Pirate's Cove]: return (itemcheck($item[dingy dinghy]) && !is_wearing_outfit("swashbuckling getup") && !have_equipped($item[pirate fledges]) && get_property("warProgress") != "started" && primecheck(45));
 	case $location[The Castle in the Clouds in the Sky (Basement)]: return (primecheck(95) && item_amount($item[S.O.C.K.]) > 0);
 	case $location[The Castle in the Clouds in the Sky (Ground Floor)]: return (primecheck(95) && item_amount($item[S.O.C.K.]) > 0);
 	case $location[The Castle in the Clouds in the Sky (Top Floor)]: return (primecheck(95) && item_amount($item[S.O.C.K.]) > 0);
@@ -6334,10 +6336,10 @@ boolean bcascDinghyHippy() {
 	return false;
 }
 
-boolean bcascEpicWeapons() {
-	if (bcasc_cloverless) return false;
-	if (!in_hardcore()) return false;
-	if (my_path() == "Avatar of Boris" || my_path() == "Zombie Slayer") return false;
+void bcascEpicWeapons() {
+	if (bcasc_cloverless) return;
+	if (!in_hardcore()) return;
+	if (my_path() == "Avatar of Boris" || my_path() == "Zombie Slayer") return;
 	
 	//Returns true if you lack one of the kickass astral weapons for your Mox/Mus class as appropriate.
 	boolean dontHaveAstral() {
@@ -6348,7 +6350,7 @@ boolean bcascEpicWeapons() {
 			case $stat[Moxie] :
 				return (i_a("astral longbow") + i_a("astral pistol") == 0);
 		}
-		return false;
+		return;
 	}
 	
 	boolean getEpic(string className, string baseWeapon, string theOtherThingYouNeed, string theEpicWeaponYouWantToGet) {
@@ -6371,7 +6373,7 @@ boolean bcascEpicWeapons() {
 		visit_url("guild.php?place=scg");
 		if (my_meat() < 1000 && i_a("tenderizing hammer") == 0 && !knoll_available()) return false;
 		if (cli_execute("make "+theEpicWeaponYouWantToGet)) {}
-		return true;
+		return;
 	}
 	
 	boolean requireRNR() {
@@ -6399,37 +6401,36 @@ boolean bcascEpicWeapons() {
 		if (my_class() == $class[Disco Bandit] && my_basestat(my_primestat()) > 10 && i_a("Disco Banjo") == 0 && i_a("Shagadelic Disco Banjo") == 0 && i_a("Seeger's Unstoppable Banjo") == 0) {
 			if (dontHaveAstral())
 				if (getEpic("DB", "disco ball", "banjo strings", "disco banjo"))
-					return true;
+					return;
 		}
 		
 		if (my_class() == $class[Turtle Tamer] && my_basestat(my_primestat()) > 10 && i_a("Mace of the Tortoise") == 0 && i_a("Chelonian Morningstar") == 0 && i_a("Flail of the Seven Aspects") == 0) {
 			if (dontHaveAstral())
 				if (getEpic("TT", "turtle totem", "chisel", "Mace of the Tortoise"))
-					return true;
+					return;
 		}
 		
 		if (my_class() == $class[Seal Clubber] && my_basestat(my_primestat()) > 10 && i_a("Bjorn's Hammer") == 0 && i_a("Hammer of Smiting") == 0 && i_a("Sledgehammer of the V&aelig;lkyr") == 0) {
 			if (dontHaveAstral())
 				if (getEpic("SC", "seal-clubbing club", "seal tooth", "Bjorn's Hammer"))
-					return true;
+					return;
 		}
 		
 		if (my_class() == $class[Sauceror] && my_basestat(my_primestat()) > 10 && ((have_skill($skill[jaba&ntilde;ero saucesphere]) || have_skill($skill[jalape&ntilde;o saucesphere])) || bcasc_bartender || bcasc_chef) && i_a("5-alarm Saucepan") == 0 && i_a("17-alarm Saucepan") == 0 && i_a("Windsor Pan of the Source") == 0) {
 			if (getEpic("S", "saucepan", "jaba&ntilde;ero pepper", "5-alarm Saucepan"))
-				return true;
+				return;
 		}
 		
 		if (my_class() == $class[Pastamancer] && my_basestat(my_primestat()) > 10 && (!have_skill($skill[springy fusilli]) || bcasc_bartender || bcasc_chef) && i_a("Pasta of Peril") == 0 && i_a("Greek Pasta of Peril") == 0 && i_a("Wrath of the Capsaician Pastalords") == 0) {
 			if (getEpic("P", "pasta spoon", "petrified noodles", "Pasta of Peril"))
-				return true;
+				return;
 		}
  	}
 	
 	if (my_basestat(my_primestat()) > 10 && i_a("Rock and Roll Legend") == 0 && i_a("Squeezebox of the Ages") == 0 && i_a("The Trickster's Trikitixa") == 0 && requireRNR()) {
 		if(getEpic("AT", "stolen accordion", "hot buttered roll", "rock and roll legend"))
-			return true;
 	}
-	return false;
+	return;
 }
 
 boolean bcascFriars() {
@@ -10111,7 +10112,9 @@ void bcs12() {
 		cli_execute("condition clear");
 		
 		int numKilled;
-		if (bcasc_doWarAs == "frat") {
+		if (bcasc_doWarAs == "abort") {
+			abort("You have told us not to automate the battlefield. Please complete it yourself or change your settings. ");
+		} else if (bcasc_doWarAs == "frat") {
 			numKilled = to_int(get_property("hippiesDefeated"));
 			buMax("+outfit frat warrior fatigues");
 		} else if (bcasc_doWarAs == "hippy") {
@@ -10155,7 +10158,9 @@ void bcs12() {
 	bcCouncil();
 	if (index_of(visit_url("questlog.php?which=1"), "Make War, Not... Oh, Wait") > 0) {
 		//First, get the outfit as necessary. 
-		if (bcasc_doWarAs == "hippy") {
+		if (bcasc_doWarAs == "abort") {
+			abort("You have told us that you would like to complete the war yourself. Please do so or change your settings.");
+		} else if (bcasc_doWarAs == "hippy") {
 			while (i_a("reinforced beaded headband") == 0 || i_a("bullet-proof corduroys") == 0 || i_a("round purple sunglasses") == 0) 
 				bumAdv($location[Wartime Hippy Camp], "+outfit filthy hippy disguise", "", "1 reinforced beaded headband, 1 bullet-proof corduroys, 1 round purple sunglasses", "Getting the War Hippy Outfit");
 		} else if (bcasc_doWarAs == "frat") {
@@ -10173,7 +10178,9 @@ void bcs12() {
 		
 		//So now we have the outfit. Let's check if the war has kicked off yet. 
 		while(!contains_text(visit_url("questlog.php?which=1"), "war between the hippies and frat boys started")) {
-			if (bcasc_doWarAs == "hippy") {
+			if (bcasc_doWarAs == "abort") {
+				abort("You have told us that you would like to complete the war yourself. Please do so or change your settings.");
+			} else if (bcasc_doWarAs == "hippy") {
 				bumAdv($location[Wartime Frat House (Hippy Disguise)], "+outfit war hippy fatigues", "", "1 choiceadv", "Starting the war by irritating the Frat Boys", "-");
 			} else if (bcasc_doWarAs == "frat") {
 				//I can't quite work out which choiceAdv number I need. Check it later. Plus, it should be "start the war" anyway. 
@@ -10183,7 +10190,9 @@ void bcs12() {
 		}
 		
 		//At this point the war should be started. 
-		if (bcasc_doWarAs == "hippy") {
+		if (bcasc_doWarAs == "abort") {
+			abort("You have told us that you would like to complete the war yourself. Please do so or change your settings.");
+		} else if (bcasc_doWarAs == "hippy") {
 			if (i_a("reinforced beaded headband") == 0 || i_a("bullet-proof corduroys") == 0 || i_a("round purple sunglasses") == 0) {
 				abort("What the heck did you do - where's your War Hippy outfit gone!?");
 			}

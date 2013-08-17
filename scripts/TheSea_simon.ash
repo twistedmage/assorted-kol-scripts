@@ -249,6 +249,7 @@ boolean TS_UNLOCK_TROPHYFISH = to_boolean(vars["seafloor_unlockTrophyfish"]);
 // 0 - Skip. 1 - Wear what we have. 2 - Buy everything.
 setvar("seafloor_abyssEquipment", 1);
 int TS_ABYSS_EQUIPMENT = to_int(vars["seafloor_abyssEquipment"]);
+
 // How do you want to complete the Outfit quest?
 // 0 - Skip. 1 - Violence. 2 - Hatred. 3 - Loathing.
 setvar("seafloor_outfitQuest", 0);

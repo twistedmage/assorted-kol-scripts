@@ -178,15 +178,15 @@ boolean solveHatred(boolean scrolling)
 void prepHatred()
 {
 	print("Preparing for the big fight!");
-	getsome(1, $item[extra-strength red potion]);
-	getsome(1, $item[filthy poultice]);
-	getsome(1, $item[gauze garter]);
-	getsome(1, $item[mer-kin mouthsoap]);
-	getsome(3, $item[mer-kin prayerbeads]);
-	getsome(1, $item[red pixel potion]);
-	getsome(1, $item[red potion]);
-	getsome(1, $item[scented massage oil]);
-	getsome(1, $item[sea lasso]);
+	if (item_amount($item[extra-strength red potion]) < 1) buy(1, $item[extra-strength red potion]);
+	if (item_amount($item[filthy poultice]) < 1) buy(1, $item[filthy poultice]);
+	if (item_amount($item[gauze garter]) < 1) buy(1, $item[gauze garter]);
+	if (item_amount($item[mer-kin mouthsoap]) < 1) buy(1, $item[mer-kin mouthsoap]);
+	if (available_amount($item[mer-kin prayerbeads]) < 3) buy(3 - available_amount($item[mer-kin prayerbeads]), $item[mer-kin prayerbeads]);
+	if (item_amount($item[red pixel potion]) < 1) buy(1, $item[red pixel potion]);
+	if (item_amount($item[red potion]) < 1) buy(1, $item[red potion]);
+	if (item_amount($item[scented massage oil]) < 1) buy(1, $item[scented massage oil]);
+	if (item_amount($item[sea lasso]) < 1) buy(1, $item[sea lasso]);
 	outfit("mer-kin scholar's vestments");
 	equip($slot[acc1], $item[mer-kin prayerbeads]);
 	equip($slot[acc2], $item[mer-kin prayerbeads]);
@@ -324,6 +324,7 @@ void MonkeeQuest()
 			if (my_adventures() > 0 && monkeycastle.contains_text("\#littlebrother\""))
 			{
 				print("Finding Big Brother in the Wreck of the Edgar Fitzsimmons.");
+				foreach it,entry in maximize("-combat, -tie", 0, 0, true, false) if (entry.score > 0 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(ceil(my_adventures().to_float() / turns_per_cast(entry.skill)), entry.skill);
 				string originalChoice = get_property("choiceAdventure299");
 				if (originalChoice != "1") set_property("choiceAdventure299", "1");
 				if (!obtain(1,"choiceadv",$location[The Wreck of the Edgar Fitzsimmons]))
@@ -355,6 +356,7 @@ void MonkeeQuest()
 			if (my_adventures() > 0 && monkeycastle.contains_text("\#brothers\""))
 			{
 				print("Finding Grandpa in the "+grandpa.to_string()+".");
+				foreach it,entry in maximize("-combat, -tie", 0, 0, true, false) if (entry.score > 0 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(ceil(my_adventures().to_float() / turns_per_cast(entry.skill)), entry.skill);
 			}
 			loopcounter = 0;
 			while (my_adventures() > 0 && monkeycastle.contains_text("\#brothers\"") && loopcounter < 5 && boolean_modifier("Adventure Underwater"))
@@ -406,6 +408,7 @@ void MonkeeQuest()
 				}
 				if (my_adventures() > 0 && boolean_modifier("Adventure Underwater"))
 				{
+					foreach it,entry in maximize("-combat, -tie", 0, 0, true, false) if (entry.score > 0 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(ceil(my_adventures().to_float() / turns_per_cast(entry.skill)), entry.skill);
 					visit_url("monkeycastle.php?action=grandpastory&topic=note");
 					while (my_adventures() > 1 && boolean_modifier("Adventure Underwater") && monkeycastle.contains_text("\#gpa\""))
 					{
@@ -553,15 +556,28 @@ void OutfitQuest()
 		int loopcounter = 0;
 		if (!seafloor.contains_text("corrala.gif") && !seafloor.contains_text("corralb.gif"))
 		{
-			print("We need a stashbox before we can talk to Grandpa.");
-			while (my_adventures() > 0 && loopcounter < 3 && boolean_modifier("Adventure Underwater") && item_amount($item[mer-kin stashbox]) < 1)
+			if (my_adventures() > 0 && boolean_modifier("Adventure Underwater") && item_amount($item[mer-kin lockkey]) < 1)
 			{
-				loopcounter += 1;
-				set_property("choiceAdventure"+(312 + get_property("choiceAdventure312").to_int()), (get_property("choiceAdventure"+(312 + get_property("choiceAdventure312").to_int())).to_int() % 3) + 1);
-				if (!obtain(1,"choiceadv",$location[The Mer-kin Outpost]))
+				print("We need a lockkey before we can open the stashbox.");
+				if (!obtain(1,"mer-kin lockkey",$location[The Mer-kin Outpost]))
 				{
 					print("You have run out of adventures. Continue tomorrow.");
 					return;
+				}
+			}
+			if (item_amount($item[mer-kin stashbox]) < 1)
+			{
+				print("We need a stashbox before we can talk to Grandpa.");
+				foreach it,entry in maximize("-combat, -tie", 0, 0, true, false) if (entry.score > 0 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(ceil(my_adventures().to_float() / turns_per_cast(entry.skill)), entry.skill);
+				while (my_adventures() > 0 && loopcounter < 4 && boolean_modifier("Adventure Underwater") && item_amount($item[mer-kin stashbox]) < 1)
+				{
+					loopcounter += 1;
+					set_property("choiceAdventure"+(312 + get_property("choiceAdventure312").to_int()), (get_property("choiceAdventure"+(312 + get_property("choiceAdventure312").to_int())).to_int() % 3) + 1);
+					if (!obtain(1,"choiceadv",$location[The Mer-kin Outpost]))
+					{
+						print("You have run out of adventures. Continue tomorrow.");
+						return;
+					}
 				}
 			}
 			if (item_amount($item[mer-kin stashbox]) > 0)
@@ -843,7 +859,7 @@ void OutfitQuest()
 				}
 				prepHatred();
 				smiteHatred();
-				print("Best of luck finishing off the fight!");
+				abort("Best of luck finishing off the fight!");
 				break;
 			case 3:
 				break;

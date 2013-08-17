@@ -147,7 +147,7 @@ void set_autoputtifaction() {
    item ihunt = to_item(to_int(get_property("currentBountyItem")));
    if (ihunt != $item[none]) {
       if (item_drops(m) contains ihunt && (
-          !($locations[fun house,the goatlet,lair of the ninja snowmen,cobb's knob laboratory] contains my_location()) ||
+          !($locations[the fun house,the goatlet,lair of the ninja snowmen,cobb's knob laboratory] contains my_location()) ||
           (contains_text(vars["ftf_olfact"],m.to_string())))) {
          if (ihunt.bounty_count <= to_int(vars["puttybountiesupto"]) && item_amount(ihunt) < ihunt.bounty_count-1) should_putty = true;
          should_olfact = true;
@@ -321,6 +321,8 @@ void build_custom() {
              encustom(to_item(i),true); break;
           }
          encustom(to_event("runaway","endscombat",1)); break;
+      case $monster[the big wisniewski]:
+      case $monster[the man]: if (get_property("hippiesDefeated") == "999" && get_property("fratboysDefeated") == "999") encustom($item[flaregun],true); break;
       case $monster[thug 1 and thug 2]: if (item_amount($item[jar full of wind]) > 9) for i from 1 to 10 encustom($item[jar full of wind]); break;
       case $monster[the bat in the spats]: if (item_amount($item[clumsiness bark]) > 9) for i from 1 to 10 encustom($item[clumsiness bark]); break;
       case $monster[the large-bellied snitch]: if (item_amount($item[dangerous jerkcicle]) > 7) for i from 1 to 10 encustom($item[dangerous jerkcicle]); break;
