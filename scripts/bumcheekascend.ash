@@ -428,7 +428,7 @@
 		- Make sure we don't destroy +ML for the oilpeak as Jarlsberg or Boris		
       - Some minor changes to quest handling
 	  
-		last compared version 310
+		last compared version 325
 */
 script "bumcheekascend.ash";
 
@@ -2749,7 +2749,7 @@ string consultJunkyard(int round, string opp, string text) {
 }
 
 string consultObtuse(int round, string opp, string text) {
-	print("BCC: Consulting for LFM or smut orc pervert.", "purple");
+	print("BCC: Consulting for anything we want to fire a romantic arrow at.", "purple");
 	if (my_familiar() == $familiar[Obtuse Angel]) {
 		print("BCC: Obtuse Angel detected.", "purple");
 		if (contains_text(text, "romantic arrow (")) {
@@ -3103,7 +3103,6 @@ boolean faxMeA(monster mon) {
             case $monster[Propaganda-spewin' Elf]: return "prop_elf";
             case $monster[Hobelf]: return "hobo_elf";
             case $monster[Somebody Else's Butt]: return "bigbutt";
-//			case $monster[Smut Orc Pervert]: return "smut_orc_perv";
         }
 
         return "";
@@ -4099,35 +4098,6 @@ monster whatShouldIFax() {
 		}
 	}
 	
-/*	if (my_path() != "Bees Hate You" && p > monster_attack($monster[smut orc pervert]) && to_int(get_property("chasmBridgeProgress")) < 30 && to_int(get_property("lastChasmReset")) == my_ascensions())
-	{
-		setMood("");
-		buMax();
-		setFamiliar("obtuse angel");
-		return $monster[smut orc pervert];
-	}*/
-	
-	/*
-	if (!contains_text(visit_url("questlog.php?which=2"), "with his monster problem") && i_a("64735 scroll") == 0) {
-		boolean a = (i_a("668 scroll") > 0) || (i_a("334 scroll") > 1);
-		boolean b = (i_a("64067 scroll") > 0) || ((i_a("30669 scroll") > 0) && (i_a("33398 scroll") > 0));
-		print("BCC: Checking the ASCII, a is "+to_string(a)+" and b is "+to_string(b), "purple");
-		
-//		if (p > monster_attack($monster[Bad ASCII Art])) {
-//			print("BCC: Checking a Bad ASCII Art", "purple");
-//			if (!a || !b) {
-//				return $monster[Bad ASCII Art];
-//			}
-//		}
-
-		if (p > monster_attack($monster[rampaging adding machine]) && (a && b)) {
-			setMood("");
-			buMax();
-			setFamiliar("");
-			cli_execute("goal set 1 64735 scroll");
-			return $monster[rampaging adding machine];
-		}
-	}*/
 	return $monster[none];
 }
 
@@ -6371,7 +6341,7 @@ void bcascDailyDungeon() {
 		cli_execute("make "+amountKeys+" skeleton key");
 	}
 	print("visiting dungeon","lime");
-	while (!contains_text(visit_url("dungeon.php"), "reached the bottom")) {
+	while (!contains_text(visit_url("adventure.php?snarfblat=325"), "You are all finished with the Daily Dungeon for today")) {
 		if (have_skill($skill[Astral Shell]) && have_castitems($class[turtle tamer], true)) {
 			cli_execute("cast 2 astral shell");
 		} else if (have_skill($skill[Elemental Saucesphere]) && have_castitems($class[sauceror], true)) {
