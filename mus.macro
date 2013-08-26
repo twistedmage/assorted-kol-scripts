@@ -118,7 +118,7 @@ if  !monstername *Naughty Sorceress* && !monstername *bonerdagon
 
 	if !monstername Battlie Knight Ghost && !monstername ghost miner && !monstername Claybender Sorcerer Ghost && !monstername Dusken Raider Ghost && !monstername Space Tourist Explorer Ghost && !monstername Whatsian Commando Ghost
 		#if monstername bad ascii art || monstername rampaging adding machine || monstername ghost || monstername lobsterfrogman || monstername bricko bat || monstername angry bassist || monstername blue-haired girl || monstername evil ex-girlfriend || monstername peeved roommate || monstername random scenester || monstername black crayon * || monstername modern zombie || monstername dirty old lich
-		if monstername ghost || monstername lobsterfrogman || monstername gaudy pirate || monstername modern zombie || monstername dirty old lich || monstername smut orc pervert
+		if monstername ghost || monstername lobsterfrogman || monstername gaudy pirate || monstername modern zombie || monstername dirty old lich
 			if hascombatitem spooky putty sheet && !hascombatitem Rain-doh black box
 				use spooky putty sheet
 			endif

@@ -79,9 +79,9 @@ void runaway_fam(int combat)
 
 void delay_fam(int combat)
 {
-	if(get_property("_hipsterAdv").to_int() < 7)
+	if(get_property("_Mini-HipsterAdv").to_int() < 7)
 	{
-		print("................. hipster","green");
+		print("................. Mini-Hipster","green");
 	}
 	else
 	{
@@ -100,9 +100,9 @@ void suggest_fam(string main_goal, int combat)
 	{
 		if(main_goal=="items")
 		{
-			if(available_amount($item[bag o tricks])>0)
+			if(available_amount($item[Bag o' Tricks])>0)
 			{
-				print("-(summon weasels from bag o tricks with 2 charges)","green");
+				print("-(summon weasels from Bag o' Tricks with 2 charges)","green");
 			}
 			if(available_amount($item[greatest american pants])>0)
 				print("(use super vision buff from GAP)","green");
@@ -115,9 +115,9 @@ void suggest_fam(string main_goal, int combat)
 		}
 		else if(main_goal=="meat")
 		{
-			if(available_amount($item[bag o tricks])>0)
+			if(available_amount($item[Bag o' Tricks])>0)
 			{
-				print("-(summon badgers from bag o tricks with 1 charges)","green");
+				print("-(summon badgers from Bag o' Tricks with 1 charges)","green");
 			}
 		}
 		return;
@@ -125,9 +125,9 @@ void suggest_fam(string main_goal, int combat)
 
 	if(main_goal=="items")
 	{
-		if(available_amount($item[bag o tricks])>0)
+		if(available_amount($item[Bag o' Tricks])>0)
 		{
-			print("-(summon weasels from bag o tricks with 2 charges)","green");
+			print("-(summon weasels from Bag o' Tricks with 2 charges)","green");
 		}
 		if(available_amount($item[crown of thrones])>0)
 			print("(feral kobold in crown)","green");
@@ -153,9 +153,9 @@ void suggest_fam(string main_goal, int combat)
 	}
 	else if(main_goal=="meat")
 	{
-		if(available_amount($item[bag o tricks])>0)
+		if(available_amount($item[Bag o' Tricks])>0)
 		{
-			print("-(summon badgers from bag o tricks with 1 charges)","green");
+			print("-(summon badgers from Bag o' Tricks with 1 charges)","green");
 		}
 		if(available_amount($item[crown of thrones])>0)
 			print("(put hobo monkey / organ grinder in crown)","green");
@@ -169,7 +169,7 @@ void suggest_fam(string main_goal, int combat)
 	{
 		runaway_fam(combat);
 	}
-	else if(main_goal=="delay") //hipster should be used primarily in delay zones, but also in superlikely zones (not for standard combat/noncomats)
+	else if(main_goal=="delay") //Mini-Hipster should be used primarily in delay zones, but also in superlikely zones (not for standard combat/noncomats)
 	{
 		delay_fam(combat);
 	}
@@ -200,10 +200,10 @@ void suggest_fam(string main_goal, int combat)
 			print("................. Frumious Bandersnatch. Improves skills.","green");
 			print("................. organ grinder. Doesn't help, but might make a badass pie?","green");
 		}
-		weight=familiar_weight($familiar[hipster]) + weight_adjustment();
+		weight=familiar_weight($familiar[Mini-Hipster]) + weight_adjustment();
 		float action = to_float(weight)*2.5;
 		action=action+25.0;
-		print("................. Hipster acts "+action+" percent of the time (split between blocking, healing, meat and damage).","green");
+		print("................. Mini-Hipster acts "+action+" percent of the time (split between blocking, healing, meat and damage).","green");
 	}
 	else if(main_goal=="none")
 	{
@@ -258,13 +258,13 @@ boolean have_buff_equip()
 	//need accordion
 	if(have_skill($skill[The Polka of Plenty]) || have_skill($skill[Fat Leon's Phat Loot Lyric]) || have_skill($skill[The Ode to Booze]) || have_skill($skill[The Sonata of Sneakiness]) || have_skill($skill[Carlweather's Cantata of Confrontation]) || have_skill($skill[Ur-Kel's Aria of Annoyance]))
 	{
-		if(item_amount($item[stolen accordion])==0 && item_amount($item[rock and roll legend])==0 && item_amount($item[Squeezebox of the Ages])==0 && item_amount($item[tricksters trikitixa])==0)
+		if(item_amount($item[stolen accordion])==0 && item_amount($item[rock and roll legend])==0 && item_amount($item[Squeezebox of the Ages])==0 && item_amount($item[The Trickster's Trikitixa])==0)
 		{
 			have=false;
 		}
 	}
 	//have saucepan
-	if(have_skill($skill[Jalapeno Saucesphere]) || have_skill($skill[Jabanero Saucesphere]) || have_skill($skill[Elemental Saucesphere]) || have_skill($skill[Scarysauce]) )
+	if(have_skill($skill[Jalape&ntilde;o Saucesphere]) || have_skill($skill[Jaba&ntilde;ero Saucesphere]) || have_skill($skill[Elemental Saucesphere]) || have_skill($skill[Scarysauce]) )
 	{
 		if(item_amount($item[saucepan])==0 && item_amount($item[5-alarm saucepan])==0 && item_amount($item[17-alarm saucepan])==0 && item_amount($item[windsor pan of the source])==0)
 		{
@@ -287,7 +287,7 @@ void get_buff_equip()
 	//get accordion
 	if(have_skill($skill[The Polka of Plenty]) || have_skill($skill[Fat Leon's Phat Loot Lyric]) || have_skill($skill[The Ode to Booze]) || have_skill($skill[The Sonata of Sneakiness]) || have_skill($skill[Carlweather's Cantata of Confrontation]) || have_skill($skill[Ur-Kel's Aria of Annoyance]))
 	{
-		if(item_amount($item[stolen accordion])==0 && item_amount($item[rock and roll legend])==0 && item_amount($item[Squeezebox of the Ages])==0 && item_amount($item[tricksters trikitixa])==0)
+		if(item_amount($item[stolen accordion])==0 && item_amount($item[rock and roll legend])==0 && item_amount($item[Squeezebox of the Ages])==0 && item_amount($item[The Trickster's Trikitixa])==0)
 		{
 			set_property("choiceAdventure502","3");
 			set_property("choiceAdventure506","1");
@@ -295,12 +295,12 @@ void get_buff_equip()
 			set_property("choiceAdventure29","2");
 			while(item_amount($item[saucepan])==0 && my_adventures()>0 && my_meat()>30)
 			{
-				adventure(1,$location[spooky forest]);
+				adventure(1,$location[The Spooky Forest]);
 			}
 		}
 	}
 	//get saucepan
-	if(have_skill($skill[Jalapeno Saucesphere]) || have_skill($skill[Jabanero Saucesphere]) || have_skill($skill[Elemental Saucesphere]) || have_skill($skill[Scarysauce]) )
+	if(have_skill($skill[Jalape&ntilde;o Saucesphere]) || have_skill($skill[Jaba&ntilde;ero Saucesphere]) || have_skill($skill[Elemental Saucesphere]) || have_skill($skill[Scarysauce]) )
 	{
 		if(item_amount($item[saucepan])==0 && item_amount($item[5-alarm saucepan])==0 && item_amount($item[17-alarm saucepan])==0 && item_amount($item[windsor pan of the source])==0)
 		{
@@ -310,7 +310,7 @@ void get_buff_equip()
 			set_property("choiceAdventure28","2");
 			while(item_amount($item[saucepan])==0 && my_adventures()>0 && my_meat()>30)
 			{
-				adventure(1,$location[spooky forest]);
+				adventure(1,$location[The Spooky Forest]);
 			}
 		}
 	}
@@ -325,7 +325,7 @@ void get_buff_equip()
 			set_property("choiceAdventure27","2");
 			while(item_amount($item[saucepan])==0 && my_adventures()>0 && my_meat()>30)
 			{
-				adventure(1,$location[spooky forest]);
+				adventure(1,$location[The Spooky Forest]);
 			}
 		}
 	}
@@ -395,7 +395,7 @@ item my_ultimate()
 	item ultimate;
 	if((my_class()==$class[seal clubber]))
 	{
-		ultimate=$item[Sledgehammer of the Vaelkyr];
+		ultimate=$item[Sledgehammer of the V&aelig;lkyr];
 	}
 	else if(my_class()==$class[turtle tamer])
 	{
@@ -675,11 +675,11 @@ boolean simons_get_bartender()
 
 void new_hermit(item it)
 {
-	while(my_meat()>50 && item_amount($item[worthless trinket])==0 && item_amount($item[worthless gewgaw])==0 && item_amount($item[worthless knick knack])==0)
+	while(my_meat()>50 && item_amount($item[worthless trinket])==0 && item_amount($item[worthless gewgaw])==0 && item_amount($item[worthless knick-knack])==0)
 	{
 		use(1,$item[chewing gum on a string]);
 	}
-	if(item_amount($item[worthless trinket])!=0 || item_amount($item[worthless gewgaw])!=0 || item_amount($item[worthless knick knack])!=0)
+	if(item_amount($item[worthless trinket])!=0 || item_amount($item[worthless gewgaw])!=0 || item_amount($item[worthless knick-knack])!=0)
 	{
 		cli_execute("hermit "+it);
 	}

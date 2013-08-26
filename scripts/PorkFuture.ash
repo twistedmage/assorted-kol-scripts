@@ -389,9 +389,9 @@ boolean Wumpwn()
 				}
 				
 				if (!contains_text(wumpus_explored,disroom) && 
-				(wumpus_pit[wumpus_adj_rooms[1,disroom]] || wumpus_bats[wumpus_adj_rooms[1,disroom]]) && 
-				(wumpus_pit[wumpus_adj_rooms[2,disroom]] || wumpus_bats[wumpus_adj_rooms[2,disroom]]) &&
-				(wumpus_pit[wumpus_adj_rooms[3,disroom]] || wumpus_bats[wumpus_adj_rooms[3,disroom]]))
+				(wumpus_pit[wumpus_adj_rooms[1,disroom]] == "PP" || wumpus_bats[wumpus_adj_rooms[1,disroom]] == "BB") && 
+				(wumpus_pit[wumpus_adj_rooms[2,disroom]] == "PP" || wumpus_bats[wumpus_adj_rooms[2,disroom]] == "BB") &&
+				(wumpus_pit[wumpus_adj_rooms[3,disroom]] == "PP" || wumpus_bats[wumpus_adj_rooms[3,disroom]] == "BB"))
 					blocked_room = disroom;
 					
 				if (wumpus_bats[disroom] == "BB")

@@ -201,7 +201,7 @@ boolean openknob(){
 		
 	if(item_amount($item[Cobb's Knob map]) < 1) visit_url("council.php");
 		
-	if(!obtain(1, "Knob Goblin encryption key", $location[Outskirts of The Knob]))
+	if(!obtain(1, "Knob Goblin encryption key", $location[The Outskirts of Cobb's Knob]))
 		return vprint("Unable to obtain the Knob Goblin encryption key.", -2);
 		
 	use(1, $item[Cobb's Knob map]);
@@ -210,7 +210,7 @@ boolean openknob(){
 
 boolean openlab(){
 	if(!openknob()) return false;
-	if(obtain(1, "Cobb's Knob lab key", $location[Harem]))
+	if(obtain(1, "Cobb's Knob lab key", $location[Cobb's Knob Harem]))
 		return vprint("Knob lab opened successfully", 2);
 	else return vprint("Unable to gain access to the lab.", -2);
 }

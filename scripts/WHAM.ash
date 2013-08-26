@@ -179,6 +179,13 @@
 				 Move removing of custom options to ok()
 				 Make the learning of Gladiator skills better by using Mafia's tracking
 				 Minor code refactoring for better readability
+		13-08-19:Fix BatBrain breakage
+		13-08-20:Always attempt to stun if my_location().kisses > 1
+		13-08-21:Fix removal of items for notiemsplease
+				 Use BatBrain's new custom_action-function
+		13-08-22:Fix item removal fully by reverting to the really old method...
+				 Print items when debug printing, but mark them red since they are disallowed
+		13-08-25:Try to blacklist KOHLS-combat items
 ***********************************************************************************************************************/
 import <SmartStasis.ash>;
 
@@ -279,6 +286,9 @@ void set_unknown_ml(monster foe, string pg) {
 		quit("Your unknown_ml is set to 0, handle this unkown monster yourself.");
 	if($monsters[Beast with X Ears, Beast with X Eyes, Ghost of Fernswarthy's Grandfather, X Bottles of Beer on a Golem, X Stone Golem, X-dimensional Horror, X-headed Hydra] contains foe)
 		set_location($location[Fernswarthy's Basement]);
+	if(my_path() == "KOLHS")
+		foreach i in $ints[6653,6656,6370,6374,6379,6382,6384,6385,6387]
+			temp_blacklist_inc("use " + i, 0);
 }
 
 //Calculate number of bees if needed
@@ -299,7 +309,7 @@ advevent mp_option(int target) {
 		return new advevent;
 	sort opts by -to_profit(value);
 	foreach i,opt in opts {
-		if (opt.custom)
+		if (opt.custom != "")
 			continue;
 		if (opt.mp <= 0)
 			continue;
@@ -316,7 +326,7 @@ advevent hp_option(int target) {
 		return new advevent;
 	sort opts by -to_profit(value);
 	foreach i,opt in opts {
-		if (opt.custom)
+		if (opt.custom != "")
 			continue;	
 		if (dmg_taken(opt.pdmg) >= 0) //Negative pdmg = healing item
 			continue;
@@ -357,7 +367,11 @@ boolean ok(advevent a) {
 	boolean no_bears() {
 		return !(happened("skill 7131") || happened("skill 7132") || happened("skill 7133") || happened("skill 7134") || happened("skill 7135") || happened("skill 7136"));
 	}
-
+	
+	//If we don't want to use items, remove them from the consideration as this speeds the script up
+	if(vars["WHAM_noitemsplease"] == "true" && contains_text(a.id, "use"))
+		return false;
+	
 	if(m == $monster[Naughty Sorority Nurse] && (dmg_dealt(a.dmg) + (m_hit_chance()*dmg_dealt(retal.dmg) + dmg_dealt(baseround().dmg))) < min(monster_stat("hp"), 90)) {
 		vprint(a.id + " is not OK since the monster heals more than it damages.", "purple", 9);
 		return false;	//These monsters heal too much for this skill
@@ -368,7 +382,7 @@ boolean ok(advevent a) {
 		return false;	//Don't use something that would kill us
 	}
 	
-	if(a.custom) {	//Custom actions are per definition not ok unless specifically called
+	if(a.custom != "") {	//Custom actions are per definition not ok unless specifically called
 		vprint(a.id + " is not OK since it is marked as a custom action.", "purple", 9);
 		return false;
 	}
@@ -468,7 +482,7 @@ void allMyOptions(float hitlimit) {
 	int n = 0;
 	clear(iterateoptions);
 	clear(myoptions);
-	if(m == $monster[dr. awkward])
+	if(m == $monster[dr. awkward] && hitlimit != -1)
 		hitlimit = min(1, hitlimit + 0.25);
 	sort opts by -to_profit(value);
 	sort opts by kill_rounds(value.dmg)*-(min(value.profit,-1));
@@ -478,7 +492,7 @@ void allMyOptions(float hitlimit) {
 			vprint("WHAM: Raw damage is estimated at " + opt.dmg[$element[cold]] + " (cold), " + opt.dmg[$element[hot]] + " (hot), " + opt.dmg[$element[stench]]+ " (stench), " + opt.dmg[$element[spooky]] + " (spooky), " + opt.dmg[$element[sleaze]] + " (sleazy) and  " + opt.dmg[$element[none]] + " (physical).", "purple", 11);
 		}
 
-		if (ok(opt) && hitchance(opt.id) >= hitlimit) {
+		if ((hitlimit != -1 ? ok(opt) : true) && hitchance(opt.id) >= hitlimit) {
 			iterateoptions[count(iterateoptions)] = opt.id;
 			myoptions[n] = opt;
 			n += 1;
@@ -529,7 +543,7 @@ advevent attack_option(boolean noitems) {
 	
 	foreach i,opt in opts {
 		vprint(opt.id + " does hurt the monster for " + dmg_dealt(opt.dmg) + " and is " + (ok(opt) ? "ok." : "not ok."), "green", 10);
-		if(opt.endscombat == true) {	//If the action is marked as a combat ender it is an ok action no matter what things say further down
+		if(opt.endscombat == true && !(contains_text(opt.id, "use") && vars["WHAM_noitemsplease"] == "true")) {	//If the action is marked as a combat ender it is an ok action no matter what things say further down
 			smacks = opt;
 			return opt;
 		}
@@ -604,7 +618,7 @@ advevent delevel_option(boolean nodmg) {
 }
 
 advevent item_option() {
-	if (ok(get_action("use 2848")) && !happened($item[gnomitronic hyperspatial demodulizer]) && monster_stat("hp") <= dmg_dealt(get_action("use 2848").dmg))
+	if(ok(get_action("use 2848")) && !happened($item[gnomitronic hyperspatial demodulizer]) && monster_stat("hp") <= dmg_dealt(get_action("use 2848").dmg))
 		return get_action("use 2848");
 	float drnd = max(1.0,die_rounds());   // a little extra pessimistic
 	//sort opts by -dmg_dealt(value.dmg);	
@@ -656,8 +670,8 @@ advevent stasis_option() {  // returns most profitable lowest-damage option
 
 // returns cheapest multi-round stun
 advevent stun_option(float rounds, boolean foritem) {
-	if(rounds < 0.90 || die_rounds() > maxround - round || monster_stat("hp") <= 10) { //Don't stun if we will kill it directly (add a ~10% buffer for swingy actions)
-		vprint("WHAM: No need to stun this monster", "purple", 8);
+	if(my_location().kisses <= 1 && (rounds < 0.90 || die_rounds() > maxround - round || monster_stat("hp") <= 10)) { //Don't stun if we will kill it directly (add a ~10% buffer for swingy actions)
+		vprint("WHAM: No need to stun this monster", "purple", 8);													  //Always attempt to stun if the kiss-value is greater than 1
 		buytime = new advevent;
 		return buytime;
 	}
@@ -847,7 +861,7 @@ actions[int] Calculate_Options(float base_hp) {
 
 	vprint("WHAM: Debug printing the damage dealt by your options.", "purple", 10);
 	vprint(" ",10);
-	allMyOptions();
+	allMyOptions(-1);
 	sort iterateoptions by -dmg_dealt(get_action(value).dmg);
 
 	foreach num,sk in iterateoptions {
@@ -855,7 +869,7 @@ actions[int] Calculate_Options(float base_hp) {
 		if(find(aid)) {
 			switch(aid.group(1)) {
 				case "skill ":	vprint("WHAM: " + to_string(to_skill(to_int(excise(sk,"skill ","")))) + ": " + to_string(dmg_dealt(get_action(sk).dmg), "%.2f") + " potential damage (raw damage: " + spread_to_string(get_action(sk).dmg) + ") and a hitchance of " + to_string(hitchance(sk)*100, "%.2f") + "%.", (hitchance(sk) > hitchance ? "blue" : "red"), 3); break;
-				case "use ":	vprint("WHAM: " + to_string(to_item(to_int(excise(sk,"use ","")))) + ": " + to_string(dmg_dealt(get_action(sk).dmg), "%.2f") + " potential damage (raw damage: " + spread_to_string(get_action(sk).dmg) + ") and a hitchance of " + to_string(hitchance(sk)*100, "%.2f") + "%.", (hitchance(sk) > hitchance ? "blue" : "red"), 3); break;
+				case "use ":	vprint("WHAM: " + to_string(to_item(to_int(excise(sk,"use ","")))) + ": " + to_string(dmg_dealt(get_action(sk).dmg), "%.2f") + " potential damage (raw damage: " + spread_to_string(get_action(sk).dmg) + ") and a hitchance of " + to_string(hitchance(sk)*100, "%.2f") + "%.", (hitchance(sk) > hitchance && vars["WHAM_noitemsplease"] == "false" ? "blue" : "red"), 3); break;
 				case "attack":	vprint("WHAM: Attack with your weapon: " + to_string(dmg_dealt(get_action(sk).dmg), "%.2f") + " potential damage (raw damage: " + spread_to_string(get_action(sk).dmg) + ") and a hitchance of " + to_string(hitchance(sk)*100, "%.2f") + "%.", (hitchance(sk) > hitchance ? "blue" : "red"), 3); break;
 				case "jiggle":	vprint("WHAM: Jiggle your chefstaff: " + to_string(dmg_dealt(get_action(sk).dmg), "%.2f") + " potential damage (raw damage: " + spread_to_string(get_action(sk).dmg) + ") and a hitchance of " + to_string(hitchance(sk)*100, "%.2f") + "%.", (hitchance(sk) > hitchance ? "blue" : "red"), 3); break;
 			}
@@ -993,14 +1007,15 @@ string Evaluate_Options() {
 	else {
 		if(to_int(vars["verbosity"]) >= 3) {
 			vprint("WHAM: Unable to determine a valid combat strategy. For your benefit here are the numbers for your combat options.", "purple", 3);
-			allMyOptions();
+			allMyOptions(-1);
 			sort iterateoptions by -dmg_dealt(get_action(value).dmg);
+
 			foreach num,sk in iterateoptions {
 				matcher aid = create_matcher("(skill |use |attack|jiggle)(?:(\\d+),?(\\d+)?)?",sk);
 				if(find(aid)) {
 					switch(aid.group(1)) {
 						case "skill ":	vprint("WHAM: " + to_string(to_skill(to_int(excise(sk,"skill ","")))) + ": " + to_string(dmg_dealt(get_action(sk).dmg), "%.2f") + " potential damage (raw damage: " + spread_to_string(get_action(sk).dmg) + ") and a hitchance of " + to_string(hitchance(sk)*100, "%.2f") + "%.", (hitchance(sk) > hitchance ? "blue" : "red"), 3); break;
-						case "use ":	vprint("WHAM: " + to_string(to_item(to_int(excise(sk,"use ","")))) + ": " + to_string(dmg_dealt(get_action(sk).dmg), "%.2f") + " potential damage (raw damage: " + spread_to_string(get_action(sk).dmg) + ") and a hitchance of " + to_string(hitchance(sk)*100, "%.2f") + "%.", (hitchance(sk) > hitchance ? "blue" : "red"), 3); break;
+						case "use ":	vprint("WHAM: " + to_string(to_item(to_int(excise(sk,"use ","")))) + ": " + to_string(dmg_dealt(get_action(sk).dmg), "%.2f") + " potential damage (raw damage: " + spread_to_string(get_action(sk).dmg) + ") and a hitchance of " + to_string(hitchance(sk)*100, "%.2f") + "%.", (hitchance(sk) > hitchance && vars["WHAM_noitemsplease"] == "false" ? "blue" : "red"), 3); break;
 						case "attack":	vprint("WHAM: Attack with your weapon: " + to_string(dmg_dealt(get_action(sk).dmg), "%.2f") + " potential damage (raw damage: " + spread_to_string(get_action(sk).dmg) + ") and a hitchance of " + to_string(hitchance(sk)*100, "%.2f") + "%.", (hitchance(sk) > hitchance ? "blue" : "red"), 3); break;
 						case "jiggle":	vprint("WHAM: Jiggle your chefstaff: " + to_string(dmg_dealt(get_action(sk).dmg), "%.2f") + " potential damage (raw damage: " + spread_to_string(get_action(sk).dmg) + ") and a hitchance of " + to_string(hitchance(sk)*100, "%.2f") + "%.", (hitchance(sk) > hitchance ? "blue" : "red"), 3); break;
 					}
@@ -1072,13 +1087,9 @@ void build_custom_WHAM() {
 		case "Sabre-Toothed Goat":
 		case "Senile Lihc":
 		case "Slick Lihc":
-			if(has_goal(m) <= 0) {
-				if(has_option(get_action($skill[banishing shout])))
-					encustom(get_action($skill[banishing shout]));
-				else if(has_option(get_action($skill[Howl of the Alpha])))
-					encustom(get_action($skill[Howl of the Alpha]));
-				else if(equipped_item($slot[weapon]) == $item[Staff of the Standalone Cheese] && to_int(get_property("_jiggleCheese")) < 5)
-					encustom(get_action($item[Staff of the Standalone Cheese]));
+			if(has_goal(m) <= 0 && (my_path() == "Avatar of Boris" || my_path() == "Zombie Slayer" || my_path() == "Avatar of Jarlsberg")) {
+				if(has_option(custom_action("banish")))
+					encustom(custom_action("banish"));
 			}
 			break;
 
@@ -1408,9 +1419,6 @@ void main(int initround, monster foe, string pg) {
 	
 	//Set up the initial variables and skills
 	vprint("WHAM: Setting up variables via BatBrain", "purple", 8);
-	//If we don't want to use items, remove them from the consideration as this speeds the script up
-	if(vars["WHAM_noitemsplease"] == "true")
-		remove factors["item"];	
 	act(pg);
 
 	//Debug info

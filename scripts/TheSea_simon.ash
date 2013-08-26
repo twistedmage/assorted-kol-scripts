@@ -180,13 +180,13 @@ void prepare_for(string type,location loc)
 	{
 		if(i_a("pulled yellow taffy")<1)
 			buy(1,$item[pulled yellow taffy]);
-		if(get_property("dreadScroll42")=="")
+		if(get_property("dreadScroll2")=="0") //confirmed as 2
 		{
 			if(i_a("mer-kin healscroll")<1)
 				buy(1,$item[mer-kin healscroll]);
 			set_combat_macro_name("library3");
 		}
-		else if(get_property("dreadScroll45")=="")
+		else if(get_property("dreadScroll5")=="0") //confirmed as 5
 		{
 			if(i_a("mer-kin killscroll")<1)
 				buy(1,$item[mer-kin killscroll]);
@@ -1010,7 +1010,7 @@ void gladiator_path()
 void get_visions()
 {
 	//cast Deep Dark Visions
-	while(get_property("dreadScroll43")=="")
+	while(get_property("dreadScroll3")=="")
 	{
 		print("learning deep-dark-visions word","green");
 		use_familiar($familiar[parrot]);
@@ -1023,25 +1023,25 @@ void get_visions()
 		if(my_maxmp()<100 || my_maxhp()<500)
 			abort("Can't operate with less than 100mp and 500 hp");
 		string html=visit_url("skills.php?pwd&action=Skillz&whichskill=90&skillform=Use+Skill&quantity=1");
-		if(contains_text(html,"of Cards"))
+/*		if(contains_text(html,"of Cards"))
 			abort("word was \"cards\"! ");
 		if(contains_text(html,"Blues"))
 			abort("word was \"Blues\"! ");
 		if(contains_text(html,"Pancakes"))
 			abort("word was \"Pancakes\"! ");
 		if(contains_text(html,"Pain"))
-			abort("word was \"Pain\"! ");
+			abort("word was \"Pain\"! ");*/
 	}
 }
 
-int num_choiceadvs_found()
+int num_choiceadvs_found() //confirmed as 1,6,8
 {
 	int ans=0;
-	if(get_property("dreadScroll48")!="0")
+	if(get_property("dreadScroll8")!="0")
 		ans=ans+1;
-	else if(get_property("dreadScroll46")!="0")
+	if(get_property("dreadScroll6")!="0")
 		ans=ans+1;
-	else if(get_property("dreadScroll41")!="0")
+	if(get_property("dreadScroll1")!="0")
 		ans=ans+1;
 	return ans;
 }
@@ -1064,7 +1064,7 @@ void scholar_path()
 			}
 			use(neededvocab, $item[mer-kin wordquiz]);
 		}
-		abort("watch the words now");
+		
 		//figure out special words farming library, using healscroll and killscroll
 		//words 1,6,8
 		while(num_choiceadvs_found()<3)
@@ -1082,9 +1082,9 @@ void scholar_path()
 			prepare_for("-", $location[Mer-Kin Library]);
 			adventure(1,$location[Mer-Kin Library]);
 		}
-		
+
 		//use knucklebone
-		if(get_property("dreadScroll4")=="0")
+		if(get_property("dreadScroll4")=="0") //confirmed as 4
 		{
 			obtain(1, $item[mer-kin knucklebone], $location[mer-kin library]);
 			use(1, $item[mer-kin knucklebone]);

@@ -207,20 +207,18 @@ if (get_property("kingLiberated") == true) {
 }
 
 //Path
-string myPath = "";
+string myPath = my_path();
 if (myLifestyle == "Aftercore") {
 	myPath = "No Restrictions";
-} else if (my_path() == "None") {
+} else if(myPath == "None") {
 	myPath = "No Path";
-} else if (my_path() == "Way of the Surprising Fist") {
+} else if(myPath == "Way of the Surprising Fist") {
 	myPath = "Surprising Fist";
 	//myPath = "Surprising Fist: " + get_property("fistSkillsKnown");
-} else if (my_path() == "Avatar of Jarlsberg") {
+} else if(myPath == "Avatar of Jarlsberg") {
 	myPath = "Jarlsberg";
-} else if (my_path() == "Avatar of St. Sneaky Pete") {
+} else if (myPath == "Avatar of St. Sneaky Pete") {
 	myPath = "Sneaky Pete";
-} else {
-	myPath = my_path();
 }
 
 string itemimages(string img) {
@@ -944,7 +942,6 @@ string toPlant(int i) {
 void pickerFlorist(string[int] planted){
 	int plantsPlanted;
 	string terrain = lastLoc.environment;
-	if(lastLoc == $location[hidden city (automatic)]) terrain = "outdoor";
 	boolean marked = false;
 	foreach i,s in planted {
 		if (s!="") plantsPlanted+=1;
@@ -988,7 +985,7 @@ void pickerFlorist(string[int] planted){
 }
 
 void addPlants(buffer result) {
-	if(lastLoc != $location[hidden city (automatic)] && (lastLoc.environment == "none" || lastLoc == $location[none])) {
+	if((lastLoc.environment == "none" || lastLoc == $location[none])) {
 		result.append('<a class="visit" target="mainpane" href="forestvillage.php?action=floristfriar">(Cannot plant here)</a>');
 		return;
 	}
@@ -1135,6 +1132,12 @@ void pickerFamiliar(familiar myfam, item famitem, boolean isFed) {
 			return "Volleyball, ML +20";
 		case $item[bugged b&Atilde;&para;n&plusmn;&Atilde;&copy;t]:
 			return "Fairy: Food, Pants, Candy +5%";
+		case $item[fixed-gear bicycle]:
+			return "+3 stats per fight";
+		case $item[chiptune guitar]:
+			return "+25% Item Drops";
+		case $item[ironic moustache]:
+			return "Weight: +10";
 		}
 		
 		if(famitem != $item[none]) {
@@ -2341,6 +2344,7 @@ void addMCD(buffer result, boolean bake) {
 			if (mcdlevel == current_mcd()) {
 				mcd.append('<tr class="' + (picker? 'pickitem ': '') + 'current"><td class="info">' + mcdmap[mcdlevel] + '</td>');
 			} else {
+#				mcd.append('<tr class="' + (picker? 'pickitem ': 'change') + '"><td class="info"><a ref="charpane.php" class="clilink through" title="mcd '+mcdlevel+'">' + mcdmap[mcdlevel] + '</a></td>');
 				mcd.append('<tr class="' + (picker? 'pickitem ': 'change') + '"><td class="info"><a ' + (picker? 'class="change" ': '') + ' href="' 
 					+ (mcdchange == ""? "": sideCommand("mcd "+mcdlevel))
 					+ '">' + mcdmap[mcdlevel] + '</a></td>');
@@ -2760,7 +2764,8 @@ void bakeStats() {
 			checkExtra = false;
 		}
 	}
-	
+#	result.append('<tr><td colspan="3"><a href="charpane.php" class="clilink through" title="mcd 10">MCD 10: Vertebra of the Bonerdagon</a></td></tr>');
+
 	result.append('</table>');
 	chitBricks["stats"] = result.to_string();
 }
@@ -2886,6 +2891,13 @@ void pickOutfit() {
 		}
 	}
 	
+	// If using Kung Fu Fighting, you might want to empty your hands
+	if(have_effect($effect[Kung Fu Fighting]) > 0 && (equipped_item($slot[weapon]) != $item[none] || equipped_item($slot[off-hand]) != $item[none]))
+		picker.append('<tr class="pickitem"><td class="info"><a class="change" href="' + sideCommand("unequip weapon; unequip off-hand") + '">Empty Hands</a></td>');
+	// In KOLHS, might want to remove hat
+	if(my_path() == "KOLHS" && equipped_item($slot[hat]) != $item[none])
+		picker.append('<tr class="pickitem"><td class="info"><a class="change" href="' + sideCommand("unequip hat") + '">Remove Hat for School</a></td>');
+	
 	picker.addLoader("Getting Dressed");
 	picker.append('</table>');
 	picker.append('</div>');
@@ -2991,6 +3003,8 @@ void bakeCharacter() {
 		}
 	} else if(myPath == "Bugbear Invasion") {
 		myPath = "Bugbear&nbsp;Invasion";
+	} else if(myPath == "KOLHS") {
+		myPath = "<a target='mainpane' style='font-weight:normal;' href='place.php?whichplace=KOLHS'>KOLHS</a>";
 	}
 	
 	//Stat Progress
@@ -3968,20 +3982,28 @@ void bakeHeader() {
 
 	//Try to get IE to play nicely in the absense of a proper doctype
 	result = chitSource["header"].replace_string('<head>', '<head>\n<meta http-equiv="X-UA-Compatible" content="IE=8" />\n');
+#	result = chitSource["header"].replace_string('<head>', '<head>\n<meta http-equiv="X-UA-Compatible" content="IE=8" />\n'
+#		+'<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>\n'
+#		+'<script src="clilinks.js"></script>\n');
+#	result.replace_string('<script language=Javascript src="/images/scripts/jquery-1.3.1.min.js"></script>',"");
+#	result.replace_string('</head>','<script src="//code.jquery.com/jquery-1.7.2.min.js"></script><script src="clilinks.js"></script></head>'); 
+
+	// Add doctype to escape quirks mode
+	result.replace_string('<html>', '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">\n<html>');
 	
 	//Add CSS to the <head> tag
-	result = result.replace_string('</head>', '\n<link rel="stylesheet" href="chit.css">\n</head>');
+	result.replace_string('</head>', '\n<link rel="stylesheet" href="chit.css">\n</head>');
 	
 	//Add JavaScript just before the <body> tag. 
 	//Ideally this should go into the <head> tag too, but KoL adds jQuery outside of <head>, so that won't work
-	result = result.replace_string('<body', '\n<script type="text/javascript" src="chit.js"></script>\n<body');
+	result.replace_string('<body', '\n<script type="text/javascript" src="chit.js"></script>\n<body');
 	
 	//Remove KoL's javascript familiar picker so that it can use our modified version in chit.js
-	result = result.replace_string('<script type="text/javascript" src="/images/scripts/familiarfaves.20120307.js"></script>', '');
+	result.replace_string('<script type="text/javascript" src="/images/scripts/familiarfaves.20120307.js"></script>', '');
 	
 	// Dunno... I'm not sure why KoLmafia adds these... Removing them is probably a mistake...
 	#result = result.replace_string('<script language="Javascript" src="/basics.js"></script><link rel="stylesheet" href="/basics.css" />', '');
-	result = result.replace_string('onload="updateSafetyText();" ', '');
+	result.replace_string('onload="updateSafetyText();" ', '');
 	
 	chitBricks["header"] = result.to_string();
 		
@@ -4017,10 +4039,9 @@ boolean parsePage(buffer original) {
 	if(find(parse)) {
 		// Header: Includes everything up to and including the body tag
 		chitSource["header"] = parse.group(1);
-		//Rollover: Includes everything after the close body tag
-#		matcher test = create_matcher("rollover \= (\\d+).*?rightnow \= (\\d+)", chitSource["header"]);
-#		if(test.find()) chitSource["header"] = chitSource["header"].replace_string(test.group(1), to_string(to_int(test.group(2)) + 50));
-		chitSource["rollover"] = parse.group(2);
+		//Rollover: Edited because I want the pop-up to fit the text
+		chitSource["rollover"] = parse.group(2).replace_string('doc("maintenance")', 'poop("doc.php?topic=maintenance", "documentation", 558, 518, "scrollbars=yes,resizable=no")');
+		#matcher test=create_matcher("rollover \= (\\d+).*?rightnow \= (\\d+)",chitSource["header"]);if(test.find())chitSource["header"]=chitSource["header"].replace_string(test.group(1),to_string(to_int(test.group(2))+30));
 		//Character: Name/Class/Level etc
 		chitSource["character"] = parse.group(3);
 		// Stats: Muscle/Mysticality/Moxie/Fullness/Drunkenness
@@ -4046,6 +4067,20 @@ boolean parsePage(buffer original) {
 		source = parse.replace_first("");
 	}
 	
+	// This is for help finding current location (below)
+	location parseLoc(string loc) {
+		if(to_location(loc) != $location[none])
+			return to_location(loc);
+		switch(loc) {	// Some of these are really tough for KoLmafia to deal with!
+		case "The Arid, Extra-Dry Desert":
+			return $location[Desert (Ultrahydrated)];
+		case "The Orcish Frat House":
+			return $location[Frat House];
+		case "The Hippy Camp":
+			return $location[Hippy Camp];
+		}
+		return my_location();
+	}
 	// Recent Adventures: May or may not be present
 	parse = create_matcher("(<center><font size=2>.+?Last Adventure:.+?</center>)", source);
 	if(find(parse)) {
@@ -4053,25 +4088,8 @@ boolean parsePage(buffer original) {
 		source = parse.replace_first("");
 		// Pull out last adventured location
 		parse = create_matcher('target=mainpane href="(.*?)">(.*?)</a><br></font>', chitSource["trail"]);
-		if(find(parse)) {  // Parse out last location for use by other functions
-			lastLoc = parse.group(2).to_location();
-			if(lastLoc == $location[none]) {	// Some of these are really tough for KoLmafia to deal with!
-				switch(parse.group(2)) {
-				case "The Hidden City":
-					lastLoc = $location[hidden city (automatic)];
-					break;
-				case "The Arid, Extra-Dry Desert":
-					lastLoc = $location[Desert (Ultrahydrated)];
-					break;
-				case "The Orcish Frat House":
-					lastLoc = $location[Frat House];
-					break;
-				case "The Hippy Camp":
-					lastLoc = $location[Hippy Camp];
-					break;
-				}
-			}
-		}
+		if(find(parse))  // Parse out last location for use by other functions
+			lastLoc = parse.group(2).parseLoc();
 		// Shorten some unreasonablely lengthy locations
 		chitSource["trail"] = chitSource["trail"]
 			.replace_string("The Castle in the Clouds in the Sky", "Giant's Castle")
@@ -4096,10 +4114,13 @@ boolean parsePage(buffer original) {
 	}
 
 	// Mood, Buffs, Intrinsic Effects
-	parse = create_matcher('<b><font size=2>(?:Intrinsics|Effects):(.+?)?(<table><tr><td.+?</td></tr></table>)(?:.*?<b><font size=2>(?:Intrinsics|Effects):(.+?)?(<table><tr><td.+?</td></tr></table>))?', source);
+	parse = create_matcher('<b><font size=2>(?:Intrinsics|Effects):(.+?)?(<table><tr><td.+?</td></tr></table>)'
+		+ '(?:.*?<b><font size=2>(?:Intrinsics|Effects):(.+?)?(<table><tr><td.+?</td></tr></table>))?'
+		+ '(?:.*?(?:Recently Expired Effects.+?</tr>)(.+?</tr></table>))?' 			// This is a KoL option
+		, source);
 	if(find(parse)) {
-		chitSource["mood"] = parse.group(1) + parse.group(3); // Only one of those might contain useful data
-		chitSource["effects"] = parse.group(2) + parse.group(4); // Effects plus Instrinsics
+		chitSource["mood"] = parse.group(1) + parse.group(3); 						// Only one of those might contain useful data
+		chitSource["effects"] = parse.group(2) + parse.group(4) + parse.group(5); 	// Effects plus Instrinsics, plus recently expired effects
 		source = parse.replace_first("");
 	}
 

@@ -632,7 +632,8 @@ void special(boolean bonus_actions) {
 		}
 		pull_and_wear_if_good($item[greatest american pants]);
 		
-		boolean screw=pull_if_good($item[loathing legion universal screwdriver]);
+		pull_if_good($item[loathing legion universal screwdriver]);
+		boolean screw=item_amount($item[loathing legion universal screwdriver])>0;
 		if(my_path()!="Avatar of Boris" && my_path()!="Avatar of Jarlsberg")
 		{
 			pull_if_good($item[moveable feast]);
@@ -706,6 +707,7 @@ void special(boolean bonus_actions) {
 					equip($slot[acc1],$item[loathing legion necktie]);
 			}
 		}
+		pull_if_good($item[jar of psychoses (The Crackpot Mystic)]);
 		
 		
 		//14 pulls

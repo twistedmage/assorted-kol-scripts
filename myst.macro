@@ -46,12 +46,12 @@ endif
 #meat shield bosses
 if (monstername The Big Wisniewski || monstername The Man || monstername *Naughty Sorceress* || monstername lord spookyraven || monstername protector spectre) && hasskill meat shield
 	skill meat shield
+	#repeatedly meat shield for ns
+	while monstername *Naughty Sorceress* && hasskill meat shield && !haseffect meat shielded
+		skill meat shield
+	endwhile
 endif
 
-#repeatedly meat shield for ns
-while monstername *Naughty Sorceress* && hasskill meat shield && !haseffect meat shielded
-	skill meat shield
-endwhile
 
 #these bosses block items
 if !monstername *Naughty Sorceress* && !monstername *bonerdagon
@@ -121,7 +121,7 @@ if !monstername *Naughty Sorceress* && !monstername *bonerdagon
 	endif
 	
 
-	if (hascombatitem spooky putty sheet || hascombatitem Rain-doh black box) && (!monstername Battlie Knight Ghost && !monstername ghost miner && !monstername Claybender Sorcerer Ghost && !monstername Dusken Raider Ghost && !monstername Space Tourist Explorer Ghost && !monstername Whatsian Commando Ghost) && (monstername ghost || monstername lobsterfrogman || monstername gaudy pirate || monstername modern zombie || monstername dirty old lich || monstername smut orc pervert)
+	if (hascombatitem spooky putty sheet || hascombatitem Rain-doh black box) && (!monstername Battlie Knight Ghost && !monstername ghost miner && !monstername Claybender Sorcerer Ghost && !monstername Dusken Raider Ghost && !monstername Space Tourist Explorer Ghost && !monstername Whatsian Commando Ghost) && (monstername ghost || monstername lobsterfrogman || monstername gaudy pirate || monstername modern zombie || monstername dirty old lich)
 		if hascombatitem spooky putty sheet && !hascombatitem Rain-doh black box
 			use spooky putty sheet
 		endif

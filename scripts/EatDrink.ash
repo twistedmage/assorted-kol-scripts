@@ -78,7 +78,7 @@ boolean EAT_ACCORDION = to_boolean(vars["eatdrink_accordionGet"]);
 // Do you want to invoke Ode before drinking?
 // This only works if you actually possess the skill
 setvar("eatdrink_ode", true);
-boolean wants_ode = have_skill($skill[ode to booze]) ? to_boolean(vars["eatdrink_ode"]) : false;
+boolean wants_ode = have_skill($skill[The Ode to Booze]) ? to_boolean(vars["eatdrink_ode"]) : false;
 
 // If shopping, ignore items that cost more than PRICE FLEXIBILITY * this 
 // (another safety precaution, but not as reliable as closting your meat). 
@@ -439,15 +439,15 @@ int get_starter_items()
 
 int get_accordion()
 {
-  if (equipped_amount($item[trickster's trikitixa]) > 0) return 20;
+  if (equipped_amount($item[The Trickster's Trikitixa]) > 0) return 20;
   else if (equipped_amount($item[squeezebox of the ages]) > 0) return 15;
   else if (equipped_amount($item[rock and roll legend]) > 0) return 10;
   else if (equipped_amount($item[calavera concertina]) > 0) return 7;
   else if (equipped_amount($item[stolen accordion]) > 0) return 5;
-  else if (item_amount($item[trickster's trikitixa]) > 0) return 20;
+  else if (item_amount($item[The Trickster's Trikitixa]) > 0) return 20;
   else if (item_amount($item[squeezebox of the ages]) > 0) return 15;
   else if (item_amount($item[rock and roll legend]) > 0) return 10;
-  if (!EAT_ACCORDION || SIM_CONSUME || my_maxmp() < mp_cost($skill[ode to booze]))
+  if (!EAT_ACCORDION || SIM_CONSUME || my_maxmp() < mp_cost($skill[The Ode to Booze]))
   {
     if (item_amount($item[calavera concertina]) > 0) return 7;
     else if (item_amount($item[stolen accordion]) > 0) return 5;
@@ -527,7 +527,7 @@ boolean get_milk(int full)
 boolean get_ode(int drink)
 {
   if (!SIM_CONSUME)
-    return (have_effect($effect[ode to booze]) >= drink);
+    return (have_effect($effect[Ode to Booze]) >= drink);
   return simode;
 }
 
@@ -1074,7 +1074,7 @@ boolean collect_ingredients(item newitem, int count, int [item] stack, int loop)
 float ode_adjust(float adj_adv, float adj_con)
 {
   if (simode) return adj_adv + adj_con;
-  return adj_adv + min(have_effect($effect[ode to booze]), adj_con);
+  return adj_adv + min(have_effect($effect[Ode to Booze]), adj_con);
 }
 
 float milk_adjust(float adj_adv, float adj_con)
@@ -1188,8 +1188,8 @@ void ode_do_liver_good(int drink)
     vprint("Skipping Ode to Booze because you don't have an accordion.",3);
   else
   {
-    int nextcost = max(0, SIM_CONSUME ? ((mp_cost($skill[ode to booze]) * ceil(to_float(drink) / accordion)) - my_mp()) : (mp_cost($skill[ode to booze]) - my_mp())) * manacost;
-    boolean shouldgetode = my_maxmp() >= mp_cost($skill[ode to booze]);
+    int nextcost = max(0, SIM_CONSUME ? ((mp_cost($skill[The Ode to Booze]) * ceil(to_float(drink) / accordion)) - my_mp()) : (mp_cost($skill[The Ode to Booze]) - my_mp())) * manacost;
+    boolean shouldgetode = my_maxmp() >= mp_cost($skill[The Ode to Booze]);
     int displaydrink = drink;
 
     // keep trying until you get it, you can't get it, or it's a bad value
@@ -1207,9 +1207,9 @@ void ode_do_liver_good(int drink)
       {
         summarize("0: <b>Ode to Booze</b> price: "+nextcost+" value: "
                   + (odevalue - nextcost));
-        if (!use_skill( 1 , $skill[Ode to Booze]))
+        if (!use_skill( 1 , $skill[The Ode to Booze]))
           wants_ode = false;
-        nextcost = max(0, mp_cost($skill[ode to booze]) - my_mp()) * manacost;
+        nextcost = max(0, mp_cost($skill[The Ode to Booze]) - my_mp()) * manacost;
         displaydrink -= accordion;
         odevalue = displaydrink * VALUE_OF_ADVENTURE;
       }
@@ -2465,12 +2465,12 @@ void eatdrink(int foodMax, int drinkMax, int spleenMax, boolean overdrink)
      get_choc();
   }
   string finished = "Finished. ";
-  if (have_effect($effect[got milk]) > 0 || (have_effect($effect[ode to booze]) > 0))
+  if (have_effect($effect[got milk]) > 0 || (have_effect($effect[Ode to Booze]) > 0))
   {
     finished += "You had ";
     if (have_effect($effect[got milk]) > 0)
       finished += " Milk of Magnesium";
-    if (have_effect($effect[ode to booze]) > 0)
+    if (have_effect($effect[Ode to Booze]) > 0)
       finished += "-Ode to Booze";
     finished += " in effect. Adventures listed above does not reflect that, but this does:";
   }
@@ -2647,7 +2647,7 @@ void drink_with_tps(int budget,boolean overdrink)
 			return;
 		}
 		cli_execute("status refresh");
-		if(have_effect($effect[ode to booze])==0)
+		if(have_effect($effect[Ode to Booze])==0)
 		{
 			abort("You miss ode, thus your nightcap would be teh sux, fix it.");
 		}

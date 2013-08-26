@@ -45,12 +45,12 @@ endif
 #meat shield bosses
 if (monstername The Big Wisniewski || monstername The Man || monstername *Naughty Sorceress* || monstername lord spookyraven || monstername protector spectre) && hasskill meat shield
 	skill meat shield
-endif
+	#repeatedly meat shield for ns
+	while monstername *Naughty Sorceress* && hasskill meat shield && !haseffect meat shielded
+		skill meat shield
+	endwhile
 
-#repeatedly meat shield for ns
-while monstername *Naughty Sorceress* && hasskill meat shield && !haseffect meat shielded
-	skill meat shield
-endwhile
+endif
 
 if !monstername *Naughty Sorceress* && !monstername *bonerdagon
 	#oil baron is immune to stuns

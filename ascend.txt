@@ -81,8 +81,8 @@ xxxx	- castle -> great hall -> ballroom (key) -> trip the light fantastic (muddy
 --------dredsylvania plan----
 === run 1 (mox)
 -woods
-twistedmage -> tree -> base -> look upward
-anid (muscle) -> tree -> top -> stomp on fruit branch
+twistedmage 1-> tree -> base -> look upward
+anid (muscle) 1-> tree -> top -> stomp on fruit branch
 
 anid (muscle) 1-> cabin -> kitchen -> grind flour from old dry bone
 twistedmage	1-> cabin -> kitchen -> raid spicerack to get tarragon
@@ -108,31 +108,32 @@ twistedmage (moxie)-> tower -> lab (key) -> brew kiwitini
 
 === run 2 (twistedmage = myst)
 -castle
-twistedmage (myst) -> great hall -> dining room -> levitate to rafters for wax banana
+twistedmage (myst) 2-> great hall -> dining room -> levitate to rafters for wax banana
 
-twistedmage myst	-> tower -> library -> read enchanted jewelery ((once)
+twistedmage myst	1-> tower -> library -> read enchanted jewelery (once)
 
-twistedmage 		-> dungeon -> boiler -> incinerator for krueggerands
+twistedmage 		1-> dungeon -> boiler -> incinerator for krueggerands
 
 -woods
-anid	-> tree -> climb -> get shing thing
+anid	-> ????
 asica	1-> tree -> base -> look downward to get seed pod
 
-twistedmage - cabin -> basement -> put wax banana in lock
+twistedmage 1- cabin -> basement -> put wax banana in lock
 
-twistedmage -> roots -> heat -> melt down old ball and chain
+twistedmage 1-> roots -> heat -> melt down old ball and chain
 
 -village
-twistedmage (mys) -> village square -> gallows -> stand on trapdoor
-anid	-> village square -> gallows -> pull the level
+twistedmage (mys) 1-> village square -> gallows -> stand on trapdoor
+anid	1-> village square -> gallows -> pull the level
 
-twistedmage (mys) -> duke -> servants quarters -> bake pie (dread tarragon, bone flour, stinking agaricus and dreadful roast)
+twistedmage (mys) 1-> duke -> servants quarters -> bake pie (dread tarragon, bone flour, stinking agaricus and dreadful roast)
 
 twistedmage -> dreadful part of town -> ticking shack -> rummage through shelves for krueggerands
 
 <zombie hard mode, unkillable skeleton hard mode>
 === run 3 (mus)
 -woods
+anid	1-> tree -> climb -> get shing thing
 <>
 
 -village
@@ -162,6 +163,14 @@ mox		-> even more dreadful part of town -> ticking shack -> replica key
 mox		-> even more dreadful part of town -> ticking shack -> polish amber
 XXX - woods -> cabin -> unlock lockbox
 ----------------------
+for bosses, use brass dreadsylvanian flask + silver dreadsylvanian flask
+<otther dreadsylvania buffs?>
+
+
+
+
+
+
 12 to 27 oct
 
 go back through trondheim

@@ -99,6 +99,20 @@ string join(string[int] pieces, string glue) {
    }
    return res;
 }
+// adds a unique entry to a glue-delimited list (and so won't add if already exists), returns modified list
+string list_add(string list, string add, string glue) {
+   if (length(list) == 0) return add;
+   if (create_matcher("(^|"+glue+")"+to_lower_case(add)+"($|"+glue+")",to_lower_case(list)).find()) return list;
+   return list+glue+add;
+}
+string list_add(string list, string add) { return list_add(list, add, ", "); }
+// removes any matching entries from a glue-delimited list, returns modified list
+string list_remove(string list, string del, string glue) {
+   string[int] bits;
+   foreach i,b in split_string(list, glue) if (b != del) bits[i] = b;
+   return join(bits,glue);
+}
+string list_remove(string list, string del) { return list_remove(list, del, ", "); }
 
 // human-readable number (formats the number with localized grouping/decimal separators, rounds floats at specified place)
 string rnum(int n) {
@@ -270,6 +284,11 @@ void setvar(string varname,string dfault,string type) {
       }
       return;
    }
+   switch (varname) {
+      case "BatMan_attract": if (vars contains "ftf_olfact") dfault = vars["ftf_olfact"]; remove vars["ftf_olfact"]; break;
+      case "BatMan_yellow": if (vars contains "ftf_yellow") dfault = vars["ftf_yellow"]; remove vars["ftf_yellow"]; break;
+      case "BatMan_banish": if (vars contains "ftf_grin") dfault = vars["ftf_grin"]; remove vars["ftf_grin"]; break;
+   }
    vars[varname] = dfault;
    vprint("New ZLib "+type+" setting: "+varname+" => "+dfault,"purple",4);
    updatevars();
@@ -384,8 +403,9 @@ int have_item(string tolookup) {
    return item_amount(to_item(tolookup)) + equipped_amount(to_item(tolookup));
 }
 
-// returns true if a given stat is a goal (from setting "level X" or "<stat> X" as a condition)
+// returns true if the given stat is a goal (from setting "level X" or "<stat> X" as a condition), or primestat needed for run
 boolean is_goal(stat gstat) {
+   if (my_primestat() == gstat && my_level() < 13) return true;
    foreach i,g in get_goals() if (create_matcher("\\d+ "+to_lower_case(gstat),g).find()) return true;
    return false;
 }
@@ -626,8 +646,7 @@ familiar best_fam(string ftype) {
    string[familiar] fams;
    if (!load_current_map("bestfamiliars",fams)) return result;
    vprint("Finding best familiar of type \""+ftype+"\"...",3);
-   int bestweight = 0;
-   int beststrength = 0;
+   int bestweight, beststrength;
    int famstrength(string alltypes, string targettype) {
      matcher m = create_matcher("(\\w+)\\s+(\\d+)", alltypes);          // thanks for the regex Jason
      while (m.find()) if (m.group(1) == targettype) return to_int(m.group(2));

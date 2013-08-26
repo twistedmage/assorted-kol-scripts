@@ -87,7 +87,7 @@ void crimbo11_buffs(string farmtype)
 		{
 			refresh_stash();
 			take_stash(stash_amount($item[fluid of fudge-finding]),$item[fluid of fudge-finding]);
-			while(have_effect($effect[fudgehound])< my_adventures() && available_amount($item[fluid of fudge finding])>0)
+			while(have_effect($effect[fudgehound])< my_adventures() && available_amount($item[fluid of fudge-finding])>0)
 			{
 				use(1,$item[fluid of fudge-finding]);
 			}
@@ -108,7 +108,7 @@ void crimbo11_buffs(string farmtype)
 			set_property("choiceAdventure559","2");
 		}
 		if(have_effect($effect[fresh scent])<1)
-			use(1,$item[rock salt]);
+			use(1,$item[chunk of rock salt]);
 		print("buffing with fudge lily");
 		if(have_effect(to_effect(962))<1)
 			use(1,to_item(5436));
@@ -153,8 +153,8 @@ void crimbo11(string farmtype)
 	if(closet_amount($item[spooky putty sheet])>0)
 		take_closet(1,$item[spooky putty sheet]);
 	//once per day buffs
-	if(available_amount($item[legendary beat])>0)
-		use(1,$item[legendary beat]);
+	if(available_amount($item[The Legendary Beat])>0)
+		use(1,$item[The Legendary Beat]);
 	cli_execute("friars familiar");
 	cli_execute("pool stylish");
 	cli_execute("pool stylish");
@@ -227,7 +227,7 @@ void buffbots()
 {
 	if(!to_boolean(get_property("_buffed_"+my_name())))
 	{			
-		if(have_effect($effect[jalapeno saucesphere])<1000 && have_effect($effect[jabanero saucesphere])<1000 ) //jalapeno and jabanero saucesphere
+		if(have_effect($effect[Jalape&ntilde;o Saucesphere])<1000 && have_effect($effect[Jaba&ntilde;ero Saucesphere])<1000 ) //jalapeno and Jaba&ntilde;ero Saucesphere
 		{
 			meatmail("testudinata",3);
 		}		
@@ -246,7 +246,7 @@ void buffbots()
 			meatmail("testudinata",6);
 			meatmail("Noblesse Oblige",17);
 		}
-		if(have_effect($effect[fat leons phat loot lyric])<1000 && my_name()=="twistedmage") //phat loot
+		if(have_effect($effect[Fat Leon's Phat Loot Lyric])<1000 && my_name()=="twistedmage") //phat loot
 		{
 			meatmail("kolabuff",18);
 			meatmail("iocainebot",14);
@@ -261,13 +261,13 @@ void buffbots()
 			meatmail("testudinata",5);
 			meatmail("Noblesse Oblige",6);
 		}
-		if(have_effect($effect[Jalapeno Saucesphere])<1000) //jalapen
+		if(have_effect($effect[Jalape&ntilde;o Saucesphere])<1000) //jalapen
 		{
 			meatmail("kolabuff",6);
 			meatmail("iocainebot",4);
 			meatmail("Noblesse Oblige",12);
 		}
-		if(have_effect($effect[jabanero saucesphere])<1000) //jabenaro
+		if(have_effect($effect[Jaba&ntilde;ero Saucesphere])<1000) //jabenaro
 		{
 			meatmail("kolabuff",15);
 			meatmail("iocainebot",12);
@@ -672,17 +672,17 @@ void morning()
 			visit_url("bhh.php");
 			abort("have to buy  hound dog");
 		}
-		if(can_interact() && available_amount($item[bounty hunting helmet])<1 && item_amount($item[filthy lucre])>14)
+		if(can_interact() && available_amount($item[bounty-hunting helmet])<1 && item_amount($item[filthy lucre])>14)
 		{
 			visit_url("bhh.php");
 			abort("have to buy bounty hat");
 		}
-		if(can_interact() && available_amount($item[bounty hunting pants])<1 && item_amount($item[filthy lucre])>14)
+		if(can_interact() && available_amount($item[bounty-hunting pants])<1 && item_amount($item[filthy lucre])>14)
 		{
 			visit_url("bhh.php");
 			abort("have to buy bounty pants");
 		}
-		if(!have_skill($skill[transcendent olfaction]) || !have_familiar($familiar[jumpsuited hound dog]) || item_amount($item[bounty hunting helmet])<1 || item_amount($item[bounty hunting pants])<1)
+		if(!have_skill($skill[transcendent olfaction]) || !have_familiar($familiar[jumpsuited hound dog]) || item_amount($item[bounty-hunting helmet])<1 || item_amount($item[bounty-hunting pants])<1)
 		{
 			cli_execute("maximize "+ my_primestat());
 			cli_execute( "bounty.ash hunt best" );
@@ -694,15 +694,15 @@ void morning()
 			}
 		}
 //get buffs------------------------------------
-		if(can_adv($location[skate park],false) && contains_text(visit_url("sea_skatepark.php"),"Comet_skate.gif"))
+		if(can_adv($location[The Skate Park],false) && contains_text(visit_url("sea_skatepark.php"),"Comet_skate.gif"))
 		{
 			cli_execute( "skate Finstrong" );
 		}
-		else if(can_adv($location[skate park],false) && contains_text(visit_url("sea_skatepark.php"),"Lutz.gif"))
+		else if(can_adv($location[The Skate Park],false) && contains_text(visit_url("sea_skatepark.php"),"Lutz.gif"))
 		{
 			cli_execute( "skate Fishy" );
 		}
-		else if(can_adv($location[skate park],false) && contains_text(visit_url("sea_skatepark.php"),"Chess2.gif"))
+		else if(can_adv($location[The Skate Park],false) && contains_text(visit_url("sea_skatepark.php"),"Chess2.gif"))
 		{
 			cli_execute( "skate eclectic eels" );
 			cli_execute( "skate merry" );
@@ -794,11 +794,11 @@ void main()
 //get pet sorted----------------------------------------------------------
 	if(my_level()<10 && my_familiar()==$familiar[none] && can_interact() && my_meat()>500 && item_amount($item[mosquito larva])>0)
 	{
-		if(item_amount($item[Familiar-Gro Terrarium])==0)
+		if(item_amount($item[Familiar-Gro&trade; Terrarium])==0)
 		{
-			buy(1,$item[Familiar-Gro Terrarium]);
+			buy(1,$item[Familiar-Gro&trade; Terrarium]);
 		}
-		use(1,$item[Familiar-Gro Terrarium]);
+		use(1,$item[Familiar-Gro&trade; Terrarium]);
 		use(1,$item[mosquito larva]);
 		use_familiar($familiar[Mosquito]);
 	}

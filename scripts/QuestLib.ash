@@ -106,7 +106,7 @@ void update_mcd(int level)
 	if (current_mcd() == level)
 		return;
 	if ((in_muscle_sign() && !retrieve_item(1,$item[detuned radio])) ||
-       (in_moxie_sign() && available_amount($item[bitchin meatcar]) == 0))
+       (in_moxie_sign() && available_amount($item[bitchin' meatcar]) == 0))
 		return;
 	print("MCD called in questlib","green");	
 	change_mcd(level);
@@ -337,13 +337,13 @@ boolean rotate_pyramid(string wanted, boolean ratchet)
 			else
 			{
 				cli_execute("conditions clear; conditions add 1 choiceadv");              
-				adventure(request_noncombat(my_adventures()), $location[Middle Chamber]); 
+				adventure(request_noncombat(my_adventures()), $location[The Middle Chamber]); 
 			}
 		}
 		else
 		{
 			cli_execute("conditions clear; conditions add 1 choiceadv");
-			adventure(request_noncombat(my_adventures()), $location[Middle Chamber]);
+			adventure(request_noncombat(my_adventures()), $location[The Middle Chamber]);
 		}
 	}
 

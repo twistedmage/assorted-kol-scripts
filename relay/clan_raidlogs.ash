@@ -3,8 +3,10 @@ TODO:
 Loot Manager
 Update Manager
 */
+string[string] contexts;
 string[string] FF=form_fields();
 string page;
+string abortMessage;
 //total, player, area, section
 int[string,string,string] data;
 int[int,string,string]odata;
@@ -171,104 +173,120 @@ theMatcher["DreadCastle",".dist"]="<b>([\\d,]+)</b> monster\\(s\\) in the Castle
 theMatcher["DreadWoods","&nbsp;"]="defeated( by)?  (hot|cold|spooky|stench|sleaze) (bugbear|werewolf)";
 theMatcher["DreadWoods","!Werewolf"]="defeated( by)? The Great Wolf of the Air";
 theMatcher["DreadWoods","!Bugbear"]="defeated( by)?  Falls-From-Sky";
-theMatcher["DreadWoods","+Cabin.101"]="acquired some dread tarragon";
-theMatcher["DreadWoods","+Cabin.102"]="made some bone flour";
-theMatcher["DreadWoods","+Cabin.103"]="made the forest less stinky";
-theMatcher["DreadWoods","+Cabin.201"]="recycled some newspapers";
-theMatcher["DreadWoods","+Cabin.202"]="read an old diary";
-theMatcher["DreadWoods","+Cabin.203"]="got a Dreadsylvanian auditor's badge";
-theMatcher["DreadWoods","+Cabin.204"]="made an impression of a complicated lock";
-theMatcher["DreadWoods","+Cabin.300"]="unlocked the attic of the cabin";
-theMatcher["DreadWoods","+Cabin.301"]="made the forest less spooky";
-theMatcher["DreadWoods","+Cabin.302"]="drove some werewolves out of the forest";
-theMatcher["DreadWoods","+Cabin.303"]="drove some vampires out of the castle";
-theMatcher["DreadWoods","+Cabin.304"]="flipped through a photo album";
-theMatcher["DreadWoods","+Tree.101"]="(?:wasted some fruit|knocked some fruit loose)";
-theMatcher["DreadWoods","+Tree.102"]="made the forest less sleazy";
-theMatcher["DreadWoods","+Tree.103"]="acquired a chunk of moon-amber";
-theMatcher["DreadWoods","+Tree.200"]="unlocked the fire watchtower";
-theMatcher["DreadWoods","+Tree.201"]="drove some ghosts out of the village";
-theMatcher["DreadWoods","+Tree.202"]="rifled through a footlocker";
-theMatcher["DreadWoods","+Tree.203"]="lifted some weights";
-theMatcher["DreadWoods","+Tree.301"]="got a blood kiwi";
-theMatcher["DreadWoods","+Tree.302"]="got a cool seed pod";
-//theMatcher["DreadWoods","+Tree.303"]="";
-theMatcher["DreadWoods","+Burrows.101"]="made the forest less hot";
-theMatcher["DreadWoods","+Burrows.102"]="got intimate with some hot coals";
-theMatcher["DreadWoods","+Burrows.103"]="made a cool iron ingot";
-theMatcher["DreadWoods","+Burrows.201"]="made the forest less cold";
-theMatcher["DreadWoods","+Burrows.202"]="listened to the forest's heart";
-theMatcher["DreadWoods","+Burrows.203"]="drank some nutritious forest goo";
-theMatcher["DreadWoods","+Burrows.301"]="drove some bugbears out of the forest";
-theMatcher["DreadWoods","+Burrows.302"]="found and sold a rare baseball card";
+theMatcher["DreadWoods","+Cabin.11"]="acquired some dread tarragon";
+theMatcher["DreadWoods","+Cabin.12"]="made some bone flour";
+theMatcher["DreadWoods","+Cabin.13"]="made the forest less stinky";
+theMatcher["DreadWoods","+Cabin.21"]="recycled some newspapers";
+theMatcher["DreadWoods","+Cabin.22"]="read an old diary";
+theMatcher["DreadWoods","+Cabin.23"]="got a Dreadsylvanian auditor's badge";
+theMatcher["DreadWoods","+Cabin.24"]="made an impression of a complicated lock";
+theMatcher["DreadWoods","+Cabin.30"]="unlocked the attic of the cabin";
+theMatcher["DreadWoods","+Cabin.31"]="made the forest less spooky";
+theMatcher["DreadWoods","+Cabin.32"]="drove some werewolves out of the forest";
+theMatcher["DreadWoods","+Cabin.33"]="drove some vampires out of the castle";
+theMatcher["DreadWoods","+Cabin.34"]="flipped through a photo album";
+//4? 5-pencil, 6-leave
+theMatcher["DreadWoods","+Tree.11"]="(?:wasted some fruit|knocked some fruit loose)";
+theMatcher["DreadWoods","+Tree.12"]="made the forest less sleazy";
+theMatcher["DreadWoods","+Tree.13"]="acquired a chunk of moon-amber";
+theMatcher["DreadWoods","+Tree.20"]="unlocked the fire watchtower";
+theMatcher["DreadWoods","+Tree.21"]="drove some ghosts out of the village";
+theMatcher["DreadWoods","+Tree.22"]="rifled through a footlocker";
+theMatcher["DreadWoods","+Tree.23"]="lifted some weights";
+theMatcher["DreadWoods","+Tree.31"]="got a blood kiwi";
+theMatcher["DreadWoods","+Tree.32"]="got a cool seed pod";
+//theMatcher["DreadWoods","+Tree.33"]="";
+theMatcher["DreadWoods","+Burrows.11"]="made the forest less hot";
+theMatcher["DreadWoods","+Burrows.12"]="got intimate with some hot coals";
+theMatcher["DreadWoods","+Burrows.13"]="made a cool iron ingot";
+theMatcher["DreadWoods","+Burrows.21"]="made the forest less cold";
+theMatcher["DreadWoods","+Burrows.22"]="listened to the forest's heart";
+theMatcher["DreadWoods","+Burrows.23"]="drank some nutritious forest goo";
+theMatcher["DreadWoods","+Burrows.31"]="drove some bugbears out of the forest";
+theMatcher["DreadWoods","+Burrows.32"]="found and sold a rare baseball card";
 
 theMatcher["DreadVillage","&nbsp;"]="defeated( by)?  (hot|cold|spooky|stench|sleaze) (ghost|zombie)";
 theMatcher["DreadVillage","!Ghost"]="defeated( by)?  Mayor Ghost";
 theMatcher["DreadVillage","!Zombie"]="defeated( by)? the Zombie Homeowners";
-theMatcher["DreadVillage","+Estate.101"]="drove some zombies out of the village";
-theMatcher["DreadVillage","+Estate.102"]="robbed some graves";
-theMatcher["DreadVillage","+Estate.103"]="read some lurid epitaphs";
-theMatcher["DreadVillage","+Estate.201"]="made the village less hot";
-theMatcher["DreadVillage","+Estate.202"]="made a shepherd's pie";
-theMatcher["DreadVillage","+Estate.203"]="raided some naughty cabinets";
-theMatcher["DreadVillage","+Estate.300"]="unlocked the master suite";
-theMatcher["DreadVillage","+Estate.301"]="drove some werewolves out of the forest";
-theMatcher["DreadVillage","+Estate.302"]="got a bottle of eau de mort";
-theMatcher["DreadVillage","+Estate.303"]="made a ghost shawl";
-theMatcher["DreadVillage","+Square.100"]="unlocked the schoolhouse";
-theMatcher["DreadVillage","+Square.101"]="drove some ghosts out of the village";
-theMatcher["DreadVillage","+Square.102"]="collected a ghost pencil";
-theMatcher["DreadVillage","+Square.103"]="read some naughty carvings";
-theMatcher["DreadVillage","+Square.201"]="made the village less cold";
-theMatcher["DreadVillage","+Square.202"]="looted the blacksmith's till";
-theMatcher["DreadVillage","+Square.203"]="made a cool(?:ing)? iron";
-theMatcher["DreadVillage","+Square.301"]="made the village less spooky";
-theMatcher["DreadVillage","+Square.302"]="was hung by a clanmate";
-//theMatcher["DreadVillage","+Square.303"]="";//gawking
-theMatcher["DreadVillage","+Square.304"]="hung a clanmate";//may have more
-theMatcher["DreadVillage","+Skid Row.101"]="made the vill?age less stinky";
-theMatcher["DreadVillage","+Skid Row.102"]="swam in a sewer";
-theMatcher["DreadVillage","+Skid Row.201"]="drove some skeletons out of the castle";
-theMatcher["DreadVillage","+Skid Row.202"]="made the village less sleazy";
-theMatcher["DreadVillage","+Skid Row.203"]="moved some bricks around";
-theMatcher["DreadVillage","+Skid Row.301"]="looted the tinker's shack";
-theMatcher["DreadVillage","+Skid Row.302"]="made a complicated key";
-theMatcher["DreadVillage","+Skid Row.303"]="polished some moon-amber";
-theMatcher["DreadVillage","+Skid Row.304"]="made a clockwork bird";
-theMatcher["DreadVillage","+Skid Row.305"]="got some old fuse";
+theMatcher["DreadVillage","+Square.10"]="unlocked the schoolhouse";
+theMatcher["DreadVillage","+Square.11"]="drove some ghosts out of the village";
+theMatcher["DreadVillage","+Square.12"]="collected a ghost pencil";
+theMatcher["DreadVillage","+Square.13"]="read some naughty carvings";
+theMatcher["DreadVillage","+Square.21"]="made the village less cold";
+theMatcher["DreadVillage","+Square.22"]="looted the blacksmith's till";
+theMatcher["DreadVillage","+Square.23"]="made (?:a|some) cool(?:ing)? iron";
+theMatcher["DreadVillage","+Square.31"]="made the village less spooky";
+theMatcher["DreadVillage","+Square.32"]="was hung by a clanmate";
+//theMatcher["DreadVillage","+Square.33"]="";//gawking
+theMatcher["DreadVillage","+Square.34"]="hung a clanmate";
+theMatcher["DreadVillage","+Skid Row.11"]="made the vill?age less stinky";
+theMatcher["DreadVillage","+Skid Row.12"]="swam in a sewer";
+theMatcher["DreadVillage","+Skid Row.21"]="drove some skeletons out of the castle";
+theMatcher["DreadVillage","+Skid Row.22"]="made the village less sleazy";
+theMatcher["DreadVillage","+Skid Row.23"]="moved some bricks around";
+theMatcher["DreadVillage","+Skid Row.31"]="looted the tinker's shack";
+theMatcher["DreadVillage","+Skid Row.32"]="made a complicated key";
+theMatcher["DreadVillage","+Skid Row.33"]="polished some moon-amber";
+theMatcher["DreadVillage","+Skid Row.34"]="made a clockwork bird";
+theMatcher["DreadVillage","+Skid Row.35"]="got some old fuse";
+theMatcher["DreadVillage","+Estate.11"]="drove some zombies out of the village";
+theMatcher["DreadVillage","+Estate.12"]="robbed some graves";
+theMatcher["DreadVillage","+Estate.13"]="read some lurid epitaphs";
+theMatcher["DreadVillage","+Estate.21"]="made the village less hot";
+theMatcher["DreadVillage","+Estate.22"]="made a shepherd's pie";
+theMatcher["DreadVillage","+Estate.23"]="raided some naughty cabinets";
+theMatcher["DreadVillage","+Estate.30"]="unlocked the master suite";
+theMatcher["DreadVillage","+Estate.31"]="drove some werewolves out of the forest";
+theMatcher["DreadVillage","+Estate.32"]="got a bottle of eau de mort";
+theMatcher["DreadVillage","+Estate.33"]="made a ghost shawl";
 
 theMatcher["DreadCastle","&nbsp;"]="defeated( by)?  (hot|cold|spooky|stench|sleaze) (skeleton|vampire)";
 theMatcher["DreadCastle","!Vampire"]="defeated( by)?  Count Drunkula";
 theMatcher["DreadCastle","!Skeleton"]="defeated( by)?  The Unkillable Skeleton";
-theMatcher["DreadCastle","+Dungeon.101"]="made the castle less spooky";
-theMatcher["DreadCastle","+Dungeon.102"]="did a whole bunch of pushups";
-theMatcher["DreadCastle","+Dungeon.103"]="took a nap on a prison cot";
-theMatcher["DreadCastle","+Dungeon.201"]="made the castle less hot";
-theMatcher["DreadCastle","+Dungeon.202"]="sifted through some ashes";
-theMatcher["DreadCastle","+Dungeon.203"]="relaxed in a furnace";
-theMatcher["DreadCastle","+Dungeon.301"]="got some stinking agaric";
-theMatcher["DreadCastle","+Dungeon.302"]="rolled around in some mushrooms";
-theMatcher["DreadCastle","+Great Hall.100"]="unlocked the ballroom";
-theMatcher["DreadCastle","+Great Hall.101"]="drove some vampires out of the castle";
-theMatcher["DreadCastle","+Great Hall.102"]="twirled on the dance floor";
-theMatcher["DreadCastle","+Great Hall.201"]="made the castle less cold";
-theMatcher["DreadCastle","+Great Hall.202"]="frolicked in a freezer";
-theMatcher["DreadCastle","+Great Hall.301"]="got some roast beast";
-theMatcher["DreadCastle","+Great Hall.302"]="made the castle less stinky";
-theMatcher["DreadCastle","+Great Hall.303"]="got a wax banana";
-theMatcher["DreadCastle","+Tower.100"]="unlocked the lab";
-theMatcher["DreadCastle","+Tower.101"]="drove some bugbears out of the forest";
-theMatcher["DreadCastle","+Tower.102"]="drove some zombies out of the village";
-theMatcher["DreadCastle","+Tower.103"]="fixed The Machine";
-theMatcher["DreadCastle","+Tower.104"]="made a blood kiwitini";
-theMatcher["DreadCastle","+Tower.201"]="drove some skeletons out of the castle";
-theMatcher["DreadCastle","+Tower.202"]="read some ancient secrets";
-theMatcher["DreadCastle","+Tower.203"]="learned to make a moon-amber necklace";
-theMatcher["DreadCastle","+Tower.301"]="made the castle less sleazy";
-theMatcher["DreadCastle","+Tower.302"]="raided a dresser";
-theMatcher["DreadCastle","+Tower.303"]="got magically fingered";
+theMatcher["DreadCastle","+Great Hall.10"]="unlocked the ballroom";
+theMatcher["DreadCastle","+Great Hall.11"]="drove some vampires out of the castle";
+theMatcher["DreadCastle","+Great Hall.12"]="twirled on the dance floor";
+theMatcher["DreadCastle","+Great Hall.21"]="made the castle less cold";
+theMatcher["DreadCastle","+Great Hall.22"]="frolicked in a freezer";
+theMatcher["DreadCastle","+Great Hall.31"]="got some roast beast";
+theMatcher["DreadCastle","+Great Hall.32"]="made the castle less stinky";
+theMatcher["DreadCastle","+Great Hall.33"]="got a wax banana";
+theMatcher["DreadCastle","+Tower.10"]="unlocked the lab";
+theMatcher["DreadCastle","+Tower.11"]="drove some bugbears out of the forest";
+theMatcher["DreadCastle","+Tower.12"]="drove some zombies out of the village";
+theMatcher["DreadCastle","+Tower.13"]="fixed The Machine";
+theMatcher["DreadCastle","+Tower.14"]="made a blood kiwitini";
+theMatcher["DreadCastle","+Tower.21"]="drove some skeletons out of the castle";
+theMatcher["DreadCastle","+Tower.22"]="read some ancient secrets";
+theMatcher["DreadCastle","+Tower.23"]="learned to make a moon-amber necklace";
+theMatcher["DreadCastle","+Tower.31"]="made the castle less sleazy";
+theMatcher["DreadCastle","+Tower.32"]="raided a dresser";
+theMatcher["DreadCastle","+Tower.33"]="got magically fingered";
+theMatcher["DreadCastle","+Dungeon.11"]="made the castle less spooky";
+theMatcher["DreadCastle","+Dungeon.12"]="did a whole bunch of pushups";
+theMatcher["DreadCastle","+Dungeon.13"]="took a nap on a prison cot";
+theMatcher["DreadCastle","+Dungeon.21"]="made the castle less hot";
+theMatcher["DreadCastle","+Dungeon.22"]="sifted through some ashes";
+theMatcher["DreadCastle","+Dungeon.23"]="relaxed in a furnace";
+theMatcher["DreadCastle","+Dungeon.31"]="got some stinking agaric";
+theMatcher["DreadCastle","+Dungeon.32"]="rolled around in some mushrooms";
+
+theMatcher["DreadPencil","DreadWoods.Cabin"]="loc=1";
+theMatcher["DreadPencil","DreadWoods.Tree"]="loc=2";
+theMatcher["DreadPencil","DreadWoods.Burrows"]="loc=3";
+theMatcher["DreadPencil","DreadVillage.Square"]="loc=4";
+theMatcher["DreadPencil","DreadVillage.Skid Row"]="loc=5";
+theMatcher["DreadPencil","DreadVillage.Estate"]="loc=6";
+theMatcher["DreadPencil","DreadCastle.Great Hall"]="loc=7";
+theMatcher["DreadPencil","DreadCastle.Tower"]="loc=8";
+theMatcher["DreadPencil","DreadCastle.Dungeon"]="loc=9";
 
 //End Consts
+
+string noSpaces(string input){
+ matcher m=create_matcher("\\s",input);
+ return m.replace_all("");
+}
 
 int abs(int i){
  if(i<0)return -i;
@@ -613,143 +631,251 @@ string spoiler(string zone, string what){
 }
 
 string[int] layout;
-layout[1]="Cabin,Unlock(Attic),Freddies(10),Auditor's Badge(1),Music Box(-Spooky),Dread Tarragon(10)";
-layout[2]="Estate,Unlock(Suite),Freddies(10)";
-layout[3]="Dungeon,Freddies(10),Stinking Agaricus(1)";
-layout[4]="Tree,Unlock(Watchtower),Freddies(10),Blood Kiwi(Stomped),Moon-Amber(1),Seed Pod(10)";
-layout[5]="Square,Unlock(Schoolhouse),Freddies(10),Ghost Pencil(10)";
-layout[6]="Great Hall,Unlock(Ballroom),Dreadful Roast(1),Wax Banana(1)";
+layout[1]="Cabin,Unlock(Attic),Freddies(10),Auditor's Badge(1),Music Box(-Spooky)";
+layout[2]="Square,Unlock(Schoolhouse),Freddies(10),Ghost Pencil(10)";
+layout[3]="Great Hall,Unlock(Ballroom),Dreadful Roast(1),Wax Banana(1)";
+layout[4]="Tree,Unlock(Watchtower),Freddies(10),Blood Kiwi(Stomped),Moon-Amber(1)";
+layout[5]="Skid Row,Freddies(10)";
+layout[6]="Tower,Unlock(Laboratory),Freddies(10)";
 layout[7]="Burrows,Freddies(10)";
-layout[8]="Skid Row,Freddies(10)";
-layout[9]="Tower,Unlock(Laboratory),Freddies(10)";
+layout[8]="Estate,Unlock(Suite),Freddies(10)";
+layout[9]="Dungeon,Freddies(10),Stinking Agaricus(1)";
 string dreadNonComStr(string zone, int opt){
  switch(zone){
   case"+Cabin":
    switch(opt){
-    case 101:return "Dread Tarragon";
-    case 102:return "Bone Flour";
-    case 103:return "-Stench";
-    case 201:return "Freddies";
-    case 202:return "Bored Stiff";
-    case 203:return "Auditor's Badge";
-    case 204:return "Lock Impression";
-    case 300:return "Attic";
-    case 301:return "-Spooky";
-    case 302:return "-Werewolves";
-    case 303:return "-Vampires";
-    case 304:return "Moxie";
+    case 11:return "Dread Tarragon";
+    case 12:return "Bone Flour";
+    case 13:return "-Stench";
+    case 21:return "Freddies";
+    case 22:return "Bored Stiff";
+    case 23:return "Auditor's Badge";
+    case 24:return "Lock Impression";
+    case 30:return "Attic";
+    case 31:return "-Spooky";
+    case 32:return "-Werewolves";
+    case 33:return "-Vampires";
+    case 34:return "Moxie";
    }
    break;
   case"+Tree":
    switch(opt){
-    case 101:return "Stomped";
-    case 102:return "-Sleaze";
-    case 103:return "Moon-Amber";
-    case 200:return "Watchtower";
-    case 201:return "-Ghosts";
-    case 202:return "Freddies";
-    case 203:return "Muscle";
-    case 301:return "Blood Kiwi";
-    case 302:return "Seed Pod";
-    case 303:return "Owl Folder";
+    case 11:return "Stomped";
+    case 12:return "-Sleaze";
+    case 13:return "Moon-Amber";
+    case 20:return "Watchtower";
+    case 21:return "-Ghosts";
+    case 22:return "Freddies";
+    case 23:return "Muscle";
+    case 31:return "Blood Kiwi";
+    case 32:return "Seed Pod";
+    case 33:return "Owl Folder";
    }
    break;
   case"+Burrows":
    switch(opt){
-    case 101:return "-Hot";
-    case 102:return "Coals";
-    case 103:return "Cool Ingot";
-    case 201:return "-Cold";
-    case 202:return "Myst";
-    case 203:return "Bounty";
-    case 301:return "-Bugbears";
-    case 302:return "Freddies";
-   }
-   break;
-  case"+Estate":
-   switch(opt){
-    case 101:return "-Zombies";
-    case 102:return "Freddies";
-    case 103:return "50 Ways";
-    case 201:return "-Hot";
-    case 202:return "Shepherd's Pie";
-    case 203:return "Moxie";
-    case 300:return "Suite";
-    case 301:return "-Werewolves";
-    case 302:return "Eau de Mort";
-    case 303:return "Ghost Shawl";
+    case 11:return "-Hot";
+    case 12:return "Coals";
+    case 13:return "Cool Ingot";
+    case 21:return "-Cold";
+    case 22:return "Myst";
+    case 23:return "Bounty";
+    case 31:return "-Bugbears";
+    case 32:return "Freddies";
    }
    break;
   case"+Square":
    switch(opt){
-    case 100:return "Schoolhouse";
-    case 101:return "-Ghosts";
-    case 102:return "Ghost Pencil";
-    case 103:return "Myst";
-    case 201:return "-Cold";
-    case 202:return "Freddies";
-    case 203:return "Cool Iron Equipment";
-    case 301:return "-Spooky";
-    case 302:return "Trap Door Item";
-    case 303:return "-";
-    case 304:return "Pulled Lever";
+    case 10:return "Schoolhouse";
+    case 11:return "-Ghosts";
+    case 12:return "Ghost Pencil";
+    case 13:return "Myst";
+    case 21:return "-Cold";
+    case 22:return "Freddies";
+    case 23:return "Cool Iron Equipment";
+    case 31:return "-Spooky";
+    case 32:return "Trap Door Item";
+    case 33:return "-";
+    case 34:return "Pulled Lever";
    }
    break;
   case"+Skid Row":
    switch(opt){
-    case 101:return "-Stench";
-    case 102:return "Drenched";
-    case 201:return "-Skeletons";
-    case 202:return "-Sleaze";
-    case 203:return "Muscle";
-    case 301:return "Freddies";
-    case 302:return "Replica Key";
-    case 303:return "Polished Amber";
-    case 304:return "Songbird";
-    case 305:return "Old Fuse";
+    case 11:return "-Stench";
+    case 12:return "Drenched";
+    case 21:return "-Skeletons";
+    case 22:return "-Sleaze";
+    case 23:return "Muscle";
+    case 31:return "Freddies";
+    case 32:return "Replica Key";
+    case 33:return "Polished Amber";
+    case 34:return "Songbird";
+    case 35:return "Old Fuse";
    }
    break;
-  case"+Dungeon":
+  case"+Estate":
    switch(opt){
-    case 101:return "-Spooky";
-    case 102:return "Muscle";
-    case 103:return "MP";
-    case 201:return "-Hot";
-    case 202:return "Freddies";
-    case 203:return "Stats";
-    case 301:return "Stinking Agaricus";
-    case 302:return "Spore-Wreathed";
+    case 11:return "-Zombies";
+    case 12:return "Freddies";
+    case 13:return "50 Ways";
+    case 21:return "-Hot";
+    case 22:return "Shepherd's Pie";
+    case 23:return "Moxie";
+    case 30:return "Suite";
+    case 31:return "-Werewolves";
+    case 32:return "Eau de Mort";
+    case 33:return "Ghost Shawl";
    }
    break;
   case"+Great Hall":
    switch(opt){
-    case 100:return "Ballroom";
-    case 101:return "-Vampires";
-    case 102:return "Moxie";
-    case 201:return "-Cold";
-    case 202:return "Frosty";
-    case 301:return "Dreadful Roast";
-    case 302:return "-Stench";
-    case 303:return "Wax Banana";
+    case 10:return "Ballroom";
+    case 11:return "-Vampires";
+    case 12:return "Moxie";
+    case 21:return "-Cold";
+    case 22:return "Frosty";
+    case 31:return "Dreadful Roast";
+    case 32:return "-Stench";
+    case 33:return "Wax Banana";
    }
    break;
   case"+Tower":
    switch(opt){
-    case 100:return "Laboratory";
-    case 101:return "-Bugbears";
-    case 102:return "-Zombies";
-    case 103:return "Fixed The Machine";
-    case 104:return "Bloody Kiwitini";
-    case 201:return "-Skeletons";
-    case 202:return "Myst";
-    case 203:return "Necklace Recipe";
-    case 301:return "-Sleaze";
-    case 302:return "Freddies";
-    case 303:return "Fingered";
+    case 10:return "Laboratory";
+    case 11:return "-Bugbears";
+    case 12:return "-Zombies";
+    case 13:return "Fixed The Machine";
+    case 14:return "Bloody Kiwitini";
+    case 21:return "-Skeletons";
+    case 22:return "Myst";
+    case 23:return "Necklace Recipe";
+    case 31:return "-Sleaze";
+    case 32:return "Freddies";
+    case 33:return "Fingered";
+   }
+   break;
+  case"+Dungeon":
+   switch(opt){
+    case 11:return "-Spooky";
+    case 12:return "Muscle";
+    case 13:return "MP";
+    case 21:return "-Hot";
+    case 22:return "Freddies";
+    case 23:return "Stats";
+    case 31:return "Stinking Agaricus";
+    case 32:return "Spore-Wreathed";
    }
    break;
  }
  return "";
+}
+
+void formatDreadOptions(){
+ boolean classLock(string nc, int directory){
+  switch(nc){
+   case"Tree":if(((directory/10)==1)&&(my_primestat()!=$stat[muscle]))return true;return false;
+   case"Skid Row":if(((directory/10)==3)&&(my_primestat()!=$stat[moxie]))return true;return false;
+   case"Tower":if(((directory/10)==2)&&(my_primestat()!=$stat[mysticality]))return true;return false;
+  }
+  return false;
+ }
+ boolean keyLocked(string nc, int directory){
+  if(data[".data"]contains(".unlock."+nc))return false;
+  switch(nc){
+   case"Cabin":if((directory/10)!=3)return false;return true;
+   case"Tree":if((directory/10)!=2)return false;return true;
+   case"Square":if((directory/10)!=1)return false;return true;
+   case"Estate":if((directory/10)!=3)return false;return true;
+   case"Tower":if((directory/10)!=1)return false;return true;
+   case"Great Hall":if((directory/10)!=1)return false;return true;
+  }
+  return false;
+ }
+ matcher m=create_matcher("([^.]+)\\.(.*)","");
+ string zone;
+ string nc;
+ string menu;
+ int[string]resultList;
+ foreach area,locNum in theMatcher["DreadPencil"]{
+  m.reset(area);
+  if(!m.find())continue;
+  zone=m.group(1);
+  nc=m.group(2);
+  menu=nc.noSpaces()+"td";
+  if(data[my_name(),zone,"+"+nc]%10!=0){
+   contexts[menu]+='"done": {name: "You\'ve already adventured here!", disabled: true}';
+   continue;
+  }
+  if( (("Cabin Tree Burrows".contains_text(nc))&&(data[".data","DreadWoods",".dist"]>999))||
+     (("Square Skid Row Estate".contains_text(nc))&&(data[".data","DreadVillage",".dist"]>999))||
+     (("Great Hall Tower Dungeon".contains_text(nc))&&(data[".data","DreadCastle",".dist"]>999)) ){
+   contexts[menu]+='"done": {name: "This area is finished.", disabled: true}';
+   continue;
+  }
+  if( (("Square Skid Row Estate".contains_text(nc))&&(data[".data","Dread",".carriage"]<1000))||
+     (("Great Hall Tower Dungeon".contains_text(nc))&&(data[".data","Dread",".carriage"]<2000)) ){
+   contexts[menu]+='"done": {name: "The carriageman isn\'t drunk enough to bring you here.", disabled: true}';
+   continue;
+  }  
+  if(data[".data",".pencil",nc]==1){
+   boolean empty=true;
+   boolean first=true;
+   boolean keyOp=false;
+   clear(resultList);
+   for tens from 1 to 3 for ones from 1 to 5 resultList[dreadNonComStr("+"+nc,tens*10+ones)]=tens*10+ones;
+   remove resultList[""];
+   if((resultList contains "Freddies")&&(data[".data",zone,"+"+nc+".Freddies"]<10)){
+    contexts[menu]+='"'+locNum.char_at(4)+resultList["Freddies"]+'": {name: "Collect Freddies", accesskey:"f"';
+    if(classLock(nc,resultList["Freddies"]))contexts[menu]+=", disabled: true";
+    else if(keyLocked(nc,resultList["Freddies"])){
+     keyOp=true;
+     contexts[menu]+=', icon: "key", disabled: function(key, opt){return !this.data(\''+nc.noSpaces()+'Disabled\');}';
+    }
+    contexts[menu]+='},';
+    empty=false;
+   }
+   foreach e in $strings[Hot,Cold,Spooky,Sleaze,Stench] if((resultList contains ("-"+e))&&(data[".data",zone,"."+e]==0)){
+    if((zone=="DreadVillage")&&(e=="Cold")&&(data[".data",zone,".Hot"]!=0))continue;
+    empty=false;
+    if(first){
+     contexts[menu]+='"elemList": {name: "Banish Element", accesskey:"e", items:{';
+     first=false;
+    }
+    contexts[zone+"_"+e]='"'+locNum.char_at(4)+resultList["-"+e]+'": {name: "Banish '+e+'", accesskey:"b"';
+    contexts[menu]+='"'+locNum.char_at(4)+resultList["-"+e]+'": {name: "'+e+'", accesskey:"'+e.char_at(0)+' '+e.char_at(1)+'"';
+    if(classLock(nc,resultList["-"+e])){
+     contexts[zone+"_"+e]+=", disabled: true";
+     contexts[menu]+=", disabled: true";
+    }else if(keyLocked(nc,resultList["-"+e])){
+     keyOp=true;
+     contexts[zone+"_"+e]+=', icon: "key", disabled: function(key, opt){return !this.data(\''+nc.noSpaces()+'Disabled\');}';
+     contexts[menu]+=', icon: "key", disabled: function(key, opt){return !this.data(\''+nc.noSpaces()+'Disabled\');}';
+    }
+    contexts[zone+"_"+e]+='},';
+    if(keyOp)contexts[zone+"_"+e]+='"toggle": {name: "Use Dreadsylvania Key", callback: function() {this.data(\''+nc.noSpaces()+'Disabled\', !this.data(\''+nc.noSpaces()+'Disabled\')); return false;}}';
+    contexts[menu]+='},';
+   }
+   if(!first)contexts[menu]+='}},';
+   first=true;
+   foreach e in $strings[Bugbears,Werewolves,Ghosts,Zombies,Skeletons,Vampires] if((resultList contains ("-"+e))&&(data[".data",zone,"+"+nc+".-"+e]==0)){
+    empty=false;
+    if(first){
+     contexts[menu]+='"monList": {name: "Banish Monster", accesskey:"m", items:{';
+     first=false;
+    }
+    contexts[menu]+='"'+locNum.char_at(4)+resultList["-"+e]+'": {name: "'+e+'", accesskey:"'+e.char_at(0)+' '+e.char_at(1)+'"';
+    if(classLock(nc,resultList["-"+e]))contexts[menu]+=", disabled: true";
+    else if(keyLocked(nc,resultList["-"+e])){
+     keyOp=true;
+     contexts[menu]+=', icon: "key", disabled: function(key, opt){return !this.data(\''+nc.noSpaces()+'Disabled\');}';
+    }
+    contexts[menu]+='},';
+   }
+   if(!first)contexts[menu]+='}},';
+   if(keyOp)contexts[menu]+='"toggle": {name: "Use Dreadsylvania Key", callback: function() {this.data(\''+nc.noSpaces()+'Disabled\', !this.data(\''+nc.noSpaces()+'Disabled\')); return false;}}';
+   if(empty)contexts[menu]+='"done": {name: "Nothing more to do here.", disabled: true}';
+  }
+ }
 }
 
 void parseDread(string dread){
@@ -850,10 +976,17 @@ void parseDread(string dread){
        if(!nc.find())abort("No.");
        pn=nc.group(1);
        t=0;
+       if(dreadNonComStr(pn,nc.group(2).to_int())=="Trap Door Item"){       
+        data[".data",".hung",w]=1;
+        data[w,"DreadCastle",".hung"]=1;
+       }else if(dreadNonComStr(pn,nc.group(2).to_int())=="Pulled Lever"){
+        data[".data",".hanger",w]=1;
+        data[w,"DreadCastle",".hanger"]=1;
+       }
        if(dreadNonComStr(pn,nc.group(2).to_int())=="Fixed The Machine"){
         data[".data",".machine",w]=1;
         data[w,"DreadCastle",".machine"]=1;
-       }else if(nc.group(2).to_int()%100==0){
+       }else if(nc.group(2).to_int()%10==0){
         data[".data",".unlock."+pn.substring(1),w]=1;
         data[w,"Dread"+zone,".unlock"]+=1;
        }else{
@@ -892,6 +1025,17 @@ void parseDread(string dread){
   }
  }else{
   data[".data","Dread",".hasdata"]=-1;
+ }
+ if(runType==-1){
+  sub=visit_url("clan_dreadsylvania.php");
+  foreach area,mString in theMatcher["DreadPencil"]{
+   m=create_matcher(mString,sub);
+   if(!m.find())continue;
+   m=create_matcher("[^.]+\\.(.*)",area);
+   if(!m.find())continue;
+   data[".data",".pencil",m.group(1)]=1;
+  }
+  formatDreadOptions();
  }
 }
 
@@ -975,14 +1119,17 @@ void pageHeader(){
  writeln(".tableD{font-size:11px;border:1px solid;border-spacing:0px;border-collapse:separate;background-color:#FFFFFF;width:100%;}");
  writeln(".imgtable td{width:75px !important;}");
  writeln(".rowD th,.rowD td{font-size:11px;text-align:center;padding:0px 3px;}");
- writeln("table:not(.tots).sortable tbody tr:nth-child(odd) td, table.tots.sortable tbody tr:nth-child(even) td{background-color:#FFFFFF !important}");
+ writeln("table:not(.tots).sortable tbody tr:nth-child(odd):not(:hover) td, table.tots.sortable tbody tr:nth-child(even):not(:hover) td{background-color:#FFFFFF !important}");
+ writeln("table.sortable tbody tr:hover *{background-color:#000080 !important;color:#FFFFFF !important;}");
  writeln("select, select option{font-size:11px;}");
  writeln(".rowL th,.rowL td{font-size:9px;text-align:left;padding:0px 3px;}");
  writeln(".bossKiller{font-weight:bold;color:black !important;}");
  writeln(".clear{font-weight:bold;color:darkgreen !important;}");
  writeln(".smalltxt{font-size:10px;color:black;background-color:white;font-weight:normal;padding:1px;height:auto;}");
  writeln(".smallbtn{font-size:9px;font-style:normal;color:black;border-color:gray;background-color:lightgray;font-weight:bold;height:16px;}");
+ writeln(".eMsg{font-size:14px; font-weight:bold; border:3px solid red;}");
 
+ writeln(".contextBox {border:2px solid blue;background-color:white;}");
  writeln(".SkinsC{color:black;}");
  writeln(".TST{border-color:black;}");
  writeln(".TSI{font-weight:bold;color:white;background-color:#17037D;}");
@@ -1028,29 +1175,38 @@ void pageHeader(){
  writeln(".DreadCastleC{color:#303030;}");
  writeln(".DreadCastleT{border-color:#CFB53B;}");
  writeln(".DreadCastleI{font-weight:bold;color:white;background-color:#303030;}");
- writeln(".DreadCastleO{background-color:#989898;}");
- writeln(".DreadCastleE{background-color:#A8A8A8;}");
+ writeln(".DreadCastleO{background-color:#B0B0B0;}");
+ writeln(".DreadCastleE{background-color:#C8C8C8;}");
  
  writeln(".DreadVillageC{color:#98790C;}");
  writeln(".DreadVillageT{border-color:brown;}");
  writeln(".DreadVillageI{font-weight:bold;color:white;background-color:#98790C;}");
- writeln(".DreadVillageO{background-color:#C8BE96;}");
- writeln(".DreadVillageE{background-color:#FEF3BB;}");
+ writeln(".DreadVillageO{background-color:#D7CAA6;}");
+ writeln(".DreadVillageE{background-color:#FFF1C5;}");
  
  writeln(".DreadWoodsC{color:#254117;}");
  writeln(".DreadWoodsT{border-color:#green;}");
  writeln(".DreadWoodsI{font-weight:bold;color:white;background-color:#254117;}");
- writeln(".DreadWoodsO{background-color:#609060;}");
- writeln(".DreadWoodsE{background-color:#70A070;}");
+ writeln(".DreadWoodsO{background-color:#93B38B;}");
+ writeln(".DreadWoodsE{background-color:#A8C8A0;}");
+ writeln(".context-menu-item:not(.icon-key) {padding:2px 2px 2px 12px !important;}");
+ writeln(".context-menu-item.icon-key { padding:2px 2px 2px 24px !important; background-image:url(http://images.kingdomofloathing.com/itemimages/dv_key.gif); background-size:18px 18px; background-repeat:no-repeat;}");
  writeln("</style>");
  writeln("<script language=\"Javascript\" type=\"text/javascript\" src=\"sorttable.js\"></script>");
  writeln("<script language=\"Javascript\" type=\"text/javascript\">function tog(e){ var i=document.getElementById(e);if(i.style.display=='none'){i.style.display='inline';}else{i.style.display='none';}}");
  writeln("function tog2(e){var i1=document.getElementById(e); var i2=document.getElementById(e+'2'); if(i1.style.display=='inline'){i1.style.display='none'; i2.style.display='inline';}else if(i2.style.display=='inline'){i2.style.display='none';}else{i1.style.display='inline';}}");
  writeln("function hideAll(){['Hobo','Slime','Haunted','Dread'].forEach(function(name){var i1=document.getElementById(name+'Tab'); if(i1==null)return; i1.style.textDecoration='underline'; i1.style.cursor='pointer'; i1=document.getElementById(name+'Div'); if(i1==null)return; i1.style.display='none';});}");
  writeln("function show(e){hideAll(); var sub=new XMLHttpRequest; sub.open('GET','KoLmafia/sideCommand?cmd=set+raidlogStartPage='+e+'&pwd="+my_hash()+"'); sub.send(); var i1=document.getElementById(e+'Div'); i1.style.display='inline'; i1=document.getElementById(e+'Tab'); i1.style.textDecoration='none'; i1.style.cursor='default';}");
+ writeln("function openContext(e,d){var div=document.getElementById('context'+d); div.style.display='inline'; div.style.position='absolute'; div.style.top=e.clientY+2; div.style.left=e.clientX; div.style.overflowy='auto';}");
  writeln("function updateTots(area){var td=document.getElementById(area+\"Ps\"); var allIs=document.getElementById(area+\"Table\").getElementsByTagName(\"input\"); var t=0; for(i=0;i<allIs.length;i++){ t=t+Number(allIs[i].value); } td.innerHTML=t;}</script>");
- int i=page.index_of("<body>");
- write(page.substring(12,i+6));
+ int i=page.index_of("</head>");
+ matcher m=create_matcher("/images/scripts/jquery.+?js",page.substring(12,i));
+ if(m.find())write(m.replace_first("jquery-1.10.2.min.js"));
+ writeln("<link rel=\"stylesheet\" type=\"text/css\" href=\"jquery.contextMenu.css\">");
+ writeln("<script type='text/javascript' src=\"jquery.contextMenu.js\"></script>");
+ writeln("<script type=\"text/javascript\">$(window).load(function(){");
+ if(runType<0)foreach menu in contexts writeln("$(function(){$.contextMenu({selector: '."+menu+"', callback: function(key,options){ window.location='"+__FILE__+"?cmd='+key;}, items: {"+contexts[menu]+"}});});");
+ writeln("});</script></head><body>");
  write("<center>");
  write("<table class=\"directory\"><tr><td><a href=\""+__FILE__+"\">");
  if(runType>0)write("Current Runs</a></td>");
@@ -1064,6 +1220,9 @@ void pageHeader(){
  if(((runType<0)||(runType==4))&&(data[".data","Dread",".hasdata"]!=-1))write("<td style=\"text-decoration:"+(get_property("raidlogStartPage")=="Dread"?"none; cursor:default;":"underline; cursor:pointer;")+"\" id=\"DreadTab\" onclick=\"show('Dread');\">Dreadsylvania</td>");
  write("<td><a href=\"clan_basement.php\">Basement</a></td>");
  writeln("</tr></table>");
+ if(abortMessage!=""){
+  writeln("<div class=\"eMsg\">"+abortMessage+"</div>");
+ }
 }
 
 string withColor(string e){
@@ -1467,7 +1626,7 @@ void formatDreadTable(){
  write("<table class=\"imgtable\"><tr class=\"rowD\">");
  foreach area in $strings[Inn, Woods, Village, Castle] write("<td class=\"Dread"+area+"I\">"+area+"</td>");
  write("</tr><tr>");
- foreach area in $strings[Inn, Woods, Village, Castle] write("<td class=\"Dread"+area+"O\"><a href=\""+area.linkTo()+"\"><img src=\""+area.bossName().imageOf()+"\" width=\"80px\" height=\"80px\" /></a></td>");
+ foreach area in $strings[Inn, Woods, Village, Castle] write("<td class=\"Dread"+area+"O\" style=\"text-align:center\"><a href=\""+area.linkTo()+"\"><img src=\""+area.bossName().imageOf()+"\" width=\"80px\" height=\"80px\" /></a></td>");
  write("</tr><tr class=\"rowD\">");
  foreach area in $strings[Inn, Woods, Village, Castle] write("<td class=\"Dread"+area+"I\">"+area.bossName()+"</td>");
  write("</tr><tr class=\"rowD\">");
@@ -1512,12 +1671,71 @@ void formatDreadTable(){
  writeln("</tr></table><br>");
 }
 
+void formatDreadNCTable(){
+ write("<table class=\"tableD TST\"><tr class=\"RowD\">");
+ foreach area in $strings[DreadWoods, DreadVillage, DreadCastle] write("<th class=\""+area+"I\" style=\"max-width:40%; min-width:28%\">"+area.expand()+"</th>");
+ string[int] list;
+ boolean odd=false;
+ string zone;
+ matcher m=create_matcher("([^(]+)\\((.+)\\)","");
+ foreach i in layout{
+  switch(i%3){
+   case 0:zone="DreadCastle";break;
+   case 1:zone="DreadWoods";write("<tr class=\"RowD\">");break;
+   case 2:zone="DreadVillage";break;
+  }
+  list=split_string(layout[i],",");
+  write("<td class=\""+list[0].noSpaces()+"td "+(odd?zone+"E":zone+"O")+"\">");
+  write("<span style=\"font-weight:bold;\">"+(data[".data",".pencil",list[0]]==1?"<a href=\""+list[0].linkTo()+"\">"+list[0]+"</a>":list[0])+"</span><br>");
+  if((i==6)&&(data[".data"] contains ".machine"))write("<span style=\"font-weight:bold\">"+data[".data"].pullField(".machine")+"</span> has fixed The Machine.<br>");
+  if((i==2)&&(data[".data"] contains ".hung"))write("<span style=\"font-weight:bold\">"+data[".data"].pullField(".hung")+"</span> was hung by <span style=\"font-weight:bold\">"+data[".data"].pullField(".hanger")+"</span>.<br>");
+  foreach i2 in list if(i2>0){
+   m.reset(list[i2]);
+   if(!m.find())continue;
+   switch(m.group(1)){
+    case"Unlock":
+     write("<span style=\"font-style:italic\">"+m.group(2));
+     if(data[".data"] contains (".unlock."+list[0]))write(" unlocked by <span style=\"font-weight:bold\">"+data[".data"].pullField(".unlock."+list[0]));
+     else write(" <span style=\"font-weight:bold\">locked");
+     write("</span>.</span><br>");
+     break;
+    case"Music Box":
+     write("Music Box parts ");
+     if(data[".data",zone,"+Cabin.-Spooky"]>0)write("unavailable.<br>");
+     else write("available.<br>");
+     break;
+    case"Blood Kiwi":
+     write("Blood Kiwi");
+     if(data[".data",zone,"+Tree.Blood Kiwi"]==data[".data",zone,"+Tree.Stomped"])write(" "+data[".data",zone,"+Tree.Blood Kiwi"]+"/1<br>");
+     else write(" unavailable.<br>");
+     break;
+    default:
+     write(m.group(1)+": "+data[".data",zone,"+"+list[0]+"."+m.group(1)]+"/"+m.group(2)+"<br>");
+     break;
+   }
+  }
+  write("</td>");
+  if(i%3==0){
+   odd=!odd;
+   write("</tr>");
+  }
+ }
+ write("</tr><tr style=\"height:5px;\"><td class=\"DreadWoodsI\"></td><td class=\"DreadVillageI\"></td><td class=\"DreadCastleI\"></td>");
+ write("</tr></table>");
+}
+
 void formatDread(string show){
  write("<div id=\"DreadDiv\" style=\"display:"+show+"\"><table class=\"directory\"><tr>");
  write("<td><a href=\"clan_dreadsylvania.php\">Dreadsylvania</a></td><td><a href=\"shop.php?whichshop=dv\">Inn</a></td></tr></table>");
  formatDreadTable();
- if(data[".data","Dread",".hasdata"]<2)return;
- write("<table class=\"tableD TST\"><tr class=\"RowD\"><td class=\"TSI\" onclick=\"tog2('DreadTotsTable')\">Totals</td></tr>");
+ if(data[".data","Dread",".hasdata"]<2){
+  write("<table class=\"tableD TST\"><tr class=\"RowD\"><td class=\"allDread TSI\" onclick=\"tog('DreadTotsTable')\">Totals</td></tr>");
+  write("<tr><td><center><div id=\"DreadTotsTable\" style=\"display:inline\">");
+  formatDreadNCTable();
+  writeln("</div></center></td></tr></table><br>");
+  return;
+ }
+ write("<table class=\"tableD TST\"><tr class=\"RowD\"><td class=\"allDread TSI\" onclick=\"tog2('DreadTotsTable')\">Totals</td></tr>");
  write("<tr><td><center><div id=\"DreadTotsTable");
  if(options["dread.limitTable"]=="on")write("2\" style=\"display:none;\"");
  else if(options["dread.limitTable"]=="none")write("\" style=\"display:none;");
@@ -1567,60 +1785,13 @@ void formatDread(string show){
  if(options["dread.limitTable"]!="on")write("<div id=\"DreadTotsTable2\" style=\"display:none;\">");
  else if(options["dread.limitTable"]=="none")write("<div id=\"DreadTotsTable2\" style=\"display:none;\">");
  else write("<div id=\"DreadTotsTable\" style=\"display:inline;\">");
- write("<table class=\"tableD TST\"><tr class=\"RowD\">");
- foreach area in $strings[DreadWoods, DreadVillage, DreadCastle] write("<th class=\""+area+"I\">"+area.expand()+"</th>");
- string[int] list;
- boolean odd=false;
- string zone;
- matcher m=create_matcher("([^(]+)\\((.+)\\)","");
- foreach i in layout{
-  switch(i%3){
-   case 0:zone="DreadCastle";break;
-   case 1:zone="DreadWoods";write("<tr class=\"RowD\">");break;
-   case 2:zone="DreadVillage";break;
-  }
-  write("<td class=\""+(odd?zone+"E":zone+"O")+"\">");
-  list=split_string(layout[i],",");
-  write("<span style=\"font-weight:bold;\"><a href=\""+list[0].linkTo()+"\">"+list[0]+"</a></span><br>");
-  if((i==9)&&(data[".data"] contains ".machine"))write("<span style=\"font-weight:bold\">"+data[".data"].pullField(".machine")+"</span> has fixed The Machine.<br>");
-  foreach i2 in list if(i2>0){
-   m.reset(list[i2]);
-   if(!m.find())continue;
-   switch(m.group(1)){
-    case"Unlock":
-     write("<span style=\"font-style:italic\">"+m.group(2));
-     if(data[".data"] contains (".unlock."+list[0]))write(" unlocked by <span style=\"font-weight:bold\">"+data[".data"].pullField(".unlock."+list[0]));
-     else write(" <span style=\"font-weight:bold\">locked");
-     write("</span>.</span><br>");
-     break;
-    case"Music Box":
-     write("Music Box parts ");
-     if(data[".data",zone,"+Cabin.-Spooky"]>0)write("unavailable.<br>");
-     else write("available.<br>");
-     break;
-    case"Blood Kiwi":
-     write("Blood Kiwi");
-     if(data[".data",zone,"+Tree.Blood Kiwi"]==data[".data",zone,"+Tree.Stomped"])write(" "+data[".data",zone,"+Tree.Blood Kiwi"]+"/1<br>");
-     else write(" unavailable.<br>");
-     break;
-    default:
-     write(m.group(1)+": "+data[".data",zone,"+"+list[0]+"."+m.group(1)]+"/"+m.group(2)+"<br>");
-     break;
-   }
-  }
-  write("</td>");
-  if(i%3==0){
-   odd=!odd;
-   write("</tr>");
-  }
- }
- write("</tr><tr style=\"height:5px;\"><td class=\"DreadWoodsI\"></td><td class=\"DreadVillageI\"></td><td class=\"DreadCastleI\"></td>");
- writeln("</tr></table></div></center></td></tr></table><br>");
+ formatDreadNCTable();
+ writeln("</div></center></td></tr></table><br>");
  foreach area in $strings[DreadWoods, DreadVillage, DreadCastle]{//Per-area tables
   if(data[".data",area,".hasdata"]<0)continue;
-  write("<table class=\"tableD "+area+"T\"><tr class=\"RowD\"><td colspan=\"3\" class=\""+area+"I\" onclick=\"tog2('"+area+"Table')\">"+expand(area)+"</td></tr>");
+  write("<table class=\"tableD "+area+"T\"><tr class=\"RowD\"><td colspan=\"3\" id=\""+area+"tr\" class=\""+area+"I\" onclick=\"tog2('"+area+"Table')\">"+expand(area)+"</td></tr>");
   write("<tr class=\"RowL\"><td>Kiss Level: "+to_string(1+data[".data",area,".kisses"])+"</td><td>Elements:");
-  foreach e in $strings[Hot, Cold, Spooky, Sleaze, Stench] if((data[".data",area,".kisses"]>4)||(data[".data",area,"."+e]!=-1)) write(" <span title=\""+area.spoiler(e)+"\">"+e.withColor()+"</span>");
+  foreach e in $strings[Hot, Cold, Spooky, Sleaze, Stench] if((data[".data",area,".kisses"]>4)||(data[".data",area,"."+e]!=-1)) write(" <span class=\""+area+"_"+e+(data[".data",area,".kisses"]<5?"\" title=\""+area.spoiler(e):"")+"\">"+e.withColor()+"</span>");
   write("</td><td>Monster Prevalence: ");
   if(data[".data",area,".tilt"]<0)switch(area){
    case "DreadWoods":write("Werewolves");break;
@@ -1637,7 +1808,7 @@ void formatDread(string show){
   foreach s in data[".dtotal",area]{//per-area headers
    if(".!".contains_text(s.char_at(0)))continue;
    if((data[".dtotal",area,s]<1)&&((s!="Defeats")||data[".dtotal",area,"!bossloss"]<1))continue;
-   write("<th class=\""+area+"O\">"+(s.char_at(0)=="+"?s.substring(1):s)+"</th>");
+   write("<th class=\""+(s.char_at(0)=="+"?s.substring(1).noSpaces()+"td ":"")+area+"O\">"+(s.char_at(0)=="+"?s.substring(1):s)+"</th>");
   }
   write("<th class=\""+area+"O\">Totals</th></tr>");
   clear(odata);
@@ -1687,7 +1858,7 @@ void formatDread(string show){
    odata[count(odata)-1,".name",user]=1;
   }
   sort odata by -(value[area,".Kills"]+value[area,"Defeats"]);
-  odd=false;
+  boolean odd=false;
   foreach index in odata{
    odd=!odd;
    write("<tr class=\"rowD\"><td class=\""+(odd?area+"O":"rowEven")+"\" style=\"text-align:left\">");
@@ -1966,7 +2137,39 @@ void noAccess(){
  writeln('</script><meta http-equiv="refresh" content="0; URL=./clan_basement.php?fromabove=1"></head><body onload="redirect();">No basement access. Sorry. <a href="clan_hall.php">Back to Clan Hall</a></body></html>');
 }
 
+void executeCommand(string cmd){
+ matcher m;
+ string p=visit_url("clan_raidlogs.php");
+ if(cmd.to_int()>0){
+  if("13 22 41 63 71 81".contains_text(cmd.substring(0,2))){
+   switch(cmd.char_at(0)){
+    case"1":m=create_matcher(theMatcher["DreadVillage","+Cabin.30"],p);break;
+    case"2":m=create_matcher(theMatcher["DreadVillage","+Tree.20"],p);break;
+    case"4":m=create_matcher(theMatcher["DreadVillage","+Square.10"],p);break;
+    case"6":m=create_matcher(theMatcher["DreadVillage","+Estate.30"],p);break;
+    case"7":m=create_matcher(theMatcher["DreadVillage","+Tower.10"],p);break;
+    case"8":m=create_matcher(theMatcher["DreadVillage","+Dungeon.10"],p);break;
+   }
+   if(!m.find())if(!retrieve_item(1,$item[dreadsylvanian skeleton key])){
+    abortMessage="Failed to acquire Dreadsylvanian skeleton key.";
+    return;
+   }
+  }
+  visit_url("clan_dreadsylvania.php?action=forceloc&loc="+cmd.char_at(0));
+  visit_url("adventure.php?snarfblat="+to_string((cmd.char_at(0).to_int()-1)/3+338));
+  p=visit_url("choice.php?forceoption=0");
+  m=create_matcher("whichchoice value=(\\d*)",p);
+  if(!m.find())return;
+  p=visit_url("choice.php?pwd="+my_hash()+"&whichchoice="+m.group(1)+"&option="+cmd.char_at(1));
+  m.reset(p);
+  if(!m.find())return;
+  p=visit_url("choice.php?pwd="+my_hash()+"&whichchoice="+m.group(1)+"&option="+cmd.char_at(2));
+ }else{
+ }
+}
+
 void main(){
+ if(FF contains "cmd")executeCommand(FF["cmd"]);
  if(FF contains "viewlog")page=visit_url("clan_raidlogs.php?viewlog="+FF["viewlog"]);
  else if(FF contains "oldLogs")page=visit_url("clan_oldraidlogs.php?startrow="+FF["oldLogs"]);
  else page=visit_url("clan_raidlogs.php");

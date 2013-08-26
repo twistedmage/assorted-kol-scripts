@@ -178,6 +178,8 @@ void stock_hagnks()
 	buy_item($item[skeleton key],4);
 	buy_item($item[borrowed time],6);
 	buy_item($item[mullet wig],2);
+	buy_item($item[jar of psychoses (The Crackpot Mystic)],2);
+	buy_item($item[cane-mail shirt],2);
 }
 
 
@@ -200,6 +202,7 @@ void main()
 		
 	//alice
 	cli_execute("alice.ash");
+	stock_hotdogs();
 	
 	//do elf quest
 	if(my_adventures()> 40 && my_inebriety()<=inebriety_limit())

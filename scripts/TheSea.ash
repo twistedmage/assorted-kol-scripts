@@ -324,7 +324,8 @@ void MonkeeQuest()
 			if (my_adventures() > 0 && monkeycastle.contains_text("\#littlebrother\""))
 			{
 				print("Finding Big Brother in the Wreck of the Edgar Fitzsimmons.");
-				foreach it,entry in maximize("-combat, -tie", 0, 0, true, false) if (entry.score > 0 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(ceil(my_adventures().to_float() / turns_per_cast(entry.skill)), entry.skill);
+				foreach it,entry in maximize("-combat, -tie", 0, 0, true, false) if (entry.score > 0 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(max(1, ceil(my_adventures().to_float() / turns_per_cast(entry.skill))), entry.skill);
+				foreach it,entry in maximize("-combat, -tie", 0, 0, true, false) if (entry.score > 0 && entry.command.index_of("uneffect ") == 0 && turns_per_cast(entry.effect.to_skill()) > 0) cli_execute(entry.command);
 				string originalChoice = get_property("choiceAdventure299");
 				if (originalChoice != "1") set_property("choiceAdventure299", "1");
 				if (!obtain(1,"choiceadv",$location[The Wreck of the Edgar Fitzsimmons]))
@@ -356,7 +357,8 @@ void MonkeeQuest()
 			if (my_adventures() > 0 && monkeycastle.contains_text("\#brothers\""))
 			{
 				print("Finding Grandpa in the "+grandpa.to_string()+".");
-				foreach it,entry in maximize("-combat, -tie", 0, 0, true, false) if (entry.score > 0 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(ceil(my_adventures().to_float() / turns_per_cast(entry.skill)), entry.skill);
+				foreach it,entry in maximize("-combat, -tie", 0, 0, true, false) if (entry.score > 0 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(max(1, ceil(my_adventures().to_float() / turns_per_cast(entry.skill))), entry.skill);
+				foreach it,entry in maximize("-combat, -tie", 0, 0, true, false) if (entry.score > 0 && entry.command.index_of("uneffect ") == 0 && turns_per_cast(entry.effect.to_skill()) > 0) cli_execute(entry.command);
 			}
 			loopcounter = 0;
 			while (my_adventures() > 0 && monkeycastle.contains_text("\#brothers\"") && loopcounter < 5 && boolean_modifier("Adventure Underwater"))
@@ -408,7 +410,8 @@ void MonkeeQuest()
 				}
 				if (my_adventures() > 0 && boolean_modifier("Adventure Underwater"))
 				{
-					foreach it,entry in maximize("-combat, -tie", 0, 0, true, false) if (entry.score > 0 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(ceil(my_adventures().to_float() / turns_per_cast(entry.skill)), entry.skill);
+				foreach it,entry in maximize("-combat, -tie", 0, 0, true, false) if (entry.score > 0 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(max(1, ceil(my_adventures().to_float() / turns_per_cast(entry.skill))), entry.skill);
+				foreach it,entry in maximize("-combat, -tie", 0, 0, true, false) if (entry.score > 0 && entry.command.index_of("uneffect ") == 0 && turns_per_cast(entry.effect.to_skill()) > 0) cli_execute(entry.command);
 					visit_url("monkeycastle.php?action=grandpastory&topic=note");
 					while (my_adventures() > 1 && boolean_modifier("Adventure Underwater") && monkeycastle.contains_text("\#gpa\""))
 					{
@@ -568,7 +571,8 @@ void OutfitQuest()
 			if (item_amount($item[mer-kin stashbox]) < 1)
 			{
 				print("We need a stashbox before we can talk to Grandpa.");
-				foreach it,entry in maximize("-combat, -tie", 0, 0, true, false) if (entry.score > 0 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(ceil(my_adventures().to_float() / turns_per_cast(entry.skill)), entry.skill);
+				foreach it,entry in maximize("-combat, -tie", 0, 0, true, false) if (entry.score > 0 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(max(1, ceil(my_adventures().to_float() / turns_per_cast(entry.skill))), entry.skill);
+				foreach it,entry in maximize("-combat, -tie", 0, 0, true, false) if (entry.score > 0 && entry.command.index_of("uneffect ") == 0 && turns_per_cast(entry.effect.to_skill()) > 0) cli_execute(entry.command);
 				while (my_adventures() > 0 && loopcounter < 4 && boolean_modifier("Adventure Underwater") && item_amount($item[mer-kin stashbox]) < 1)
 				{
 					loopcounter += 1;
@@ -706,7 +710,7 @@ void OutfitQuest()
 		switch(TS_OUTFIT_QUEST)
 		{
 			case 1:
-				if (!have_outfit("mer-kin gladiatorial garb") && !have_outfit("crappy mer-kin disguise"))
+				if (!have_outfit("mer-kin gladiatorial gear") && !have_outfit("crappy mer-kin disguise"))
 				{
 					print("Getting your crappy disguise together.");
 					getsome(1, $item[crappy mer-kin mask]);
@@ -716,19 +720,21 @@ void OutfitQuest()
 						print("Crappy retrieval failed. Crap.");
 						return;
 					}
-					foreach it,entry in maximize("10 muscle, +shield, outfit crappy mer-kin disguise, 1000 combat", 0, 0, false, false) if (entry.score >= 1000 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(ceil(my_adventures().to_float() / turns_per_cast(entry.skill)), entry.skill);
+					maximize("10 muscle, +shield, outfit crappy mer-kin disguise", false);
 				}
-				else if (have_outfit("mer-kin gladiatorial garb"))
+				else if (have_outfit("mer-kin gladiatorial gear"))
 				{
-					foreach it,entry in maximize("10 muscle, +shield, outfit mer-kin gladiatorial garb, 1000 combat", 0, 0, false, false) if (entry.score >= 1000 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(ceil(my_adventures().to_float() / turns_per_cast(entry.skill)), entry.skill);
+					maximize("10 muscle, +shield, outfit mer-kin gladiatorial gear", false);
 				}
 				else
 				{
-					foreach it,entry in maximize("10 muscle, +shield, outfit crappy mer-kin disguise, 1000 combat", 0, 0, false, false) if (entry.score >= 1000 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(ceil(my_adventures().to_float() / turns_per_cast(entry.skill)), entry.skill);
+					maximize("10 muscle, +shield, outfit crappy mer-kin disguise", false);
 				}
 				set_property("choiceAdventure701", "1");
 				if (!have_outfit("mer-kin gladiatorial gear"))
 				{
+					foreach it,entry in maximize("10 muscle, +shield, -hat, -pants, 1000 combat", 0, 0, false, false) if (entry.score >= 1000 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(max(1, ceil(my_adventures().to_float() / turns_per_cast(entry.skill))), entry.skill);
+					foreach it,entry in maximize("10 muscle, +shield, -hat, -pants, 1000 combat", 0, 0, false, false) if (entry.score >= 1000 && entry.command.index_of("uneffect ") == 0 && turns_per_cast(entry.effect.to_skill()) > 0) cli_execute(entry.command);
 					if (available_amount($item[mer-kin gladiator mask]) < 1)
 					{
 						if (!obtain(1, $item[mer-kin headguard], $location[mer-kin gymnasium]))
@@ -754,12 +760,86 @@ void OutfitQuest()
 					}
 					outfit("mer-kin gladiatorial gear");
 				}
-				if (!obtain(1, $item[mer-kin dodgeball], $location[mer-kin gymnasium]) ||
-					!obtain(1, $item[mer-kin dragnet], $location[mer-kin gymnasium]) ||
-					!obtain(1, $item[mer-kin switchblade], $location[mer-kin gymnasium]))
+				if (available_amount($item[mer-kin dodgeball]) < 1 || available_amount($item[mer-kin dragnet]) < 1 || available_amount($item[mer-kin switchblade]) < 1)
 				{
-					print("You need some more mer-weapons. How else are you going to fight?");
-					return;
+					foreach it,entry in maximize("10 muscle, +shield, -hat, -pants, 1000 combat", 0, 0, false, false) if (entry.score >= 1000 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(max(1, ceil(my_adventures().to_float() / turns_per_cast(entry.skill))), entry.skill);
+					foreach it,entry in maximize("10 muscle, +shield, -hat, -pants, 1000 combat", 0, 0, false, false) if (entry.score >= 1000 && entry.command.index_of("uneffect ") == 0 && turns_per_cast(entry.effect.to_skill()) > 0) cli_execute(entry.command);
+					if (!obtain(1, $item[mer-kin dodgeball], $location[mer-kin gymnasium]) ||
+						!obtain(1, $item[mer-kin dragnet], $location[mer-kin gymnasium]) ||
+						!obtain(1, $item[mer-kin switchblade], $location[mer-kin gymnasium]))
+					{
+						print("You need some more mer-weapons. How else are you going to fight?");
+						return;
+					}
+				}
+				if (my_adventures() > 1 && get_property("gladiatorNetMovesKnown").to_int() < 3)
+				{
+					equip($item[Mer-kin dragnet]);
+					foreach it,entry in maximize("10 muscle, -weapon, outfit mer-kin gladiatorial gear, -1000 combat", 0, 0, false, false) if (entry.score >= 1000 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(max(1, ceil(my_adventures().to_float() / turns_per_cast(entry.skill))), entry.skill);
+					foreach it,entry in maximize("10 muscle, -weapon, outfit mer-kin gladiatorial gear, -1000 combat", 0, 0, false, false) if (entry.score >= 1000 && entry.command.index_of("uneffect ") == 0 && turns_per_cast(entry.effect.to_skill()) > 0) cli_execute(entry.command);
+					if (buffed_hit_stat() < 650)
+					{
+						print("Your stats are too low to actually train your skills. Raise your moxie.");
+						return;
+					}
+					while (my_adventures() > 1 && get_property("gladiatorNetMovesKnown").to_int() < 3)
+					{
+						if (have_effect($effect[ninja, please]) < 1)
+						{
+							use(1, $item[natto marble soda]);
+						}
+						if (have_effect($effect[nightstalkin']) < 1)
+						{
+							use(1, $item[Nightstalker perfume]);
+						}
+						adventure(1, $location[mer-kin gymnasium]);
+					}
+				}
+				if (my_adventures() > 1 && get_property("gladiatorBladeMovesKnown").to_int() < 3)
+				{
+					equip($item[Mer-kin switchblade]);
+					foreach it,entry in maximize("10 muscle, -weapon, outfit mer-kin gladiatorial gear, -1000 combat", 0, 0, false, false) if (entry.score >= 1000 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(max(1, ceil(my_adventures().to_float() / turns_per_cast(entry.skill))), entry.skill);
+					foreach it,entry in maximize("10 muscle, -weapon, outfit mer-kin gladiatorial gear, -1000 combat", 0, 0, false, false) if (entry.score >= 1000 && entry.command.index_of("uneffect ") == 0 && turns_per_cast(entry.effect.to_skill()) > 0) cli_execute(entry.command);
+					if (buffed_hit_stat() < 650)
+					{
+						print("Your stats are too low to actually train your skills. Raise your moxie.");
+						return;
+					}
+					while (my_adventures() > 1 && get_property("gladiatorBladeMovesKnown").to_int() < 3)
+					{
+						if (have_effect($effect[ninja, please]) < 1)
+						{
+							use(1, $item[natto marble soda]);
+						}
+						if (have_effect($effect[nightstalkin']) < 1)
+						{
+							use(1, $item[Nightstalker perfume]);
+						}
+						adventure(1, $location[mer-kin gymnasium]);
+					}
+				}
+				if (my_adventures() > 1 && get_property("gladiatorBallMovesKnown").to_int() < 3)
+				{
+					equip($item[Mer-kin dodgeball]);
+					foreach it,entry in maximize("10 moxie, -weapon, outfit mer-kin gladiatorial gear, -1000 combat", 0, 0, false, false) if (entry.score >= 1000 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(max(1, ceil(my_adventures().to_float() / turns_per_cast(entry.skill))), entry.skill);
+					foreach it,entry in maximize("10 moxie, -weapon, outfit mer-kin gladiatorial gear, -1000 combat", 0, 0, false, false) if (entry.score >= 1000 && entry.command.index_of("uneffect ") == 0 && turns_per_cast(entry.effect.to_skill()) > 0) cli_execute(entry.command);
+					if (buffed_hit_stat() < 650)
+					{
+						print("Your stats are too low to actually train your skills. Raise your moxie.");
+						return;
+					}
+					while (my_adventures() > 1 && get_property("gladiatorBallMovesKnown").to_int() < 3)
+					{
+						if (have_effect($effect[ninja, please]) < 1)
+						{
+							use(1, $item[natto marble soda]);
+						}
+						if (have_effect($effect[nightstalkin']) < 1)
+						{
+							use(1, $item[Nightstalker perfume]);
+						}
+						adventure(1, $location[mer-kin gymnasium]);
+					}
 				}
 				break;
 			case 2:

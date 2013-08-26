@@ -110,7 +110,7 @@ if !monstername *Naughty Sorceress* && !monstername *bonerdagon
 	endif
 	
 
-	if (hascombatitem spooky putty sheet || hascombatitem Rain-doh black box) && (!monstername Battlie Knight Ghost && !monstername ghost miner && !monstername Claybender Sorcerer Ghost && !monstername Dusken Raider Ghost && !monstername Space Tourist Explorer Ghost && !monstername Whatsian Commando Ghost) && (monstername ghost || monstername lobsterfrogman || monstername gaudy pirate || monstername modern zombie || monstername dirty old lich || monstername smut orc pervert)
+	if (hascombatitem spooky putty sheet || hascombatitem Rain-doh black box) && (!monstername Battlie Knight Ghost && !monstername ghost miner && !monstername Claybender Sorcerer Ghost && !monstername Dusken Raider Ghost && !monstername Space Tourist Explorer Ghost && !monstername Whatsian Commando Ghost) && (monstername ghost || monstername lobsterfrogman || monstername gaudy pirate || monstername modern zombie || monstername dirty old lich)
 		if hascombatitem spooky putty sheet && !hascombatitem Rain-doh black box
 			use spooky putty sheet
 		endif
