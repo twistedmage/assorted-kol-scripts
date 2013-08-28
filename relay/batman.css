@@ -167,7 +167,6 @@ tr.even { background-color: white; }
    margin-right: 0;
    padding-right: 0;
 }
-.clilink { font-size: 0.7em; }
 
 .versioninfo {
    background-color: #ddd;
@@ -185,4 +184,12 @@ tr.even { background-color: white; }
 #undermon {
    font-size: 0.7em;
    color: #888;
+}
+.goalmon {
+   color: green;
+   font-weight: bold;
+}
+.dimmed {
+   opacity: 0.4;
+   filter: alpha(opacity=40); /* msie */
 }

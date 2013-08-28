@@ -16,7 +16,7 @@ record plant
 int zone_type(location loc)
 {
 	//outdoor
-	if($locations[Sonofa Beach, The Battlefield (hippy uniform), 8-bit realm, The Obligatory Pirate's Cove, The Goatlet, The eXtreme Slope, The F'c'le, Smut Orc Logging Camp, A-Boo Peak, The Spooky Forest, Oil Peak, The Penultimate Fantasy Airship, The Black Forest, The Poop Deck, The Palindome, Whitey's Grove, Desert (ultrahydrated), The Oasis, wartime Frat House, McMillicancuddy's Pond, mcmillicancuddy's back 40, mcmillicancuddy's other back 40, The Themthar Hills, Over Where the Old Tires Are, Out By that Rusted-Out Car, The Hole in the Sky, the outskirts of cobb's knob, The Dark Elbow of the Woods, The Dark Heart of the Woods, The Dark Neck of the Woods, Hippy Camp, The Valley of Rof L'm Fao, Next to that Barrel with Something Burning in it, Near an Abandoned Refrigerator, Hidden City (Automatic), Twin Peak, Fear Man's Level] contains loc)
+	if($locations[Sonofa Beach, The Battlefield (hippy uniform), 8-bit realm, The Obligatory Pirate's Cove, The Goatlet, The eXtreme Slope, The F'c'le, Smut Orc Logging Camp, A-Boo Peak, The Spooky Forest, Oil Peak, The Penultimate Fantasy Airship, The Black Forest, The Poop Deck, The Palindome, Whitey's Grove, Desert (ultrahydrated), The Oasis, wartime Frat House, McMillicancuddy's Pond, mcmillicancuddy's back 40, mcmillicancuddy's other back 40, The Themthar Hills, Over Where the Old Tires Are, Out By that Rusted-Out Car, The Hole in the Sky, the outskirts of cobb's knob, The Dark Elbow of the Woods, The Dark Heart of the Woods, The Dark Neck of the Woods, Hippy Camp, The Valley of Rof L'm Fao, Next to that Barrel with Something Burning in it, Near an Abandoned Refrigerator, Twin Peak, Fear Man's Level] contains loc)
 		return 0;
 	
 	//indoor
@@ -32,8 +32,8 @@ int zone_type(location loc)
 		return 3;
 		
 	//no enemies so don't bother
-	if($locations[The Hidden Temple] contains loc)
-		return 1;
+//	if($locations[The Hidden Temple] contains loc)
+//		return 1;
 		
 	abort("unknown location type for "+loc);
 	return -1;

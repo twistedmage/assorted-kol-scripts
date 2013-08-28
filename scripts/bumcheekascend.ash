@@ -3541,7 +3541,7 @@ boolean can_adv(location where) {
 	case $location[The F'c'le]: return (pirate_check("cove3_3x1b.gif"));
 	case $location[The Poop Deck]: return (pirate_check("cove3_3x3b.gif"));
 	case $location[Belowdecks]: return (pirate_check("cove3_5x2b.gif"));
-	case $location[Hidden City (encounter)]: return (levelcheck(11) && itemcheck($item[your father's macguffin diary]) && perm_urlcheck("woods.php","hiddencity.php"));
+//	case $location[Hidden City (encounter)]: return (levelcheck(11) && itemcheck($item[your father's macguffin diary]) && perm_urlcheck("woods.php","hiddencity.php"));
 	default: return false;
 	}
 }
@@ -4320,8 +4320,7 @@ location level_location(int value) {
 			The Haunted Ballroom, The Palindome, Tower Ruins, The Oasis, The Upper Chamber, The Middle Chamber, Thugnderdome, 
 			Outskirts of Camp Logging Camp, Camp Logging Camp, Post-Quest Bugbear Pens, Bugbear Pens, Degrassi Knoll, The Fun House, 
 			Pre-Cyrpt Cemetary, Post-Cyrpt Cemetary, The Goatlet, Lair of the Ninja Snowmen, The eXtreme Slope, Whitey's Grove, The Laugh Floor,
-			Infernal Rackets Backstage, Pandamonium Slums, The Valley of Rof L'm Fao, The Penultimate Fantasy Airship, The Road to White Citadel, The Haunted Billiards Room, The Haunted Bathroom, The Haunted Bedroom, Icy Peak, Barrrney's Barrr, The F'c'le, The Poop Deck, Belowdecks, 
-			Hidden City (encounter)]
+			Infernal Rackets Backstage, Pandamonium Slums, The Valley of Rof L'm Fao, The Penultimate Fantasy Airship, The Road to White Citadel, The Haunted Billiards Room, The Haunted Bathroom, The Haunted Bedroom, Icy Peak, Barrrney's Barrr, The F'c'le, The Poop Deck, Belowdecks]
 		{
 			if (can_adv(loc)) {
 				one = safeMox(loc);
@@ -7443,7 +7442,7 @@ boolean bcascLairFirstGate() {
 							if (tryPull(lairitems[x].a))
 								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
 							else while(i_a("pygmy pygment")==0)
-								 (bumAdv($location[Hidden City (encounter)], "item", "hebo", "1 pygmy pygment", "Getting some pygmy pygment", "+i", "consultHeBo"));
+//								 (bumAdv($location[Hidden City (encounter)], "item", "hebo", "1 pygmy pygment", "Getting some pygmy pygment", "+i", "consultHeBo"));
 								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
 						break;
 						
@@ -7740,7 +7739,7 @@ void bcascTowerItem() {
 		break;
 		
 		case $item[pygmy blowgun]:
-			bumAdv($location[Hidden City (encounter)], "item", "hebo", "1 pygmy blowgun", "Getting a pygmy blowgun", "i", "consultHeBo");
+//			bumAdv($location[Hidden City (encounter)], "item", "hebo", "1 pygmy blowgun", "Getting a pygmy blowgun", "i", "consultHeBo");
 		break;
 		
 		case $item[fancy bath salts]:

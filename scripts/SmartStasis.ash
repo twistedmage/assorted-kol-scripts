@@ -79,6 +79,7 @@ boolean should_mayfly() {                // TODO: make this return an advevent
    return (my_adventures()/2 - 2 < 30 - to_int(get_property("_mayflySummons")));
 }
 item to_paste(monster whatsit) {
+   if (whatsit.boss) return $item[none];
    switch (whatsit.phylum) {
       case $phylum[constellation]: return $item[cosmic paste];
       case $phylum[construct]: return $item[oily paste];
@@ -141,33 +142,30 @@ void set_autoputtifaction() {
    if (item_drops(m) contains to_item(excise(get_property("autoPutty"),"item ",""))) should_putty = true;
    if (m == $monster[lobsterfrogman] && get_property("sidequestLighthouseCompleted") == "none" &&
        item_amount($item[barrel of gunpowder]) < 4) should_putty = true;
-//           (my_location() == $location[guards' chamber] && have_effect($effect[fithworm drone stench]) == 1) ||
    if (should_putty && should_olfact) return;
   // second, set puttifaction for bounty monsters
    item ihunt = to_item(to_int(get_property("currentBountyItem")));
    if (ihunt != $item[none]) {
       if (item_drops(m) contains ihunt && (
           !($locations[the fun house,the goatlet,lair of the ninja snowmen,cobb's knob laboratory] contains my_location()) ||
-          (contains_text(vars["ftf_olfact"],m.to_string())))) {
+          (create_matcher("(^|, )"+m+"($|, )",vars["BatMan_attract"]).find()))) {
          if (ihunt.bounty_count <= to_int(vars["puttybountiesupto"]) && item_amount(ihunt) < ihunt.bounty_count-1) should_putty = true;
          should_olfact = true;
-      } else if (contains_text(vars["ftf_olfact"],m.to_string()) && ihunt.bounty != my_location())
+      } else if (create_matcher("(^|, )"+m+"($|, )",vars["BatMan_attract"]).find() && ihunt.bounty != my_location())
          should_olfact = true;
-   } else if (contains_text(vars["ftf_olfact"],m.to_string())) should_olfact = true;
+   } else if (create_matcher("(^|, )"+m+"($|, )",vars["BatMan_attract"]).find()) should_olfact = true;
   // next, handle effective goal-getting (this only olfacts if you set "goals" for autoOlfact)
-   monster bestm;
-   float bestr, temp;
+   monster[int] sortm = get_monsters(my_location());
+   sort sortm by -has_goal(value);
    int sources;
-   foreach i,mon in get_monsters(my_location()) {
-      temp = has_goal(mon);
-      if (temp <= 0) continue;
+   foreach i,mon in sortm {
+      if (has_goal(mon) == 0) break;
       sources += 1;
-      if (temp > bestr || (temp == bestr && mon == m)) { bestm = mon; bestr = temp; }
    }
-   if (bestr == 0) return;
+   if (sources == 0) return;
    print(sources+"/"+count(get_monsters(my_location()))+" monsters drop goals here.");
-   if (bestm == m) {
-      vprint("This monster is the best source of goals ("+rnum(bestr)+")!","green",3);
+   if (sortm[0] == m) {
+      vprint("This monster is the best source of goals ("+rnum(has_goal(m))+")!","green",3);
       if (get_property("autoOlfact").contains_text("goals")) should_olfact = true;
       if (get_property("autoPutty").contains_text("goals")) should_putty = true;
    }
@@ -203,26 +201,13 @@ void build_custom() {
      encustom(to_event("use "+to_int(flyer),to_spread(0),to_spread(to_string(m_dpr(0,0)*(1-m_hit_chance()))),"!! flyeredML +"+monster_attack(m),1));
   // putty
    set_autoputtifaction();
-   item copy_item() {
-      if (item_amount($item[spooky putty sheet]) > 0 && to_int(get_property("spookyPuttyCopiesMade")) < 5 &&
-          to_int(get_property("spookyPuttyCopiesMade")) + to_int(get_property("_raindohCopiesMade")) < 6)
-         return $item[spooky putty sheet];
-      if (item_amount($item[rain-doh black box]) > 0 && to_int(get_property("_raindohCopiesMade")) < 5 &&
-          to_int(get_property("spookyPuttyCopiesMade")) + to_int(get_property("_raindohCopiesMade")) < 6)
-         return $item[rain-doh black box];
-      if (item_amount($item[4-d camera]) > 0 && !to_boolean(get_property("_cameraUsed")) && to_boolean(vars["cameraPutty"]))
-         return $item[4-d camera];
-      return $item[none];
-   }
-   if (should_putty && copy_item() != $item[none]) {
+   if (should_putty && encustom(custom_action("copy"))) {
       if (to_item(to_int(get_property("currentBountyItem"))).bounty_count > 0)
          should_olfact = (to_item(to_int(get_property("currentBountyItem"))).bounty_count >= 5 -
             (to_int(get_property("spookyPuttyCopiesMade")) + to_int(get_property("_raindohCopiesMade"))));
-      encustom(to_event("use "+to_int(copy_item()),to_spread(0),to_spread(to_string(m_dpr(0,0)*(1-m_hit_chance()))),"",1));
    }
-  // olfaction
-   if (have_effect($effect[form of...bird!]) == 0 && have_effect($effect[on the trail]) == 0 &&
-       should_olfact && !happened($skill[transcendent olfaction])) encustom($skill[transcendent olfaction]);
+  // attraction
+   if (should_olfact) encustom(custom_action("attract"));
   // insults
    if (m.phylum == $phylum[pirate] && !($strings[step5, finished] contains get_property("questM12Pirate")) &&
       !($monsters[scary pirate, migratory pirate, ambulatory pirate, peripatetic pirate, black crayon pirate] contains m))
@@ -247,7 +232,7 @@ void build_custom() {
          encustom(to_event("use "+i,get_sphere(""),1));
   // release the boots!
    if (my_familiar() == $familiar[pair of stomping boots] && my_location() != $location[none] && get_property("bootsCharged") == "true" && 
-       count(get_monsters(my_location())) > 1 && !($items[none,gooey paste] contains to_paste(m)) && !m.boss) {
+       count(get_monsters(my_location())) > 1 && !($items[none,gooey paste] contains to_paste(m))) {
       boolean[item] pastegoals;
       for i from 5198 to 5219 if (is_goal(to_item(i))) pastegoals[to_item(i)] = true;
      // TODO: if there are other monsters in the zone that have paste goals, wait to stomp them
@@ -262,10 +247,12 @@ void build_custom() {
          if (get_property("dreadScroll2") == "0") encustom($item[Mer-kin healscroll]);
       }
    }
-  // grin/stinkeye
-   if (contains_text(vars["ftf_grin"],m.to_string()))
-      foreach sk in $skills[creepy grin, give your opponent the stinkeye] encustom(sk);
-  // summon mayflies   (toward the end since it can result in free runaways)
+  // banishing actions
+   if (create_matcher("(^|, )"+m+"($|, )",vars["BatMan_banish"]).find()) encustom(custom_action("banish"));
+  // yellow ray actions
+   if (have_effect($effect[everything looks yellow]) == 0 && create_matcher("(^|, )"+m+"($|, )",vars["BatMan_yellow"]).find() && 
+       my_fam() != $familiar[he-boulder]) encustom(custom_action("yellow"));
+  // summon mayflies (toward the end since it can result in free runaways)
    if (should_mayfly()) encustom(get_action($skill[summon mayfly swarm]));
   // vibrato punchcards
    boolean try_cards(int com, int obj, string note) {
@@ -463,7 +450,7 @@ void build_combos() {
    if (should_pp || my_location() == $location[outside the club])
       encombo($effect[none]);
    if (count(item_drops(m)) > 1 && !(my_fam() == $familiar[he-boulder] && have_effect($effect[everything looks yellow]) == 0 &&
-       contains_text(vars["ftf_yellow"],m.to_string()))) {            // no need for +items if you're going to yellow ray
+       contains_text(vars["BatMan_yellow"],m.to_string()))) {            // no need for +items if you're going to yellow ray
       encombo($effect[disco concentration]);
       encombo($effect[rave concentration]);
    }
@@ -508,7 +495,7 @@ boolean is_our_huckleberry() {
       case $location[the clumsiness grove]: if (m == $monster[the thorax] && item_amount($item[clumsiness bark]) > 0) return true; break;
    }
    if (my_fam() == $familiar[he-boulder] && have_effect($effect[everything looks yellow]) == 0 &&
-       contains_text(vars["ftf_yellow"],m.to_string())) return vprint("Monsters in ftf_yellow are your huckleberry.",9);
+       contains_text(vars["BatMan_yellow"],m.to_string())) return vprint("Monsters in BatMan_yellow are your huckleberry.",9);
    return vprint("This monster is not your huckleberry.","black",-9);
 }
 
@@ -552,10 +539,9 @@ string stasis() {
 // effect.  You can view ("zlib vars") or edit ("zlib <settingname> = <value>") values in the CLI.
 setvar("flyereverything",true);
 setvar("puttybountiesupto",19);
-setvar("cameraPutty",false);
-setvar("ftf_olfact","blooper, dairy goat, shaky clown, zombie waltzers, goth giant, knott yeti, hellion, violent fungus","list of monster");
-setvar("ftf_grin","procrastination giant","list of monster");
-setvar("ftf_yellow","knob goblin harem girl","list of monster");
+setvar("BatMan_attract","blooper, dairy goat, shaky clown, zombie waltzers, goth giant, dirty old lihc, hellion, violent fungus","list of monster");
+setvar("BatMan_banish","senile lihc, slick lihc, A.M.C. gremlin","list of monster");
+setvar("BatMan_yellow","knob goblin harem girl, 7-foot dwarf foreman","list of monster");
 string SSver = check_version("SmartStasis","smartstasis",1715);
 
 void main(int initround, monster foe, string pg) {

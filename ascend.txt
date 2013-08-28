@@ -170,6 +170,67 @@ for bosses, use brass dreadsylvanian flask + silver dreadsylvanian flask
 
 
 
+---slimeling vs hatrack in dreadsylvania----
+base drop rate = 0.1%
+-hatrack
+weight=(20+15)*2=70
+base bonus=129%
+final drop chance=0.229%
+
+hound dog
+weight=(20+15+5)*1.25=50
+bonus=1.25*=99.4
+final drop chance=0.1994%
+
+songbird
+weight=20+15+5=40
+base bonus=1.25*weight or bonus = 99.4 or 104.9
+final drop chance=0.1994% or 0.2049%
+
+slimeling (no contacts)
+weight=20+15+5=40
+base bonus=83.9%
+disgorge chance=0.1*1.839=0.1839%
+final drop chance=0.1839% + 0.1839% = 0.3678%
+
+
+slimeling (contacts)
+weight=20+15=35
+base bonus=75.9%
+disgorge chance=0.1*(1.839+0.25)=0.2089%
+final drop chance=0.1759% + 0.2089% = 0.3848%
+
+item drop from gear = 174.98 + 500 = 674.98
+total chance = 1.05978%
+-----------------------------------------------
+
+The unkillable skeleton hard mode
+1800 hp
+passive damage only - need 60 per turn base
+
+<<<REMEMBER TO MAXIMIZE BEFORE REDUCING STTATS>>>
+get consumed by doubt, from doubt tmans level
+wear mer-kin gutgirdle
+equip loathing legion helicopter
+
+hat - parasitic headgnawer = 37.5 * 100%
+off hand - ol' scratchs stove door = 45 * 100%
+acc1 - spiky turtle shoulderpads = 15 * 100%
+acc2 - groovy prism necklace = 25 * 50%
+
+use glowing syringe = 90 * 50%
+cast bone homie = 15 * 100%
+summon Burning, Man = 90 * 100%
+skill vent rage gland = 1.5*level = ~30 * 100%
+use cheap cigar butt = 7*100%
+skill jalapeno saucesphere
+skill jabanero saucesphere
+skill scarysauce
+
+familiar mosquito; maximize familiar weight, equip parasitic headgnawer, equip ol scratchs stove door, equip spiky turtle shoulderpads, equip groovy prism necklace, equip mer-kin gutgirdle, equip loathing legion helicopter; cast jalape&ntilde;o saucesphere; cast jaba&ntilde;ero saucesphere; cast scarysauce; use potion of punctual companionship; cast jingle bells; cast empathy; cast leash; use cheap cigar butt; cast vent rage gland; use Stabonic scroll; use glowing syringe; cast frigidalmatian;
+
+
+
 
 12 to 27 oct
 

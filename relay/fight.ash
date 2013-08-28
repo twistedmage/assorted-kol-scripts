@@ -23,6 +23,22 @@ float turns_till_goals(boolean usespec) {
    }
    return totalgoalitems / max(has_goal(my_location(),usespec),0.0001);
 }
+boolean is_banished(monster m) {
+   if (m == $monster[none] || m.boss) return false;
+   if (m == to_monster(get_property("_nanorhinoBanishedMonster"))) return true;
+   switch (my_class()) {
+      case $class[avatar of boris]:
+      case $class[zombie master]: foreach i,s in split_string(get_property("banishingShoutMonsters"),"\\|") if (m == to_monster(s)) return true; break;
+      case $class[avatar of jarlsberg]: foreach i,s in split_string(get_property("_jiggleCheesedMonsters"),"\\|") if (m == to_monster(s)) return true; break;
+   }
+   if (get_counters(m+" banished",0,20) != "") return true;
+   return false;
+}
+boolean is_set_to(monster m, string attban) {
+   string[int] ms = split_string(vars[(attban == "attract" ? "BatMan_attract" : "BatMan_banish")],", ");
+   foreach i,foe in ms if (to_monster(foe) == m) return true;
+   return false;
+}
 buffer results;
 
 record einclove {
@@ -64,13 +80,15 @@ void handle_post() {
       case $item[mer-kin switchblade]: return to_int(get_property("gladiatorBladeMovesKnown"));
    } return 0; }
    item next_w() {   // order: balldodger (dragnet), netdragger (switchblade), bladeswitcher (dodgeball)
+      if ($location[mer-kin colosseum].combat_queue == "") return $item[mer-kin dragnet];
+	  if (($monsters[mer-kin balldodger, mer-kin bladeswitcher, mer-kin netdragger, Georgepaul\, the Balldodger, Ringogeorge\, the Bladeswitcher] 
+	     contains to_monster(get_property("lastEncounter"))) && !contains_text(run_combat(),"WINWINWIN")) return equipped_item($slot[weapon]);
       string[int] ms = split_string($location[mer-kin colosseum].combat_queue,"; ");
-      if (ms.count() < 1) return $item[mer-kin dragnet];
-	  switch (to_monster(ms[ms.count()-1])) {
-	     case $monster[mer-kin balldodger]: case $monster[Georgepaul, the Balldodger]: return $item[mer-kin switchblade];
-	     case $monster[mer-kin bladeswitcher]: case $monster[Ringogeorge, the Bladeswitcher]: return $item[mer-kin dragnet];
-	     case $monster[mer-kin netdragger]: case $monster[Johnringo, the Netdragger]: return $item[mer-kin dodgeball];
-	  } return $item[none];
+      switch (to_monster(ms[ms.count()-1])) {
+         case $monster[mer-kin balldodger]: case $monster[Georgepaul, the Balldodger]: return $item[mer-kin switchblade];
+         case $monster[mer-kin bladeswitcher]: case $monster[Ringogeorge, the Bladeswitcher]: return $item[mer-kin dragnet];
+         case $monster[mer-kin netdragger]: case $monster[Johnringo, the Netdragger]: return $item[mer-kin dodgeball];
+      } return $item[none];
    }
    if (post contains "dashi") switch (post["dashi"]) {     // build Adventure Again info box
      case "annae":
@@ -108,7 +126,7 @@ void handle_post() {
               (creatable_amount(i) > 0 ? "<a href=# class='cliimglink' title=\"create 1 "+i+"\"><img src='/images/itemimages/"+i.image+"' class=hand></a>" : "<img src='/images/itemimages/"+i.image+"' title=\""+i+"\" border=0>")+
 			  "</td><td align=center>"+get_ingredients(i)[$item[star]]+"</td><td align=center>"+get_ingredients(i)[$item[line]]+"</td></tr>");
             abox.append("</table>"); break;		 
-         case $location[smut orc logging camp]: int planktot; for i from 5782 to 5784 planktot += item_amount(to_item(i));
+         case $location[the smut orc logging camp]: int planktot; for i from 5782 to 5784 planktot += item_amount(to_item(i));
 		    abox.append("<p>You have <b>"+planktot+"</b> of <b>"+rnum(30 - to_int(get_property("chasmBridgeProgress")))+"</b> needed planks."); 
 			if (item_amount($item[smut orc keepsake box]) > 0) abox.append("<p><a href=# class='cliimglink' title='use smut orc keepsake box'><img src='/images/itemimages/keepsakebox.gif' class=hand></a>"); break;
 		 case $location[barrrney's barrr]: int insultsknown; for n from 1 to 8 if (get_property("lastPirateInsult"+n) == "true") insultsknown += 1;
@@ -146,13 +164,28 @@ void handle_post() {
 	     abox.append("<p><table><tr>");
 		 monster[int] sortm;
          foreach m in arq sortm[count(sortm)] = m;
+		 sort sortm by -has_goal(value);
+		 monster goalmon = has_goal(sortm[0]) == 0 ? $monster[none] : sortm[0];
 		 sort sortm by -arq[value];
          foreach i,m in sortm {
 		    if (arq[m] <= 0) continue;
-			abox.append("<td align=center><a href=# class='cliimglink' title='wiki "+(m == $monster[none] ? to_string(my_location()) : m)+
+			abox.append("<td align=center class='queuecell"+(m == goalmon && count(get_goals()) > 0 ? " goalmon" : "")+(is_banished(m) ? " dimmed" : "")+
+               "'><a href=# class='cliimglink' title='wiki "+(m == $monster[none] ? to_string(my_location()) : m)+
                "'><img src='/images/adventureimages/"+(m == $monster[none] ? "3doors.gif" : m.image == "" ? "question.gif" : m.image)+
                "' title='"+(m == $monster[none] ? "Noncombat" : entity_encode(m)+(has_goal(m) > 0 ? " (goals: "+rnum(has_goal(m))+")" : ""))+
-               "' height=50 width=50></a><br>"+rnum(arq[m],1)+"%</td>");
+               "' height=50 width=50></a>");
+            if (m == $monster[none] || m.boss) abox.append("<p>"); 
+			else if (count(arq) > 1 && !($locations[mer-kin colosseum, the slime tube] contains my_location()) && !($strings[Dreadsylvania, Volcano] contains my_location().zone)) {
+               abox.append("<br><a href=# class='cliimglink"+(is_set_to(m,"attract") ? "" : " dimmed")+"' title='zlib BatMan_attract = "+
+                  (is_set_to(m,"attract") ? list_remove(vars["BatMan_attract"],m) : list_add(vars["BatMan_attract"],m))+
+				  "'><img src='/images/itemimages/uparrow.gif' height='16' width='16' title='Click to "+
+				  (is_set_to(m,"attract") ? "stop attracting "+m+" (remove from BatMan_attract)." : "attract "+m+" (add to BatMan_attract).")+"'></a>");
+               abox.append("<a href=# class='cliimglink"+(is_set_to(m,"banish") ? "" : " dimmed")+"' title='zlib BatMan_banish = "+
+                  (is_set_to(m,"banish") ? list_remove(vars["BatMan_banish"],m) : list_add(vars["BatMan_banish"],m))+
+				  "'><img src='/images/itemimages/downarrow.gif' height='16' width='16' title='Click to "+
+				  (is_set_to(m,"banish") ? "stop banishing "+m+" (remove from BatMan_banish)." : "banish "+m+" (add to BatMan_banish).")+"'></a>");
+			}
+            abox.append("<br>"+rnum(arq[m],1)+"%</td>");
 		 }
 		 abox.append(clover_string(my_location()));
 	     abox.append("</tr></table>");
@@ -167,21 +200,18 @@ void handle_post() {
           foreach i,s in split_string(get_property("_jiggleCheesedMonsters"),"\\|") abox.append("<li>"+normalized(s,"monster")+"</li>");
           abox.append("</ul>");
       }
-      if (have_effect($effect[on the trail]) > 0 && get_property("olfactedMonster") == last_monster().to_string() && !contains_text(vars["ftf_olfact"],last_monster().to_string())) {
-         abox.append("<p><a href=# class='clilink' title='zlib ftf_olfact = "+vars["ftf_olfact"]+", "+last_monster()+"'>Always olfact this monster</a>");
-      }
       if (count(get_goals()) == 0) abox.append("<p>All goals met. <a href='#' class='clilink edit' title='conditions set'>add goals</a>");
        else {
           float gturns = turns_till_goals(false);
           abox.append("<p><b>Goals remaining"+(gturns < 9999 ? " (satisfied in <b>~"+rnum(max(1.0,gturns))+"</b> turns)" : "")+":</b>"+
-             " <a href=# class='clilink' title='conditions clear'>clear</a>\n<ul>");
+             " <a href='#' class='clilink edit' title='conditions set'>add goals</a> <a href=# class='clilink' title='conditions clear'>clear</a>\n<ul>");
           foreach i,g in get_goals() abox.append("<li>"+g+" <a href=# class='clilink' title=\"conditions remove "+g+"\">remove</a> "+
 		     (is_goal(to_item(excise(g," ",""))) && creatable_amount(to_item(excise(g," ",""))) > 0 ? "<a href=# class='clilink' title=\"create 1 "+to_item(excise(g," ",""))+"\">create</a>" : "")+"</li>");
           abox.append("</ul>");
           if (goal_exists("item")) {
              item[slot] itgarb;
 			 foreach s in $slots[] itgarb[s] = equipped_item(s);
-             foreach i in get_inventory() if (can_equip(i) && numeric_modifier(i,"Item Drop") > numeric_modifier(itgarb[to_slot(i)],"Item Drop")) 
+             foreach i in get_inventory() if (can_equip(i) && numeric_modifier(i,"Item Drop") > numeric_modifier(itgarb[to_slot(i)],"Item Drop") && be_good(i))
 			    itgarb[to_slot(i)] = i;
              foreach s,i in itgarb {
                 if (equipped_item(s) == i || (i.to_int() > 3508 && i.to_int() < 3515)) continue;
@@ -191,7 +221,10 @@ void handle_post() {
                 abox.append("<br><a href=# class='clilink' title=\"equip "+i+"\">Save "+rnum(gturns-newturns)+" turns by equipping "+i+".</a>");
                 if (i.to_slot() == $slot[acc1]) for j from 1 to 3 abox.append(" <a href=# class='clilink' title=\"equip acc"+j+" "+i+"\">"+j+"</a>");
              }
-          }
+          } else if (goal_exists("choiceadv")) foreach i in get_inventory() if (can_equip(i) && !have_equipped(i) && numeric_modifier(i,"Combat Rate") < 0 && be_good(i)) {
+                abox.append("<br><a href=# class='clilink' title=\"equip "+i+"\">Reduce combat rate by equipping "+i+".</a>");
+				if (i.to_slot() == $slot[acc1]) for j from 1 to 3 abox.append(" <a href=# class='clilink' title=\"equip acc"+j+" "+i+"\">"+j+"</a>");
+		  }
        }
        if (my_class() == $class[avatar of jarlsberg] && item_amount($item[cosmic calorie]) > 19) {
           abox.append("<p><div style='float: left; text-align: center'><a href=# class='cliimglink' title='wiki cosmic calorie'><img src='/images/itemimages/cosmiccalorie.gif' title='Cosmic Calories'></a><br><b>"+

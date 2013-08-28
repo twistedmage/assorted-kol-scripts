@@ -1300,7 +1300,7 @@ string act(string action);
 // adds action to queue, adjusts script state; returns false if unable to enqueue the action
 boolean enqueue(advevent a) {     // handle inserts/auto-funk
    if (my_fam() == $familiar[he-boulder] && have_effect($effect[everything looks yellow]) == 0 && contains_text(page," yellow eye") && 
-       contains_text(to_lower_case(vars["ftf_yellow"]),to_lower_case(m.to_string())) && (count(custom) == 0 || die_rounds() <= 3)) {
+       contains_text(to_lower_case(vars["BatMan_yellow"]),to_lower_case(m.to_string())) && (count(custom) == 0 || die_rounds() <= 3)) {
       act(use_skill($skill[point at your opponent])); return true;
    }
    if (a.id == "") return vprint("Unable to enqueue empty action.",-8);  // allows if(enqueue())
@@ -1384,7 +1384,8 @@ void set_monster(monster elmo) {  // should be called once per BB instance; init
    if (happened("use 4603")) nomiss = true;
    load_factors();
   // special monster attributes
-   foreach i,mrec in (factors["monster"]) if (mrec.ufname.to_monster() == m) {
+   foreach i,mrec in (factors["monster"]) if (normalized(mrec.ufname,"monster") != mrec.ufname) vprint("Bad monster name supplied for monster "+i+" ("+mrec.ufname+")",-2);
+    else if (mrec.ufname.to_monster() == m) {
       matcher monmat = create_matcher("([a-z!]+?)(?: (.+?))?(?:$|, )", mrec.special);
       while (monmat.find()) switch (monmat.group(1)) {                 // parse other special attributes
          case "maxround": if (is_integer(monmat.group(2))) maxround = to_int(monmat.group(2)); vprint("This combat may last up to "+rnum(maxround)+" rounds.",8); break;
@@ -1646,7 +1647,7 @@ string batround() {
 	     "if match \"begins to paw at the ground\"; skill 7160; endif; if match \"shuffles toward you\"; skill 7159; endif; "); break;
    }
    switch (my_fam()) {
-      case $familiar[he-boulder]: if (have_effect($effect[everything looks yellow]) > 0 || !contains_text(to_lower_case(vars["ftf_yellow"]),to_lower_case(m.to_string()))) break;
+      case $familiar[he-boulder]: if (have_effect($effect[everything looks yellow]) > 0 || !contains_text(to_lower_case(vars["BatMan_yellow"]),to_lower_case(m.to_string()))) break;
          if (count(custom) > 0 && die_rounds() > 3) break;
          res.append("if !haseffect 790 && match \" yellow eye\"; skill 7082; endif; "); break;
    }

@@ -202,7 +202,7 @@ boolean can_adv(location where, boolean prep) {
    case $location[The Poker Room]: if (my_meat() < 30) return vprint("You need 10 meat to play the "+where+".",-6); return (itemcheck($item[casino pass]));
   // level-opened
    case $location[The Haiku Dungeon]: return (primecheck(5));
-   case $location[The Daily Dungeon]: return (primecheck(15));
+   case $location[Daily Dungeon]: return (primecheck(15));
    case $location[The Limerick Dungeon]: return (primecheck(21));
    case $location[The Spooky Forest]: return (levelcheck(2));
    case $location[A Barroom Brawl]:
@@ -305,7 +305,7 @@ boolean can_adv(location where, boolean prep) {
    case $location[Infernal Rackets Backstage]:
    case $location[Pandamonium Slums]: return (primecheck(29) && (have_skill($skill[liver of steel]) || have_skill($skill[spleen of steel]) ||
                                          have_skill($skill[stomach of steel]) || perm_urlcheck("questlog.php?which=2","cleansed the taint")));
-   case $location[The Smut Orc Logging Camp]: return (levelcheck(9));
+   case $location[Smut Orc Logging Camp]: return (levelcheck(9));
    case $location[A-Boo Peak]: return (levelcheck(9) && perm_propcheck("chasmBridgeProgress","30"));
    case $location[Twin Peak]: return (levelcheck(9) && perm_propcheck("chasmBridgeProgress","30"));
    case $location[Oil Peak]: return (levelcheck(9) && perm_propcheck("chasmBridgeProgress","30"));
@@ -351,12 +351,12 @@ boolean can_adv(location where, boolean prep) {
    case $location[Video Game Level 2]:
    case $location[Video Game Level 3]: return (itemcheck($item[GameInformPowerDailyPro Walkthru]) || itemcheck($item[GameInformPowerDailyPro magazine]));
   // mr. familiar zones
-   case $location[An Incredibly Strange Place (Great Trip)]: if (!primecheck(143)) return false;
-   case $location[An Incredibly Strange Place (Mediocre Trip)]: if (!primecheck(51)) return false;
-   case $location[An Incredibly Strange Place (Bad Trip)]: return (primecheck(19) && (effectcheck($effect[half-astral]) || itemcheck($item[Astral Mushroom])));
-   case $location[The Stately Pleasure Dome]:
-   case $location[The Mouldering Mansion]:
-   case $location[The Rogue Windmill]: return (effectcheck($effect[absinthe-minded]) || (!prep && itemcheck($item[tiny bottle of absinthe])) || (prep && use(1,$item[tiny bottle of absinthe])));
+   case $location[Astral Mushroom (Great Trip)]: if (!primecheck(143)) return false;
+   case $location[Astral Mushroom (Mediocre Trip)]: if (!primecheck(51)) return false;
+   case $location[Astral Mushroom (Bad Trip)]: return (primecheck(19) && (effectcheck($effect[half-astral]) || itemcheck($item[astral mushroom])));
+   case $location[Stately Pleasure Dome]:
+   case $location[Mouldering Mansion]:
+   case $location[Rogue Windmill]: return (effectcheck($effect[absinthe-minded]) || (!prep && itemcheck($item[tiny bottle of absinthe])) || (prep && use(1,$item[tiny bottle of absinthe])));
    case $location[Mt. Molehill]: return (effectcheck($effect[shape of...mole!]) || (!prep && itemcheck($item[llama lama gong])));
    case $location[The Primordial Soup]:
    case $location[The Jungles of Ancient Loathing]:

@@ -41,10 +41,9 @@ function bjilgt(doug) {
    function load_wicky() {
       if ($('#wikibox div').length == 0) $('#wikibox').load('fight.ash', {dashi: 'wicky'});
    }
-   cliComplete = function(cmd) {                                    // extend cliComplete to refresh the Again box when done
-      var ret = oldComplete.apply(this, arguments);
+   cliComplete = function(data) {                                  // extend cliComplete to refresh the Again box when done
+      oldComplete.apply(this, arguments);
 	  refresh_again();
-      return ret;
    };
 
 jQuery(function($){
