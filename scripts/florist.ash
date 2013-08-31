@@ -16,7 +16,7 @@ record plant
 int zone_type(location loc)
 {
 	//outdoor
-	if($locations[Sonofa Beach, The Battlefield (hippy uniform), 8-bit realm, The Obligatory Pirate's Cove, The Goatlet, The eXtreme Slope, The F'c'le, Smut Orc Logging Camp, A-Boo Peak, The Spooky Forest, Oil Peak, The Penultimate Fantasy Airship, The Black Forest, The Poop Deck, The Palindome, Whitey's Grove, Desert (ultrahydrated), The Oasis, wartime Frat House, McMillicancuddy's Pond, mcmillicancuddy's back 40, mcmillicancuddy's other back 40, The Themthar Hills, Over Where the Old Tires Are, Out By that Rusted-Out Car, The Hole in the Sky, the outskirts of cobb's knob, The Dark Elbow of the Woods, The Dark Heart of the Woods, The Dark Neck of the Woods, Hippy Camp, The Valley of Rof L'm Fao, Next to that Barrel with Something Burning in it, Near an Abandoned Refrigerator, Twin Peak, Fear Man's Level] contains loc)
+	if($locations[Sonofa Beach, The Battlefield (hippy uniform), 8-bit realm, The Obligatory Pirate's Cove, The Goatlet, The eXtreme Slope, The F'c'le, The Smut Orc Logging Camp, A-Boo Peak, The Spooky Forest, Oil Peak, The Penultimate Fantasy Airship, The Black Forest, The Poop Deck, The Palindome, Whitey's Grove, Desert (ultrahydrated), The Oasis, wartime Frat House, McMillicancuddy's Pond, mcmillicancuddy's back 40, mcmillicancuddy's other back 40, The Themthar Hills, Over Where the Old Tires Are, Out By that Rusted-Out Car, The Hole in the Sky, the outskirts of cobb's knob, The Dark Elbow of the Woods, The Dark Heart of the Woods, The Dark Neck of the Woods, Hippy Camp, The Valley of Rof L'm Fao, Next to that Barrel with Something Burning in it, Near an Abandoned Refrigerator, Twin Peak, Fear Man's Level] contains loc)
 		return 0;
 	
 	//indoor
@@ -24,7 +24,7 @@ int zone_type(location loc)
 		return 1;
 	
 	//underground
-	if($locations[The Batrat and Ratbat Burrow, Guano Junction, The Upper Chamber, The Middle Chamber, Cobb's Knob Barracks, Cobb's Knob Kitchens, The Defiled Nook, The Defiled Alcove, The Defiled Cranny, The Defiled Niche, Itznotyerzitz Mine, The Enormous Greater-Than Sign, The Dungeons of Doom, The Beanbat Chamber, The Castle in the Clouds in the Sky (Basement), Cobb's Knob Laboratory, The Haunted Wine Cellar (Southwest), The Haunted Wine Cellar (Southeast), The Haunted Wine Cellar (northwest), The Haunted Wine Cellar (northeast), The Royal Guard Chamber, The Filthworm Queen's Chamber, The Bat Hole Entrance, The Boss Bat's Lair, The Feeding Chamber,Cobb's Knob Harem,Degrassi Knoll,The hatching chamber] contains loc)
+	if($locations[The Batrat and Ratbat Burrow, Guano Junction, The Upper Chamber, The Middle Chamber, Cobb's Knob Barracks, Cobb's Knob Kitchens, The Defiled Nook, The Defiled Alcove, The Defiled Cranny, The Defiled Niche, Itznotyerzitz Mine, The Enormous Greater-Than Sign, The Dungeons of Doom, The Beanbat Chamber, The Castle in the Clouds in the Sky (Basement), Cobb's Knob Laboratory, The Haunted Wine Cellar (Southwest), The Haunted Wine Cellar (Southeast), The Haunted Wine Cellar (northwest), The Haunted Wine Cellar (northeast), The Royal Guard Chamber, The Filthworm Queen's Chamber, The Bat Hole Entrance, The Boss Bat's Lair, The Feeding Chamber,Cobb's Knob Harem,The hatching chamber] contains loc)
 		return 2;
 		
 	//underwater
@@ -215,7 +215,7 @@ int choose_best_plant(string type, location loc, plant[int] plants)
 			}
 			else if(contains_text(plants[pli].bonus_type,"sleaze"))
 			{
-				if(loc!=$location[The Battlefield (Hippy uniform)] && loc!=$location[The Frat House (Bombed Back to the Stone Age)] && loc!=$location[Frat House] && loc!=$location[The Hole in the sky] && loc!=$location[mcmillicancuddy's other back 40] && loc!=$location[The Purple Light District] && loc!=$location[The eXtreme Slope] && loc!=$location[The Fun House] && loc!=$location[Tower Ruins] && loc!=$location[The Obligatory Pirate's Cove] && loc!=$location[The Road to White Citadel]&& loc!=$location[Degrassi Knoll]&& loc!=$location[Anemone Mine]&& loc!=$location[Cobb's Knob Harem])
+				if(loc!=$location[The Battlefield (Hippy uniform)] && loc!=$location[The Frat House (Bombed Back to the Stone Age)] && loc!=$location[Frat House] && loc!=$location[The Hole in the sky] && loc!=$location[mcmillicancuddy's other back 40] && loc!=$location[The Purple Light District] && loc!=$location[The eXtreme Slope] && loc!=$location[The Fun House] && loc!=$location[Tower Ruins] && loc!=$location[The Obligatory Pirate's Cove] && loc!=$location[The Road to White Citadel]&& loc!=$location[The Degrassi Knoll Gym]&& loc!=$location[Anemone Mine]&& loc!=$location[Cobb's Knob Harem])
 					return pli;
 			}
 			else if(contains_text(plants[pli].bonus_type,"stench"))

@@ -428,7 +428,7 @@
 		- Make sure we don't destroy +ML for the oilpeak as Jarlsberg or Boris		
       - Some minor changes to quest handling
 	  
-		last compared version 325
+		last compared version 328
 */
 script "bumcheekascend.ash";
 
@@ -3516,7 +3516,7 @@ boolean can_adv(location where) {
 	case $location[Post-Quest Bugbear Pens]: return (my_path() != "Zombie Slayer" && knoll_available() && primecheck(13) && contains_text(visit_url("questlog.php?which=2"),"You've helped Mayor Zapruder") && perm_urlcheck("woods.php","pen.gif"));
 	case $location[Bugbear Pens]: return (my_path() != "Zombie Slayer" && knoll_available() && primecheck(13) && !contains_text(visit_url("questlog.php?which=2"),"You've helped Mayor Zapruder") && perm_urlcheck("woods.php","pen.gif"));
 	// misc
-	case $location[Degrassi Knoll]: return (!knoll_available() && primecheck(10) && guild_store_available( ) && perm_urlcheck("plains.php","knoll1.gif"));
+	case $location[The Degrassi Knoll Garage]: return (!knoll_available() && primecheck(10) && guild_store_available( ) && perm_urlcheck("plains.php","knoll1.gif"));
 	case $location[The Fun House]: return (guild_store_available( ) && primecheck(15) && perm_urlcheck("plains.php","funhouse.gif"));
 	case $location[Pre-Cyrpt Cemetary]: return (primecheck(11) && guild_store_available( ) && !visit_url("questlog.php?which=2").contains_text("defeated the Bonerdagon"));
 	case $location[Post-Cyrpt Cemetary]: return (primecheck(40) && perm_urlcheck("questlog.php?which=2","defeated the Bonerdagon"));
@@ -4318,7 +4318,7 @@ location level_location(int value) {
 			The Bat Hole Entrance, Guano Junction, The Batrat and Ratbat Burrow, The Beanbat Chamber, Cobb's Knob Kitchens, Cobb's Knob Barracks, Cobb's Knob Treasury, 
 			Cobb's Knob Menagerie\, Level 2, Cobb's Knob Menagerie\, Level 3, Hippy Camp, Frat House, The Obligatory Pirate's Cove, The Castle in the Clouds in the Sky (Basement), The Hole in the Sky, The Haunted Library, The Haunted Gallery, 
 			The Haunted Ballroom, The Palindome, Tower Ruins, The Oasis, The Upper Chamber, The Middle Chamber, Thugnderdome, 
-			Outskirts of Camp Logging Camp, Camp Logging Camp, Post-Quest Bugbear Pens, Bugbear Pens, Degrassi Knoll, The Fun House, 
+			Outskirts of Camp Logging Camp, Camp Logging Camp, Post-Quest Bugbear Pens, Bugbear Pens, The Degrassi Knoll Garage, The Fun House, 
 			Pre-Cyrpt Cemetary, Post-Cyrpt Cemetary, The Goatlet, Lair of the Ninja Snowmen, The eXtreme Slope, Whitey's Grove, The Laugh Floor,
 			Infernal Rackets Backstage, Pandamonium Slums, The Valley of Rof L'm Fao, The Penultimate Fantasy Airship, The Road to White Citadel, The Haunted Billiards Room, The Haunted Bathroom, The Haunted Bedroom, Icy Peak, Barrrney's Barrr, The F'c'le, The Poop Deck, Belowdecks]
 		{
@@ -7956,7 +7956,11 @@ boolean bcascMacguffinFinal() {
 
 boolean bcascMacguffinHiddenCity() {
 	if (checkStage("macguffinhiddencity")) return true;
-	
+	print("This is the point at which the script would try to do the hidden city. The change has not yet been applied to bumcheekascend. Please do this manually, then type the following into the CLI.", "red");
+	print("If this does not work, please post in the thread on the kolmafia.us forums.", "red");
+	print("");
+	print("ash import bumcheekascend.ash; checkStage(\"macguffinhiddencity\", true)");
+	abort("");
 	while (contains_text(visit_url("questlog.php?which=1"), "Gotta Worship Them All")) {
 		string[int] citymap;
 		string urldata;
@@ -8284,7 +8288,7 @@ boolean bcascMacguffinPrelim() {
 	buMax("items");
 	setFamiliar("itemsnc");
 	setMood("-i");
-	while (!contains_text(visit_url("woods.php"),"hiddencity.gif") && my_adventures() > 3) {
+	while (!contains_text(visit_url("woods.php"),"hiddencitylink.gif") && my_adventures() > 3) {
 		if (to_int(get_property("lastTempleUnlock")) != my_ascensions())
 	 	    bcascOpenTemple();
 		traverse_temple();
@@ -8637,9 +8641,9 @@ boolean bcascMeatcar() {
 					}
 		
 					//place florist friar plants
-					choose_all_plants("", $location[degrassi knoll]);
+					choose_all_plants("", $location[The degrassi knoll Garage]);
 					
-					bumMiniAdv(1, $location[Degrassi Knoll]);
+					bumMiniAdv(1, $location[The Degrassi Knoll Garage]);
 				}
 			}
 			cli_execute("make bitchin' meatcar");
@@ -8664,9 +8668,9 @@ boolean bcascMeatcar() {
 				}
 	
 				//place florist friar plants
-				choose_all_plants("", $location[degrassi knoll]);
+				choose_all_plants("", $location[The degrassi knoll Garage]);
 				
-				bumMiniAdv(1, $location[Degrassi Knoll]);
+				bumMiniAdv(1, $location[The Degrassi Knoll Garage]);
 			}
 			cli_execute("make pumpkin carriage");
 			visit_url("guild.php?place=paco");

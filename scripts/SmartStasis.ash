@@ -57,7 +57,7 @@ boolean should_mayfly() {                // TODO: make this return an advevent
       case $location[the slime tube]:                  // free tiny slimy cyst
       case $location[the haunted sorority house]:      // free useful item
       case $location[hobopolis town square]: return true;    // free hobo nickel
-      case $location[degrassi knoll]: foreach i in $items[spring, cog, sprocket, empty meat tank] if (has_goal(i) > 0) return true; break;
+      case $location[the degrassi knoll garage]: foreach i in $items[spring, cog, sprocket, empty meat tank] if (has_goal(i) > 0) return true; break;
       case $location[south of the border]: for i from 297 to 300 if (is_goal(to_item(i))) return true; break;   // free gum
       case $location[the penultimate fantasy airship]: if (my_level() < 13) return true; break;             // substats
       case $location[the hole in the sky]: for i from 657 to 665 if (is_goal(to_item(i))) return true; break;   // free star/line, free runaway
