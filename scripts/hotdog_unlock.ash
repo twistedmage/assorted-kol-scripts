@@ -131,19 +131,6 @@ void unlock_sleeping()
 	abort("Not implemented");
 }
 	
-	/*
-The unlocker in the Haunted Bedroom comes from a new choice that is added to the WOODEN nightstand noncombat adventure. On any given day, a given character account will either have the new choice or not. If you see the NC and it doesn't have the new choice, you can stop looking there.
-
-The unlocker in the eXtreme Slope comes from a new choice that is added to the Duffel Bag noncombat adventure. Same deal as the wooden nightstand -- if it's not there, stop looking.
-
-The unlocker in Menagerie 1 appears to be from an ultra-rare monster, using whatever mechanisms UR monsters use.
-
-The unlocker in Fern's Basement comes from the great great great ... grandfather ghost, with a very low drop rate. I have no idea whether +item helps or not.
-
-The unlocker in the Haunted Conservatory is a rare drop from the skeletal cat (sniff it!). No idea whether +item helps.
-The unlocker from resting probably has some ridiculously low rate of occurrence. You can get it from your daily free rests only if you don't have an Unconscious Collective familiar. If you have one of those, you can't get it from free rests; just from turn-costing rests.
-The others... I don't know.
-*/
 void unlock_hotdogs()
 {
 	unlock_video();
