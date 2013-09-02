@@ -57,7 +57,8 @@ void unlock_devil()
 	//devil dog
 	if(i_a("chicle de salchicha")>0)
 		abort("Have a chicle de salchicha! Disable this part of hotdog_ulock.ash");
-	abort("Not implemented");
+	while(my_adventures()>0 && can_adv($location[south of the border]) && i_a("chicle de salchicha")<1)
+		bumAdv($location[south of the border], "", "", "", "Hunting for chicle de salchicha", "");
 }
 void unlock_chilly()
 {
@@ -92,7 +93,8 @@ void unlock_junkyard()
 	//junkyard dog
 	if(i_a("Grey Guanon")>0)
 		abort("Have a Grey Guanon! Disable this part of hotdog_ulock.ash");
-	abort("Not implemented");
+	while(my_adventures()>0 && can_adv($location[cobb's knob menagerie\, level 1]) && i_a("Grey Guanon")<1)
+		bumAdv($location[guano junction], "", "", "", "Hunting for guanon", "");
 }
 void unlock_wet()
 {
@@ -152,7 +154,7 @@ void unlock_hotdogs()
 	unlock_optimal();
 	unlock_owe();
 	unlock_devil();
-	unlock_ghost();
+//	unlock_ghost();
 	unlock_junkyard();
 	unlock_sleeping();
 }
