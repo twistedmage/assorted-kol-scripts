@@ -38,7 +38,7 @@ void unlock_sly()
 			set_property("choiceAdventure155", "4");
 			set_property("battleAction","try to run away");
 			cli_execute("goal set 1 choiceadv");
-			while(my_adventures()>0 && get_property("lastAdventure") != "Skull, Skull, Skull")
+			while(my_adventures()>0 && get_property("lastEncounter") != "Skull, Skull, Skull")
 				bumAdv($location[The defiled nook], "", "itemsnc", "1 choiceadv", "Hunting for deboner", "-");
 			set_property("battleAction","custom combat script");
 		}
@@ -72,8 +72,10 @@ void unlock_chilly()
 			//set choiceadv for deboner, set combat to runaway, then adv until choiceadventure
 			set_property("choiceAdventure575", 2);
 			cli_execute("goal set 1 choiceadv");
-			while(my_adventures()>0 && get_property("lastAdventure") != "Duffel on the Double")
+			while(my_adventures()>0 && get_property("lastEncounter") != "Duffel on the Double")
+			{
 				bumAdv($location[The extreme slope], "", "itemsnc", "1 choiceadv", "Hunting for frostigkraut", "-");
+			}
 		}
 		set_property("_chilly_checked_today","true");
 	}
@@ -97,16 +99,18 @@ void unlock_wet()
 	//wet dog
 	if(i_a("Engorged Sausages and You")>0)
 		abort("Have a Engorged Sausages and You! Disable this part of hotdog_ulock.ash");
-	if(!get_property("_wet_checked_today").to_boolean())
+	//manor 2 open
+	if(can_adv($location[the haunted bedroom]))
 	{
-		//manor 2 open
-		if(can_adv($location[the haunted bedroom]))
+		while(my_adventures()>0 && !get_property("_wet_checked_today").to_boolean())
 		{
 			set_property("choiceAdventure85", 4);
-			while(my_adventures()>0 && get_property("lastAdventure") != "One Nightstand (Wooden)")
-				bumAdv($location[the haunted bedroom], "", "itemsnc", "", "Hunting for engorged sausage book", "-");
+			cli_execute("mood execute");
+			string txt=visit_url("adventure.php?snarfblat=108");
+			if(contains_text(txt,"a simple wooden nightstand"))
+				set_property("_wet_checked_today","true");
+			run_combat();
 		}
-		set_property("_wet_checked_today","true");
 	}
 }
 void unlock_optimal()

@@ -24,7 +24,7 @@ int zone_type(location loc)
 		return 1;
 	
 	//underground
-	if($locations[The Batrat and Ratbat Burrow, Guano Junction, The Upper Chamber, The Middle Chamber, Cobb's Knob Barracks, Cobb's Knob Kitchens, The Defiled Nook, The Defiled Alcove, The Defiled Cranny, The Defiled Niche, Itznotyerzitz Mine, The Enormous Greater-Than Sign, The Dungeons of Doom, The Beanbat Chamber, The Castle in the Clouds in the Sky (Basement), Cobb's Knob Laboratory, The Haunted Wine Cellar (Southwest), The Haunted Wine Cellar (Southeast), The Haunted Wine Cellar (northwest), The Haunted Wine Cellar (northeast), The Royal Guard Chamber, The Filthworm Queen's Chamber, The Bat Hole Entrance, The Boss Bat's Lair, The Feeding Chamber,Cobb's Knob Harem,The hatching chamber] contains loc)
+	if($locations[The Batrat and Ratbat Burrow, Guano Junction, The Upper Chamber, The Middle Chamber, Cobb's Knob Barracks, Cobb's Knob Kitchens, The Defiled Nook, The Defiled Alcove, The Defiled Cranny, The Defiled Niche, Itznotyerzitz Mine, The Enormous Greater-Than Sign, The Dungeons of Doom, The Beanbat Chamber, The Castle in the Clouds in the Sky (Basement), Cobb's Knob Laboratory, The Haunted Wine Cellar (Southwest), The Haunted Wine Cellar (Southeast), The Haunted Wine Cellar (northwest), The Haunted Wine Cellar (northeast), The Royal Guard Chamber, The Filthworm Queen's Chamber, The Bat Hole Entrance, The Boss Bat's Lair, The Feeding Chamber,Cobb's Knob Harem,The hatching chamber, cobb's knob menagerie\, level 1] contains loc)
 		return 2;
 		
 	//underwater
