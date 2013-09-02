@@ -230,6 +230,38 @@ skill scarysauce
 familiar mosquito; maximize familiar weight, equip parasitic headgnawer, equip ol scratchs stove door, equip spiky turtle shoulderpads, equip groovy prism necklace, equip mer-kin gutgirdle, equip loathing legion helicopter; cast jalape&ntilde;o saucesphere; cast jaba&ntilde;ero saucesphere; cast scarysauce; use potion of punctual companionship; cast jingle bells; cast empathy; cast leash; use cheap cigar butt; cast vent rage gland; use Stabonic scroll; use glowing syringe; cast frigidalmatian;
 
 
+crimbo duds - 90m
+primitive radio - 110m
+radio free - 240m
+-440m
+present -120m
+need 560m
+
+tam - 68m
+navel ring - 66m
+maypole - 55m
+vivala - 47m
+bottle-rocket crossbow - 39m
+tps = 36.5m
+crown of thrones 38m
+gap - 38.5m
+jewh - 29.5m
+juju 22.9m
+440.4m
+
+moveable feast - 40.3m
+wax lips - 33.5m
+loathing legion - 31.75m
+strinky cheese 15m
+=120.55m (11 items)
+
+2*haiku katana - 12.4m each (24.8m)
+spooky putty - 19m
+iceberglet - 17m (other vers?)
+frozen fire
+naughty origami kit - 16.4m
+fireworks 8m
+elvish sunglasses 9,
 
 
 12 to 27 oct
@@ -382,11 +414,17 @@ wooden one nightstand noncom
 duffel noncom on extreme slope
 
 The video game hot dog unlocker comes from the Jackass Plumber coin slot in the Game Grid Arcade. You can check it once per day; this costs no turns. The Arcade must be unlocked by clicking the wrong side of the tracks while you have a Game Grid token or ticket in your inventory.
+
 The unlocker in the Haunted Bedroom comes from a new choice that is added to the WOODEN nightstand noncombat adventure. On any given day, a given character account will either have the new choice or not. If you see the NC and it doesn't have the new choice, you can stop looking there.
+
 The unlocker in the eXtreme Slope comes from a new choice that is added to the Duffel Bag noncombat adventure. Same deal as the wooden nightstand -- if it's not there, stop looking.
+
 The unlocker in the Defiled Nook (northwest corner, the +item one) works the same way. Either you get a new choice in the NC, or you don't.
+
 The unlocker in Menagerie 1 appears to be from an ultra-rare monster, using whatever mechanisms UR monsters use.
+
 The unlocker in Fern's Basement comes from the great great great ... grandfather ghost, with a very low drop rate. I have no idea whether +item helps or not.
+
 The unlocker in the Haunted Conservatory is a rare drop from the skeletal cat (sniff it!). No idea whether +item helps.
 The unlocker from resting probably has some ridiculously low rate of occurrence. You can get it from your daily free rests only if you don't have an Unconscious Collective familiar. If you have one of those, you can't get it from free rests; just from turn-costing rests.
 The others... I don't know.
