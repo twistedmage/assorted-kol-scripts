@@ -198,18 +198,19 @@ string to_html(advevent a, int i, boolean shorty) {
    res.append(" <form name='"+a.id+"' style='display: inline' action=fight.php method=post><input type=hidden name=action value='macro'>"+
          "<input type='hidden' name='macrotext' value='"+batround()+a.id+"; call batround'><input type=submit title='"+a.id+"' class='buttlink");
    matcher funkmatch = create_matcher("use (\\d+),(\\d+)",a.id);
+   string ufname;
    switch {
-      case (contains_text(a.id,";")): res.append("' value='"+a.id+"'"); break;
-      case (contains_text(a.id,"skill ")): res.append(" skill' value=\""+to_skill(to_int(excise(a.id,"skill ","")))+"\""); break;
-      case (a.id == "attack"): res.append("' value='Attack with weapon'"); break;
-      case (a.id == "jiggle"): res.append("' value='Jiggle your chefstaff'"); break;
-      case (a.id == "pickpocket"): res.append("' value='Steal'"); break;
-      case (funkmatch.find()): res.append(" item' value=\"Funksling "+to_item(to_int(funkmatch.group(1)))+" / "+to_item(to_int(funkmatch.group(2)))+"\""); break;
-      case (contains_text(a.id,"use ")): item blbl = to_item(excise(a.id,"use ",""));
-            if (blbl != $item[none]) { res.append(" item' value=\""+blbl+" ("+item_amount(blbl)+")\""); break; }
-      default: res.append("' value='"+a.id+"'"); break;
+      case (contains_text(a.id,";")): res.append("' "); ufname = a.id; break;
+      case (contains_text(a.id,"skill ")): res.append(" skill' "); ufname = to_skill(to_int(excise(a.id,"skill ",""))); break;
+      case (a.id == "attack"): res.append("' "); ufname = "Attack with weapon"; break;
+      case (a.id == "jiggle"): res.append("' "); ufname = "Jiggle your chefstaff"; break;
+      case (a.id == "pickpocket"): res.append("' "); ufname = "Steal"; break;
+      case (funkmatch.find()): res.append(" item' "); ufname = "Funksling "+to_item(to_int(funkmatch.group(1)))+" / "+to_item(to_int(funkmatch.group(2)))+"\""; break;
+      case (contains_text(a.id,"use ")): item blbl = to_item(to_int(excise(a.id,"use ","")));
+            if (blbl != $item[none]) { res.append(" item' "); ufname = blbl+" ("+item_amount(blbl)+")"; break; }
+      default: res.append("' "); ufname = a.id; break;
    }
-   res.append(" onclick='return bjilgt(this);'></form>");
+   res.append("value=\""+ufname+"\" onclick='return bjilgt(this);'></form>");
    if (a.note != "") res.append(" <img src='images/itemimages/asterisk.gif' width=12 height=12 title='"+a.note+"' style='cursor:help'>");  // note
    res.append(" <span class='littlemeat'>("+rnum(-a.meat)+"&mu;)</span></td>");  // cost appended
    if (shorty) return to_string(res);
@@ -262,9 +263,10 @@ string to_html(advevent a, int i, boolean shorty) {
   // Add to Blacklist
    if (!(rawlist contains a.id)) res.append("<a href=# class='addblack' title='"+a.id+"'><img src='images/itemimages/rightarrow.gif' title=\"Send '"+a.id+"' to blacklist.\" height=15 width=15></a>");
   // Hidden Indices
-   res.append("</td><td>"+rnum(i)+"</td>");                   // attack_action()
+   res.append("</td><td>"+rnum(i)+"</td>");              // attack_action()
    res.append("<td>"+rnum(stasdex[a.id])+"</td>");       // stasis_action()
-   res.append("<td>"+rnum(stundex[a.id])+"</td></tr>");  // stun_action()
+   res.append("<td>"+rnum(stundex[a.id])+"</td>");       // stun_action()
+   res.append("<td>"+a.id+" "+ufname+(a.custom != "" ? " custom "+a.custom : "")+"</td></tr>");  // text for searchability
    return res.to_string();
 }
 string to_html(advevent a, int i) { return to_html(a,i,false); }
@@ -370,7 +372,8 @@ void batman_enhance() {
         "<th><img src='images/itemimages/hp.gif' title='1 HP = "+rnum(meatperhp,3)+"&mu;' border=0></th>"+
         "<th><img src='images/itemimages/mp.gif' title='1 MP = "+rnum(meatpermp,3)+"&mu;' border=0></th>"+
         "<th><img src='images/itemimages/meatstack.gif' title='Profit' border=0></th>"+
-        "<th><img src='images/itemimages/scroll1.gif' title='Add to Blacklist' height=26 width=26 border=0></th><th>A</th><th>...</th><th>S</th></tr></thead>\n<tbody>");
+        "<th><img src='images/itemimages/scroll1.gif' title='Add to Blacklist' height=26 width=26 border=0></th>"+
+		"<th>A</th><th>...</th><th>S</th><th>U</th></tr></thead>\n<tbody>");
       foreach i,ev in opts actbox.append(to_html(ev,i));
       actbox.append("\n</tbody></table>\n   ");
   // enhanced Manuel box

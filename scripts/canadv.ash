@@ -284,9 +284,7 @@ boolean can_adv(location where, boolean prep) {
    case $location[The Fun House]: return (checkguild() && primecheck(15) && perm_urlcheck("plains.php","funhouse.gif"));
    case $location[Throne Room]: return (levelcheck(5) && !contains_text(visit_url("questlog.php?which=2"),"slain the Goblin King") && outfitcheck("harem girl disguise") &&
                                   (effectcheck($effect[knob goblin perfume]) || (!prep && itemcheck($item[knob goblin perfume])) || (prep && use(1,$item[knob goblin perfume]))));
-   case $location[Muscle Vacation]:
-   case $location[Mysticality Vacation]:
-   case $location[Moxie Vacation]: if (my_adventures() < 3) return vprint("Not enough adventures to take a "+where+".",-6); return (perm_urlcheck("main.php","map7beach.gif"));
+   case $location[The Shore\, Inc. Travel Agency]: if (my_adventures() < 3) return vprint("Not enough adventures to take a "+where+".",-6); return (perm_urlcheck("main.php","map7beach.gif"));
    case $location[South of the Border]: return (primecheck(10) && perm_urlcheck("main.php","map7beach.gif"));
    case $location[The Defiled Nook]: return (levelcheck(7) && itemcheck($item[evilometer]) && get_property("cyrptNookEvilness").to_int() > 0); 
    case $location[The Defiled Cranny]: return (levelcheck(7) && itemcheck($item[evilometer]) && get_property("cyrptCrannyEvilness").to_int() > 0); 

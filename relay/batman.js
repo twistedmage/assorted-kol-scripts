@@ -111,12 +111,15 @@ jQuery(function($){
           'sScrollY': '244px',                                      // vertical scroll, table is 244px high
           'bScrollCollapse': true,                                  // if table data is shorter than 244px, shrink table to fit
           'bPaginate': false,                                       // we scroll instead of paginate
-          'bFilter': false,                                         // disable search (for now?)
           'aaSorting': [],                                          // no initial sort, options are already sorted
-          'oLanguage': { 'sInfo': '_TOTAL_ possible actions' },
+          'oLanguage': {
+             'sInfo': '_TOTAL_ possible actions',
+             'sSearch': '<img src="/images/itemimages/magnify.gif" title="Filter (press 9 to give focus)" height=16 width=16> ',
+			 'sZeroRecords': 'No matching actions found'
+          },
           'bSortClasses': false,                                    // don't bother applying classes to sorted columns
           'aoColumnDefs': [
-              { "bVisible": false, "aTargets": [ 9, 10, 11 ] },     // hidden action-type indices (attack, stasis, stun)
+              { "bVisible": false, "aTargets": [ 9, 10, 11, 12 ] },     // hidden action-type indices (attack, stasis, stun)
               { "sType": "html", "aTargets": [ 5 ] },
               { "sType": "batnum-html", "aTargets": [ 1, 2, 3, 6, 7 ] },
               { "sType": "numeric", "aTargets": [ 9, 10, 11 ] },
@@ -193,6 +196,7 @@ jQuery(function($){
          case 51:
          case 52:
          case 53: $('.onemenu:eq('+(e.keyCode-48)+') form:first').submit(); break;  // 1-5 keys submit 2nd-6th menus
+		 case 57: if ($('#battable_filter').is(":visible")) $('#battable_filter label input:text').focus(); return false; // 9 key gives focus to filter
          case 48: return cliPopup('');                            // 0 key opens CLI box
       }
    });

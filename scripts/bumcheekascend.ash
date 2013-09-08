@@ -3622,8 +3622,15 @@ boolean innerSetFamiliar(string famtype) {
 		return true;
 	}
 	//Then a quick check for if we have Everything Looks Yellow
-	if ((have_effect($effect[Everything Looks Yellow]) > 0 || (my_path() == "Bees Hate You") || my_path() == "Avatar of Boris" || my_path() == "AVatar of Jarlsberg") && famtype == "hebo") { famtype = "items"; }
-	
+	if ((have_effect($effect[Everything Looks Yellow]) > 0 || (my_path() == "Bees Hate You") || my_path() == "Avatar of Boris" || my_path() == "Avatar of Jarlsberg") && famtype == "hebo") { famtype = "items"; }
+		
+	//Finally, actually start getting familiars.
+	if(my_path()=="KOLHS" && famtype=="items" && have_familiar($familiar[Steam-powered cheerleader]))
+	{
+		use_familiar($familiar[steam-powered cheerleader]);
+		return true;
+	}
+		
 	//THEN a quick check for a spanglerack
 	if (i_a("spangly sombrero") > 0 && have_path_familiar($familiar[Mad Hatrack]) &&
 	(contains_text(famtype, "item") || contains_text(famtype, "equipment")) && famtype!="itemsw") { //not underwater
@@ -3640,8 +3647,7 @@ boolean innerSetFamiliar(string famtype) {
 		if (equipped_item($slot[familiar]) == $item[spangly mariachi pants]) return true;
 		print("BCC: There seemed to be a problem and you don't have the spangly mariachi pants equipped. I'll use a 'normal' item drop familiar.", "purple");
 	}
-		
-	//Finally, actually start getting familiars.
+	
 	if (famtype != "") {
 		string [int] famlist;
 		load_current_map("bcs_fam_"+famtype, famlist);

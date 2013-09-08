@@ -121,7 +121,7 @@ void unlock_optimal()
 	if(i_a("optimal spreadsheet")>0)
 		abort("Have a optimal spreadsheet! Disable this part of hotdog_ulock.ash");
 	while(my_adventures()>0 && can_adv($location[cobb's knob menagerie\, level 1]))
-		bumAdv($location[cobb's knob menagerie\, level 1], "", "items", "", "Hunting for frostigkraut", "i");
+		bumAdv($location[cobb's knob menagerie\, level 1], "", "items", "", "Hunting for optimal spreadsheet", "i");
 }
 void unlock_sleeping()
 {
@@ -142,7 +142,7 @@ void unlock_hotdogs()
 	unlock_owe();
 	unlock_devil();
 //	unlock_ghost();
-	unlock_junkyard();
+//	unlock_junkyard();
 	unlock_sleeping();
 }
 

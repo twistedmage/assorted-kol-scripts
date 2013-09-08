@@ -604,6 +604,10 @@ void advise_food()
 			add_food(con_map,"- Hot Dog (Sleeping Dog) ",9.5,0,2); //free rests
 			add_food(con_map,"- Hot Dog (Video Games Hot Dog) ",13,0,3); //pixels items meat
 		}
+		if(available_amount($item[Exotic jungle fruit])>0)
+			add_food(con_map,"- Exotic jungle fruit",2.5,0,1);
+		if(available_amount($item[sandwich of the gods])>0)
+			add_drink(con_map,"- sandwich of the gods ",35,0,5);
 	}
 	
 	//sort map
@@ -720,6 +724,10 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 			add_drink(con_map,"- carrot claret ",8.5,0,3);
 		if(available_amount($item[open sauce])>0)
 			add_drink(con_map,"- open sauce ",12,0,4);
+		if(available_amount($item[imitation white russian])>0)
+			add_drink(con_map,"- imitation white russian ",5,0,2);
+		if(available_amount($item[pan-dimensional gargle blaster])>0)
+			add_drink(con_map,"- pan-dimensional gargle blaster ",25,0,5);
 	}
 	//sort map
 	sort con_map by -value.efficiency;

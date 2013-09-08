@@ -825,7 +825,7 @@ void formatDreadOptions(){
    for tens from 1 to 3 for ones from 1 to 5 resultList[dreadNonComStr("+"+nc,tens*10+ones)]=tens*10+ones;
    remove resultList[""];
    if((resultList contains "Freddies")&&(data[".data",zone,"+"+nc+".Freddies"]<10)){
-    contexts[menu]+='"'+locNum.char_at(4)+resultList["Freddies"]+'": {name: "Collect Freddies", accesskey:"f"';
+    contexts[menu]+='"g'+locNum.char_at(4)+resultList["Freddies"]+'": {name: "Collect Freddies", accesskey:"f"';
     if(classLock(nc,resultList["Freddies"]))contexts[menu]+=", disabled: true";
     else if(keyLocked(nc,resultList["Freddies"])){
      keyOp=true;
@@ -841,8 +841,8 @@ void formatDreadOptions(){
      contexts[menu]+='"elemList": {name: "Banish Element", accesskey:"e", items:{';
      first=false;
     }
-    contexts[zone+"_"+e]='"'+locNum.char_at(4)+resultList["-"+e]+'": {name: "Banish '+e+'", accesskey:"b"';
-    contexts[menu]+='"'+locNum.char_at(4)+resultList["-"+e]+'": {name: "'+e+'", accesskey:"'+e.char_at(0)+' '+e.char_at(1)+'"';
+    contexts[zone+"_"+e]='"g'+locNum.char_at(4)+resultList["-"+e]+'": {name: "Banish '+e+'", accesskey:"b"';
+    contexts[menu]+='"g'+locNum.char_at(4)+resultList["-"+e]+'": {name: "'+e+'", accesskey:"'+e.char_at(0)+' '+e.char_at(1)+'"';
     if(classLock(nc,resultList["-"+e])){
      contexts[zone+"_"+e]+=", disabled: true";
      contexts[menu]+=", disabled: true";
@@ -851,6 +851,7 @@ void formatDreadOptions(){
      contexts[zone+"_"+e]+=', icon: "key", disabled: function(key, opt){return !this.data(\''+nc.noSpaces()+'Disabled\');}';
      contexts[menu]+=', icon: "key", disabled: function(key, opt){return !this.data(\''+nc.noSpaces()+'Disabled\');}';
     }
+    if((zone=='DreadVillage')&&(e=='Hot')&&(data[".data",zone,".Cold"]==0))contexts[zone+"_"+e]+=", callback: function(key, options){if(confirm('Cold has not been banished yet, banishing Hot now will make this impossible, do you wish to continue?')){window.location='clan_raidlogs.ash?cmd=g621';}}";
     contexts[zone+"_"+e]+='},';
     if(keyOp)contexts[zone+"_"+e]+='"toggle": {name: "Use Dreadsylvania Key", callback: function() {this.data(\''+nc.noSpaces()+'Disabled\', !this.data(\''+nc.noSpaces()+'Disabled\')); return false;}}';
     contexts[menu]+='},';
@@ -863,7 +864,7 @@ void formatDreadOptions(){
      contexts[menu]+='"monList": {name: "Banish Monster", accesskey:"m", items:{';
      first=false;
     }
-    contexts[menu]+='"'+locNum.char_at(4)+resultList["-"+e]+'": {name: "'+e+'", accesskey:"'+e.char_at(0)+' '+e.char_at(1)+'"';
+    contexts[menu]+='"g'+locNum.char_at(4)+resultList["-"+e]+'": {name: "'+e+'", accesskey:"'+e.char_at(0)+' '+e.char_at(1)+'"';
     if(classLock(nc,resultList["-"+e]))contexts[menu]+=", disabled: true";
     else if(keyLocked(nc,resultList["-"+e])){
      keyOp=true;
@@ -872,8 +873,136 @@ void formatDreadOptions(){
     contexts[menu]+='},';
    }
    if(!first)contexts[menu]+='}},';
-   if(keyOp)contexts[menu]+='"toggle": {name: "Use Dreadsylvania Key", callback: function() {this.data(\''+nc.noSpaces()+'Disabled\', !this.data(\''+nc.noSpaces()+'Disabled\')); return false;}}';
-   if(empty)contexts[menu]+='"done": {name: "Nothing more to do here.", disabled: true}';
+   if(!empty)contexts[menu]+='"sep1": "---------",';
+   switch(nc){
+    case"Cabin":
+     contexts[menu]+='"kitchenList": {name: "Kitchen", items:{';
+     contexts[menu]+='"g111": {name: "Collect Dread Tarragon"},';
+     contexts[menu]+='"g112": {name: "Grind Bone into Flour"'+((my_primestat()==$stat[muscle])&&(item_amount($item[old dry bone])>0)?"":", disabled: true")+'},';
+     contexts[menu]+='"g113": {name: "Banish Stench"'+(data[".data",zone,".Stench"]==0?"":", disabled: true")+'}}},';
+     contexts[menu]+='"basementList": {name: "Basement", items:{';
+     contexts[menu]+='"g121": {name: "Collect Freddies"'+(data[".data",zone,"+"+nc+".Freddies"]<10?"":", disabled: true")+'},';
+     contexts[menu]+='"g122": {name: "Gain Bored Stiff"},';
+     contexts[menu]+='"g123": {name: "Collect Auditor\'s Badge"'+((item_amount($item[replica key])>0)&&(data[".data",zone,"+"+nc+".Auditor's Badge"]<1)?"":", disabled: true")+'},';
+     contexts[menu]+='"g124": {name: "Make Lock Impression"'+(item_amount($item[wax banana])>0?"":", disabled: true")+'}}},';
+     contexts[menu]+='"atticList": {name: "Attic", '+(keyLocked(nc,30)?'icon: "key", disabled: function(key, opt){return !this.data(\''+nc.noSpaces()+'Disabled\');}, ':"")+'items:{';
+     contexts[menu]+='"g131": {name: "Banish Spooky"'+(data[".data",zone,".Spooky"]==0?"":", disabled: true")+'},';
+     contexts[menu]+='"g132": {name: "Banish Werewolves"'+(data[".data",zone,"+"+nc+".-Werewolves"]==0?"":", disabled: true")+'},';
+     contexts[menu]+='"g133": {name: "Banish Vampires"'+(data[".data",zone,"+"+nc+".-Vampires"]==0?"":", disabled: true")+'},';
+     contexts[menu]+='"g134": {name: "Moxie Stats"}}},';
+     break;
+    case"Tree":
+     contexts[menu]+='"topList": {name: "Top", '+(classLock(nc,10)?"disabled: true, ":"")+'items:{';
+     contexts[menu]+='"g211": {name: "Drop Blood Kiwi"'+(data[".data",zone,"+"+nc+".Stomped"]>0?", disabled: true":"")+'},';
+     contexts[menu]+='"g212": {name: "Banish Sleaze"'+(data[".data",zone,".Sleaze"]==0?"":", disabled: true")+'},';
+     contexts[menu]+='"g213": {name: "Collect Moon-Amber"'+(data[".data",zone,"+"+nc+".Moon-Amber"]>0?", disabled: true":"")+'}}},';
+     contexts[menu]+='"towerList": {name: "Fire Tower", '+(keyLocked(nc,20)?'icon: "key", disabled: function(key, opt){return !this.data(\''+nc.noSpaces()+'Disabled\');}, ':"")+'items:{';
+     contexts[menu]+='"g221": {name: "Banish Ghosts"'+(data[".data",zone,"+"+nc+".-Ghosts"]==0?"":", disabled: true")+'},';
+     contexts[menu]+='"g222": {name: "Collect Freddies"'+(data[".data",zone,"+"+nc+".Freddies"]<10?"":", disabled: true")+'},';
+     contexts[menu]+='"g223": {name: "Muscle Stats"}}},';
+     contexts[menu]+='"baseList": {name: "Base", items:{';
+     contexts[menu]+='"r231": {name: "Wait for Blood Kiwi"'+(data[".data",zone,"+"+nc+".Stomped"]>0?", disabled: true":"")+'},';
+     contexts[menu]+='"g232": {name: "Collect Seed Pod"},';
+     contexts[menu]+='"g233": {name: "Collect Owl Folder"'+(item_amount($item[over-the-shoulder folder holder])>0?"":", disabled: true")+'}}},';
+     break;
+    case"Burrows":
+     contexts[menu]+='"hotList": {name: "Heat", items:{';
+     contexts[menu]+='"g311": {name: "Banish Hot"'+(data[".data",zone,".Hot"]==0?"":", disabled: true")+'},';
+     contexts[menu]+='"g312": {name: "Gain Dragged Through the Coals"},';
+     contexts[menu]+='"g313": {name: "Smelt Cool Iron"'+(item_amount($item[old ball and chain])>0?"":", disabled: true")+'}}},';
+     contexts[menu]+='"coldList": {name: "Cold", items:{';
+     contexts[menu]+='"g321": {name: "Banish Cold"'+(data[".data",zone,".Cold"]==0?"":", disabled: true")+'},';
+     contexts[menu]+='"g322": {name: "Mysticality Stats"},';
+     contexts[menu]+='"g323": {name: "Gain Nature\'s Bounty"}}},';
+     contexts[menu]+='"smellyList": {name: "Smelly", items:{';
+     contexts[menu]+='"g331": {name: "Banish Bugbears"'+(data[".data",zone,"+"+nc+".-Bugbears"]==0?"":", disabled: true")+'},';
+     contexts[menu]+='"g332": {name: "Collect Freddies"'+(data[".data",zone,"+"+nc+".Freddies"]<10?"":", disabled: true")+'}}},';
+     break;
+    case"Square":
+     contexts[menu]+='"schoolList": {name: "Schoolhouse", '+(keyLocked(nc,10)?'icon: "key", disabled: function(key, opt){return !this.data(\''+nc.noSpaces()+'Disabled\');}, ':"")+'items:{';
+     contexts[menu]+='"g411": {name: "Banish Ghosts"'+(data[".data",zone,"+"+nc+".-Ghosts"]==0?"":", disabled: true")+'},';
+     contexts[menu]+='"g412": {name: "Collect Ghost Pencil"'+(data[".data",zone,"+"+nc+".Ghost Pencil"]<10?"":", disabled: true")+'},';
+     contexts[menu]+='"g413": {name: "Mysticality Stats"}}},';
+     contexts[menu]+='"blackList": {name: "Blacksmith", items:{';
+     contexts[menu]+='"g421": {name: "Banish Cold"'+((data[".data",zone,".Cold"]==0)&&(data[".data",zone,".Hot"]==0)?"":", disabled: true")+'},';
+     contexts[menu]+='"g422": {name: "Collect Freddies"'+(data[".data",zone,"+"+nc+".Freddies"]<10?"":", disabled: true")+'},';
+     contexts[menu]+='"r423": {name: "Smith Cool Iron"'+((item_amount($item[hothammer])>0)&&(item_amount($item[cool iron ingot])>0)&&(item_amount($item[warm fur])>0)?"":", disabled: true")+'}}},';
+     contexts[menu]+='"gallowsList": {name: "Gallows", items:{';
+     contexts[menu]+='"g431": {name: "Banish Spooky"'+(data[".data",zone,".Spooky"]==0?"":", disabled: true")+'},';
+     contexts[menu]+='"r432": {name: "Wait for '+(my_primestat()==$stat[muscle]?"Hangman's Hood":(my_primestat()==$stat[moxie]?"Clockwork Key":"Cursed Ring"))+'"'+(data[".data"] contains ".hung"?", disabled: true":"")+'},';
+     contexts[menu]+='"g434": {name: "Pull the Lever"'+(data[".data"] contains ".hung"?", disabled: true":"")+'}}},';
+     break;
+    case"Skid Row":
+     contexts[menu]+='"sewerList": {name: "Sewers", items:{';
+     contexts[menu]+='"g511": {name: "Banish Stench"'+(data[".data",zone,".Stench"]==0?"":", disabled: true")+'},';
+     contexts[menu]+='"g512": {name: "Gain Sewer-Drenched"}}},';
+     contexts[menu]+='"tenementsList": {name: "Tenements", items:{';
+     contexts[menu]+='"g521": {name: "Banish Skeletons"'+(data[".data",zone,"+"+nc+".-Skeletons"]==0?"":", disabled: true")+'},';
+     contexts[menu]+='"g522": {name: "Banish Sleaze"'+(data[".data",zone,".Sleaze"]==0?"":", disabled: true")+'},';
+     contexts[menu]+='"g523": {name: "Muscle Stats"}}},';
+     contexts[menu]+='"shackList": {name: "Ticking Shack", '+(classLock(nc,30)?"disabled: true, ":"")+'items:{';
+     contexts[menu]+='"g531": {name: "Collect Freddies"'+(data[".data",zone,"+"+nc+".Freddies"]<10?"":", disabled: true")+'},';
+     contexts[menu]+='"g532": {name: "Replicate Key"'+((item_amount($item[intricate music box parts])>0)&&(item_amount($item[complicated lock impression])>0)?"":", disabled: true")+'},';
+     contexts[menu]+='"g533": {name: "Polish Moon-Amber"'+(item_amount($item[moon-amber])>0?"":", disabled: true")+'},';
+     contexts[menu]+='"g534": {name: "Assemble Songbird"'+((item_amount($item[intricate music box parts])>2)&&(item_amount($item[dreadsylvanian clockwork key])>0)?"":", disabled: true")+'},';
+     contexts[menu]+='"g535": {name: "Collect Old Fuse"}}},';
+     break;
+    case"Estate":
+     contexts[menu]+='"plotList": {name: "Family Plot", items:{';
+     contexts[menu]+='"g611": {name: "Banish Zombies"'+(data[".data",zone,"+"+nc+".-Zombies"]==0?"":", disabled: true")+'},';
+     contexts[menu]+='"g612": {name: "Collect Freddies"'+(data[".data",zone,"+"+nc+".Freddies"]<10?"":", disabled: true")+'},';
+     contexts[menu]+='"g613": {name: "Gain 50 Ways"}}},';
+     contexts[menu]+='"quarterList": {name: "Servant\'s Quarters", items:{';
+     contexts[menu]+='"g621": {name: "Banish Hot"'+(data[".data",zone,".Hot"]==0?"":", disabled: true")+(data[".data",zone,".Cold"]==0?", callback: function(key, options){if(confirm('Cold has not been banished yet, banishing Hot now will make this impossible, do you wish to continue?')){window.location='clan_raidlogs.ash?cmd=621';}}":"")+'},';
+     contexts[menu]+='"g622": {name: "Make Pie"'+((item_amount($item[dread tarragon])>0)&&(item_amount($item[bone flour])>0)&&(item_amount($item[dreadful roast])>0)&&(item_amount($item[stinking agaricus])>0)?"":", disabled: true")+'},';
+     contexts[menu]+='"g623": {name: "Moxie Stats"}}},';
+     contexts[menu]+='"suiteList": {name: "Master Suite", '+(keyLocked(nc,30)?'icon: "key", disabled: function(key, opt){return !this.data(\''+nc.noSpaces()+'Disabled\');}, ':"")+'items:{';
+     contexts[menu]+='"g631": {name: "Banish Werewolves"'+(data[".data",zone,"+"+nc+".-Werewolves"]==0?"":", disabled: true")+'},';
+     contexts[menu]+='"g632": {name: "Collect Eau de Mort"},';
+     contexts[menu]+='"g633": {name: "Sew Ghost Shawl"'+(item_amount($item[ghost thread])>9?"":", disabled: true")+'}}},';
+     break;
+    case"Great Hall":
+     contexts[menu]+='"ballroomList": {name: "Ballroom", '+(keyLocked(nc,10)?'icon: "key", disabled: function(key, opt){return !this.data(\''+nc.noSpaces()+'Disabled\');}, ':"")+'items:{';
+     contexts[menu]+='"g711": {name: "Banish Vampires"'+(data[".data",zone,"+"+nc+".-Vampires"]==0?"":", disabled: true")+'},';
+     contexts[menu]+='"g712": {name: "Moxie Stats"}}},';
+     contexts[menu]+='"kitchenList": {name: "Kitchen", items:{';
+     contexts[menu]+='"g721": {name: "Banish Cold"'+(data[".data",zone,".Cold"]==0?"":", disabled: true")+'},';
+     contexts[menu]+='"g722": {name: "Gain Staying Frosty"}}},';
+     contexts[menu]+='"diningList": {name: "Dining Room", items:{';
+     contexts[menu]+='"g731": {name: "Collect Dreadful Roast"'+(data[".data",zone,"+"+nc+".Dreadful Roast"]>0?", disabled: true":"")+'},';
+     contexts[menu]+='"g732": {name: "Banish Stench"'+(data[".data",zone,".Stench"]==0?"":", disabled: true")+'},';
+     contexts[menu]+='"g733": {name: "Collect Wax Banana"'+(my_primestat()==$stat[mysticality]?"":", disabled: true")+'}}},';
+     break;
+    case"Tower":
+     contexts[menu]+='"labratoryList": {name: "Laboratory", '+(keyLocked(nc,10)?'icon: "key", disabled: function(key, opt){return !this.data(\''+nc.noSpaces()+'Disabled\');}, ':"")+'items:{';
+     contexts[menu]+='"g811": {name: "Banish Bugbears"'+(data[".data",zone,"+"+nc+".-Bugbears"]==0?"":", disabled: true")+'},';
+     contexts[menu]+='"g812": {name: "Banish Zombies"'+(data[".data",zone,"+"+nc+".-Zombies"]==0?"":", disabled: true")+'},';
+     contexts[menu]+='"g813": {name: "'+(data[".data"] contains ".machine"?"Visit":"Repair")+' the Machine"'+((data[".data"] contains ".machine")||(item_amount($item[skull capacitor])>0)?"":", disabled: true")+'},';
+     contexts[menu]+='"g814": {name: "Mix Blood Kiwitini"'+((item_amount($item[eau de mort])>0)&&(item_amount($item[blood kiwi])>0)&&(my_primestat()==$stat[moxie])?"":", disabled: true")+'}}},';
+     contexts[menu]+='"booksList": {name: "Books", '+(classLock(nc,20)?"disabled: true, ":"")+'items:{';
+     contexts[menu]+='"g821": {name: "Banish Skeletons"'+(data[".data",zone,"+"+nc+".-Skeletons"]==0?"":", disabled: true")+'},';
+     contexts[menu]+='"g822": {name: "Myst Stats"},';
+     contexts[menu]+='"g823": {name: "Learn Necklace Recipe"}}},';
+     contexts[menu]+='"bedroomList": {name: "Bedroom", items:{';
+     contexts[menu]+='"g831": {name: "Banish Sleaze"'+(data[".data",zone,".Sleaze"]==0?"":", disabled: true")+'},';
+     contexts[menu]+='"g832": {name: "Collect Freddies"'+(data[".data",zone,"+"+nc+".Freddies"]<10?"":", disabled: true")+'},';
+     contexts[menu]+='"g833": {name: "Gain Magically Fingered"}}},';
+     break;
+    case"Dungeon":
+     contexts[menu]+='"cellList": {name: "Cell Block", items:{';
+     contexts[menu]+='"g911": {name: "Banish Spooky"'+(data[".data",zone,".Spooky"]==0?"":", disabled: true")+'},';
+     contexts[menu]+='"g912": {name: "Muscle Stats"},';
+     contexts[menu]+='"g913": {name: "MP"}}},';
+     contexts[menu]+='"boilerList": {name: "Boiler Room", items:{';
+     contexts[menu]+='"g921": {name: "Banish Hot"'+(data[".data",zone,".Hot"]==0?"":", disabled: true")+'},';
+     contexts[menu]+='"g922": {name: "Collect Freddies"'+(data[".data",zone,"+"+nc+".Freddies"]<10?"":", disabled: true")+'},';
+     contexts[menu]+='"g923": {name: "All Stats"}}},';
+     contexts[menu]+='"guardList": {name: "Guardroom", items:{';
+     contexts[menu]+='"g931": {name: "Collect Stinking Agaricus"'+(data[".data",zone,"+"+nc+".Stinking Agaricus"]>0?", disabled: true":"")+'},';
+     contexts[menu]+='"g932": {name: "Gain Spore-Wreathed"}}},';
+     break;
+   }
+   if(keyOp)contexts[menu]+='"sep2": "---------", "toggle": {name: "Use Dreadsylvania Key", callback: function() {this.data(\''+nc.noSpaces()+'Disabled\', !this.data(\''+nc.noSpaces()+'Disabled\')); return false;}}';
   }
  }
 }
@@ -1664,7 +1793,7 @@ void formatDreadTable(){
      break;
     }
    default:
-    write(to_string(1000-data[".data","Dread"+area,".dist"])+" Kill"+(data[".data","Dread"+area,".dist"]!=999?"s":"")+" Remain");
+    write(to_string(1000-data[".data","Dread"+area,".dist"])+" Kill"+(data[".data","Dread"+area,".dist"]!=999?"s":"")+" Remain"+(data[".data","Dread"+area,".dist"]!=999?"":"s"));
   }
   write("</td>");
  }
@@ -1792,7 +1921,7 @@ void formatDread(string show){
   write("<table class=\"tableD "+area+"T\"><tr class=\"RowD\"><td colspan=\"3\" id=\""+area+"tr\" class=\""+area+"I\" onclick=\"tog2('"+area+"Table')\">"+expand(area)+"</td></tr>");
   write("<tr class=\"RowL\"><td>Kiss Level: "+to_string(1+data[".data",area,".kisses"])+"</td><td>Elements:");
   foreach e in $strings[Hot, Cold, Spooky, Sleaze, Stench] if((data[".data",area,".kisses"]>4)||(data[".data",area,"."+e]!=-1)) write(" <span class=\""+area+"_"+e+(data[".data",area,".kisses"]<5?"\" title=\""+area.spoiler(e):"")+"\">"+e.withColor()+"</span>");
-  write("</td><td>Monster Prevalence: ");
+  write("</td><td>Monster Shift: ");
   if(data[".data",area,".tilt"]<0)switch(area){
    case "DreadWoods":write("Werewolves");break;
    case "DreadVillage":write("Zombies");break;
@@ -2137,39 +2266,49 @@ void noAccess(){
  writeln('</script><meta http-equiv="refresh" content="0; URL=./clan_basement.php?fromabove=1"></head><body onload="redirect();">No basement access. Sorry. <a href="clan_hall.php">Back to Clan Hall</a></body></html>');
 }
 
-void executeCommand(string cmd){
+boolean executeCommand(string cmd){
  matcher m;
  string p=visit_url("clan_raidlogs.php");
+ boolean moveTo=false;
+ if(cmd.char_at(0)=='r')moveTo=true;
+ cmd=cmd.substring(1);
  if(cmd.to_int()>0){
   if("13 22 41 63 71 81".contains_text(cmd.substring(0,2))){
    switch(cmd.char_at(0)){
-    case"1":m=create_matcher(theMatcher["DreadVillage","+Cabin.30"],p);break;
-    case"2":m=create_matcher(theMatcher["DreadVillage","+Tree.20"],p);break;
+    case"1":m=create_matcher(theMatcher["DreadWoods","+Cabin.30"],p);break;
+    case"2":m=create_matcher(theMatcher["DreadWoods","+Tree.20"],p);break;
     case"4":m=create_matcher(theMatcher["DreadVillage","+Square.10"],p);break;
     case"6":m=create_matcher(theMatcher["DreadVillage","+Estate.30"],p);break;
-    case"7":m=create_matcher(theMatcher["DreadVillage","+Tower.10"],p);break;
-    case"8":m=create_matcher(theMatcher["DreadVillage","+Dungeon.10"],p);break;
+    case"7":m=create_matcher(theMatcher["DreadCastle","+Great Hall.10"],p);break;
+    case"8":m=create_matcher(theMatcher["DreadCastle","+Tower.10"],p);break;
    }
-   if(!m.find())if(!retrieve_item(1,$item[dreadsylvanian skeleton key])){
-    abortMessage="Failed to acquire Dreadsylvanian skeleton key.";
-    return;
+   if(!m.find()){
+    if(!retrieve_item(1,$item[dreadsylvanian skeleton key])){
+     abortMessage="Failed to acquire Dreadsylvanian skeleton key.";
+     return false;
+    }
    }
   }
   visit_url("clan_dreadsylvania.php?action=forceloc&loc="+cmd.char_at(0));
   visit_url("adventure.php?snarfblat="+to_string((cmd.char_at(0).to_int()-1)/3+338));
   p=visit_url("choice.php?forceoption=0");
   m=create_matcher("whichchoice value=(\\d*)",p);
-  if(!m.find())return;
+  if(!m.find())return false;
   p=visit_url("choice.php?pwd="+my_hash()+"&whichchoice="+m.group(1)+"&option="+cmd.char_at(1));
   m.reset(p);
-  if(!m.find())return;
+  if(!m.find())return false;
   p=visit_url("choice.php?pwd="+my_hash()+"&whichchoice="+m.group(1)+"&option="+cmd.char_at(2));
+  if(moveTo){
+   write(p);
+   return true;
+  }
  }else{
  }
+ return false;
 }
 
 void main(){
- if(FF contains "cmd")executeCommand(FF["cmd"]);
+ if((FF contains "cmd")&&(executeCommand(FF["cmd"])))return;
  if(FF contains "viewlog")page=visit_url("clan_raidlogs.php?viewlog="+FF["viewlog"]);
  else if(FF contains "oldLogs")page=visit_url("clan_oldraidlogs.php?startrow="+FF["oldLogs"]);
  else page=visit_url("clan_raidlogs.php");

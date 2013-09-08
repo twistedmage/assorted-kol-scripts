@@ -122,6 +122,8 @@ void do_fights()
 //		abort("buy slap and slap again recipe");
 //	if(swagger>5000 && available_amount($item[fettucini épines Inconnu recipe])<1 && can_interact())
 //		abort("buy fettucini épines Inconnu recipe");
+//	if(swagger>5000 && !have_skill($skill[Summon Annoyance]) && can_interact())
+//		abort("buy Essence of Annoyance");
 }
 
 void main()

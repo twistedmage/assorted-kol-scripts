@@ -259,7 +259,8 @@ void handle_post() {
 
 void add_features() {
   // add "loading" div
-   results.replace_string("</body>", contains_text(results,"<center><table><a name=\"end\">") ? "<div id='battab'><ul><li><a href='#bat-enhance'>Actions</a>"+
+   results.replace_string("</body>", (contains_text(results,"<center><table><a name=\"end\">") && !contains_text(results, "window.fightover = true")) ? 
+      "<div id='battab'><ul><li><a href='#bat-enhance'>Actions</a>"+
       "</li><li><a href='#kolformbox' title='Note: non-macro actions are not tracked!'>KoL</a></li><li><a href='#blacklist' class='blacktrigger'>Blacklist</a></li>"+
 	  "<li><a href='#wikibox' class='wickytrigger'>Wiki</a></li></ul>"+
 	  "<div id='bat-enhance' class='panel'><a href='fight.php' border=0><img id='compimg' src='images/adventureimages/3machines.gif'></a><p>Bat-Computer "+
