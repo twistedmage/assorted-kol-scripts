@@ -38,8 +38,13 @@ void unlock_sly()
 			set_property("choiceAdventure155", "4");
 			set_property("battleAction","try to run away");
 			cli_execute("goal set 1 choiceadv");
+			setFamiliar("items");
+			cli_execute("clear mood");
+			cli_execute("maximize items, -combat frequency");
+			if (have_skill($skill[Smooth Movement])) cli_execute("trigger lose_effect, Smooth Movements, cast 1 smooth movement");
+			if (have_skill($skill[The Sonata of Sneakiness])) cli_execute("trigger lose_effect, The Sonata of Sneakiness, cast 1 sonata of sneakiness");
 			while(my_adventures()>0 && get_property("lastEncounter") != "Skull, Skull, Skull")
-				bumAdv($location[The defiled nook], "", "itemsnc", "1 choiceadv", "Hunting for deboner", "-");
+				adventure(1,$location[The defiled nook]);
 			set_property("battleAction","custom combat script");
 		}
 		set_property("_sly_checked_today","true");
@@ -57,8 +62,10 @@ void unlock_devil()
 	//devil dog
 	if(i_a("chicle de salchicha")>0)
 		abort("Have a chicle de salchicha! Disable this part of hotdog_ulock.ash");
+	setFamiliar("items");
+	cli_execute("clear mood");
 	while(my_adventures()>0 && can_adv($location[south of the border]) && i_a("chicle de salchicha")<1)
-		bumAdv($location[south of the border], "", "", "", "Hunting for chicle de salchicha", "");
+		adventure(1,$location[south of the border]);
 }
 void unlock_chilly()
 {
@@ -73,9 +80,14 @@ void unlock_chilly()
 			//set choiceadv for deboner, set combat to runaway, then adv until choiceadventure
 			set_property("choiceAdventure575", 2);
 			cli_execute("goal set 1 choiceadv");
+			setFamiliar("items");
+			cli_execute("clear mood");
+			cli_execute("maximize items, -combat frequency");
+			if (have_skill($skill[Smooth Movement])) cli_execute("trigger lose_effect, Smooth Movements, cast 1 smooth movement");
+			if (have_skill($skill[The Sonata of Sneakiness])) cli_execute("trigger lose_effect, The Sonata of Sneakiness, cast 1 sonata of sneakiness");
 			while(my_adventures()>0 && get_property("lastEncounter") != "Duffel on the Double")
 			{
-				bumAdv($location[The extreme slope], "", "itemsnc", "1 choiceadv", "Hunting for frostigkraut", "-");
+				adventure(1,$location[The extreme slope]);
 			}
 		}
 		set_property("_chilly_checked_today","true");
@@ -104,6 +116,11 @@ void unlock_wet()
 	//manor 2 open
 	if(can_adv($location[the haunted bedroom]))
 	{
+		setFamiliar("items");
+		cli_execute("clear mood");
+		cli_execute("maximize items, -combat frequency");
+		if (have_skill($skill[Smooth Movement])) cli_execute("trigger lose_effect, Smooth Movements, cast 1 smooth movement");
+		if (have_skill($skill[The Sonata of Sneakiness])) cli_execute("trigger lose_effect, The Sonata of Sneakiness, cast 1 sonata of sneakiness");
 		while(my_adventures()>0 && !get_property("_wet_checked_today").to_boolean())
 		{
 			set_property("choiceAdventure85", 4);
@@ -120,8 +137,10 @@ void unlock_optimal()
 	//optimal dog
 	if(i_a("optimal spreadsheet")>0)
 		abort("Have a optimal spreadsheet! Disable this part of hotdog_ulock.ash");
+	setFamiliar("items");
+	cli_execute("clear mood");
 	while(my_adventures()>0 && can_adv($location[cobb's knob menagerie\, level 1]))
-		bumAdv($location[cobb's knob menagerie\, level 1], "", "items", "", "Hunting for optimal spreadsheet", "i");
+		adventure(1,$location[cobb's knob menagerie\, level 1]);
 }
 void unlock_sleeping()
 {

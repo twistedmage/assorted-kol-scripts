@@ -186,6 +186,7 @@
 		13-08-22:Fix item removal fully by reverting to the really old method...
 				 Print items when debug printing, but mark them red since they are disallowed
 		13-08-25:Try to blacklist KOHLS-combat items
+		13-09-03:Attempt to abort when we tame a sea horse
 ***********************************************************************************************************************/
 import <SmartStasis.ash>;
 
@@ -1494,6 +1495,9 @@ void main(int initround, monster foe, string pg) {
 		//Debug info
 		vprint("WHAM: We currently think that the round number is: " + round + " and that the turn number is " + my_turncount() + ".", "purple", 9);
 	} until(finished() || die_rounds() <= 1 || round >= min(maxround, WHAM_maxround));
+	
+	if(foe == $monster[wild seahorse] && happened($item[sea lasso]))
+		quit("You've tamed a Sea Horse. Aborting so you can decide how to continue.");
 	
 	//Reset unknown_ml in case we changed it
 	if(vars["unknown_ml"] != unknown_ml) {

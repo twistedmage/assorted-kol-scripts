@@ -49,6 +49,7 @@ Version History:
 2013-06-25: Actually initiate the goofball setting as well
 2013-06-28: Fix order of operations error for the drinking check
 2013-08-09: Don't ignore the value of items in inventory
+2013-08-31: Fix some fuzzy matching
 */
 
 import <zlib.ash>;
@@ -209,14 +210,14 @@ boolean strip_familiar(string tested_outfit)
 	
 	if(have_familiar($familiar[disembodied hand]))
 		hand = familiar_equipped_equipment($familiar[disembodied hand]);
-	if(have_familiar($familiar[hatrack]))
-		hat = familiar_equipped_equipment($familiar[hatrack]);
+	if(have_familiar($familiar[Mad Hatrack]))
+		hat = familiar_equipped_equipment($familiar[Mad Hatrack]);
 	if(have_familiar($familiar[fancypants scarecrow]))
 		pants = familiar_equipped_equipment($familiar[fancypants scarecrow]);
 	
 	if(hat != $item[none])
 	{
-		use_familiar($familiar[hatrack]);
+		use_familiar($familiar[Mad Hatrack]);
 		equip($slot[familiar],$item[none]);
 		use_familiar(current);
 	}
@@ -264,7 +265,7 @@ boolean ok(item it, string command, effect ef) {
 		return false;
 	if(it.spleen > 0 && autoBasement_spleen_to_buff == false) //Don't spleen unless told to
 		return false;
-	if(it == $item[goofballs] && autoBasement_hop_on_up == false)	//Don't use drugs unless told to
+	if(it == $item[bottle of goofballs] && autoBasement_hop_on_up == false)	//Don't use drugs unless told to
 		return false;
 	if(contains_text(command, "gong"))	//Don't use buffs that take turns to get
 		return false;
