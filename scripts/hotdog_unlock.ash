@@ -39,7 +39,7 @@ void unlock_sly()
 			set_property("battleAction","try to run away");
 			cli_execute("goal set 1 choiceadv");
 			setFamiliar("items");
-			cli_execute("clear mood");
+			cli_execute("mood clear");
 			cli_execute("maximize items, -combat frequency");
 			if (have_skill($skill[Smooth Movement])) cli_execute("trigger lose_effect, Smooth Movements, cast 1 smooth movement");
 			if (have_skill($skill[The Sonata of Sneakiness])) cli_execute("trigger lose_effect, The Sonata of Sneakiness, cast 1 sonata of sneakiness");
@@ -63,7 +63,7 @@ void unlock_devil()
 	if(i_a("chicle de salchicha")>0)
 		abort("Have a chicle de salchicha! Disable this part of hotdog_ulock.ash");
 	setFamiliar("items");
-	cli_execute("clear mood");
+	cli_execute("mood clear");
 	while(my_adventures()>0 && can_adv($location[south of the border]) && i_a("chicle de salchicha")<1)
 		adventure(1,$location[south of the border]);
 }
@@ -81,7 +81,7 @@ void unlock_chilly()
 			set_property("choiceAdventure575", 2);
 			cli_execute("goal set 1 choiceadv");
 			setFamiliar("items");
-			cli_execute("clear mood");
+			cli_execute("mood clear");
 			cli_execute("maximize items, -combat frequency");
 			if (have_skill($skill[Smooth Movement])) cli_execute("trigger lose_effect, Smooth Movements, cast 1 smooth movement");
 			if (have_skill($skill[The Sonata of Sneakiness])) cli_execute("trigger lose_effect, The Sonata of Sneakiness, cast 1 sonata of sneakiness");
@@ -117,7 +117,7 @@ void unlock_wet()
 	if(can_adv($location[the haunted bedroom]))
 	{
 		setFamiliar("items");
-		cli_execute("clear mood");
+		cli_execute("mood clear");
 		cli_execute("maximize items, -combat frequency");
 		if (have_skill($skill[Smooth Movement])) cli_execute("trigger lose_effect, Smooth Movements, cast 1 smooth movement");
 		if (have_skill($skill[The Sonata of Sneakiness])) cli_execute("trigger lose_effect, The Sonata of Sneakiness, cast 1 sonata of sneakiness");
@@ -138,7 +138,7 @@ void unlock_optimal()
 	if(i_a("optimal spreadsheet")>0)
 		abort("Have a optimal spreadsheet! Disable this part of hotdog_ulock.ash");
 	setFamiliar("items");
-	cli_execute("clear mood");
+	cli_execute("mood clear");
 	while(my_adventures()>0 && can_adv($location[cobb's knob menagerie\, level 1]))
 		adventure(1,$location[cobb's knob menagerie\, level 1]);
 }
