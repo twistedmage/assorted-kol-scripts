@@ -37,7 +37,7 @@ void unlock_sly()
 			//set choiceadv for deboner, set combat to runaway, then adv until choiceadventure
 			set_property("choiceAdventure155", "4");
 			set_property("battleAction","try to run away");
-			cli_execute("goal set 1 choiceadv");
+			cli_execute("goal clear");
 			setFamiliar("items");
 			cli_execute("mood clear");
 			cli_execute("maximize items, -combat frequency");
@@ -79,7 +79,7 @@ void unlock_chilly()
 		{
 			//set choiceadv for deboner, set combat to runaway, then adv until choiceadventure
 			set_property("choiceAdventure575", 2);
-			cli_execute("goal set 1 choiceadv");
+			cli_execute("goal clear");
 			setFamiliar("items");
 			cli_execute("mood clear");
 			cli_execute("maximize items, -combat frequency");

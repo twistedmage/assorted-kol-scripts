@@ -289,7 +289,7 @@ void set_unknown_ml(monster foe, string pg) {
 		set_location($location[Fernswarthy's Basement]);
 	if(my_path() == "KOLHS")
 		foreach i in $ints[6653,6656,6370,6374,6379,6382,6384,6385,6387]
-			temp_blacklist_inc("use " + i, 0);
+			blacklist["use "+i] = 0;
 }
 
 //Calculate number of bees if needed
