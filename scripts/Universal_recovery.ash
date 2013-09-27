@@ -102,7 +102,7 @@ int objective;			// This is the target passed to the recoveryScript.
 string start_type;		// This is the type passed to the recoveryScript.
 item null = $item[Xlyinia's notebook];	// The purpose of the null is that it restores nothing. Obviously.
 	// Can the character cure beaten up without an item?
-boolean tongue = have_skill($skill[Tongue of the Otter]) || have_skill($skill[Tongue of the Walrus]);
+boolean tongue = false;//have_skill($skill[Tongue of the Otter]) || have_skill($skill[Tongue of the Walrus]);
 	// Can the character purchase magical mystery juice?
 boolean buy_mmj = ($classes[Pastamancer, Sauceror] contains my_class()) || (my_class() == $class[accordion thief] && my_level() >= 9);
 	// Check preferences to see what forms of healing are allowed.
@@ -311,7 +311,7 @@ boolean populate_skills(int target) {
 	mp_gear = mp_gear(target);
 	if(have_skill($skill[Cannelloni Cocoon])) skills[$skill[Cannelloni Cocoon]].ave = 999999999;
 	if(have_skill($skill[Tongue of the Walrus])) skills[$skill[Tongue of the Walrus]].ave = 35;
-	if(have_skill($skill[Tongue of the Otter])) skills[$skill[Tongue of the Otter]].ave = 15;
+//	if(have_skill($skill[Tongue of the Otter])) skills[$skill[Tongue of the Otter]].ave = 15;
 	if(have_skill($skill[Disco Power Nap])) skills[$skill[Disco Power Nap]].ave = 40;
 	if(have_skill($skill[Disco Nap])) skills[$skill[Disco Nap]].ave = 20;
 	if(have_skill($skill[Lasagna Bandages])) skills[$skill[Lasagna Bandages]].ave =20;
@@ -1249,7 +1249,7 @@ boolean inv_hp_restore(int target, item [int] options) {
 
 // This determines if Tongue of the Otter is better than Walrus for curing beaten up.
 boolean otter_best(int maxhp) {
-	if(!have_skill($skill[Tongue of the Otter])) return false;
+//	if(!have_skill($skill[Tongue of the Otter])) return false;
 	int toheal = maxhp - my_hp();
 	if(!have_skill($skill[Tongue of the Walrus]) || toheal < 51 
 	  || my_maxmp() < skills[$skill[Tongue of the Walrus]].mp)
@@ -1259,9 +1259,9 @@ boolean otter_best(int maxhp) {
 		int remainder = toheal % 35;
 		if(remainder > 15)
 			tongue_cost = tongue_cost + skills[$skill[Tongue of the Walrus]].mp;
-		else if(remainder > 0)
-			tongue_cost = tongue_cost + skills[$skill[Tongue of the Otter]].mp;
-		if(tongue_cost < skills[$skill[Cannelloni Cocoon]].mp + skills[$skill[Tongue of the Otter]].mp
+//		else if(remainder > 0)
+//			tongue_cost = tongue_cost + skills[$skill[Tongue of the Otter]].mp;
+		if(tongue_cost < skills[$skill[Cannelloni Cocoon]].mp + 0
 		  && (remainder == 0 || remainder > 15))
 			return false;
 	}
@@ -1277,9 +1277,9 @@ boolean cheapest_beatup() {
 		if(historical_age(test) > 2) price[doodad] = mall_price(test); 	// Ensure price is good
 		else price[doodad] = historical_price(test);
 	}
-	if(have_skill($skill[Tongue of the Otter]) && my_maxmp() >= skills[$skill[Tongue of the Otter]].mp)
-		price["Tongue of the Otter"] = mp_to_meat(skills[$skill[Tongue of the Otter]].mp);
-	else if(have_skill($skill[Tongue of the Walrus]) && my_maxmp() >= skills[$skill[Tongue of the Walrus]].mp)
+//	if(have_skill($skill[Tongue of the Otter]) && my_maxmp() >= skills[$skill[Tongue of the Otter]].mp)
+//		price["Tongue of the Otter"] = mp_to_meat(skills[$skill[Tongue of the Otter]].mp);
+	if(have_skill($skill[Tongue of the Walrus]) && my_maxmp() >= skills[$skill[Tongue of the Walrus]].mp)
 		price["Tongue of the Walrus"] = mp_to_meat(skills[$skill[Tongue of the Walrus]].mp);
 	string best = "";
 	price[best] = 999999999;
@@ -1289,10 +1289,10 @@ boolean cheapest_beatup() {
 	switch (best) {
 	case "":
 		break;
-	case "Tongue of the Otter":
-		if(my_mp() >= skills[$skill[Tongue of the Otter]].mp || mp_heal(skills[$skill[Tongue of the Otter]].mp))
-			cast(1, $skill[Tongue of the Otter]);
-		break;
+//	case "Tongue of the Otter":
+//		if(my_mp() >= skills[$skill[Tongue of the Otter]].mp || mp_heal(skills[$skill[Tongue of the Otter]].mp))
+//			cast(1, $skill[Tongue of the Otter]);
+//		break;
 	case "Tongue of the Walrus":
 		if(my_mp() >= skills[$skill[Tongue of the Walrus]].mp || mp_heal(skills[$skill[Tongue of the Walrus]].mp))
 			cast(1, $skill[Tongue of the Walrus]);
@@ -1362,10 +1362,7 @@ boolean cure_beatenup(int target){
 		}
 	}
 	if(beset($effect[Beaten Up])) {
-		if(otter_best(maxhp) && my_maxmp() >= skills[$skill[Tongue of the Otter]].mp) {
-			if(my_mp() >= skills[$skill[Tongue of the Otter]].mp || mp_heal(skills[$skill[Tongue of the Otter]].mp))
-				cast(1, $skill[Tongue of the Otter]);
-		} else if(have_skill($skill[Tongue of the Walrus]) && my_maxmp() >= skills[$skill[Tongue of the Walrus]].mp
+		if(have_skill($skill[Tongue of the Walrus]) && my_maxmp() >= skills[$skill[Tongue of the Walrus]].mp
 		  && (my_mp() >= skills[$skill[Tongue of the Walrus]].mp || mp_heal(skills[$skill[Tongue of the Walrus]].mp)))
 			cast(1, $skill[Tongue of the Walrus]);
 	}
