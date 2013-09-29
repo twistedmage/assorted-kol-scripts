@@ -383,7 +383,7 @@
 		- Fix bug with forcing a wepon in Fist-runs
 		- Don't count things in the closet if the user has autoSatisfyWithCloset set to false
 		- Plant the bean by clicking the ground rather than have Mafia do it for us
-		- Fix bug with outfit in the icy peak
+		- Fix bug with outfit in the The Icy Peak
 		- Migrate cold_res to get_res and adapt it for all elements
 		- Make sure we have casting items for sauceror and turtle tamer skills
 		- Adapt the script for the new level 9 quest
@@ -1032,7 +1032,7 @@ void bcAutoClancy() {
 
 					case "Camps"	: visit_url("choice.php?pwd&whichchoice=576&option=1");
 							break;
-//Icy Peak			Encounter: Mercury Rising
+//The Icy Peak			Encounter: Mercury Rising
 
 					case "Scamp"	: visit_url("choice.php?pwd&whichchoice=577&option=1");
 							break;
@@ -1071,10 +1071,10 @@ void bcAutoClancy() {
 							break;
 //plains.php?action=lutergrave	Encounter: The Luter
 
-					case "take him to the Icy Peak"	: 
-							clancyLoop($location[Icy Peak]);
+					case "take him to the The Icy Peak"	: 
+							clancyLoop($location[The Icy Peak]);
 							break;
-//Icy Peak			Encounter: Mercury Rising
+//The Icy Peak			Encounter: Mercury Rising
 
 					case "take him to the Ancient Buried Pyramid" :
 							clancyLoop($location[The Middle Chamber]);
@@ -2818,7 +2818,7 @@ void defaultMood(boolean castMojo) {
 		cli_execute("trigger lose_effect, astral shell, cast 1 astral shell");
 	if (have_skill($skill[Moxie of the Mariachi]) && my_path() != "BIG!") cli_execute("trigger lose_effect, Mariachi Mood, cast 1 Moxie of the Mariachi");
 	if (have_skill($skill[Disco Aerobics]) && my_path() != "BIG!") cli_execute("trigger lose_effect, Disco State of Mind, cast 1 Disco Aerobics");
-	if (have_skill($skill[Blubbered Up])) cli_execute("trigger lose_effect, Blubbered Up, cast 1 Blubbered Up");
+	if (have_skill($skill[Blubber Up])) cli_execute("trigger lose_effect, Blubbered Up, cast 1 Blubbered Up");
 		
 	//use fire kits for pvp fights
 	if(i_a("CSA fire-starting kit")>0 && to_boolean(get_property("_fireStartingKitUsed")))
@@ -3552,7 +3552,7 @@ boolean can_adv(location where) {
 	case $location[The Haunted Billiards Room]: return (primecheck(10) && perm_urlcheck("town_right.php","manor.gif"));
 	case $location[The Haunted Bathroom]: return (primecheck(68) && to_int(get_property("lastSecondFloorUnlock")) == my_ascensions());
 	case $location[The Haunted Bedroom]: return (primecheck(85) && to_int(get_property("lastSecondFloorUnlock")) == my_ascensions());
-	case $location[Icy Peak]: return (levelcheck(8) && primecheck(53) && perm_urlcheck("questlog.php?which=2","L337 Tr4pz0r") && numeric_modifier("Cold Resistance") > 0);
+	case $location[The Icy Peak]: return (levelcheck(8) && primecheck(53) && perm_urlcheck("questlog.php?which=2","L337 Tr4pz0r") && numeric_modifier("Cold Resistance") > 0);
 	//case $location[Barrrney's Barrr]: return (itemcheck($item[dingy dinghy]) && (equipcheck($item[pirate fledges]) || outfitcheck("swashbuckling getup")));
 	case $location[The F'c'le]: return (pirate_check("cove3_3x1b.gif"));
 	case $location[The Poop Deck]: return (pirate_check("cove3_3x3b.gif"));
@@ -4343,7 +4343,7 @@ location level_location(int value) {
 			The Haunted Ballroom, The Palindome, Tower Ruins, The Oasis, The Upper Chamber, The Middle Chamber, Thugnderdome, 
 			Outskirts of Camp Logging Camp, Camp Logging Camp, Post-Quest Bugbear Pens, Bugbear Pens, The Degrassi Knoll Garage, The Fun House, 
 			Pre-Cyrpt Cemetary, Post-Cyrpt Cemetary, The Goatlet, Lair of the Ninja Snowmen, The eXtreme Slope, Whitey's Grove, The Laugh Floor,
-			Infernal Rackets Backstage, Pandamonium Slums, The Valley of Rof L'm Fao, The Penultimate Fantasy Airship, The Road to White Citadel, The Haunted Billiards Room, The Haunted Bathroom, The Haunted Bedroom, Icy Peak, Barrrney's Barrr, The F'c'le, The Poop Deck, Belowdecks]
+			Infernal Rackets Backstage, Pandamonium Slums, The Valley of Rof L'm Fao, The Penultimate Fantasy Airship, The Road to White Citadel, The Haunted Billiards Room, The Haunted Bathroom, The Haunted Bedroom, The Icy Peak, Barrrney's Barrr, The F'c'le, The Poop Deck, Belowdecks]
 		{
 			if (can_adv(loc)) {
 				one = safeMox(loc);
@@ -9479,7 +9479,7 @@ boolean bcascTrapper() {
 		}
 		
 		if (is_not_yet(get_property("questL08Trapper"),"finished")) {
-			print("BCC: Climbing up to the Icy peak and searching for Groar.", "purple");
+			print("BCC: Climbing up to the The Icy Peak and searching for Groar.", "purple");
 			//SIMON ADDED NEXT FEW LINES OF COLD RES STUFF
 			if(elemental_resistance($element[cold]) <48 && have_effect($effect[elemental saucesphere])<4 && have_skill($skill[elemental saucesphere]))
 				use_skill(1,$skill[elemental saucesphere]);
@@ -9508,11 +9508,11 @@ boolean bcascTrapper() {
 			if(elemental_resistance($element[cold]) <48)
 				buMax("+1000 cold res");
 			if(elemental_resistance($element[cold]) <48)
-				abort("couldn't get enough cold resistance for icy peak");
+				abort("couldn't get enough cold resistance for The Icy Peak");
 			
 			trapper = visit_url("place.php?whichplace=mclargehuge&action=trappercabin");
 			betweenBattle();
-			//Adventure once at the Icy Peak to move the quest forwar
+			//Adventure once at the The Icy Peak to move the quest forwar
 			trapper = visit_url("place.php?whichplace=mclargehuge&action=cloudypeak");
 			while(i_a("Groar's fur")<1)
 				bumAdv($location[Mist-Shrouded Peak], "", "", "Groar's fur", "Finding and fighting Groar!");
@@ -9551,7 +9551,7 @@ boolean bcascTrapper() {
 			}
 			print("BCC: Unlocking peak with snowboard.", "purple");
 			trapper = visit_url("place.php?whichplace=mclargehuge&action=trappercabin");
-			//Adventure once at the Icy Peak to move the quest forward
+			//Adventure once at the The Icy Peak to move the quest forward
 			trapper = visit_url("place.php?whichplace=mclargehuge&action=cloudypeak");
 		}
 //		abort("check current value of get_property(questL08Trapper)");
@@ -9587,7 +9587,7 @@ boolean bcascTrapper() {
 			if(elemental_resistance($element[cold]) <48)
 				buMax("+1000 cold res");
 			if(elemental_resistance($element[cold]) <48)
-				abort("couldn't get enough cold resistance for icy peak");
+				abort("couldn't get enough cold resistance for The Icy Peak");
 				
 			trapper = visit_url("place.php?whichplace=mclargehuge&action=cloudypeak");
 			while(i_a("Groar's fur")<1)
