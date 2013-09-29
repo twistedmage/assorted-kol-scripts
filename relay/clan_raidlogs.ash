@@ -903,7 +903,7 @@ void formatDreadOptions(){
      contexts[menu]+='"baseList": {name: "Base", items:{';
      contexts[menu]+='"r231": {name: "Wait for Blood Kiwi"'+(data[".data",zone,"+"+nc+".Stomped"]>0?", disabled: true":"")+'},';
      contexts[menu]+='"g232": {name: "Collect Seed Pod"},';
-     contexts[menu]+='"g233": {name: "Collect Owl Folder"'+(item_amount($item[over-the-shoulder folder holder])>0?"":", disabled: true")+'}}},';
+     contexts[menu]+='"g233": {name: "Collect Owl Folder"'+(equipped_amount($item[over-the-shoulder folder holder])>0?"":", disabled: true")+'}}},';
      break;
     case"Burrows":
      contexts[menu]+='"hotList": {name: "Heat", items:{';
@@ -1250,7 +1250,7 @@ void pageHeader(){
  writeln(".rowD th,.rowD td{font-size:11px;text-align:center;padding:0px 3px;}");
  writeln("table:not(.tots).sortable tbody tr:nth-child(odd):not(:hover) td, table.tots.sortable tbody tr:nth-child(even):not(:hover) td{background-color:#FFFFFF}");
  writeln("table.sortable tbody tr:hover *{background-color:#000080 !important;color:#FFFFFF !important;}");
- writeln("tr.HL *{background-color:#00ffff !important;}");
+ writeln("tr.HL *{background-color:#94c5e9 !important;}");
  writeln("select, select option{font-size:11px;}");
  writeln(".rowL th,.rowL td{font-size:9px;text-align:left;padding:0px 3px;}");
  writeln(".bossKiller{font-weight:bold;color:black !important;}");
@@ -1335,7 +1335,7 @@ void pageHeader(){
  writeln("function openContext(e,d){var div=document.getElementById('context'+d); div.style.display='inline'; div.style.position='absolute'; div.style.top=e.clientY+2; div.style.left=e.clientX; div.style.overflowy='auto';}");
  writeln("function updateTots(area){var td=document.getElementById(area+\"Ps\"); var allIs=document.getElementById(area+\"Table\").getElementsByTagName(\"input\"); var t=0; for(i=0;i<allIs.length;i++){ t=t+Number(allIs[i].value); } td.innerHTML=t;}</script>");
  int i=page.index_of("</head>");
- matcher m=create_matcher("/images/scripts/jquery.+?js",page.substring(12,i));
+ matcher m=create_matcher("(http://images\\.kingdomofloathing\\.com|images)/scripts/jquery.+?js",page.substring(12,i));
  if(m.find())write(m.replace_first("jquery-1.10.2.min.js"));
  writeln("<link rel=\"stylesheet\" type=\"text/css\" href=\"jquery.contextMenu.css\">");
  writeln("<script type='text/javascript' src=\"jquery.contextMenu.js\"></script>");

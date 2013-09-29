@@ -434,6 +434,9 @@ script "bumcheekascend.ash";
 
 import "florist.ash";
 
+//simons global which remembers current combat macro choice
+int using_putty=-1;
+
 string bcasc_version = "0.55";
 string bcasc_doWarAs = get_property("bcasc_doWarAs"), bcasc_100familiar = get_property("bcasc_100familiar"), bcasc_warOutfit;
 boolean bcasc_bartender = get_property("bcasc_bartender").to_boolean(), bcasc_bedroom = get_property("bcasc_bedroom").to_boolean(), 
@@ -706,7 +709,7 @@ void clear_combat_macro()
 
 void set_combat_macro(boolean use_putty)
 {
-	switch(my_primestat())
+/*	switch(my_primestat())
 	{
 		case $stat[muscle] :
 			if(use_putty)
@@ -728,6 +731,16 @@ void set_combat_macro(boolean use_putty)
 		break;
 		default:
 			abort("Unrecognised mainstat in set_combat_macro()");
+	}*/
+	if(use_putty && using_putty!=1)
+	{
+		visit_url("account.php?actions[]=autoattack&autoattack=99106733&flag_aabosses=1&flag_compactmanuel=1&pwd&action=Update");
+		using_putty=1;
+	}
+	else if(!use_putty && using_putty!=0)
+	{
+		visit_url("account.php?actions[]=autoattack&autoattack=99106734&flag_aabosses=1&flag_compactmanuel=1&pwd&action=Update");
+		using_putty=0;
 	}
 	
 	//find and write out chosen macro
@@ -2805,6 +2818,7 @@ void defaultMood(boolean castMojo) {
 		cli_execute("trigger lose_effect, astral shell, cast 1 astral shell");
 	if (have_skill($skill[Moxie of the Mariachi]) && my_path() != "BIG!") cli_execute("trigger lose_effect, Mariachi Mood, cast 1 Moxie of the Mariachi");
 	if (have_skill($skill[Disco Aerobics]) && my_path() != "BIG!") cli_execute("trigger lose_effect, Disco State of Mind, cast 1 Disco Aerobics");
+	if (have_skill($skill[Blubbered Up])) cli_execute("trigger lose_effect, Blubbered Up, cast 1 Blubbered Up");
 		
 	//use fire kits for pvp fights
 	if(i_a("CSA fire-starting kit")>0 && to_boolean(get_property("_fireStartingKitUsed")))
@@ -2887,6 +2901,8 @@ if(can_interact())
 				cli_execute("trigger lose_effect, jaba&ntilde;ero saucesphere, cast 1 jaba&ntilde;ero saucesphere");
 			if (have_skill($skill[Jalape&ntilde;o Saucesphere]))
 				cli_execute("trigger lose_effect, jalape&ntilde;o saucesphere, cast 1 jalape&ntilde;o saucesphere");
+			if (have_skill($skill[Scowl of the Auk]))
+				cli_execute("trigger lose_effect, Scowl of the Auk, cast 1 Scowl of the Auk");
 }
 		}
 		switch (my_primestat()) {
@@ -4208,6 +4224,7 @@ void setMood(string combat) {
 				print("BCC: Need bigger monsters!", "purple");
 				if (have_skill($skill[Ur-Kel's Aria of Annoyance])) cli_execute("trigger lose_effect, Ur-Kel's Aria of Annoyance, cast 1 Ur-Kel's Aria of Annoyance");
 				if (have_skill($skill[Drescher's Annoying Noise])) cli_execute("trigger lose_effect, Drescher's Annoying Noise, cast 1 Drescher's Annoying Noise");
+				if (have_skill($skill[Pride of the Puffin])) cli_execute("trigger lose_effect, Pride of the Puffin, cast 1 Pride of the Puffin");
 			}
 		} 
 	} else if(my_path() == "Avatar of Boris"){

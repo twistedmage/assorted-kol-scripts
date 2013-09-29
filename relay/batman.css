@@ -192,6 +192,12 @@ tr.even { background-color: white; }
    padding: 12px;
 }
 
+/* General */
+.hot { color: red; }
+.cold { color: blue; }
+.spooky { color: gray; }
+.stench { color: green; }
+.sleaze { color: blueviolet; }
 #undermon {
    font-size: 0.7em;
    color: #888;

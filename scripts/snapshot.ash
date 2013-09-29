@@ -207,6 +207,23 @@ int manuelTimes(string monsterName, string questmanpage, string firstFact, boole
 	int iend=0;
 	string ssub="";
 	int rcount=0;
+
+	//Manually override monsterName in some circumstances
+	if (contains_text(monsterName, "fabricator g")) {
+		monsterName = "fabricator g";
+	}
+	if (contains_text(monsterName, "novio cad")) {
+		monsterName = "novio cad";
+	}
+	if (contains_text(monsterName, "padre cad")) {
+		monsterName = "padre cad";
+	}
+	if (contains_text(monsterName, "novia cad")) {
+		monsterName = "novia cad";
+	}
+	if (contains_text(monsterName, "persona inoce")) {
+		monsterName = "persona inoce";
+	}
 	
 	string searchForThis = "";
 	//If we specify a first fact then we should search for the monster name AND fact, else just the monster name. 
@@ -516,11 +533,23 @@ void mainSnapshot() {
 				if (mritems[x].e != "none") { itemAmount = itemAmount + i_a(to_item(mritems[x].e)); }
 				if (mritems[x].f != "none") { itemAmount = itemAmount + i_a(to_item(mritems[x].f)); }
 			break;
-			//Pen Pal Kit
+			//Correspondences (Pen Pal, Game Magazine, etc)
 			case "p" :
-				if (contains_text(visit_url("messages.php"), ">[Pen Pal]</a>")) {
-					itemAmount = 1;
+				// initial check to see if we have any
+				if (contains_text(visit_url("messages.php"), ">[Correspondence]</a>")) {
+					// this is the most accurate but only happens if you have 1+
+					if (contains_text(visit_url("account.php?tab=correspondence"), ">" + mritems[x].a +"</option>"))
+						itemAmount = 1;
+					else if (contains_text(visit_url("messages.php?box=Correspondence"), mritems[x].b))
+							itemAmount = 1;					
 				}
+				itemAmount = itemAmount + i_a(to_item(mritems[x].gifname));
+			break;
+			// forest village
+			case "v" :
+				if (index_of(html, mritems[x].a) > 0) { itemAmount = 1; }
+				if (contains_text(visit_url("forestvillage.php"), "friarcottage.gif"))
+					itemAmount = itemAmount + 1;				
 			break;
 			//Tome, Libram, Grimore
 			case "t" :

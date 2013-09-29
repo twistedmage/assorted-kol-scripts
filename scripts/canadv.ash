@@ -280,7 +280,7 @@ boolean can_adv(location where, boolean prep) {
    case $location[The Degrassi Knoll Bakery]:
    case $location[The Degrassi Knoll Garage]:
    case $location[The Degrassi Knoll Gym]:
-   case $location[The Degrassi Knoll Restroom]: return (!knoll_available() && primecheck(10) && (checkguild() || get_property("questM01Untinker") != "unstarted") && perm_urlcheck("plains.php","knoll1.gif"));
+   case $location[The Degrassi Knoll Restroom]: return (!knoll_available() && primecheck(10) && (checkguild() || get_property("questM01Untinker") != "unstarted") && perm_urlcheck("place.php?whichplace=plains","knollinside.gif"));
    case $location[The Fun House]: return (checkguild() && primecheck(15) && perm_urlcheck("plains.php","funhouse.gif"));
    case $location[Throne Room]: return (levelcheck(5) && !contains_text(visit_url("questlog.php?which=2"),"slain the Goblin King") && outfitcheck("harem girl disguise") &&
                                   (effectcheck($effect[knob goblin perfume]) || (!prep && itemcheck($item[knob goblin perfume])) || (prep && use(1,$item[knob goblin perfume]))));
@@ -318,7 +318,7 @@ boolean can_adv(location where, boolean prep) {
    case $location[The Haunted Billiards Room]: return (primecheck(10) && perm_urlcheck("town_right.php","manor.gif"));
    case $location[The Haunted Bathroom]: return (primecheck(68) && to_int(get_property("lastSecondFloorUnlock")) == my_ascensions());
    case $location[The Haunted Bedroom]: return (primecheck(85) && to_int(get_property("lastSecondFloorUnlock")) == my_ascensions());
-   case $location[Icy Peak]: return (levelcheck(8) && primecheck(53) && perm_urlcheck("questlog.php?which=2","Trapper"));
+   case $location[The Icy Peak]: return (levelcheck(8) && primecheck(53) && perm_urlcheck("questlog.php?which=2","Trapper"));
    case $location[Barrrney's Barrr]: return ((itemcheck($item[dingy dinghy]) || itemcheck($item[skeletal skiff])) && (equipcheck($item[pirate fledges],$slot[acc3]) || outfitcheck("swashbuckling getup")));
    case $location[The F'c'le]: return (pirate_check("cove3_3x1b.gif"));
    case $location[The Poop Deck]: return (pirate_check("cove3_3x3b.gif"));

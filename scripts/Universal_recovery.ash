@@ -2,7 +2,7 @@
 // http://kolmafia.us/showthread.php?t=1780
 script "Universal_recovery.ash";
 notify "Bale";
-string thisver = "3.10.16";		// This is the script's version!
+string thisver = "3.11";		// This is the script's version!
 
 // To use this script, put Universal_recovery in the /script directory. 
 // Then in the Graphical CLI type:
@@ -102,7 +102,7 @@ int objective;			// This is the target passed to the recoveryScript.
 string start_type;		// This is the type passed to the recoveryScript.
 item null = $item[Xlyinia's notebook];	// The purpose of the null is that it restores nothing. Obviously.
 	// Can the character cure beaten up without an item?
-boolean tongue = false;//have_skill($skill[Tongue of the Otter]) || have_skill($skill[Tongue of the Walrus]);
+boolean tongue = have_skill($skill[Tongue of the Walrus]);
 	// Can the character purchase magical mystery juice?
 boolean buy_mmj = ($classes[Pastamancer, Sauceror] contains my_class()) || (my_class() == $class[accordion thief] && my_level() >= 9);
 	// Check preferences to see what forms of healing are allowed.
@@ -219,6 +219,12 @@ boolean beset(boolean [effect] badstuff) {
 	return false;
 }
 
+int mpcost(skill sk) {
+	if(have_effect($effect[Chilled to the Bone]) > 0)
+		return 3 ** (my_location().kisses - 1) + mp_cost(sk);
+	return mp_cost(sk);
+}
+
 // This will return the character's best equipment for reducing mp cost. There are two times that this function
 // is called. When trying to cure beaten up or when healing with skills. It is much less important to check 
 // changes to Max HP when casting tongue skills. It will be called a second time after Beaten Up has been cured.
@@ -311,7 +317,6 @@ boolean populate_skills(int target) {
 	mp_gear = mp_gear(target);
 	if(have_skill($skill[Cannelloni Cocoon])) skills[$skill[Cannelloni Cocoon]].ave = 999999999;
 	if(have_skill($skill[Tongue of the Walrus])) skills[$skill[Tongue of the Walrus]].ave = 35;
-//	if(have_skill($skill[Tongue of the Otter])) skills[$skill[Tongue of the Otter]].ave = 15;
 	if(have_skill($skill[Disco Power Nap])) skills[$skill[Disco Power Nap]].ave = 40;
 	if(have_skill($skill[Disco Nap])) skills[$skill[Disco Nap]].ave = 20;
 	if(have_skill($skill[Lasagna Bandages])) skills[$skill[Lasagna Bandages]].ave =20;
@@ -319,7 +324,7 @@ boolean populate_skills(int target) {
 	if(have_skill($skill[Bite Minion])) skills[$skill[Bite Minion]].ave =max(my_maxhp()/10, 10);
 	if(have_skill($skill[Devour Minions])) skills[$skill[Devour Minions]].ave =max(my_maxhp()/2, 20);
 	foreach key in skills
-		skills[key].mp = max(mp_cost(key) + mana_mod, 1);
+		skills[key].mp = max(mpcost(key) + mana_mod, 1);
 	return true;
 }
 
@@ -837,6 +842,7 @@ boolean visit_nuns(int target, string type) {
 
 // This handles all visits to the hot tub, including getting the VIP Key out of Hangks.
 boolean hot_tub() {
+	if(have_effect($effect[Once-Cursed]) > 0 || have_effect($effect[Twice-Cursed]) > 0 || have_effect($effect[Thrice-Cursed]) > 0) return false;
 	if(DontUseHotTub || (in_bad_moon() && get_property("kingLiberated") == "false") 
 	  || available_amount($item[Clan VIP Lounge key]) == 0 || to_int(get_property("_hotTubSoaks")) >4
 	   || my_location() == $location[The Slime Tube])
@@ -1046,8 +1052,8 @@ boolean purchase_mp(int target) {
 boolean lure_minion(int target) {
 	if(have_skill($skill[Lure Minions])) {
 		if(Verbosity > 2) print("Need to Lure Minions with Brains");
-		// Need to keep enough brains for today and half of tomorrow. SIMON CHANGED
-		int brains_needed = 10;//ceil(fullness_limit() * 1.5) - my_fullness();
+		// Need to keep enough brains for today and half of tomorrow.
+		int brains_needed = ceil(fullness_limit() * 1.5) - my_fullness();
 		int check_brains(int brains) {
 			if(brains_needed == 0) return brains;
 			int temp = max(brains - brains_needed, 0);
@@ -1247,27 +1253,6 @@ boolean inv_hp_restore(int target, item [int] options) {
 	return false;
 }
 
-// This determines if Tongue of the Otter is better than Walrus for curing beaten up.
-boolean otter_best(int maxhp) {
-//	if(!have_skill($skill[Tongue of the Otter])) return false;
-	int toheal = maxhp - my_hp();
-	if(!have_skill($skill[Tongue of the Walrus]) || toheal < 51 
-	  || my_maxmp() < skills[$skill[Tongue of the Walrus]].mp)
-		return true;
-	if(have_skill($skill[Cannelloni Cocoon])) {
-		int tongue_cost = floor(toheal /35) * skills[$skill[Tongue of the Walrus]].mp;
-		int remainder = toheal % 35;
-		if(remainder > 15)
-			tongue_cost = tongue_cost + skills[$skill[Tongue of the Walrus]].mp;
-//		else if(remainder > 0)
-//			tongue_cost = tongue_cost + skills[$skill[Tongue of the Otter]].mp;
-		if(tongue_cost < skills[$skill[Cannelloni Cocoon]].mp + 0
-		  && (remainder == 0 || remainder > 15))
-			return false;
-	}
-	return true;
-}
-
 // If out of ronin/hardcore this will determine the method of recovering from beaten up that costs least meat.
 boolean cheapest_beatup() {
 	int [string] price;
@@ -1277,8 +1262,6 @@ boolean cheapest_beatup() {
 		if(historical_age(test) > 2) price[doodad] = mall_price(test); 	// Ensure price is good
 		else price[doodad] = historical_price(test);
 	}
-//	if(have_skill($skill[Tongue of the Otter]) && my_maxmp() >= skills[$skill[Tongue of the Otter]].mp)
-//		price["Tongue of the Otter"] = mp_to_meat(skills[$skill[Tongue of the Otter]].mp);
 	if(have_skill($skill[Tongue of the Walrus]) && my_maxmp() >= skills[$skill[Tongue of the Walrus]].mp)
 		price["Tongue of the Walrus"] = mp_to_meat(skills[$skill[Tongue of the Walrus]].mp);
 	string best = "";
@@ -1289,10 +1272,6 @@ boolean cheapest_beatup() {
 	switch (best) {
 	case "":
 		break;
-//	case "Tongue of the Otter":
-//		if(my_mp() >= skills[$skill[Tongue of the Otter]].mp || mp_heal(skills[$skill[Tongue of the Otter]].mp))
-//			cast(1, $skill[Tongue of the Otter]);
-//		break;
 	case "Tongue of the Walrus":
 		if(my_mp() >= skills[$skill[Tongue of the Walrus]].mp || mp_heal(skills[$skill[Tongue of the Walrus]].mp))
 			cast(1, $skill[Tongue of the Walrus]);
@@ -1361,11 +1340,9 @@ boolean cure_beatenup(int target){
 			use(1, $item[tiny house]); break;
 		}
 	}
-	if(beset($effect[Beaten Up])) {
-		if(have_skill($skill[Tongue of the Walrus]) && my_maxmp() >= skills[$skill[Tongue of the Walrus]].mp
+	if(beset($effect[Beaten Up]) && have_skill($skill[Tongue of the Walrus]) && my_maxmp() >= skills[$skill[Tongue of the Walrus]].mp
 		  && (my_mp() >= skills[$skill[Tongue of the Walrus]].mp || mp_heal(skills[$skill[Tongue of the Walrus]].mp)))
 			cast(1, $skill[Tongue of the Walrus]);
-	}
 	if(beset($effect[Beaten Up]) && item_amount($item[Soft green echo eyedrop antidote])>1 
 	  && !have_skill($skill[Transcendent Olfaction]))	// Don't use SGEEAs for this if you have Olfaction!
 		cli_execute ("uneffect beaten up"); 		// Also, won't ever use last SGEEA.
@@ -1861,11 +1838,11 @@ boolean restore(string type, int amount) {
 			cure_beatenup(objective);
 		// Check to see if the player needs MP for auto-Olfaction.
 		if(get_property("autoOlfact") != "" && !beset($effect[On the Trail])
-		  && my_mp() < mp_cost($skill[Transcendent Olfaction]) && my_maxmp() >= mp_cost($skill[Transcendent Olfaction])) {
+		  && my_mp() < mpcost($skill[Transcendent Olfaction]) && my_maxmp() >= mpcost($skill[Transcendent Olfaction])) {
 			if(objective == 0)
-				amount = mp_cost($skill[Transcendent Olfaction]);
+				amount = mpcost($skill[Transcendent Olfaction]);
 			else
-				amount = max(mp_cost($skill[Transcendent Olfaction]), amount);
+				amount = max(mpcost($skill[Transcendent Olfaction]), amount);
 			objective = amount;
 		}
 		if(objective == 0 || (objective >0 && amount < mp_target && mp_trigger > 0))

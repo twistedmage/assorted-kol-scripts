@@ -232,6 +232,8 @@ advevent to_event(string id, spread dmg, spread pdmg, string special, int howman
       case "endscombat": res.endscombat = true; break;
       case "quick": res.rounds = 0; break;
 	  case "!!": res.note = bittles.group(2); break;
+      case "noitems": noitems = 1.0; break;
+      case "noskills": noskills = 1.0; break;
    }
    if (!res.endscombat && fvars["dmg"] >= monster_stat("hp")) res.endscombat = true;
    res.pdmg = factor(pdmg,1.0);
@@ -455,7 +457,6 @@ float beatenup_cost() {     // returns the cost of getting (removing) beaten up
    if (my_fam() == $familiar[wild hare] || have_effect($effect[heal thy nanoself]) > 0) return 0;
    if (item_amount($item[personal massager]) > 0) return 100;
    float cheapest = to_int(get_property("valueOfAdventure"))*3;    // beaten up costs 3 adventures
-   if (have_skill($skill[tongue of the otter])) cheapest = min(cheapest,meatpermp*mp_cost($skill[tongue of the otter]));
    if (have_skill($skill[tongue of the walrus])) cheapest = min(cheapest,meatpermp*mp_cost($skill[tongue of the walrus]));
    if (item_amount($item[tiny house]) > 0) cheapest = min(cheapest,item_val($item[tiny house]));
    if (item_amount($item[forest tears]) > 0) cheapest = min(cheapest,item_val($item[forest tears]));
@@ -1206,6 +1207,8 @@ void build_options() {
   // 4. add skillz, yo
    if (noskills < 1.0 && have_effect($effect[temporary amnesia]) == 0 && 
        (have_effect($effect[more like a suckrament]) == 0 || round + equipped_amount($item[mer-kin prayerbeads]) > 8)) build_skillz();
+  // 5. runaway
+   addopt(to_event("runaway; repeat","custom runaway",1),runaway_cost(),0);
    sort opts by -to_profit(value);
    sort opts by kill_rounds(value.dmg)*-max(1,value.profit);
    vprint("Options built! ("+count(opts)+" actions)",9);
@@ -1374,8 +1377,6 @@ void set_monster(monster elmo) {  // should be called once per BB instance; init
    if (have_equipped($item[mer-kin hookspear])) fvars["monstermeat"] = to_float(my_path() == "Way of the Surprising Fist" ? max(meat_drop(m),12) : meat_drop(m));
    if (my_location().zone == "Dreadsylvania") { fvars["woodskisses"] = $location[dreadsylvanian woods].kisses; 
       fvars["villagekisses"] = $location[dreadsylvanian village].kisses; fvars["castlekisses"] = $location[dreadsylvanian castle].kisses; }
-  // initialize effects/gear
-   fxngear();
   // set default monster attributes
    nostun = false; nomultistun = false; nomiss = false; nohit = false; isseal = false;
    howmanyfoes = 1; maxround = 30; damagecap = 0; capexp = 0; noitems = 0; noskills = 0;
@@ -1383,6 +1384,8 @@ void set_monster(monster elmo) {  // should be called once per BB instance; init
     else mres = get_resistance(m.defense_element);
    if (happened("use 4603")) nomiss = true;
    load_factors();
+  // initialize effects/gear
+   fxngear();
   // special monster attributes
    foreach i,mrec in (factors["monster"]) if (normalized(mrec.ufname,"monster") != mrec.ufname) vprint("Bad monster name supplied for monster "+i+" ("+mrec.ufname+")",-2);
     else if (mrec.ufname.to_monster() == m) {
@@ -1443,7 +1446,7 @@ string act(string action) {
     else reset_queue();
   // set combat round and record happenings
    round = (contains_text(action,"<!--WINWINWIN-->") ||
-            (get_property("serverAddsCustomCombat") == "true" && !contains_text(action,"(show old combat form)")) ||
+            (get_property("serverAddsCustomCombat") == "true" && contains_text(action, "window.fightover = true")) ||
             !create_matcher("action=\"?fight\\.php",page).find()) ? 0 : to_int(excise(action,"var onturn = ",";"));
    matcher roundmatch = create_matcher("\\<!-- macroaction: (.+?)(?:, (\\d+))? -->",action);
    boolean skipped;

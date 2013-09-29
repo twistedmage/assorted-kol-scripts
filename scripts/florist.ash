@@ -205,7 +205,7 @@ int choose_best_plant(string type, location loc, plant[int] plants)
 		{ 		
 			if(contains_text(plants[pli].bonus_type,"cold"))
 			{
-				if(loc!=$location[icy peak] && loc!=$location[Lair of the Ninja Snowmen] && loc!=$location[exposure esplanade] && loc!=$location[McMillicancuddy's Pond])
+				if(loc!=$location[The Icy Peak] && loc!=$location[Lair of the Ninja Snowmen] && loc!=$location[exposure esplanade] && loc!=$location[McMillicancuddy's Pond])
 					return pli;
 			}
 			else if(contains_text(plants[pli].bonus_type,"hot"))
@@ -230,7 +230,7 @@ int choose_best_plant(string type, location loc, plant[int] plants)
 			}
 			else if(contains_text(plants[pli].bonus_type,"weapon"))
 			{
-				if(loc!=$location[The Haunted billiards room] && loc!=$location[the knob shaft] && loc!=$location[icy peak] && loc!=$location[Tower Ruins])
+				if(loc!=$location[The Haunted billiards room] && loc!=$location[the knob shaft] && loc!=$location[The Icy Peak] && loc!=$location[Tower Ruins])
 					return pli;
 			}
 		}

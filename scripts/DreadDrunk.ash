@@ -98,10 +98,28 @@ void main(string sheets)
 	int current_sheets = get_sheets();
 	int x_boozers, haz_boozers, got_boozers;
 	
+	boolean[item] invalid_boozers;
+	
+	boolean all_npc_ingredients(item ahtem)
+	{
+		int[item] bewz = get_ingredients(ahtem);
+		if (is_npc_item(ahtem))
+			return true;
+		boolean greedyents = false;
+		foreach thing in bewz
+		{
+			greedyents = true;
+			if (!all_npc_ingredients(thing))
+				return false;
+		}
+		return greedyents;
+	}
+	
 	foreach ahtem in $items[]
 	{
 		// non-tradeables, non-discardables, and NPC store items can't be fed to him.
-		if (ahtem != $item[none] && item_type(ahtem) == "booze" && is_tradeable(ahtem) && autosell_price(ahtem) > 0 && !is_npc_item(ahtem))   
+		if (ahtem != $item[none] && item_type(ahtem) == "booze" && is_tradeable(ahtem) && !invalid_boozers[ahtem] && 
+		autosell_price(ahtem) > 0 && !all_npc_ingredients(ahtem) && !contains_text(ahtem.to_string(),"dusty bottle of "))
 		{
 			boozers[ahtem] = avrij(ahtem.adventures);
 			// fix incorrect sheet quantities
@@ -204,6 +222,12 @@ void main(string sheets)
 					current_sheets = get_sheets();
 					if (contains_text(man_carriage,"That'd be a waste") || contains_text(man_carriage,"already plenty drunk"))
 						print("Someone dumped in booze before you did, so you may have some left over.","red");
+					else if (!contains_text(man_carriage,"gladly accepts your booze"))
+					{
+						invalid_boozers[best_boozer] = true;
+						boozers[best_boozer] = -1;
+						print("ALERT: "+to_string(best_boozer)+" is not a valid carriageman-drunkener! This needs to be added to the do-not-use list.","red");
+					}
 				}
 			}
 			else

@@ -343,7 +343,7 @@ void batman_enhance() {
          "title='Automate' height=22 width=22 onclick='return bjilgt(this);'></form></div>\n<div class='popout'>Hand this combat over to mafia.<p>"+
          round+". "+get_ccs_action(round)+"</div>");
 
-   } else if (my_location() != $location[none] && my_adventures() > 1 && contains_text(page,"adventure.php")) {
+   } else if (my_location() != $location[none] && my_adventures() > 0 && contains_text(page,to_url(my_location()))) {
      // adventure again link, includes location info?
       actbox.append("\n   <div class='onemenu'><a href='"+to_url(my_location())+(my_location() == $location[the boss bat's lair] ? "&confirm2=on" : "")+"'>"+
       "<img src='../images/itemimages/hourglass.gif' height=22 width=22 border=0></a></div>"+

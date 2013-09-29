@@ -204,6 +204,15 @@ item drop from gear = 174.98 + 500 = 674.98
 total chance = 1.05978%
 -----------------------------------------------
 
+TT + AT - twistedmage, 
+AT + DB - twistedmage
+TT + DB - twistedmage
+PM + TT - 
+PM + AT - 
+PM + DB - 
+
+<ASICA HAS A BLOODY KIWITINI>
+
 The unkillable skeleton hard mode
 1800 hp
 passive damage only - need 60 per turn base
@@ -219,15 +228,45 @@ acc1 - spiky turtle shoulderpads = 15 * 100%
 acc2 - groovy prism necklace = 25 * 50%
 
 use glowing syringe = 90 * 50%
-cast bone homie = 15 * 100%
+cast boner battallion = 15 * 100%
+cast frigidalmatian
 summon Burning, Man = 90 * 100%
-skill vent rage gland = 1.5*level = ~30 * 100%
+cast vent rage gland = 1.5*level = ~30 * 100%
 use cheap cigar butt = 7*100%
-skill jalapeno saucesphere
-skill jabanero saucesphere
-skill scarysauce
+cast jala;
+cast jaba;
+cast scarysauce
 
-familiar mosquito; maximize familiar weight, equip parasitic headgnawer, equip ol scratchs stove door, equip spiky turtle shoulderpads, equip groovy prism necklace, equip mer-kin gutgirdle, equip loathing legion helicopter; cast jalape&ntilde;o saucesphere; cast jaba&ntilde;ero saucesphere; cast scarysauce; use potion of punctual companionship; cast jingle bells; cast empathy; cast leash; use cheap cigar butt; cast vent rage gland; use Stabonic scroll; use glowing syringe; cast frigidalmatian;
+familiar mosquito; fold loathing legion helicopter; maximize familiar weight, -0.01 hp, equip parasitic headgnawer, equip ol scratchs stove door, equip spiky turtle shoulderpads, equip groovy prism necklace, equip mer-kin gutgirdle, equip loathing legion helicopter; cast jalape&ntilde;o saucesphere; cast jaba&ntilde;ero saucesphere; cast scarysauce; use potion of punctual companionship; cast jingle bells; cast empathy; cast leash; use cheap cigar butt; cast vent rage gland; use Stabonic scroll; use glowing syringe; cast frigidalmatian; cast boner battalion
+
+----great wolf hard mode------
+familiar disembodied hand;
+maximize 100 dr, 0.01 mainstat, equip moon amber necklace, equip rain-doh green lantern
+buy 10 scented massage oil
+cast frigidalmation
+use connery; use serum of; use hair spray; ballpit; telescope high
+use foetid seal tear
+----mayor ghost hard mode-----
+familiar disembodied
+maximize equip dreadsylvania auditors badge,equip Choker of the Ultragoth, equip clown wig, equip giant gym membership card, equip leotarrrd, equip oven mitts, equip plush hamsterpus, equip spork, equip white snakeskin duster
+shrug jaba
+buy 5 poltergeist; buy 5 brick of sand; buy 5 blue plastic oyster egg; buy 5 tequila grenade; buy 5 fetid feather; buy 5 stone frisbee; buy 5 onion shuriken
+get sparking el vibrato drones (insert ATTACK cards into drone)
+make hot clusterbombs, mixing fuse with hot cluster
+get sharpened hubcap from hobopolis
+cast frigidalmatian;
+buy 30 love song of sugary cuteness
+eat spooky hi mein
+---------------xcom-------------------------------
+build a couple of blaster launchers
+<dismantle containment chamber and build gollop chamber>
+
+5 firestorms - building
+5 emp cannons - building
+sniper -> archangel - done
+5-6 ghost armor on others? 
+no titan
+psi armour for psi
 
 
 crimbo duds - 90m
@@ -350,10 +389,6 @@ TT - 100% untamed turtle (take energy drinks)
 
 stealth mnistletoe will help DB runs a lot?
 //when i have a nice combat suite, stop using astral shirt and switch to astral belt
-
-
-
-
 
 
 

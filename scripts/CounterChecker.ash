@@ -77,7 +77,7 @@ item [location] semi_rare;
 	semi_rare[$location[Post-Cyrpt Cemetary]] = $item[poltergeist-in-the-jar-o];
 	semi_rare[$location[South of The Border]] = $item[donkey flipbook];
 	semi_rare[$location[Pandamonium Slums]] = $item[SPF 451 lip balm];
-	#semi_rare[$location[Hidden City (encounter)]] = $item[shrinking powder];
+	semi_rare[$location[The Hidden Park]] = $item[shrinking powder];
 	semi_rare[$location[8-Bit Realm]] = $item[fire flower];
 	semi_rare[$location[The Spooky Forest]] = $item[fake blood];
 	semi_rare[$location[Whitey's Grove]] = $item[bag of lard];
@@ -212,9 +212,8 @@ boolean canadv(location loc) {
 		return get_property("questL06Friar") == "started";
 	case $location[Pandamonium Slums]:
 		return my_buffedstat(my_primestat()) >= 29 && get_property("questL06Friar") == "finished";
-	#case $location[Hidden City (encounter)]:
-	#	return (get_property("questL11Worship") == "finished" || get_property("questL11Worship") == "step3") 
-	#	  && (get_property("lastHiddenCityAscension") == my_ascensions() && index_of(get_property("hiddenCityLayout"), "E") > -1);
+	case $location[The Hidden Park]:
+		return get_property("questL11Worship") != "unstarted";
 	case $location[8-Bit Realm]:
 		return my_buffedstat(my_primestat()) >= 20 && available_amount($item[continuum transfunctioner]) > 0;
 	case $location[Chapel]:
@@ -349,11 +348,6 @@ void get_semirare() {
 		if(have_equipped($item[pirate fledges]))
 			cli_execute("unequip pirate fledges");
 		break;
-	#case $location[Hidden City (encounter)]:
-	#	int hiddenCitySquare = get_property("hiddenCitySquare").to_int() - 1;
-	#	if(hiddenCitySquare < 1 || get_property("hiddenCityLayout").char_at(hiddenCitySquare) != "E")
-	#		set_property("hiddenCitySquare", index_of(get_property("hiddenCityLayout"), "E") + 1);
-	#	break;
 	case $location[Guano Junction]:
 		cli_execute("checkpoint");
 		stinkup(false);

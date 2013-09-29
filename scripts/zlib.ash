@@ -357,15 +357,17 @@ boolean[item] tower_items(boolean combatsafe) {
    if (get_property("lastTelescopeReset").to_int() < my_ascensions() && !combatsafe)         // tower_items() contains X : >0% chance
       visit_url("campground.php?action=telescopelow");                                       // tower_items(X) == true : 100% chance
    item[string] t;
-   t["an armchair"] = $item[pygmy pygment];                                 // door
-   t["a cowardly-looking man"] = $item[wussiness potion];
-   t["a banana peel"] = $item[gremlin juice];
-   t["a coiled viper"] = $item[adder bladder];
-   t["a rose"] = $item[angry farmer candy];
-   t["a glum teenager"] = $item[thin black candle];
-   t["a hedgehog"] = $item[super-spiky hair gel];
-   t["a raven"] = $item[Black No. 2];
-   t["a smiling man smoking a pipe"] = $item[Mick's IcyVapoHotness Rub];
+   if (available_amount($item[makeshift scuba gear]) == 0) {
+      t["an armchair"] = $item[pygmy pygment];                                 // door
+      t["a cowardly-looking man"] = $item[wussiness potion];
+      t["a banana peel"] = $item[gremlin juice];
+      t["a coiled viper"] = $item[adder bladder];
+      t["a rose"] = $item[angry farmer candy];
+      t["a glum teenager"] = $item[thin black candle];
+      t["a hedgehog"] = $item[super-spiky hair gel];
+      t["a raven"] = $item[Black No. 2];
+      t["a smiling man smoking a pipe"] = $item[Mick's IcyVapoHotness Rub];
+   }
    t["catch a glimpse of a flaming katana"] = $item[frigid ninja stars];    // tower proper
    t["catch a glimpse of a translucent wing"] = $item[spider web];
    t["see a fancy-looking tophat"] = $item[sonar-in-a-biscuit];
@@ -505,7 +507,8 @@ float has_goal(location l) { return has_goal(l,false); }
 // gets n (-existing) of cond, either by purchasing, pulling from Hangk's, or
 // adventuring at the given location.  also works with choiceadvs
 boolean obtain(int n, string cond, location locale, string filter) {
-   if ($strings[choiceadv, autostop, arena flyer ml, pirate insult] contains cond) cli_execute("conditions clear; conditions add "+n+" "+cond);
+   if ($strings[choiceadv, autostop, arena flyer ml, pirate insult] contains cond || to_item(cond) == $item[none])
+      cli_execute("conditions clear; conditions set "+n+" "+cond);
    else {
       if (retrieve_item(n, to_item(cond))) return vprint("You have "+n+" "+cond+", no adventuring necessary.",5);
       if (!in_hardcore() && storage_amount(to_item(cond)) > 0) take_storage(n-have_item(cond),to_item(cond));
@@ -513,10 +516,11 @@ boolean obtain(int n, string cond, location locale, string filter) {
       if (count(get_goals()) > 0) cli_execute("conditions clear");
       add_item_condition(n - have_item(cond), to_item(cond));
    }
+   if (count(get_goals()) == 0) return vprint("No goals left after setting '"+rnum(n)+" "+cond+"' as goals; no adventuring necessary.",5);
    set_location(locale);
    if (length(filter) > 0) { if (adventure(my_adventures(), locale, filter)) return vprint("Out of adventures.",-1); }
     else if (adventure(my_adventures(), locale)) return vprint("Out of adventures.",-1);
-   if ($strings[choiceadv, autostop, arena flyer ml, pirate insult] contains cond) return (my_adventures() > 0);
+   if ($strings[choiceadv, autostop, arena flyer ml, pirate insult] contains cond || to_item(cond) == $item[none]) return (my_adventures() > 0);
    return (have_item(cond) >= n);
 }
 boolean obtain(int n, string cond, location locale) { return obtain(n, cond, locale, ""); }

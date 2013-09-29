@@ -81,7 +81,8 @@ jQuery(function($){
 
   // initialize/enable tabs
    if ($('#battab').length != 0) {
-      $('body').css('margin-bottom','300px');
+      if ($('table.actionbar').length == 0) $('body').css('margin-bottom','310px');
+       else $('div.content').append('<p><img src="/images/otherimages/spacer.gif" width=1 height=310>');
       $('#battab > div').hide();
       $('#battab div:first').fadeIn('fast');
       $('#battab ul li:first').addClass('active');
