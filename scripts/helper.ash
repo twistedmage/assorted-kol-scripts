@@ -728,6 +728,27 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 			add_drink(con_map,"- imitation white russian ",5,0,2);
 		if(available_amount($item[pan-dimensional gargle blaster])>0)
 			add_drink(con_map,"- pan-dimensional gargle blaster ",25,0,5);
+			
+		if(my_primestat()==$stat[muscle] && ((available_amount($item[handful of barley])>0 && available_amount($item[cluster of hops])>0) || available_amount($item[can of brutalbrau])>0))
+			add_drink(con_map,"- can of brutalbrau ",6,0,1);
+		if(my_primestat()==$stat[mysticality] && ((available_amount($item[handful of barley])>0 && available_amount($item[cluster of hops])>0) || available_amount($item[can of drooling monk])>0))
+			add_drink(con_map,"- can of drooling monk ",6,0,1);
+		if(my_primestat()==$stat[moxie] && ((available_amount($item[handful of barley])>0 && available_amount($item[cluster of hops])>0) || available_amount($item[can of impetuous scofflaw])>0))
+			add_drink(con_map,"- can of impetuous scofflaw ",6,0,1);
+			
+		if(my_primestat()==$stat[muscle] && ((available_amount($item[handful of barley])>0 && available_amount($item[cluster of hops])>0 && available_amount($item[fancy beer bottle])>0 && available_amount($item[fancy beer label])>0) || available_amount($item[bottle of old pugilist])>0))
+			add_drink(con_map,"- bottle of old pugilist ",12,0,2);
+		if(my_primestat()==$stat[mysticality] && ((available_amount($item[handful of barley])>0 && available_amount($item[cluster of hops])>0 && available_amount($item[fancy beer bottle])>0 && available_amount($item[fancy beer label])>0) || available_amount($item[bottle of Professor Beer])>0))
+			add_drink(con_map,"- bottle of Professor Beer ",12,0,2);
+		if(my_primestat()==$stat[moxie] && ((available_amount($item[handful of barley])>0 && available_amount($item[cluster of hops])>0 && available_amount($item[fancy beer bottle])>0 && available_amount($item[fancy beer label])>0) || available_amount($item[bottle of Rapier Witbier])>0))
+			add_drink(con_map,"- bottle of Rapier Witbier ",12,0,2);
+			
+		if(my_primestat()==$stat[muscle] && ((available_amount($item[handful of barley])>2 && available_amount($item[cluster of hops])>2 && available_amount($item[fancy beer bottle])>2 && available_amount($item[fancy beer label])>2) || available_amount($item[bottle of Race Car Red])>0))
+			add_drink(con_map,"- bottle of Race Car Red (chance from artisanal homebrew gift package) ",20,0,3);
+		if(my_primestat()==$stat[mysticality] && ((available_amount($item[handful of barley])>2 && available_amount($item[cluster of hops])>2 && available_amount($item[fancy beer bottle])>2 && available_amount($item[fancy beer label])>2) || available_amount($item[bottle of Greedy Dog])>0))
+			add_drink(con_map,"- bottle of Greedy Dog (chance from artisanal homebrew gift package) ",20,0,3);
+		if(my_primestat()==$stat[moxie] && ((available_amount($item[handful of barley])>2 && available_amount($item[cluster of hops])>2 && available_amount($item[fancy beer bottle])>2 && available_amount($item[fancy beer label])>2) || available_amount($item[bottle of Lambada Lambic])>0))
+			add_drink(con_map,"- bottle of Lambada Lambic (chance from artisanal homebrew gift package) ",20,0,3);
 	}
 	//sort map
 	sort con_map by -value.efficiency;
