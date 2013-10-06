@@ -11,19 +11,8 @@ if(check_version("newLife", "bale-new-life", "1.14.4", 2769) != ""
 	exit;
 }
 
-void knife_untinker(item it)
-{
-	if(item_amount($item[loathing legion universal screwdriver])<1)
-		abort("Can't untinker without legion screwdriver");
-	//use knife
-	string catch = visit_url("inv_use.php?which=3&whichitem=&pwd="+my_hash(),false,true);
-	//unscrew item
-	catch = visit_url("inv_use.php?whichitem=4926&action=screw&dowhichitem="+to_int(it)+"&untinker=Unscrew%21&pwd="+my_hash(),false,true);
-}
-
-
 if(!($strings[None, Teetotaler, Boozetafarian, Oxygenarian, Bees Hate You, Way of the Surprising Fist, Trendy,
-Avatar of Boris, Bugbear Invasion, Zombie Slayer, Class Act, Avatar of Jarlsberg, 14, BIG!] contains my_path())
+Avatar of Boris, Bugbear Invasion, Zombie Slayer, Class Act, Avatar of Jarlsberg, BIG!, 15, KOLHS] contains my_path())
   && user_confirm("Your current challenge path is unknown to this script!\nUnknown and unknowable errors may take place if it is run.\nDo you want to abort?")) {
 	print("Your current path is unknown to this script! A new version of this script should be released very soon.", "red");
 	exit;
@@ -129,6 +118,11 @@ void set_choice_adventures() {
 	set_choice(677, 0, "Steam Punk Giant's Room: Manual");
 	set_choice(678, 0, "Punk Rock Giant's Room: Manual");
 	set_choice(679, 1, "Spin That Wheel, Giants Get Real");
+	// Hidden City!
+	set_choice(781, 1, "An Overgrown Shrine (Northwest)");
+	set_choice(783, 1, "An Overgrown Shrine (Southwest)");
+	set_choice(785, 1, "An Overgrown Shrine (Northeast)");
+	set_choice(787, 1, "An Overgrown Shrine (Southeast)");
 	
 	// Path specific choices
 	if(my_path() == "Way of the Surprising Fist")
@@ -164,10 +158,6 @@ void set_choice_adventures() {
 		set_choice(148, 1, "McMillicancuddy's Farm: Back 40");
 		set_choice(149, 2, "McMillicancuddy's Farm: The Other Back 40");
 	}
-	if(have_skill($skill[Torso Awaregness]) && have_skill($skill[Armorcraftiness]) || have_skill($skill[Ur-Kel's Aria of Annoyance]))
-		set_choice(182, 1, "Fantasy Airship, Lack of an Encounter: Fight MechaMech for metallic A if you turn up the ML");
-	else
-		set_choice(182, 3, "Fantasy Airship, Lack of an Encounter: Get Stats");
 	// In BIG! There is no need for leveling up
 	if(my_path() == "BIG!") {
 		set_choice("oceanDestination", "ignore", "At the Poop Deck: Skip the wheel");
@@ -336,8 +326,6 @@ void buy_stuff() {
 		if(item_amount($item[porquoise])  > 0) return autosell(1, $item[porquoise]);
 		return false;
 	}
-	//SIMON: force it to sell the silly stones
-	while(meat4pork(9999999)){}
 	
 	boolean worthless() {
 		for i from 43 to 45
@@ -436,8 +424,8 @@ void equip_stuff() {
 		gear +=" +shield";
 	if(my_path() == "Bees Hate You")
 		gear += ", 0 beeosity";
-	//SIMON ADDED item bonus
-	gear +=", 0.2 items";
+	else if(my_path() == "KOLHS" || my_path() == "15")
+		gear+= " -hat";
 	maximize(gear, false);
 }
 
@@ -475,8 +463,6 @@ void recovery_settings() {
 			set_property("baleUr_ZombieAuto", "-0.05");
 		if(get_property("baleUr_ZombieTarget") != "")
 			set_property("baleUr_ZombieTarget", 1);
-		//simon to stop waste during moods
-		set_choice("manaBurningThreshold", "-0.05", "");
 		// Turn off mana restoration in combat. It causes problems in zombiecore
 		set_property("autoManaRestore", "false");
 	} else {
@@ -532,32 +518,6 @@ void path_skills(boolean always_learn) {
 		break;
 	}
 }
-boolean pull_if_good(item it)
-{
-	if(good(it))
-	{
-		print("pulling "+it);
-		take_storage(1,it);
-		return true;
-	}
-	return false;
-}
-
-void pull_and_wear_if_good(item it)
-{
-	if(pull_if_good(it))
-	{
-		equip(it);
-	}
-}
- 
-void pull_and_wear_if_good(item it, slot sl)
-{
-	if(pull_if_good(it))
-	{
-		equip(sl,it);
-	}
-}
 
 // This is stuff I like to do, but not everyone will be happy with.
 void special(boolean bonus_actions) {
@@ -574,159 +534,39 @@ void special(boolean bonus_actions) {
 	vprint("Now for a few things that "+my_name()+" wants to do.", "blue", 3);
 	if(available_amount($item[detuned radio]) > 0 || canadia_available())
 		change_mcd(10 + canadia_available().to_int());
-	//if in softcore, pull my set
-	if(!in_hardcore())
-	{
-		cli_execute("inventory refresh");
-		refresh_stash();
-		//hat
-		if(!good($item[crown of thrones]) || !good("el vibrato Megadrone"))
-		{
-			if(storage_amount($item[Boris's Helm (askew)])>0)
-				pull_and_wear_if_good($item[Boris's Helm (askew)]);
-			else
-			{
-				pull_if_good($item[Boris's Helm]);
-				if(available_amount($item[boris's helm])>0)
-				{
-					cli_execute("fold boris's helm (askew)");
-					equip($item[boris's helm (askew)]);
-				}
-			}
-		}
-		else
-		{
-			pull_and_wear_if_good($item[crown of thrones]);
-			if(available_amount($item[crown of thrones])>0)
-				if(good("el vibrato Megadrone"))
-				{
+	// In softcore I want to pull this stuff
+	if(!in_hardcore()) {
+		if(my_path() == "BIG!") {  // Most pulls involve leveling up, so BIG is very different!
+			if(!knoll_available() && pull_it($item[Loathing Legion knife]))
+				cli_execute("fold Loathing Legion universal screwdriver");
+		} else {
+			if(pull_it($item[Loathing Legion knife])) cli_execute("fold Loathing Legion necktie");
+			if(pull_it($item[Juju Mojo Mask])) equip($slot[acc2],$item[Juju Mojo Mask]);
+			pull_it($item[Greatest American Pants]);
+			// Offhand: Use Jarlsberg's Pan if mainstat is Myst. For other mainstat or no Pan, use OPS
+			if(my_primestat() != $stat[mysticality] || !(pull_it($item[Jarlsberg's pan]) || pull_it($item[Jarlsberg's pan (Cosmic portal mode)])))
+				pull_it($item[Operation Patriot Shield]);
+			// Get a weapon, only if none is in inventory already
+			if(item_amount($item[astral mace]) + item_amount($item[astral bludgeon]) + item_amount($item[right bear arm]) < 1)
+				pull_it($item[ice sickle]);
+			if(available_amount($item[astral shirt]) < 1 && have_skill($skill[Torso Awaregness]))
+				pull_it($item[cane-mail shirt]);
+			// Best Hat? Jarlsberg comes with all the hat he needs
+			if(my_path() != "Avatar of Jarlsberg") {
+				if(have_familiar($familiar[El Vibrato Megadrone]) && good($familiar[El Vibrato Megadrone]) && pull_it($item[Crown of Thrones]))
 					cli_execute("enthrone El Vibrato Megadrone");
-//					else if(good("Li'l Xenomorph"))
-//					cli_execute("enthrone Li'l Xenomorph");
-				}
-				else
-					abort("Don't know what familiar to enthrone for this path");
-		}
-		//myst classes want a pan offhand
-		if(my_primestat()==$stat[mysticality] && my_path()!="Bees Hate You" && my_path()!="BIG!")
-		{
-			//pull whichever
-			if(storage_amount($item[Jarlsberg's pan (Cosmic portal mode)])>0)
-			{
-				pull_and_wear_if_good($item[Jarlsberg's pan (Cosmic portal mode)]);
-			}
-			else
-			{
-				pull_and_wear_if_good($item[Jarlsberg's pan]);
-			}
-			//for now we will always use the portal version, might want to change it one day though
-			if(available_amount($item[Jarlsberg's pan])>0)
-			{
-				cli_execute("fold Jarlsberg's pan (Cosmic portal mode)");
-			}
-			equip($item[Jarlsberg's pan (Cosmic portal mode)]);
-		}
-		else //others want a shield
-		{
-			pull_and_wear_if_good($item[operation patriot shield]);
-		}
-		pull_and_wear_if_good($item[greatest american pants]);
-		
-		pull_if_good($item[loathing legion universal screwdriver]);
-		boolean screw=item_amount($item[loathing legion universal screwdriver])>0;
-		if(my_path()!="Avatar of Boris" && my_path()!="Avatar of Jarlsberg")
-		{
-			pull_if_good($item[moveable feast]);
-			pull_and_wear_if_good($item[snow suit]);
-		}
-		if(have_skill($skill[torso awaregness]))
-			if(available_amount($item[astral shirt]) < 1)
-				pull_and_wear_if_good($item[cane-mail shirt]);
-		pull_and_wear_if_good($item[Camp Scout backpack]);
-		if(available_amount($item[Camp Scout backpack])<1)
-			pull_and_wear_if_good($item[Cloak of Dire Shadows]);
-		//now pull useful stuff
-		if(pull_if_good($item[can of rain-doh]))
-			if(available_amount($item[rain-doh blue balls])==0)
-				use(1,$item[can of rain-doh]);
-		if(available_amount($item[box of bear arms])>0)
-			use(1,$item[box of bear arms]);
-//			pull_if_good($item[jewel-eyed wizard hat]);
-		//pull tps drink
-//			pull_if_good($item[grogtini]);
-		if(available_amount($item[wrecked generator])<1)
-			pull_if_good($item[wrecked generator]);
-		//handle zombie head + maid if we have gnoll
-		if( knoll_available() && pull_if_good($item[Ninja pirate zombie robot head]))
-		{
-			if(screw)
-			{
-				knife_untinker($item[ninja pirate zombie robot head]);
-				knife_untinker($item[pirate zombie robot head]);
-				knife_untinker($item[pirate zombie head]);
-				knife_untinker($item[clockwork pirate skull]);
-				knife_untinker($item[enchanted eyepatch]);
-				if(my_path()!="Way of the Surprising Fist") //can't afford other meat maid pieces in wotsf
-				{
-					cli_execute("make clockwork maid");
-					cli_execute("use clockwork maid");
-				}
+				else if(pull_it($item[Boris's Helm]))
+					cli_execute("fold Boris's Helm (askew)");
+				else pull_it($item[Boris's Helm (askew)]);
 			}
 		}
-		
-		if(my_path()=="BIG!")
-		{
-			 if(my_primestat()==$stat[moxie])
-				pull_and_wear_if_good($item[bottle-rocket crossbow]);
-			else
-				pull_and_wear_if_good($item[haiku katana]);
-				
-			pull_and_wear_if_good($item[v for vivala mask],$slot[acc2]);
-			pull_and_wear_if_good($item[mr. accessory jr.],$slot[acc1]);
-			if(available_amount($item[astral mask])>0)
-				equip($slot[acc3],$item[astral mask]);
-			else
-				pull_and_wear_if_good($item[mr. accessory jr.],$slot[acc3]);
-		}
-		else //not big
-		{
-			pull_and_wear_if_good($item[ice sickle]);
-			pull_and_wear_if_good($item[juju mojo mask],$slot[acc2]);
-			//if we have no astral belt, wear fangs. Else pull fangs as superclover but dont wear 
-			if(available_amount($item[astral belt])<1)
-				pull_and_wear_if_good($item[plastic vampire fangs],$slot[acc3]);
-			else
-			{
-				pull_if_good($item[plastic vampire fangs]);
-				equip($slot[acc3],$item[astral belt]);
-			}
-			if(screw)
-			{
-				cli_execute("fold loathing legion necktie");
-				if(good($item[loathing legion necktie]))
-					equip($slot[acc1],$item[loathing legion necktie]);
-			}
-		}
-		pull_if_good($item[jar of psychoses (The Crackpot Mystic)]);
-		
-		
-		//14 pulls
-//			pull_if_good($item[v for vivala mask]);
-//			if(storage_amount($item[stinky cheese eye])>0)
-//				pull_if_good($item[stinky cheese eye]);
-//			else if(storage_amount($item[stinky cheese diaper])>0)
-//				pull_if_good($item[stinky cheese diaper]);
-//			else
-//				print("Couldn't find stinky cheese item","red");
-		//16 pull 
-//could also pull miniborg destroy o bot for combat
-	}
-//		if(get_property("tomeSummons").to_int() > 0 && my_path()!="Way of the Surprising Fist")
-//			use_skill(3 - get_property("tomeSummons").to_int(), $skill[Summon Stickers]);
-	set_property("_photocopyUsed","false"); //in case the game crashes during ascension and it isn't reset
-	cli_execute("mood default");
-	if(in_hardcore())
+		if(pull_it($item[can of Rain-Doh])) use(1, $item[can of Rain-Doh]);
+		// Select best familiar item if familiars can be used
+		if(good("familiar") && available_amount($item[astral pet sweater]) < 1)
+			(pull_it($item[moveable feast]) || pull_it($item[snow suit]) || pull_it($item[little box of fireworks]) || pull_it($item[plastic pumpkin bucket]));
 		equip_stuff();
+	}
+	cli_execute("mood default");
 }
 
 void check_breakfast() {
@@ -736,18 +576,6 @@ void check_breakfast() {
 	string loginScript = get_property("loginScript");
 	if(loginScript != "")
 		cli_execute(loginScript);
-}
-
-void start_quests()
-{
-	//visit artist and accept
-	visit_url("town_wrong.php?place=artist");
-	wait(3);
-	visit_url("town_wrong.php?place=artist&getquest=1");
-	//visit doc galaktik
-	visit_url("galaktik.php");
-	//visit guild
-	visit_url("guild.php?place=challenge");
 }
 
 void new_ascension() {
@@ -763,27 +591,18 @@ void new_ascension() {
 		special(extra_stuff);		// Only executes if true
 	}
 	check_breakfast();
-	start_quests();
 	cli_execute("outfit save Backup");  // Accidently equiping Backup after ascending cases error. No more oops.
-	cli_execute("outfit save bumcheekascend");  // Accidently equiping Backup after ascending cases error. No more oops.
 	print("Welcome to your new life as a "+myclass+"!", "green");
-	set_property("unlockedLocations",""); 
-	set_property("ready_for_ascension",false);	
-	set_property("rave_open",false);	
-	cli_execute("inventory refresh");
-	if(my_name()!="twistedmage")
-	{
-		cli_execute("awake");
-	}
 }
 
 // These are default values here. To change for each character, edit their vars file in /data direcory or use the zlib commands.
 setvar("newLife_SetupGuyMadeOfBees", FALSE); // If you like to set up the guy made of bees set this TRUE. 
 setvar("newLife_FightBedstands", FALSE);	// If this is set to TRUE, you'll prefer fighting Bedstands to getting meat. (Note that mainstat is still better than fighting.)
-setvar("newLife_SmashHippyStone", TRUE);	// Smash stone if you want to break it at level 1 for some PvPing!
+setvar("newLife_SmashHippyStone", FALSE);	// Smash stone if you want to break it at level 1 for some PvPing!
 setvar("newLife_UseNewbieTent", TRUE);		// Use newbie tent if you don't want togive your clannes a fair shot at bricking you in the face!
 setvar("newLife_SellPorkForStuff", TRUE);	// Sell pork gems to purchase detuned radio, stolen accordion & seal tooth
-setvar("newLife_Extras", TRUE); 			// Mixed bag of custom actions. This is personal to me, but maybe someone else will like it also
+setvar("newLife_Extras", FALSE); 			// Mixed bag of custom actions. This is personal to me, but maybe someone else will like it also
+
 void main() {
 	new_ascension();
 }

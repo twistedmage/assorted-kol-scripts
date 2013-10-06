@@ -1,4 +1,3 @@
-import awake.ash
 
 void fill_up()
 {

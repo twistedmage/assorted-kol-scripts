@@ -61,8 +61,8 @@ boolean should_mayfly() {                // TODO: make this return an advevent
       case $location[south of the border]: for i from 297 to 300 if (is_goal(to_item(i))) return true; break;   // free gum
       case $location[the penultimate fantasy airship]: if (my_level() < 13) return true; break;             // substats
       case $location[the hole in the sky]: for i from 657 to 665 if (is_goal(to_item(i))) return true; break;   // free star/line, free runaway
-      case $location[the haunted pantry]: 
-      case $location[the haunted kitchen]: 
+      case $location[the haunted pantry]:
+      case $location[the haunted kitchen]:
       case $location[cobb's knob kitchens]: foreach i in item_drops(m) if (item_type(i) == "food" && has_goal(i) > 0) return true; break;
       case $location[Cobb's Knob Menagerie\, Level 1]: if (has_goal($monster[fruit golem]) > 0 &&
          m != $monster[knob goblin mutant]) return true; break;  // increase fruit drops, free runaway from BASIC elemental
@@ -147,7 +147,7 @@ void set_autoputtifaction() {
    item ihunt = to_item(to_int(get_property("currentBountyItem")));
    if (ihunt != $item[none]) {
       if (item_drops(m) contains ihunt && (
-          !($locations[the fun house,the goatlet,lair of the ninja snowmen,cobb's knob laboratory] contains my_location()) ||
+          !($locations[the "fun" house,the goatlet,lair of the ninja snowmen,cobb's knob laboratory] contains my_location()) ||
           (create_matcher("(^|, )"+m+"($|, )",vars["BatMan_attract"]).find()))) {
          if (ihunt.bounty_count <= to_int(vars["puttybountiesupto"]) && item_amount(ihunt) < ihunt.bounty_count-1) should_putty = true;
          should_olfact = true;
@@ -182,7 +182,7 @@ void build_custom() {
    void encustom(item which) { encustom(which, false); }
    void encustom(skill which) { advevent toque = get_action(which); encustom(toque); }
   // stealing! add directly to queue[] rather than custom actions
-   if (should_pp && (intheclear() || has_goal(m) > 0) && contains_text(page,"value=\"steal"))
+   if (should_pp && (intheclear() || has_goal(m) > 0) && contains_text(page,"value=\"steal"))   //"
       enqueue(to_event("pickpocket","once",1));
   // safe salve
    if (have_skill($skill[saucy salve]) && !happened($skill[saucy salve]) && (my_stat("hp") < m_dpr(0,0) ||

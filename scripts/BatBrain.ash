@@ -15,7 +15,7 @@ import <zlib.ash>
 monster m;
 boolean isseal, nostun, nomultistun, nomiss, nohit;  // monster attributes not included in proxy records
 int round, howmanyfoes, damagecap, maxround;
-float noitems, noskills, capexp;
+float noitems, noskills, capexp, mvalcache;
 effect dangerpoison;             // threatening poison effect of this monster
 boolean should_putty, should_olfact, should_pp;
 boolean havemanuel;
@@ -450,7 +450,7 @@ if (get_property("_meatpermp") != "") meatpermp = to_float(get_property("_meatpe
  }
 vprint("1 MP costs "+rnum(meatpermp,3)+entity_decode("&mu;")+". ( "+rnum(my_stat("mp"))+" / "+my_maxmp()+" )","#000088",7);
 float runaway_cost() {       // returns the cost of running away
-   return monstervalue() + to_int(get_property("valueOfAdventure"));
+   return mvalcache + to_int(get_property("valueOfAdventure"));
   // TODO: include navel ring / bander runaways?  Or maybe not.
 }
 float beatenup_cost() {     // returns the cost of getting (removing) beaten up
@@ -801,7 +801,7 @@ advevent oneround(advevent r) {           // plugs an advevent into the current 
    a.mp = min(a.mp,my_maxmp()-my_stat("mp"));
    if (!a.endscombat) for i from 1 upto a.rounds
       a = merge(a,m_event(a.att,max(0,a.stun+1-i)));   // monster event(s)
-//   if (monster_stat("hp")-dmg_dealt(a.dmg) < 1) a.meat += monstervalue();   // monster death should only be included for chain profits
+//   if (monster_stat("hp")-dmg_dealt(a.dmg) < 1) a.meat += mvalcache;   // monster death should only be included for chain profits
    return a;
 }
 
@@ -1380,6 +1380,7 @@ void set_monster(monster elmo) {  // should be called once per BB instance; init
   // set default monster attributes
    nostun = false; nomultistun = false; nomiss = false; nohit = false; isseal = false;
    howmanyfoes = 1; maxround = 30; damagecap = 0; capexp = 0; noitems = 0; noskills = 0;
+   mvalcache = monstervalue();
    if (happened("use 5048")) mres = get_resistance($element[cold]);
     else mres = get_resistance(m.defense_element);
    if (happened("use 4603")) nomiss = true;
@@ -1432,7 +1433,7 @@ void set_monster(monster elmo) {  // should be called once per BB instance; init
       ", death in "+die_rounds()+")<br>DEF: <b>"+rnum(monster_stat("def"))+"</b> ("+rnum(hitchance("attack")*100.0)+
       "% &times; "+to_html(regular(1))+", win in "+kill_rounds(to_event("attack",factor(regular(1),hitchance("attack")),
       to_spread(0),""))+")<br>HP: <b>"+rnum(monster_stat("hp"))+"</b>, Value: <b><span style='color:green'>"+
-      rnum(monstervalue())+" "+entity_decode("&mu;")+"</span></b>, RES: "+to_html(mres),5);
+      rnum(mvalcache)+" "+entity_decode("&mu;")+"</span></b>, RES: "+to_html(mres),5);
 }
 
 
@@ -1477,7 +1478,8 @@ string act(string action) {
       if (contains_text(action,"grab something") || contains_text(action,"You manage to wrest") ||
          (my_class() == $class[disco bandit] && contains_text(action,"knocked loose some treasure."))) {
          vprint("You snatched a "+doodad+" ("+rnum(item_val(doodad))+entity_decode("&mu;")+")!","green",5);
-         should_pp = vprint("Revised monster value: "+rnum(monstervalue()),"green",-4);
+		 mvalcache = monstervalue();
+         should_pp = vprint("Revised monster value: "+rnum(mvalcache),"green",-4);
          set_happened("stolen");
       } else vprint("Look! You found "+n+" "+doodad+" ("+rnum(n*item_val(doodad))+entity_decode("&mu;")+")!","green",5);
    }

@@ -71,6 +71,15 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
       }
       return round(numeric_modifier("Item Drop") - famBonus() + numeric_modifier("Food Drop"));
    }
+   boolean hacienda_target(string targ, string reason) {
+      int ti = last_index_of(substring(get_property("haciendaLayout"),0,18),targ);
+      if (ti < 0 || ti > 17) return false;
+      friendlyset(410,(ti < 9 ? "1" : "2"),reason);
+      if (ti < 9) friendlyset(411,(ti/3 + 1),reason);
+       else friendlyset(412,(ti/3 - 2),reason);
+      friendlyset((ti / 3) + 413, (ti % 3)+1, reason);
+      return true;
+   }
    switch (my_location()) {
       case $location[an octopus's garden]:
          if (item_amount($item[glob of green slime]) > 0 && item_amount($item[soggy seed packet]) > 0)
@@ -78,6 +87,10 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
                friendlyset(298,"1","Plant seeds to get a sea fruit/vegetable goal."); return;
             }
          friendlyset(298,"2","Skip planting seeds. ("+item_amount($item[soggy seed packet])+" seed packets, "+item_amount($item[glob of green slime])+" green slime)");
+         return;
+      case $location[barrrney's barrr]: int nappunmal; for i from 1 to 8 if (get_property("lastPirateInsult"+i) == "true") nappunmal += 1;
+         if (nappunmal > 5) friendlyset(187,"1","Step up to the beer pong!");
+          else friendlyset(187,"2","You're not ready for beer pong; skip it.");
          return;
       case $location[The Batrat and Ratbat Burrow]:
       case $location[guano junction]:
@@ -122,7 +135,7 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
           else if (get_property("choiceAdventure671") == "1" && is_goal($stat[moxie])) friendlyset(669,"2","Get moxie stats.");
           else friendlyset(669,"1","Proceed to the Neckbeard room for more options.");
          return;
-      case $location[the castle in the clouds in the sky (top floor)]:
+      case $location[the castle in the clouds in the sky (top floor)]: friendlyset(679,"1","Spin the wheel (mafia doesn't have this by default).");
         // Raver
          if (item_amount($item[drum 'n' bass 'n' drum 'n' bass record]) == 0 && !have_equipped($item[mohawk wig]) && 
             get_property("questL10Garbage") != "finished") friendlyset(676,"3","Get a quest (drum+bass)*2 record.");
@@ -287,8 +300,23 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
           else if (get_property("relocatePygmyJanitor").to_int() < my_ascensions()) friendlyset(789,"2","Knock over the dumpster (move pygmy janitors here).");
           else friendlyset(789,"6","Skip the dumpster.");
          return;
-      case $location[the hidden temple]: if ((goal_exists("choiceadv") || is_goal($item[the nostril of the serpent])) && 
-         item_amount($item[stone wool]) > 0 && have_effect($effect[stone-faced]) == 0) use(1,$item[stone wool]); break;
+      case $location[the hidden temple]: 
+        // such great heights
+         if ((goal_exists("choiceadv") || is_goal($item[the nostril of the serpent])) && 
+          item_amount($item[stone wool]) > 0 && have_effect($effect[stone-faced]) == 0) use(1,$item[stone wool]);
+         if (item_amount($item[the nostril of the serpent]) == 0 && get_property("lastTempleButtonsUnlock").to_int() < my_ascensions())
+            friendlyset(579,"2","Get the Nostril of the Serpent.");
+          else if (get_property("lastTempleAdventures").to_int() < my_ascensions()) friendlyset(579,"3","Gain a trio of adventures!");
+          else if (is_goal($stat[mysticality])) friendlyset(579,"1","Already got Nostril and adventures, get goal myst stats.");
+        // heart (pikachulotlcoatlopteryx)
+         if (!($strings[step3, finished] contains get_property("questL11Worship"))) friendlyset(580,"1","Unlock the Hidden City.");
+          else friendlyset(580,"2","Hidden City unlocked, leave Pikachutlotl and go back to the Heart.");
+        // fitting in (stone wool choice)
+         if (get_property("choiceAdventure579") == "2") friendlyset(582,"1","Go to the heights for the Nostril.");
+          else if (item_amount($item[your father's MacGuffin diary]) > 0 && get_property("lastHiddenCityAscension").to_int() < my_ascensions())
+           friendlyset(582,"2","Go to the Heart to unlock the Hidden City.");
+          else friendlyset(582,"0","Non-quest-related support for the Hidden Temple is incomplete; show in browser.");
+         return;
       case $location[hobopolis town square]:
          if (available_amount($item[hobo code binder]) == 0 && item_amount($item[hobo nickel]) >= 30)
             friendlyset(230,"1","Buy a hobo binder.");
@@ -297,6 +325,14 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
             friendlyset(272,"2","Skip marketplace (no binder equipped, or you have set nickels as a goal).");
           else friendlyset(272,"0","Show marketplace in browser.");
         // to add: tent?
+         return;
+      case $location[the island barracks]: friendlyset(409,"1","Continue (only one choice here anyway)");
+		 if (get_property("questG04Nemesis") != "finished" && hacienda_target("k","Get key deduced or indicated by clue.")) return;
+		 if (hacienda_target("0","Explore unknown choice.")) return;
+		 if (hacienda_target("r","Collect unvisited reward.")) return;
+		 if (hacienda_target("f",get_property("questG04Nemesis") == "finished" ? "Get remaining once-only loot from previous fight locations." : "All locations known; fight!")) return;
+		 if (get_property("questG04Nemesis") == "finished" && hacienda_target("F","Get remaining once-only loot from previous fight locations.")) return;
+		 hacienda_target("W","Hacienda cleared; head to Puttin' on the Wax.");
          return;
       case $location[kegger in the woods]:
          if (is_goal($item[orquette's phone number]) || item_amount($item[orquette's phone number]) < 20)
@@ -441,7 +477,6 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
          return;
         // two more choiceadvs?
 /*
-
       case $location[]:
          if ()
             friendlyset( ,"2","");
@@ -673,6 +708,52 @@ setvar("bbb_turtlegear",false);   // toggle automatically creating gear from tam
 setvar("bbb_famitems",false);     // toggle automatically farming familiar-dropped items
 check_version("Best Between Battle","bestbetweenbattle",1240);
 
+void hacienda_tracking() {
+   if (get_property("lastHaciendaReset").to_int() < my_ascensions() || get_property("haciendaLayout").length() < 19) {
+      set_property("haciendaLayout","0000000000000000000");
+      set_property("lastHaciendaReset",my_ascensions());
+   }
+   buffer hl;
+   hl.append(get_property("haciendaLayout"));
+   if (get_property("questG04Nemesis") == "finished" && !contains_text(hl,"W")) {  // W for Puttin' on the Wax
+      hl.replace(17,18,"W");
+      set_property("haciendaLayout",hl);
+   }
+   boolean save_room(int r, string value) {
+      if (r < 0 || r > 18 || value.length() != 1 || value == char_at(hl,r)) return true;
+      if ($strings[R,K,C,W] contains char_at(hl,r))
+         return vprint("Room "+r+" already contains content: "+char_at(hl,r),-2);
+      hl.replace(r,r+1,value);
+      set_property("haciendaLayout",hl);
+      if (get_property("questG04Nemesis") != "finished") {  // deduce room when 2/3 are known
+         int[string] cont;  
+         for i from (value - (value % 3)) to (value - (value % 3) + 2) cont[to_lower_case(hl.char_at(i))] += 1;
+         if (cont["0"] == 1) if (!(cont contains "f")) save_room(index_of(hl,"0",value - (value % 3)),"f");
+          else if (!(cont contains "r")) save_room(index_of(hl,"0",value - (value % 3)),"r");
+          else save_room(index_of(hl,"0",value - (value % 3)),"k");
+      }
+      return vprint("BBB: Hacienda room "+r+" set to '"+value+"'.","#F87217",4);
+   }
+   string log = session_logs(1)[0] + session_logs(2)[1];
+   matcher cres; int room;
+   vprint(hl,9);
+   for i from 413 to 418
+      for j from 1 to 3 {
+         room = (i - 413)*3 + j - 1;
+         cres = create_matcher("choice.php\\?(?:pwd&)?whichchoice="+i+"&option="+j+"(?:&pwd)?\\r(.*?)[$\\r]",log);
+         while ($strings[F,0,f,r,k] contains hl.char_at(room) && cres.find()) {
+            vprint(i+"/"+j+": "+cres.group(1),9);
+            switch {
+               case (index_of(cres.group(1),"Round 0:") == 1): save_room(room,"F"); break;
+               case (index_of(cres.group(1),"hacienda key") > 15): save_room(room,"K"); break;
+               case (create_matcher("You gain \\d+ Meat",cres.group(1)).find()):
+               case (index_of(cres.group(1),"You acquire ") == 1): save_room(room,"R"); break;
+               default: save_room(room,"C");
+            }
+         }
+      }
+}
+
 void bbb() {
   // reactions to previous encounters; expect this to get fleshed out with more ascensions
    switch (get_property("lastEncounter")) {
@@ -688,6 +769,7 @@ void bbb() {
       } break;
       case "Keep On Turnin' the Wheel in the Sky": visit_url("council.php"); break;
    }
+   if (my_location() == $location[the island barracks]) hacienda_tracking();
    if (have_equipped($item[bag o' tricks]) && (run_combat().contains_text("a single fat bumblebee") || run_combat().contains_text("You open the bag and ")))
       set_property("bagOTricksCharges","0");
   // exchange tokens for tickets if they'll probably be needed
