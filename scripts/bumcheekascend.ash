@@ -3642,13 +3642,6 @@ boolean innerSetFamiliar(string famtype) {
 	//Then a quick check for if we have Everything Looks Yellow
 	if ((have_effect($effect[Everything Looks Yellow]) > 0 || (my_path() == "Bees Hate You") || my_path() == "Avatar of Boris" || my_path() == "Avatar of Jarlsberg") && famtype == "hebo") { famtype = "items"; }
 		
-	//Finally, actually start getting familiars.
-	if(my_path()=="KOLHS" && famtype=="items" && have_familiar($familiar[Steam-powered cheerleader]))
-	{
-		use_familiar($familiar[steam-powered cheerleader]);
-		return true;
-	}
-		
 	//THEN a quick check for a spanglerack
 	if (i_a("spangly sombrero") > 0 && have_path_familiar($familiar[Mad Hatrack]) &&
 	(contains_text(famtype, "item") || contains_text(famtype, "equipment")) && famtype!="itemsw") { //not underwater
@@ -3666,6 +3659,18 @@ boolean innerSetFamiliar(string famtype) {
 		print("BCC: There seemed to be a problem and you don't have the spangly mariachi pants equipped. I'll use a 'normal' item drop familiar.", "purple");
 	}
 	
+	//then a cheerleader check
+	if(my_path()=="KOLHS" && have_familiar($familiar[Steam-powered cheerleader])
+		&& get_property("_cheerleaderSteam").to_int()>0) //cheerleader is a possibility
+	{
+		if(famtype=="itemsnc" || (famtype=="items" && !have_familiar($familiar[jumpsuited hound dog]))) //and is suitable
+		{
+			use_familiar($familiar[steam-powered cheerleader]);
+			return true;
+		}
+	}
+	
+	//Finally, actually start getting familiars.
 	if (famtype != "") {
 		string [int] famlist;
 		load_current_map("bcs_fam_"+famtype, famlist);
@@ -5099,26 +5104,33 @@ boolean bcasc8Bit() {
 	//can we get to Fear Man's Level?
 	if(!contains_text(visit_url("campground.php"),"junggate_3"))
 	{
+		print("fear mans level not currently open","blue");
 		if(get_property("_psychoJarUsed").to_boolean())
 		{
 			print("Can't use a crackpot mystic psycho jar because some other jar was already used.","red");
 		}
 		else
 		{
+			print("no psycho jar used yet","blue");
 			if(i_a("jar of psychoses (The Crackpot Mystic)")<1)
 			{
+				print("dont have a crackpot jar yet","blue");
 				if(i_a("psychoanalytic jar")>0)
 				{
+					print("making one","blue");
 					visit_url("shop.php?whichshop=mystic&action=jung&whichperson=mystic");
 				}
 				else
 				{
-					print("Wanted to go to crackpot mystics psychoses but didn't have a jar");
+					print("Wanted to go to crackpot mystics psychoses but didn't have a jar","blue");
 				}
 			}
 			//now use it
 			if(i_a("jar of psychoses (The Crackpot Mystic)")>0)	
+			{
+				print("we have a crackpot jar, ;ets use it","blue");
 				use(1,$item[jar of psychoses (The Crackpot Mystic)]);
+			}
 		}
 	}
 	boolean use_jar=contains_text(visit_url("campground.php"),"junggate_3");
@@ -5131,20 +5143,24 @@ boolean bcasc8Bit() {
 	while (i_a("digital key") == 0) {
 		//First, we have to make sure we have at least one-handed moxie weapon to do this with. 	
 		if (i_a("continuum transfunctioner") == 0) {
-			visit_url("forestvillage.php?action=mystic");
+			visit_url("place.php?whichplace=forestvillage&action=fv_mystic");
 			if (my_path() != "Zombie Slayer") {
-				visit_url("choice.php?pwd&whichchoice=664&option=1&choiceform1");
-				visit_url("choice.php?pwd&whichchoice=664&option=1&choiceform1");
+				visit_url("choice.php?pwd&whichchoice=664&option=1&choiceform1=Sure%2C+old+man.++Tell+me+all+about+it.");
+				visit_url("choice.php?pwd&whichchoice=664&option=1&choiceform1=Against+my+better+judgment%2C+yes.");
 				visit_url("choice.php?pwd&whichchoice=664&option=1&choiceform1");
 			}
 		}
 		if(use_jar)
 		{
+			print("going to fear man","blue");
 			set_property("choiceAdventure644","3");
 			bumAdv($location[Fear Man's Level], "+item drop", "items", "1 digital key", "Getting the digital key (from fear man)", "i");
 		}
 		else
+		{
+			print("going to 8 bit realm","blue");
 			bumAdv($location[8-bit realm], "+equip continuum transfunctioner +item drop", "items", "1 digital key", "Getting the digital key (from 8 bit)", "i");
+		}
 	}
 	if(have_effect($effect[consumed by fear])>0)
 		cli_execute("hottub");
@@ -9662,8 +9678,7 @@ void bcascKOLHS()
 	while(get_property("_kolhsAdventures").to_int()<40)
 	{
 		cli_execute("unequip hat");
-		if(familiar_weight(my_familiar())>=10)
-			abort("Change fam to go to school");
+		use_familiar($familiar[steam-powered cheerleader]); //no weight restriction
 		
 		//if we have enough approval but no intrinsic, get it
 		if(get_property("_kolhsAdventures").to_int() > 20 && have_effect(intrinsic)==0)
