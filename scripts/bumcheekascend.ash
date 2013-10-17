@@ -9641,29 +9641,40 @@ void bcascKOLHS()
 	//what is our inttrinsic? also se choiceadv
 	effect intrinsic=$effect[nerd is the word]; //myst
 	set_property("choiceAdventure700","2");
-	abort("uncomment stuff line 9640");
+	location zone=$location[chemistry class];
+	
 	if(my_primestat()==$stat[muscle])
 	{
-//		intrinsic=$effect[jamming with the jocks];
+		intrinsic=$effect[jamming with the jocks];
 		set_property("choiceAdventure700","1");
+		zone=$location[shop class];
 	}
 	else if(my_primestat()==$stat[moxie])
 	{
-//		intrinsic=$effect[greaser lightnin'];
+		intrinsic=$effect[greaser lightnin'];
 		set_property("choiceAdventure700","3");
+		zone=$location[art class];
 	}
 		
 	//burn 40 turns
-/*	while(get_property(<>).to_int()<40)
+	while(get_property("_kolhsAdventures").to_int()<40)
 	{
-		<no hat>
-		<less than 10lb base fams>
+		cli_execute("unequip hat");
+		if(familiar_weight(my_familiar())>=10)
+			abort("Change fam to go to school");
 		
 		//if we have enough approval but no intrinsic, get it
-		if(get_property(<>).to_int()> <>)
-			bumMiniAdv($location[The Hallowed Halls]);
+		if(get_property("_kolhsAdventures").to_int() > 20 && have_effect(intrinsic)==0)
+		{
+			print("Getting intrisic: "+intrinsic,"blue");
+			bumMiniAdv(1,$location[The Hallowed Halls]);
+		}
+		else
+		{
+			print("burning school","blue");
+			bumMiniAdv(1,zone);
+		}
 	}
-	<>;*/
 }
 
 boolean bcascWand(boolean force) {

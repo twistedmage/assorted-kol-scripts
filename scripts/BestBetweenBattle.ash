@@ -21,7 +21,7 @@ notify Zarqon;
 import <zlib.ash>
 
 boolean cookiecheck() {
-   if (my_fullness() >= fullness_limit() || !can_eat() || my_meat() < 40 || ($strings[Zombie Slayer,Avatar of Jarlsberg] contains my_path())) return true;
+   if (my_fullness() >= fullness_limit() || !can_eat() || my_meat() < 40 || my_fullness() == 0 || ($strings[Zombie Slayer,Avatar of Jarlsberg] contains my_path())) return true;
    matcher cooks = create_matcher("(timely|always|true|never|false) ?([1-3]?)",vars["auto_semirare"]);
    if (!cooks.find()) return vprint("Warning: your auto_semirare setting is not an accepted value: timely|always|never (maximumcounters)",-5);
    switch (cooks.group(1)) {
@@ -135,7 +135,7 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
           else if (get_property("choiceAdventure671") == "1" && is_goal($stat[moxie])) friendlyset(669,"2","Get moxie stats.");
           else friendlyset(669,"1","Proceed to the Neckbeard room for more options.");
          return;
-      case $location[the castle in the clouds in the sky (top floor)]: friendlyset(679,"1","Spin the wheel (mafia doesn't have this by default).");
+      case $location[the castle in the clouds in the sky (top floor)]:
         // Raver
          if (item_amount($item[drum 'n' bass 'n' drum 'n' bass record]) == 0 && !have_equipped($item[mohawk wig]) && 
             get_property("questL10Garbage") != "finished") friendlyset(676,"3","Get a quest (drum+bass)*2 record.");
@@ -238,7 +238,7 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
           else if (is_goal($stat[mysticality])) friendlyset(451,"4","Get useful Mysticality (and MP).");
           else friendlyset(451,"2","Get useful Moxie and meat.");
          return;
-      case $location[the fun house]:
+      case $location[the "fun" house]:
          if (numeric_modifier("clownosity") < 4)
             friendlyset(151,"2","Skip Beelzebozo due to insufficient clownosity.");
           else friendlyset(151,"1","Fight Beelzebozo.");
@@ -309,8 +309,13 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
           else if (get_property("lastTempleAdventures").to_int() < my_ascensions()) friendlyset(579,"3","Gain a trio of adventures!");
           else if (is_goal($stat[mysticality])) friendlyset(579,"1","Already got Nostril and adventures, get goal myst stats.");
         // heart (pikachulotlcoatlopteryx)
-         if (!($strings[step3, finished] contains get_property("questL11Worship"))) friendlyset(580,"1","Unlock the Hidden City.");
-          else friendlyset(580,"2","Hidden City unlocked, leave Pikachutlotl and go back to the Heart.");
+         if (!($strings[step3, finished] contains get_property("questL11Worship"))) {
+            friendlyset(580,"1","Unlock the Hidden City.");
+            friendlyset(584,"4","Unlock the Hidden City.");
+         } else {
+            friendlyset(580,"2","Hidden City unlocked, leave Pikachutlotl and go back to the Heart.");
+			friendlyset(584,"0","Choice of post-quest Heart not yet supported.");
+         }
         // fitting in (stone wool choice)
          if (get_property("choiceAdventure579") == "2") friendlyset(582,"1","Go to the heights for the Nostril.");
           else if (item_amount($item[your father's MacGuffin diary]) > 0 && get_property("lastHiddenCityAscension").to_int() < my_ascensions())
@@ -351,7 +356,18 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
       case $location[mer-kin library]: if (get_property("merkinVocabularyMastery") != "100") return; int choice;
          foreach prop in $strings[dreadScroll1, dreadScroll6, dreadScroll8] if (get_property(prop) != "0") choice += 1;
          friendlyset(704,((choice + 1) % 4),choice == 3 ? "All card catalog clues found." : "Card Catalog clues found: "+rnum(choice));
+         if (get_property("dreadScroll4") == "0" && item_amount($item[mer-kin knucklebone]) > 0) use(1,$item[mer-kin knucklebone]);
          return;
+/*
+	1: catalog
+	2: healscroll
+	3: Deep Dark Visions clue (cast when HP > 500 and spooky res >= 9)
+	4: knucklebone
+	5: killscroll
+	6: catalog
+	7: sushi with worktea
+	8: catalog
+*/
       case $location[the outskirts of cobb's knob]:
          if (item_amount($item[unlit birthday cake]) > 0)
             friendlyset(113,"1","Complete cake quest.");
