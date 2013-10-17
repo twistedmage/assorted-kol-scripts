@@ -6,18 +6,48 @@ import <pvp.ash>;
 
 void stock_hotdog(string html, string ingredient, int req_ing, int desired_dogs)
 {
-	matcher hotdog_mtch = create_matcher("title=\\\""+ingredient+"\\\"></td><td><b>x "+req_ing+"</b></td><td class=tiny>\\((.d*) in stock\\)",html);
+	matcher hotdog_mtch = create_matcher("title=\\\""+ingredient+"\\\"></td><td><b>x "+req_ing+"</b></td><td class=tiny>\\((\\d*) in stock\\)",html);
 	if(hotdog_mtch.find())
 	{
-		int in_stock= hotdog_mtch.group(1).to_int();
+		int in_stock= hotdog_mtch.group(1).to_int()/req_ing;
 		int more_needed=desired_dogs - in_stock;
 		if(more_needed<1)
 			return;
 		//restock
 		int needed_ingredients=more_needed*req_ing;
 		buy(needed_ingredients - item_amount(to_item(ingredient)),to_item(ingredient));
-		abort("stocking url, line 19");
-		visit_url(""+needed_ingredients+""+to_int(to_item(ingredient)));
+		print("Currently have "+in_stock+" of these hotdogs in stock. Adding "+more_needed+
+				" more by donating "+needed_ingredients+" "+ingredient,"blue");
+				
+		//which dog is this
+		int dog=0;
+		switch(ingredient)
+		{
+			case "furry fur":
+				//savage macho dog
+				dog=-93;
+				break;
+			case "hot wad":
+				//devil dog
+				dog=-96;
+				break;
+			case "cold wad":
+				//chilly dog
+				dog=-97;
+				break;
+			case "spooky wad":
+				//ghost dog
+				dog=-98;
+				break;
+			case "stench wad":
+				//junkyard dog
+				dog=-99;
+				break;
+			default:
+				abort("Unrecognised dog on ascend line 30, using ingredient "+ingredient);
+		}
+		//clan_viplounge.php?preaction=hotdogsupply&whichdog=-93&quantity=1
+		visit_url("clan_viplounge.php?preaction=hotdogsupply&whichdog="+dog+"&quantity="+needed_ingredients);
 	}
 	else
 	{
@@ -28,8 +58,7 @@ void stock_hotdog(string html, string ingredient, int req_ing, int desired_dogs)
 void stock_hotdogs()
 {
 	//title="furry fur"></td><td><b>x 10</b></td><td class=tiny>(0 in stock)
-	abort("hotdog vendor url, line 31");
-	string hotdog_str=visit_url("");
+	string hotdog_str=visit_url("clan_viplounge.php?action=hotdogstand");
 	stock_hotdog(hotdog_str,"furry fur",10,5);
 	stock_hotdog(hotdog_str,"handul of cranberries",10,5);
 	stock_hotdog(hotdog_str,"skeleton bone",10,5);
@@ -89,7 +118,8 @@ void stock_hagnks()
 	get_item($item[wet stew],1);
 	get_item($item[stunt nuts],1);
 	//fold loathing legion screwdriver
-	cli_execute("fold loathing legion screwdriver");
+	if(item_amount($item[loathing legion screwdriver])<1)
+		cli_execute("fold loathing legion screwdriver");
 	if(item_amount($item[boris's helm])>0)
 		cli_execute("fold boris's helm (askew)");
 	//chaos butterfly

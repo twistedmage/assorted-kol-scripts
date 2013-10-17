@@ -3711,7 +3711,7 @@ boolean innerSetFamiliar(string famtype) {
 			}
 			else
 			{
-				if(!in_hardcore())
+				if(!in_hardcore() && storage_amount($item[mojo filter])>0)
 					abort("You may want to pull a mojo filter");
 			}
 		}
