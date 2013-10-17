@@ -244,7 +244,7 @@ void choose_all_plants(string type, location loc)
 	if(my_name()!="twistedmage")
 		return;
 	//get friars html
-	string friar_str=visit_url("forestvillage.php?action=floristfriar");
+	string friar_str=visit_url("place.php?whichplace=forestvillage&action=fv_friar");
 	//string friar_str=visit_url("choice.php?option=4&whichchoice=720");
 	if(contains_text(friar_str,"go scout out an appropriate location for me to plant something"))
 	{

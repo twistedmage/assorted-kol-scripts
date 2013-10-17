@@ -500,10 +500,13 @@ string bcParseOptions(string inputString, string validOptions) {
 
 void eat_hot_dog(string dog,location loc)
 {
-	if(get_property("_hotdogcheck_"+loc)=="")
+	if(!get_property("_fancyHotDogEaten").to_boolean())
 	{
-		set_property("_hotdogcheck_"+loc,"true");
-		abort("maybe eat a "+dog);
+		if(get_property("_hotdogcheck_"+loc)=="")
+		{
+			set_property("_hotdogcheck_"+loc,"true");
+			abort("maybe eat a "+dog);
+		}
 	}
 }
 
@@ -1112,30 +1115,29 @@ void get_kolhs_buff(string bufftype)
 		//which buff is for us
 		effect mybuff;
 		int mychoice;
-		abort("uncomment line 1107");
 		
 		if(bufftype=="stats")
 		{
 			if(my_primestat()==$stat[muscle])
 			{
-//				mybuff=$effect[Cut But Not Dried];
+				mybuff=$effect[Cut But Not Dried];
 				mychoice=4;
 			}
 			else if(my_primestat()==$stat[mysticality])
 			{
-//				mybuff=$effect[Poetically Licensed];
+				mybuff=$effect[Poetically Licensed];
 				mychoice=2;
 			}
 			else
 			{
-//				mybuff=$effect[Isskay like an Ashtray]; //mopxie
+				mybuff=$effect[Isskay like an Ashtray]; //mopxie
 				mychoice=5;
 			}
 		}
 		
 		if(bufftype=="meat" || bufftype=="items")
 		{
-//			mybuff=$effect[school spirited];
+			mybuff=$effect[school spirited];
 			mychoice=1;
 		}
 		
@@ -2818,7 +2820,7 @@ void defaultMood(boolean castMojo) {
 		cli_execute("trigger lose_effect, astral shell, cast 1 astral shell");
 	if (have_skill($skill[Moxie of the Mariachi]) && my_path() != "BIG!") cli_execute("trigger lose_effect, Mariachi Mood, cast 1 Moxie of the Mariachi");
 	if (have_skill($skill[Disco Aerobics]) && my_path() != "BIG!") cli_execute("trigger lose_effect, Disco State of Mind, cast 1 Disco Aerobics");
-	if (have_skill($skill[Blubber Up])) cli_execute("trigger lose_effect, Blubbered Up, cast 1 Blubbered Up");
+	if (have_skill($skill[Blubber Up])) cli_execute("trigger lose_effect, Blubbered Up, cast 1 Blubber Up");
 		
 	//use fire kits for pvp fights
 	if(i_a("CSA fire-starting kit")>0 && to_boolean(get_property("_fireStartingKitUsed")))
@@ -2826,7 +2828,7 @@ void defaultMood(boolean castMojo) {
 		visit_url("inv_use.php?which=3&whichitem=5739");
 		visit_url("choice.php?pwd&whichchoice=595&option=1&choiceform1=Use+the+sticks");
 	}
-	if(i_a("CSA discount card ")>0)
+	if(i_a("CSA discount card")>0)
 		use(1,$item[CSA discount card]);
 	
 	//if we have skeletons planted and already made a skeletal skiff
@@ -2992,7 +2994,7 @@ boolean faxMeA(monster mon) {
         if (contains_text(fax, "grainy, blurry likeness of a monster on it."))
             return false;
 
-		matcher mon_match = create_matcher("blurry likeness of a (.*) on it",fax);
+		matcher mon_match = create_matcher("blurry likeness of an? (.*) on it",fax);
 		find(mon_match);
 		if(group(mon_match,1)==mon)
 			return true;

@@ -661,7 +661,7 @@ void special(boolean bonus_actions) {
 //			pull_if_good($item[jewel-eyed wizard hat]);
 		//pull tps drink
 //			pull_if_good($item[grogtini]);
-		if(available_amount($item[wrecked generator])<1)
+		if(available_amount($item[wrecked generator])<1 && my_path() != "KOLHS")
 			pull_if_good($item[wrecked generator]);
 		//handle zombie head + maid if we have gnoll
 		if( knoll_available() && pull_if_good($item[Ninja pirate zombie robot head]))
