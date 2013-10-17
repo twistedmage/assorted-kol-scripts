@@ -193,14 +193,14 @@ string tostring(stat s) {
 
 string itemimages(string img) {
 	buffer src;
-	src.append('src="http://images.kingdomofloathing.com/itemimages/');
+	src.append('src="/images/itemimages/');
 	src.append(img);
 	src.append('.gif"');
 	return src;
 }
 string otherimages(string prefix, string img) {
 	buffer src;
-	src.append('src="http://images.kingdomofloathing.com/otherimages/');
+	src.append('src="/images/otherimages/');
 	src.append(prefix);
 	src.append(img);
 	src.append('.gif"');
@@ -251,10 +251,11 @@ string progressCustom(int current, int limit, string hover, int severity, boolea
 		case 6	: color = "black"; 		break;		//super-busted
 		default	: color = "blue";
 	}
+	string title() { return current + ' / ' + limit; }
 	switch (hover) {
 		case "" : title = ""; break;
-		case "auto": title = ' title="' + current + ' / ' + limit + '"'; break;
-		default: title = ' title="' + hover +'"';
+		case "auto": title = ' title="' + title() + '"'; break;
+		default: title = ' title="' + hover +' ('+ title() +')"';
 	}
 	if (active) border = ' style="border-color:#707070"';
 	if (limit == 0) limit = 1;
@@ -927,8 +928,8 @@ void pickerFlorist(string[int] planted){
 		picker.pickerStart("florist", "Pull a Plant");
 		foreach i,s in planted {
 			color = plantsUsed.contains_text(s)? (plantData[s].territorial? 'Khaki': 'Gainsboro'): (plantData[s].territorial? 'PaleGreen': 'LightSkyBlue');
-			picker.append('<tr class="florist" style="background-color:' + color + '"><td><img src="http://images.kingdomofloathing.com/itemimages/shovel.gif"></td>');
-			picker.append('<td><a href="' + sideCommand('ashq visit_url("forestvillage.php?action=floristfriar");visit_url("choice.php?option=2&whichchoice=720&pwd=' + my_hash() + '&plnti=' + i +'");') +'">'+ plantDesc(s, true) + '</a></td></tr>');
+			picker.append('<tr class="florist" style="background-color:' + color + '"><td><img src="/images/itemimages/shovel.gif"></td>');
+			picker.append('<td><a href="' + sideCommand('ashq visit_url("place.php?whichplace=forestvillage&action=fv_friar");visit_url("choice.php?option=2&whichchoice=720&pwd=' + my_hash() + '&plnti=' + i +'");') +'">'+ plantDesc(s, true) + '</a></td></tr>');
 		}
 		if (count(plantable)>0) {
 			picker.append('<tr class="pickitem"><td colspan="2" style="color:white;background-color:blue;font-weight:bold;">Remaining Plants</th></tr>');
@@ -936,7 +937,7 @@ void pickerFlorist(string[int] planted){
 				if (!plantable[i]) continue;
 				plant = i.toPlant();
 				color = plantable[i]? (plantData[plant].territorial? (marked? "Khaki": "PaleGreen"): "LightSkyBlue"): "Gainsboro";
-				picker.append('<tr class="florist" style="background-color:' + color + '"><td><img src="http://images.kingdomofloathing.com/otherimages/friarplants/plant' + i + '.gif" title="' + plantDesc(plant, false) + '"></td>');
+				picker.append('<tr class="florist" style="background-color:' + color + '"><td><img src="/images/otherimages/friarplants/plant' + i + '.gif" title="' + plantDesc(plant, false) + '"></td>');
 				picker.append('<td>' + plantDesc(plant, true) + '</td></tr>');
 			}
 		} else picker.append('<tr><th colspan="2">No plants in stock for this area.</th></tr>');
@@ -945,7 +946,7 @@ void pickerFlorist(string[int] planted){
 		if (count(plantable)>0) foreach i in plantable {
 			plant = i.toPlant();
 			color = plantable[i]? (plantData[plant].territorial? (marked? "Khaki": "PaleGreen"): "LightSkyBlue"): "Gainsboro";
-			picker.append('<tr class="florist" style="background-color:' + color + '"><td><img src="http://images.kingdomofloathing.com/otherimages/friarplants/plant' + i + '.gif" title="' + plantDesc(plant, false) + '"></td>');
+			picker.append('<tr class="florist" style="background-color:' + color + '"><td><img src="/images/otherimages/friarplants/plant' + i + '.gif" title="' + plantDesc(plant, false) + '"></td>');
 			picker.append('<td><a href="' + sideCommand("florist plant "+plant) + '">' + plantDesc(plant, true) + '</a></td></tr>');
 		} else picker.append('<tr><td colspan="2">No more plants available to plant here</td></tr>');
 	}
@@ -956,16 +957,16 @@ void pickerFlorist(string[int] planted){
 
 void addPlants(buffer result) {
 	if((lastLoc.environment == "none" || lastLoc == $location[none])) {
-		result.append('<a class="visit" target="mainpane" href="forestvillage.php?action=floristfriar">(Cannot plant here)</a>');
+		result.append('<a class="visit" target="mainpane" href="place.php?whichplace=forestvillage&action=fv_friar">(Cannot plant here)</a>');
 		return;
 	}
 	string[int] plants=get_florist_plants()[lastLoc];
 	result.append('<a class="chit_launcher" rel="chit_pickerflorist" href="#">');
 	foreach i,s in plants
 		if (plantData[s].no>0)
-			result.append('<img src="http://images.kingdomofloathing.com/otherimages/friarplants/plant'+plantData[s].no+'.gif" title="'+plantDesc(s, false)+'">');
+			result.append('<img src="/images/otherimages/friarplants/plant'+plantData[s].no+'.gif" title="'+plantDesc(s, false)+'">');
 		else {
-			result.append('<img src="http://images.kingdomofloathing.com/otherimages/friarplants/noplant.gif" title="No Plant">');
+			result.append('<img src="/images/otherimages/friarplants/noplant.gif" title="No Plant">');
 			#break;		// I think I prefer the look of three empty plots
 		}
 	result.append('</a>');
@@ -979,7 +980,7 @@ void addFlorist(buffer result, boolean label) {
 		// label is not necessary if right after trail
 		if(vars["chit.stats.layout"].contains_text("trail,florist"))
 			label = false;
-		result.append(label? '<a class="visit" target="mainpane" href="forestvillage.php?action=floristfriar">Florist</a>': '&nbsp;');
+		result.append(label? '<a class="visit" target="mainpane" href="place.php?whichplace=forestvillage&action=fv_friar">Florist</a>': '&nbsp;');
 		
 		result.append('</td><td class="florist" colspan="2">');
 		result.addPlants();
@@ -992,7 +993,7 @@ void bakeFlorist() {
 
 	if (florist_available()) {
 		result.append('<table id="chit_florist" class="chit_brick nospace">');
-		result.append('<tr><th><a class="visit" target="mainpane" href="forestvillage.php?action=floristfriar">Florist Friar</a></th></tr>');
+		result.append('<tr><th><a class="visit" target="mainpane" href="place.php?whichplace=forestvillage&action=fv_friar">Florist Friar</a></th></tr>');
 		result.append('<tr><td class="florist">');
 		result.addPlants();
 		result.append('</td></tr></table>');
@@ -1110,6 +1111,8 @@ void pickerFamiliar(familiar myfam, item famitem, boolean isFed) {
 			return "Weight: +10";
 		case $item[school spirit socket set]:
 			return "Keeps more steam in";
+		case $item[flask of embalming fluid]:
+			return "Helps collect body parts";
 		}
 		
 		if(famitem != $item[none]) {
@@ -1493,23 +1496,16 @@ void bakeFamiliar() {
 
 	string famname = "Familiar";
 	string famtype = '<a target=mainpane href="familiar.php" class="familiarpick">(None)</a>';
-	string actortype = "";
 	string famimage = "/images/itemimages/blank.gif";
-	string equiptype = "";
 	string equipimage = "blank.gif";
-	string famweight = "";
-	string info = "";
-	string famstyle = "";
+	string equiptype, actortype, famweight, info, famstyle, charges, chargeTitle;
 	boolean isFed = false;
-	string charges = "";
-	string chargeTitle = "";
 	string weight_title = "Buffed Weight";
 	
 	familiar myfam = my_familiar();
-	familiar actor = my_familiar();
 	item famitem = $item[none];
 
-	if (myfam != $familiar[none]) {
+	if(myfam != $familiar[none]) {
 		famtype = to_string(myfam);
 		actortype = famtype;
 		// Set Familiar image
@@ -1591,7 +1587,14 @@ void bakeFamiliar() {
 		}
 	}
 
-	
+	// Show Reanimator parts
+	if(myfam == $familiar[Reanimated Reanimator])
+		foreach l in $strings[Arm, Leg, Skull, Wing, WeirdPart] {
+			string prop = get_property("reanimator"+l+"s");
+			if(prop != "0")
+				info += (length(info) == 0? "": ", ") + prop + " "+ l +(prop == "1"? "": "s");
+		}
+
 	//Get Familiar Weight
 	matcher weightMatcher = create_matcher("</a></b>, the (<i>extremely</i> well-fed)? <b>(.*?)</b> pound ", source);
 	if (find(weightMatcher)) {
@@ -1608,8 +1611,7 @@ void bakeFamiliar() {
 		matcher actorMatcher = create_matcher("</b\> pound (.*?),", source);
 		if (find(actorMatcher)) {
 			actortype = group(actorMatcher, 1);
-			actor = to_familiar(actortype);
-			equipimage = actor.image;
+			equipimage = to_familiar(actortype).image;
 			info = actortype;
 		}
 	} else {
@@ -1639,7 +1641,7 @@ void bakeFamiliar() {
 			} else info = "Unknown effect";
 		} else info = "None";
 	} else if(myfam == $familiar[Reanimated Reanimator]) {
-		famname += ' <a target=mainpane href="main.php?talktoreanimator=1">[chat]</a>';
+		famname += ' (<a target=mainpane href="main.php?talktoreanimator=1">chat</a>)';
 	}
 	
 	// Charges
@@ -1792,8 +1794,6 @@ void bakeFamiliar() {
 		result.append('<th width="30" title="' + chargeTitle + '">' + charges + '</th>');
 	}
 	result.append('</tr><tr>');
-	#result.append('<td class="icon" title="Familiar Haiku and Description">');
-	#result.append('<img src="' + famimage + '" class="hand" onclick="fam(' + to_int(myfam) + ')" origin-level="third-party"/>');
 	result.append('<td class="icon" title="' + hover + '">');
 	if (protect) {
 		result.append('<img src="' + famimage + '">');
@@ -2775,30 +2775,30 @@ string fancycurrency(string page) {
 	//big ol ugly case structure to figure out which thing you clicked last!
 	switch(get_property("_ChitCurrency")){
 	case "meat": 
-		output+='<a href="#"><img src="http://images.kingdomofloathing.com/itemimages/meat.gif" class="hand" title="Meat" alt="Meat"><br>"+formatInt(my_meat())+" </a> ';
+		output+='<a href="#"><img src="/images/itemimages/meat.gif" class="hand" title="Meat" alt="Meat"><br>"+formatInt(my_meat())+" </a> ';
 		break;
 	case "sanddollar":
-		output+='<a href="#"><img src="http://images.kingdomofloathing.com/itemimages/sanddollar.gif" class="hand" title="Sand Dollars" alt="Sand Dollars"> <br>'+ formatInt(item_amount($item[sand dollar]))+' </a>';
+		output+='<a href="#"><img src="/images/itemimages/sanddollar.gif" class="hand" title="Sand Dollars" alt="Sand Dollars"> <br>'+ formatInt(item_amount($item[sand dollar]))+' </a>';
 		break;
 	 case "isotope":
-		output+='<a href="#"><img src="http://images.kingdomofloathing.com/itemimages/isotope.gif" class="hand" title="Lunar Isotopes" alt="Lunar Isotopes"> <br>'+ formatInt(item_amount($item[lunar isotope]))+' </a>';
+		output+='<a href="#"><img src="/images/itemimages/isotope.gif" class="hand" title="Lunar Isotopes" alt="Lunar Isotopes"> <br>'+ formatInt(item_amount($item[lunar isotope]))+' </a>';
 		break;
 	 case "nickel":
-		output+='<a href="#"><img src="http://images.kingdomofloathing.com/itemimages/nickel.gif" class="hand" title="Hobo Nickels" alt="Hobo Nickels"> <br>'+ formatInt(item_amount($item[hobo nickel]))+' </a>';
+		output+='<a href="#"><img src="/images/itemimages/nickel.gif" class="hand" title="Hobo Nickels" alt="Hobo Nickels"> <br>'+ formatInt(item_amount($item[hobo nickel]))+' </a>';
 		break;
 	}
 
-	output+='\n <ul> \n <li><a href="/KoLmafia/sideCommand?cmd='+url_encode("set _ChitCurrency=sanddollar")+ '&pwd=' + my_hash() +'" ><img src="http://images.kingdomofloathing.com/itemimages/sanddollar.gif"> <br>'
+	output+='\n <ul> \n <li><a href="/KoLmafia/sideCommand?cmd='+url_encode("set _ChitCurrency=sanddollar")+ '&pwd=' + my_hash() +'" ><img src="/images/itemimages/sanddollar.gif"> <br>'
 		+ formatInt(item_amount($item[sand dollar]))+' </a></li> \n <li><a href="/KoLmafia/sideCommand?cmd='+url_encode("set _ChitCurrency=isotope")+ '&pwd=' 
-		+ my_hash() +'" ><img src="http://images.kingdomofloathing.com/itemimages/isotope.gif"> <br>'+formatInt(item_amount($item[lunar isotope]))+' </a></li> \n <li><a href="/KoLmafia/sideCommand?cmd='
-		+ url_encode("set _ChitCurrency=nickel")+ '&pwd=' + my_hash() +'" ><img src="http://images.kingdomofloathing.com/itemimages/nickel.gif"> <br>'
+		+ my_hash() +'" ><img src="/images/itemimages/isotope.gif"> <br>'+formatInt(item_amount($item[lunar isotope]))+' </a></li> \n <li><a href="/KoLmafia/sideCommand?cmd='
+		+ url_encode("set _ChitCurrency=nickel")+ '&pwd=' + my_hash() +'" ><img src="/images/itemimages/nickel.gif"> <br>'
 		+ formatInt(item_amount($item[hobo nickel]))+'</a></li> \n <li><a href="/KoLmafia/sideCommand?cmd='+url_encode("set _ChitCurrency=meat")+ '&pwd=' 
-		+ my_hash() +'" ><img src="http://images.kingdomofloathing.com/itemimages/meat.gif"><br>'+formatInt(my_meat())+'</a></li> \n </li> \n </ul> \n';
+		+ my_hash() +'" ><img src="/images/itemimages/meat.gif"><br>'+formatInt(my_meat())+'</a></li> \n </li> \n </ul> \n';
 	
-	page.replace_string('<img src="http://images.kingdomofloathing.com/itemimages/meat.gif" class=hand onclick=\'doc("meat");\' title="Meat" alt="Meat"><br>',"output");
+	page.replace_string('<img src="/images/itemimages/meat.gif" class=hand onclick=\'doc("meat");\' title="Meat" alt="Meat"><br>',"output");
 
 	matcher m;
-	m = create_matcher('<img src="http://images.kingdomofloathing.com/itemimages/meat.gif" .+</td><td a',page);
+	m = create_matcher('<img src="/images/itemimages/meat.gif" .+</td><td a',page);
 	if (m.find()){
 	page = replace_first(m, output +" </td><td a");
 	}

@@ -19,10 +19,10 @@ foreach k,v in post switch (k) {
    case "getjar": if (to_int(v) < 5898 || to_int(v) > 5905) continue; item wj = to_item(to_int(v));
       switch (wj) {
          case $item[jar of psychoses (The Suspicious-Looking Guy)]: visit_url("tavern.php?action=jung&whichperson=susguy"); break;
-         case $item[jar of psychoses (The Captain of the Gourd)]: visit_url("town_right.php?action=jung&whichperson=gourdcaptain"); break;
+         case $item[jar of psychoses (The Captain of the Gourd)]: visit_url("place.php?whichplace=town_right&action=jung&whichperson=gourdcaptain"); break;
          case $item[jar of psychoses (The Crackpot Mystic)]: visit_url("shop.php?whichshop=mystic&action=jung&whichperson=mystic"); break;
-         case $item[jar of psychoses (The Old Man)]: visit_url("oldman.php?action=jung&whichperson=oldman"); break;
-         case $item[jar of psychoses (The Pretentious Artist)]: visit_url("town_wrong.php?action=jung&whichperson=artist"); break;
+         case $item[jar of psychoses (The Old Man)]: visit_url("place.php?whichplace=sea_oldman&action=jung&whichperson=oldman"); break;
+         case $item[jar of psychoses (The Pretentious Artist)]: visit_url("place.php?whichplace=town_wrong&action=jung&whichperson=artist"); break;
          case $item[jar of psychoses (The Meatsmith)]: visit_url("store.php?whichstore=s&action=jung&whichperson=meatsmith"); break;
          case $item[jar of psychoses (Jick)]: visit_url("showplayer.php?who=1&action=jung&whichperson=jick"); break;
       }
