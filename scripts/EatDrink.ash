@@ -611,6 +611,8 @@ int special_prices(item it, int startprice)
     return 2;
   if (it == $item[steel-scented air freshener] && (item_amount(it) > 0))
     return 2;
+  if (it == $item[spaghetti breakfast] && (item_amount(it) > 0))
+    return 2;
 
   int price1 = 0;
   int price2 = 0;
@@ -709,7 +711,12 @@ int effective_price(item it, boolean inventoried)
     vprint("NONTRADEABLE: "+it,8);
     return PRICE_OF_NONTRADEABLES;
   }
-  if (!(special_items contains it))
+  if (special_items contains it)
+  {
+    price = special_prices(it, price);
+    vprint("SPECIAL   :"+it+" = "+price,8);
+  }
+  else
   { 
     if (brokenprice contains it)
     {
@@ -884,11 +891,6 @@ int effective_price(item it, boolean inventoried)
       else
         vprint("HISTORICAL:"+it+" = "+price,8);
     }
-  }
-  else
-  {
-    price = special_prices(it, price);
-    vprint("SPECIAL   :"+it+" = "+price,8);
   }
   if ((price == 0) || (price == -1) || (price == 1))
   {
