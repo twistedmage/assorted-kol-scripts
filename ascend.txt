@@ -209,8 +209,13 @@ AT + PM - <asica,anid>
 AT + S
 AT + DB - twistedmage, <anid>
 
+
 DB + SC - 
 DB + TT - twistedmage, <dinala>
+
+
+
+
 DB + PM - <dinala, anid>
 DB + S  - 
 
@@ -259,10 +264,7 @@ cast scarysauce
 familiar mosquito; fold loathing legion helicopter; maximize familiar weight, -0.01 hp, equip parasitic headgnawer, equip ol scratchs stove door, equip spiky turtle shoulderpads, equip groovy prism necklace, equip mer-kin gutgirdle, equip loathing legion helicopter; cast jalape&ntilde;o saucesphere; cast jaba&ntilde;ero saucesphere; cast scarysauce; use potion of punctual companionship; cast jingle bells; cast empathy; cast leash; use cheap cigar butt; cast vent rage gland; use Stabonic scroll; use glowing syringe; cast frigidalmatian; cast boner battalion; use silver dreadsylvanian flask; use brass dreadsylvanian flask
 
 ----great wolf hard mode------
-familiar disembodied hand;
-maximize 100 dr, 0.01 mainstat, equip moon amber necklace, equip rain-doh green lantern;
-cast frigidalmatian;
-use connery; use serum of; use hair spray; ballpit; telescope high; use foetid seal tear; use silver dreadsylvanian flask; use brass dreadsylvanian flask;
+familiar disembodied hand; maximize 100 dr, 0.01 mainstat, equip moon amber necklace, equip rain-doh green lantern; cast frigidalmatian; use connery; use serum of; use hair spray; ballpit; telescope high; use Cold seal sweat; use silver dreadsylvanian flask; use brass dreadsylvanian flask;
 buy 10 scented massage oil
 ----mayor ghost hard mode-----
 familiar disembodied; maximize equip dreadsylvania auditors badge,equip Choker of the Ultragoth, equip clown wig, equip giant gym membership card, equip leotarrrd, equip oven mitts, equip plush hamsterpus, equip spork, equip white snakeskin duster; shrug jaba; buy 5 poltergeist; buy 5 brick of sand; buy 5 blue plastic oyster egg; buy 5 tequila grenade; buy 5 fetid feather; buy 5 stone frisbee; buy 5 onion shuriken; buy 30 love song of sugary cuteness; cast frigidalmatian; cast boner bat; use silver dreadsylvanian flask; use brass dreadsylvanian flask
@@ -276,7 +278,7 @@ use glowing syringe; eat bag of gorf; eat cursed black pearl onion; maximize mox
 init
 skeleton warrior; skeleton wizard; skeleton rogue; skeletal cleric; use silver dreadsylvanian flask; use brass dreadsylvanian flask
 -----drunkula hard mode---
-maximize spell damage percent, equip ghost shawl, equip rain-doh green lantern; use 300 potion of inebriety; use silver dreadsylvanian flask; use brass dreadsylvanian flask;use jackass plumber home game; pool 2; cast deep dark visions; hatter 11; use black sheepskin; use glittery mascara; ballpit; telescope high;
+maximize spell damage percent, equip ghost shawl, equip rain-doh green lantern; use 300 potion of inebriety; use silver dreadsylvanian flask; use brass dreadsylvanian flask;use jackass plumber home game; pool 2; cast deep dark visions; hatter 11; use black sheepskin; use glittery mascara; ballpit; telescope high;use silver dreadsylvanian flask; use brass dreadsylvanian flask
 ----------svns----------
 svn checkout https://svn.code.sf.net/p/therazekolmafia/eatdrink/code/;
 svn checkout https://svn.code.sf.net/p/winterbay-mafia/autobasement/code/;
@@ -297,6 +299,7 @@ svn checkout https://svn.code.sf.net/p/formhtml/code/;
 svn checkout https://svn.code.sf.net/p/zlib/code/;
 svn checkout https://svn.code.sf.net/p/bestbetweenbattle/code/;
 svn checkout https://svn.code.sf.net/p/guyymafia/code/dreaddrunk/;
+
 
 ash set_property("bcasc_unlockHiddenTavern","true");
 
@@ -322,8 +325,6 @@ zlib eatdrink_fav_groose_grease = true;
 zlib eatdrink_favUse = true;
 zlib eatdrink_valueOfPrimeStat = 2;
 zlib eatdrink_valueOfNonPrimeStat = 1;
-zlib eatdrink_priceOfNontradeables = 999999;
-zlib eatdrink_priceOfQuestItems = 999999;
 ash set_property("valueOfAdventure",1000);
 
 ---------------xcom-------------------------------

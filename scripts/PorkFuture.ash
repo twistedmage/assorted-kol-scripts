@@ -1362,6 +1362,13 @@ void futurella()
 			}
 		}
 		equip($slot[weapon],$item[Ruby Rod]);
+		if (have_effect($effect[chilled to the bone]) > 0)
+		{
+			if (retrieve_item(1,$item[hot Dreadsylvanian cocoa]))
+				use(1,$item[hot Dreadsylvanian cocoa]);
+			else
+				abort("Need to get rid of Chilled to the Bone to collect essences.");
+		}
 		
 		item fat_stacking()
 		{
