@@ -55,6 +55,10 @@ int TS_ABYSS_EQUIPMENT = to_int(vars["seafloor_abyssEquipment"]);
 setvar("seafloor_outfitQuest", 0);
 int TS_OUTFIT_QUEST = to_int(vars["seafloor_outfitQuest"]);
 
+// Do you want to go through training and automation on the Gladiator quest?
+setvar("seafloor_automateGladiators", true);
+boolean TS_GLADIATORS = to_boolean(vars["seafloor_automateGladiators"]);
+
 // How do you want to complete the Skate quest?
 // 0 - Skip. 1 - Ice. 2 - Roller. 3 - Board. 4 - Unlock, but don't do the quest.
 setvar("seafloor_skateQuest", 0);
@@ -155,7 +159,7 @@ boolean solveHatred(boolean scrolling)
 		print("We are aborting with "+unknowncount+" unknown scroll segments.");
 		return false;
 	}
-	while (scrolling && my_adventures() > 0 && dreadchoice[unknownnumber] < 4 && have_effect($effect[deep-tainted mind]) == 0)
+	while (scrolling && my_adventures() > 1 && dreadchoice[unknownnumber] < 4 && have_effect($effect[deep-tainted mind]) == 0)
 	{
 		dreadchoice[unknownnumber] = dreadchoice[unknownnumber] + 1;
 		visit_url("inv_use.php?pwd&which=3&whichitem=6353");
@@ -256,7 +260,7 @@ void MonkeeQuest()
 		{
 			string seafloor = visit_url("seafloor.php");
 			string monkeycastle;
-			if (my_adventures() > 0 && !contains_text(seafloor,"monkeycastle.gif"))
+			if (my_adventures() > 1 && !contains_text(seafloor,"monkeycastle.gif"))
 			{
 				print("Finding Little Brother in the Octopus\'s Garden.");
 				if (TS_FAX_NEPTUNE && !get_property("_photocopyUsed").to_boolean() && item_amount($item[wriggling flytrap pellet]) < 1)
@@ -278,7 +282,7 @@ void MonkeeQuest()
 						wait (60);
 						cli_execute ("fax get");
 					}
-					if (my_adventures() > 0 && item_amount($item[wriggling flytrap pellet]) < 1)
+					if (my_adventures() > 1 && item_amount($item[wriggling flytrap pellet]) < 1)
 					{
 						if (item_amount($item[photocopied monster]) < 1) cli_execute ("fax get");
 						if (item_amount($item[photocopied monster]) > 0 && !contains_text(to_lower_case(visit_url("desc_item.php?whichitem=835898159")), "neptune flytrap"))
@@ -321,7 +325,7 @@ void MonkeeQuest()
 			{
 				return;
 			}
-			if (my_adventures() > 0 && monkeycastle.contains_text("\#littlebrother\""))
+			if (my_adventures() > 1 && monkeycastle.contains_text("\#littlebrother\""))
 			{
 				print("Finding Big Brother in the Wreck of the Edgar Fitzsimmons.");
 				foreach it,entry in maximize("-combat, -tie", 0, 0, true, false) if (entry.score > 0 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(max(1, ceil(my_adventures().to_float() / turns_per_cast(entry.skill))), entry.skill);
@@ -354,14 +358,14 @@ void MonkeeQuest()
 			{
 				return;
 			}
-			if (my_adventures() > 0 && monkeycastle.contains_text("\#brothers\""))
+			if (my_adventures() > 1 && monkeycastle.contains_text("\#brothers\""))
 			{
 				print("Finding Grandpa in the "+grandpa.to_string()+".");
 				foreach it,entry in maximize("-combat, -tie", 0, 0, true, false) if (entry.score > 0 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(max(1, ceil(my_adventures().to_float() / turns_per_cast(entry.skill))), entry.skill);
 				foreach it,entry in maximize("-combat, -tie", 0, 0, true, false) if (entry.score > 0 && entry.command.index_of("uneffect ") == 0 && turns_per_cast(entry.effect.to_skill()) > 0) cli_execute(entry.command);
 			}
 			loopcounter = 0;
-			while (my_adventures() > 0 && monkeycastle.contains_text("\#brothers\"") && loopcounter < 5 && boolean_modifier("Adventure Underwater"))
+			while (my_adventures() > 1 && monkeycastle.contains_text("\#brothers\"") && loopcounter < 5 && boolean_modifier("Adventure Underwater"))
 			{
 				loopcounter += 1;
 				if (!obtain(1,"choiceadv",grandpa))
@@ -400,7 +404,7 @@ void MonkeeQuest()
 			{
 				return;
 			}
-			if (my_adventures() > 0 && monkeycastle.contains_text("\#gpa\""))
+			if (my_adventures() > 1 && monkeycastle.contains_text("\#gpa\""))
 			{
 				print("Finding Grandma in the Mer-kin Outpost.");
 				if (item_amount($item[Grandma's Map]) < 1 && !obtain(1,"grandma chartreuse yarn",$location[The Mer-kin Outpost]))
@@ -408,7 +412,7 @@ void MonkeeQuest()
 					print("You have run out of adventures. Continue tomorrow.");
 					return;
 				}
-				if (my_adventures() > 0 && boolean_modifier("Adventure Underwater"))
+				if (my_adventures() > 1 && boolean_modifier("Adventure Underwater"))
 				{
 				foreach it,entry in maximize("-combat, -tie", 0, 0, true, false) if (entry.score > 0 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(max(1, ceil(my_adventures().to_float() / turns_per_cast(entry.skill))), entry.skill);
 				foreach it,entry in maximize("-combat, -tie", 0, 0, true, false) if (entry.score > 0 && entry.command.index_of("uneffect ") == 0 && turns_per_cast(entry.effect.to_skill()) > 0) cli_execute(entry.command);
@@ -444,7 +448,7 @@ void MonkeeQuest()
 			{
 				return;
 			}
-			if (my_adventures() > 0 && monkeycastle.contains_text("\#gfolks\""))
+			if (my_adventures() > 1 && monkeycastle.contains_text("\#gfolks\""))
 			{
 				if (available_amount($item[black glass]) < 1)
 				{
@@ -515,7 +519,7 @@ void MonkeeQuest()
 				}
 				print("Finding Mom in the Caliginous Abyss.");
 				loopcounter = 0;
-				while (my_adventures() > 0 && monkeycastle.contains_text("\#gfolks\"") && loopcounter < 2)
+				while (my_adventures() > 1 && monkeycastle.contains_text("\#gfolks\"") && loopcounter < 2)
 				{
 					loopcounter += 2;
 					obtain(1, "choiceadv", $location[The Caliginous Abyss]);
@@ -547,7 +551,7 @@ void MonkeeQuest()
 
 void OutfitQuest()
 {
-	if (my_level() >= 13)
+	if (my_level() >= 13 && get_property("merkinQuestPath") != "done")
 	{
 		if (TS_MONKEE_QUEST < 4 || to_int(vars["seafloor_monkeeStep"]) < TS_MONKEE_QUEST)
 		{
@@ -559,7 +563,7 @@ void OutfitQuest()
 		int loopcounter = 0;
 		if (!seafloor.contains_text("corrala.gif") && !seafloor.contains_text("corralb.gif"))
 		{
-			if (my_adventures() > 0 && boolean_modifier("Adventure Underwater") && item_amount($item[mer-kin lockkey]) < 1)
+			if (my_adventures() > 1 && boolean_modifier("Adventure Underwater") && item_amount($item[mer-kin lockkey]) < 1)
 			{
 				print("We need a lockkey before we can open the stashbox.");
 				if (!obtain(1,"mer-kin lockkey",$location[The Mer-kin Outpost]))
@@ -573,7 +577,7 @@ void OutfitQuest()
 				print("We need a stashbox before we can talk to Grandpa.");
 				foreach it,entry in maximize("-combat, -tie", 0, 0, true, false) if (entry.score > 0 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(max(1, ceil(my_adventures().to_float() / turns_per_cast(entry.skill))), entry.skill);
 				foreach it,entry in maximize("-combat, -tie", 0, 0, true, false) if (entry.score > 0 && entry.command.index_of("uneffect ") == 0 && turns_per_cast(entry.effect.to_skill()) > 0) cli_execute(entry.command);
-				while (my_adventures() > 0 && loopcounter < 4 && boolean_modifier("Adventure Underwater") && item_amount($item[mer-kin stashbox]) < 1)
+				while (my_adventures() > 1 && loopcounter < 4 && boolean_modifier("Adventure Underwater") && item_amount($item[mer-kin stashbox]) < 1)
 				{
 					loopcounter += 1;
 					set_property("choiceAdventure"+(312 + get_property("choiceAdventure312").to_int()), (get_property("choiceAdventure"+(312 + get_property("choiceAdventure312").to_int())).to_int() % 3) + 1);
@@ -607,7 +611,7 @@ void OutfitQuest()
 			if (!getsome(3, $item[sea cowbell])) obtain(3, $item[sea cowbell], $location[the coral corral]);
 			if (!getsome(1, $item[sea lasso])) obtain(1, $item[sea lasso], $location[the coral corral]);
 			boolean tamingloop = true;
-			while (my_adventures() > 0 && tamingloop && boolean_modifier("Adventure Underwater"))
+			while (my_adventures() > 1 && tamingloop && boolean_modifier("Adventure Underwater"))
 			{
 				if (to_float(my_hp()) / my_maxhp() < to_float(get_property("hpAutoRecovery")))
 				{
@@ -760,6 +764,11 @@ void OutfitQuest()
 					}
 					outfit("mer-kin gladiatorial gear");
 				}
+				if (!TS_GLADIATORS)
+				{
+					print("You have told the script to skip automation of the gladiators.");
+					return;
+				}
 				if (available_amount($item[mer-kin dodgeball]) < 1 || available_amount($item[mer-kin dragnet]) < 1 || available_amount($item[mer-kin switchblade]) < 1)
 				{
 					foreach it,entry in maximize("10 muscle, +shield, -hat, -pants, -familiar, 1000 combat", 0, 0, false, false) if (entry.score >= 1000 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(max(1, ceil(my_adventures().to_float() / turns_per_cast(entry.skill))), entry.skill);
@@ -772,75 +781,382 @@ void OutfitQuest()
 						return;
 					}
 				}
-				if (my_adventures() > 1 && get_property("gladiatorNetMovesKnown").to_int() < 3)
+				item buffingitem;
+				while (my_adventures() > 1 && get_property("gladiatorNetMovesKnown").to_int() < 3)
 				{
 					equip($item[Mer-kin dragnet]);
 					foreach it,entry in maximize("10 muscle, -weapon, -familiar, outfit mer-kin gladiatorial gear, -1000 combat", 0, 0, false, false) if (entry.score >= 1000 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(max(1, ceil(my_adventures().to_float() / turns_per_cast(entry.skill))), entry.skill);
 					foreach it,entry in maximize("10 muscle, -weapon, -familiar, outfit mer-kin gladiatorial gear, -1000 combat", 0, 0, false, false) if (entry.score >= 1000 && entry.command.index_of("uneffect ") == 0 && turns_per_cast(entry.effect.to_skill()) > 0) cli_execute(entry.command);
-					if (buffed_hit_stat() < 650)
+					while (buffed_hit_stat() < 750)
 					{
-						print("Your stats are too low to actually train your skills. Raise your muscle.");
-						return;
+						if (my_primestat() == $stat[muscle] && have_effect($effect[Stabilizing Oiliness]) < 1)
+						{
+							buffingitem = $item[oil of stability];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else if (my_primestat() == $stat[mysticality] && have_effect($effect[Expert Oiliness]) < 1)
+						{
+							buffingitem = $item[oil of expertise];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else if (my_primestat() == $stat[moxie] && have_effect($effect[Slippery Oiliness]) < 1)
+						{
+							buffingitem = $item[oil of slipperiness];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else if (have_effect($effect[Incredibly Hulking]) < 1)
+						{
+							buffingitem = $item[ferrigno's elixir of power];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else if (have_effect($effect[Phorcefullness]) < 1)
+						{
+							buffingitem = $item[philter of phorce];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else if (have_effect($effect[Gr8tness]) < 1)
+						{
+							buffingitem = $item[potion of temporary gr8tness];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else if (have_effect($effect[Tomato Power]) < 1)
+						{
+							buffingitem = $item[tomato juice of powerful power];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else
+						{
+							abort("We tried (and failed) to buff your "+current_hit_stat()+" to 750. Since we failed, we are aborting to let you decide how to continue.");
+						}
 					}
-					while (my_adventures() > 1 && get_property("gladiatorNetMovesKnown").to_int() < 3)
+					if (have_effect($effect[ninja, please]) < 1)
 					{
-						if (have_effect($effect[ninja, please]) < 1)
-						{
-							use(1, $item[natto marble soda]);
-						}
-						if (have_effect($effect[nightstalkin']) < 1)
-						{
-							use(1, $item[Nightstalker perfume]);
-						}
-						adventure(1, $location[mer-kin gymnasium]);
+						use(1, $item[natto marble soda]);
 					}
+					if (have_effect($effect[nightstalkin']) < 1)
+					{
+						use(1, $item[Nightstalker perfume]);
+					}
+					adventure(1, $location[mer-kin gymnasium]);
 				}
-				if (my_adventures() > 1 && get_property("gladiatorBladeMovesKnown").to_int() < 3)
+				while (my_adventures() > 1 && get_property("gladiatorBladeMovesKnown").to_int() < 3)
 				{
 					equip($item[Mer-kin switchblade]);
 					foreach it,entry in maximize("10 muscle, -weapon, -familiar, outfit mer-kin gladiatorial gear, -1000 combat", 0, 0, false, false) if (entry.score >= 1000 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(max(1, ceil(my_adventures().to_float() / turns_per_cast(entry.skill))), entry.skill);
 					foreach it,entry in maximize("10 muscle, -weapon, -familiar, outfit mer-kin gladiatorial gear, -1000 combat", 0, 0, false, false) if (entry.score >= 1000 && entry.command.index_of("uneffect ") == 0 && turns_per_cast(entry.effect.to_skill()) > 0) cli_execute(entry.command);
-					if (buffed_hit_stat() < 650)
+					while (buffed_hit_stat() < 750)
 					{
-						print("Your stats are too low to actually train your skills. Raise your muscle.");
-						return;
+						if (my_primestat() == $stat[muscle] && have_effect($effect[Stabilizing Oiliness]) < 1)
+						{
+							buffingitem = $item[oil of stability];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else if (my_primestat() == $stat[mysticality] && have_effect($effect[Expert Oiliness]) < 1)
+						{
+							buffingitem = $item[oil of expertise];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else if (my_primestat() == $stat[moxie] && have_effect($effect[Slippery Oiliness]) < 1)
+						{
+							buffingitem = $item[oil of slipperiness];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else if (have_effect($effect[Incredibly Hulking]) < 1)
+						{
+							buffingitem = $item[ferrigno's elixir of power];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else if (have_effect($effect[Phorcefullness]) < 1)
+						{
+							buffingitem = $item[philter of phorce];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else if (have_effect($effect[Gr8tness]) < 1)
+						{
+							buffingitem = $item[potion of temporary gr8tness];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else if (have_effect($effect[Tomato Power]) < 1)
+						{
+							buffingitem = $item[tomato juice of powerful power];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else
+						{
+							abort("We tried (and failed) to buff your "+current_hit_stat()+" to 750. Since we failed, we are aborting to let you decide how to continue.");
+						}
 					}
-					while (my_adventures() > 1 && get_property("gladiatorBladeMovesKnown").to_int() < 3)
+					if (have_effect($effect[ninja, please]) < 1)
 					{
-						if (have_effect($effect[ninja, please]) < 1)
-						{
-							use(1, $item[natto marble soda]);
-						}
-						if (have_effect($effect[nightstalkin']) < 1)
-						{
-							use(1, $item[Nightstalker perfume]);
-						}
-						adventure(1, $location[mer-kin gymnasium]);
+						use(1, $item[natto marble soda]);
 					}
+					if (have_effect($effect[nightstalkin']) < 1)
+					{
+						use(1, $item[Nightstalker perfume]);
+					}
+					adventure(1, $location[mer-kin gymnasium]);
 				}
-				if (my_adventures() > 1 && get_property("gladiatorBallMovesKnown").to_int() < 3)
+				while (my_adventures() > 1 && get_property("gladiatorBallMovesKnown").to_int() < 3)
 				{
 					equip($item[Mer-kin dodgeball]);
 					foreach it,entry in maximize("10 moxie, -weapon, -familiar, outfit mer-kin gladiatorial gear, -1000 combat", 0, 0, false, false) if (entry.score >= 1000 && entry.skill != $skill[none] && turns_per_cast(entry.skill) > 0) use_skill(max(1, ceil(my_adventures().to_float() / turns_per_cast(entry.skill))), entry.skill);
 					foreach it,entry in maximize("10 moxie, -weapon, -familiar, outfit mer-kin gladiatorial gear, -1000 combat", 0, 0, false, false) if (entry.score >= 1000 && entry.command.index_of("uneffect ") == 0 && turns_per_cast(entry.effect.to_skill()) > 0) cli_execute(entry.command);
-					if (buffed_hit_stat() < 650)
+					while (buffed_hit_stat() < 750)
 					{
-						print("Your stats are too low to actually train your skills. Raise your moxie.");
-						return;
+						if (my_primestat() == $stat[muscle] && have_effect($effect[Stabilizing Oiliness]) < 1)
+						{
+							buffingitem = $item[oil of stability];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else if (my_primestat() == $stat[mysticality] && have_effect($effect[Expert Oiliness]) < 1)
+						{
+							buffingitem = $item[oil of expertise];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else if (my_primestat() == $stat[moxie] && have_effect($effect[Slippery Oiliness]) < 1)
+						{
+							buffingitem = $item[oil of slipperiness];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else if (have_effect($effect[Cock of the Walk]) < 1)
+						{
+							buffingitem = $item[connery's elixir of audacity];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else if (have_effect($effect[Superhuman Sarcasm]) < 1)
+						{
+							buffingitem = $item[serum of sarcasm];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else if (have_effect($effect[Gr8tness]) < 1)
+						{
+							buffingitem = $item[potion of temporary gr8tness];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else if (have_effect($effect[Tomato Power]) < 1)
+						{
+							buffingitem = $item[tomato juice of powerful power];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else
+						{
+							abort("We tried (and failed) to buff your "+current_hit_stat()+" to 750. Since we failed, we are aborting to let you decide how to continue.");
+						}
 					}
-					while (my_adventures() > 1 && get_property("gladiatorBallMovesKnown").to_int() < 3)
+					if (have_effect($effect[ninja, please]) < 1)
 					{
-						if (have_effect($effect[ninja, please]) < 1)
-						{
-							use(1, $item[natto marble soda]);
-						}
-						if (have_effect($effect[nightstalkin']) < 1)
-						{
-							use(1, $item[Nightstalker perfume]);
-						}
-						adventure(1, $location[mer-kin gymnasium]);
+						use(1, $item[natto marble soda]);
 					}
+					if (have_effect($effect[nightstalkin']) < 1)
+					{
+						use(1, $item[Nightstalker perfume]);
+					}
+					adventure(1, $location[mer-kin gymnasium]);
 				}
+				int COLOSSEUM_ROUND = get_property("lastColosseumRoundWon").to_int();
+				monster nextfight;
+				while (my_adventures() > 1 && COLOSSEUM_ROUND < 15)
+				{
+					switch(COLOSSEUM_ROUND % 3)
+					{
+						case 0:
+							equip($item[mer-kin dragnet]);
+							maximize("10 muscle, moxie, -weapon, -familiar, outfit mer-kin gladiatorial gear", false);
+							if (COLOSSEUM_ROUND < 12) nextfight = $monster[mer-kin balldodger];
+							else nextfight = $monster[georgepaul, the balldodger];
+							break;
+						case 1:
+							equip($item[mer-kin switchblade]);
+							maximize("10 muscle, moxie, -weapon, -familiar, outfit mer-kin gladiatorial gear", false);
+							if (COLOSSEUM_ROUND < 12) nextfight = $monster[mer-kin netdragger];
+							else nextfight = $monster[johnringo, the netdragger];
+							break;
+						case 2:
+							equip($item[mer-kin dodgeball]);
+							maximize("10 moxie, -weapon, -familiar, outfit mer-kin gladiatorial gear", false);
+							if (COLOSSEUM_ROUND < 12) nextfight = $monster[mer-kin bladeswitcher];
+							else nextfight = $monster[ringogeorge, the bladeswitcher];
+							break;
+					}
+					while (buffed_hit_stat() < nextfight.base_defense + 10)
+					{
+						if (current_hit_stat() == $stat[muscle])
+						{
+							if (my_primestat() == $stat[muscle] && have_effect($effect[Stabilizing Oiliness]) < 1)
+							{
+								buffingitem = $item[oil of stability];
+								if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+								use(1, buffingitem);
+							}
+							else if (my_primestat() == $stat[mysticality] && have_effect($effect[Expert Oiliness]) < 1)
+							{
+								buffingitem = $item[oil of expertise];
+								if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+								use(1, buffingitem);
+							}
+							else if (my_primestat() == $stat[moxie] && have_effect($effect[Slippery Oiliness]) < 1)
+							{
+								buffingitem = $item[oil of slipperiness];
+								if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+								use(1, buffingitem);
+							}
+							else if (have_effect($effect[Incredibly Hulking]) < 1)
+							{
+								buffingitem = $item[ferrigno's elixir of power];
+								if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+								use(1, buffingitem);
+							}
+							else if (have_effect($effect[Phorcefullness]) < 1)
+							{
+								buffingitem = $item[philter of phorce];
+								if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+								use(1, buffingitem);
+							}
+							else if (have_effect($effect[Gr8tness]) < 1)
+							{
+								buffingitem = $item[potion of temporary gr8tness];
+								if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+								use(1, buffingitem);
+							}
+							else if (have_effect($effect[Tomato Power]) < 1)
+							{
+								buffingitem = $item[tomato juice of powerful power];
+								if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+								use(1, buffingitem);
+							}
+							else
+							{
+								abort("We tried (and failed) to buff your "+current_hit_stat()+" to "+(nextfight.base_defense + 10)+". Since we failed, we are aborting to let you decide how to continue.");
+							}
+						}
+						else
+						{
+							if (my_primestat() == $stat[muscle] && have_effect($effect[Stabilizing Oiliness]) < 1)
+							{
+								buffingitem = $item[oil of stability];
+								if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+								use(1, buffingitem);
+							}
+							else if (my_primestat() == $stat[mysticality] && have_effect($effect[Expert Oiliness]) < 1)
+							{
+								buffingitem = $item[oil of expertise];
+								if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+								use(1, buffingitem);
+							}
+							else if (my_primestat() == $stat[moxie] && have_effect($effect[Slippery Oiliness]) < 1)
+							{
+								buffingitem = $item[oil of slipperiness];
+								if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+								use(1, buffingitem);
+							}
+							else if (have_effect($effect[Cock of the Walk]) < 1)
+							{
+								buffingitem = $item[connery's elixir of audacity];
+								if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+								use(1, buffingitem);
+							}
+							else if (have_effect($effect[Superhuman Sarcasm]) < 1)
+							{
+								buffingitem = $item[serum of sarcasm];
+								if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+								use(1, buffingitem);
+							}
+							else if (have_effect($effect[Gr8tness]) < 1)
+							{
+								buffingitem = $item[potion of temporary gr8tness];
+								if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+								use(1, buffingitem);
+							}
+							else if (have_effect($effect[Tomato Power]) < 1)
+							{
+								buffingitem = $item[tomato juice of powerful power];
+								if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+								use(1, buffingitem);
+							}
+							else
+							{
+								abort("We tried (and failed) to buff your "+current_hit_stat()+" to "+(nextfight.base_defense + 10)+". Since we failed, we are aborting to let you decide how to continue.");
+							}
+						}
+					}
+					while (my_buffedstat($stat[moxie]) < nextfight.base_attack + 10)
+					{
+						if (my_primestat() == $stat[muscle] && have_effect($effect[Stabilizing Oiliness]) < 1)
+						{
+							buffingitem = $item[oil of stability];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else if (my_primestat() == $stat[mysticality] && have_effect($effect[Expert Oiliness]) < 1)
+						{
+							buffingitem = $item[oil of expertise];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else if (my_primestat() == $stat[moxie] && have_effect($effect[Slippery Oiliness]) < 1)
+						{
+							buffingitem = $item[oil of slipperiness];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else if (have_effect($effect[Cock of the Walk]) < 1)
+						{
+							buffingitem = $item[connery's elixir of audacity];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else if (have_effect($effect[Superhuman Sarcasm]) < 1)
+						{
+							buffingitem = $item[serum of sarcasm];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else if (have_effect($effect[Gr8tness]) < 1)
+						{
+							buffingitem = $item[potion of temporary gr8tness];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else if (have_effect($effect[Tomato Power]) < 1)
+						{
+							buffingitem = $item[tomato juice of powerful power];
+							if (item_amount(buffingitem) < 1) buy(1, buffingitem);
+							use(1, buffingitem);
+						}
+						else
+						{
+							abort("We tried (and failed) to buff your moxie to "+(nextfight.base_attack + 10)+". Since we failed, we are aborting to let you decide how to continue.");
+						}
+					}
+					if (!adventure(1, $location[mer-kin colosseum]))
+					{
+						abort("You fought the monster "+nextfight+" and lost. Either re-run the script or try the fight yourself.");
+					}
+					COLOSSEUM_ROUND = get_property("lastColosseumRoundWon").to_int();
+				}
+				if (item_amount($item[crayon shavings]) < 4) buy(4 - item_amount($item[crayon shavings]), $item[crayon shavings]);
+				print("Time for the boss fight! Make sure you remove any sources of elemental damage first.");
 				break;
 			case 2:
 				if (!have_outfit("mer-kin scholar's vestment") && !have_outfit("crappy mer-kin disguise"))
@@ -952,7 +1268,7 @@ void SkateQuest()
 	if (my_level() >= 13)
 	{
 		string seafloor = visit_url("seafloor.php");
-		if (my_adventures() > 0 && !contains_text(seafloor,"skatepark.gif") && seafloor.contains_text("monkeycastle.gif") && !contains_text(visit_url("monkeycastle.php"),"\#littlebrother\""))
+		if (my_adventures() > 1 && !contains_text(seafloor,"skatepark.gif") && seafloor.contains_text("monkeycastle.gif") && !contains_text(visit_url("monkeycastle.php"),"\#littlebrother\""))
 		{
 			if (!boolean_modifier("Adventure Underwater") || contains_text(visit_url("monkeycastle.php"),"without some way of breathing underwater"))
 			{
@@ -992,7 +1308,7 @@ void SkateQuest()
 			print("You have unlocked the Skate Park.");
 			return;
 		}
-		if (my_adventures() > 0 && TS_SKATE_QUEST < 4 && contains_text(seafloor,"skatepark.gif") && contains_text(visit_url("sea_skatepark.php"),"rumble_"))
+		if (my_adventures() > 1 && TS_SKATE_QUEST < 4 && contains_text(seafloor,"skatepark.gif") && contains_text(visit_url("sea_skatepark.php"),"rumble_"))
 		{
 			int loopcounter = 0;
 			item neededweapon = $item[skate board];
@@ -1018,7 +1334,7 @@ void SkateQuest()
 				}
 			}
 			print("You will need a "+neededweapon.to_string()+" to complete your Skate Park quest.");
-			while (my_adventures() > 0 && TS_SKATE_QUEST < 3 && available_amount(neededweapon) < 1 && loopcounter < 5)
+			while (my_adventures() > 1 && TS_SKATE_QUEST < 3 && available_amount(neededweapon) < 1 && loopcounter < 5)
 			{
 				loopcounter += 1;
 				obtain(1, "choiceadv", $location[The Skate Park]);
@@ -1034,7 +1350,7 @@ void SkateQuest()
 					getsome(1, neededweapon);
 				}
 				loopcounter = 0;
-				while (my_adventures() > 0 && available_amount(neededweapon) < 1 && loopcounter < 5)
+				while (my_adventures() > 1 && available_amount(neededweapon) < 1 && loopcounter < 5)
 				{
 					loopcounter += 1;
 					obtain(1, neededweapon.to_string(), $location[The Skate Park]);
@@ -1053,7 +1369,7 @@ void SkateQuest()
 			print("\'For peace!\' will be our battle cry! To the Skate Park!");
 			loopcounter = 0;
 			string skatepark = visit_url("sea_skatepark.php");
-			while (my_adventures() > 0 && (contains_text(skatepark,"rumble_a.gif") || contains_text(skatepark,"rumble_b.gif")) && loopcounter < 5)
+			while (my_adventures() > 1 && (contains_text(skatepark,"rumble_a.gif") || contains_text(skatepark,"rumble_b.gif")) && loopcounter < 5)
 			{
 				loopcounter += 1;
 				obtain(1, "choiceadv", $location[The Skate Park]);
@@ -1092,7 +1408,7 @@ void BootQuest()
 			{
 				getsome(50, $item[sand dollar]);
 			}
-			else if (available_amount($item[damp old boot]) < 1 && my_adventures() > 0 && available_amount($item[sand dollar]) < 50 && contains_text(visit_url("seafloor.php"),"monkeycastle.gif") && !contains_text(visit_url("monkeycastle.php"),"\#littlebrother\""))
+			else if (available_amount($item[damp old boot]) < 1 && my_adventures() > 1 && available_amount($item[sand dollar]) < 50 && contains_text(visit_url("seafloor.php"),"monkeycastle.gif") && !contains_text(visit_url("monkeycastle.php"),"\#littlebrother\""))
 			{
 				if (count(get_goals()) > 0)
 				{
@@ -1177,7 +1493,7 @@ void GetSushiMat()
 			{
 				getsome(50, $item[sand dollar]);
 			}
-			else if (my_adventures() > 0 && available_amount($item[sand dollar]) < 50 && contains_text(visit_url("seafloor.php"),"monkeycastle.gif") && !contains_text(visit_url("monkeycastle.php"),"\#littlebrother\""))
+			else if (my_adventures() > 1 && available_amount($item[sand dollar]) < 50 && contains_text(visit_url("seafloor.php"),"monkeycastle.gif") && !contains_text(visit_url("monkeycastle.php"),"\#littlebrother\""))
 			{
 				if (count(get_goals()) > 0)
 				{
@@ -1219,7 +1535,7 @@ void GetAeratedHelmet()
 			{
 				getsome(1, $item[rusty diving helmet]);
 			}
-			else if (my_adventures() > 0 && available_amount($item[rusty diving helmet]) < 1)
+			else if (my_adventures() > 1 && available_amount($item[rusty diving helmet]) < 1)
 			{
 				if (count(get_goals()) > 0)
 				{
@@ -1246,7 +1562,7 @@ void GetAeratedHelmet()
 						cli_execute ("fax get");
 					}
 					loopcounter = 0;
-					while (my_adventures() > 0 && loopcounter < 15 && creatable_amount($item[rusty diving helmet]) < 1)
+					while (my_adventures() > 1 && loopcounter < 15 && creatable_amount($item[rusty diving helmet]) < 1)
 					{
 						loopcounter += 1;
 						if (item_amount($item[photocopied monster]) < 1) cli_execute ("fax get");

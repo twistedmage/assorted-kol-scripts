@@ -79,7 +79,7 @@ void prepare_for(string type,location loc)
 		}
 		else if(inebriety_limit() - my_inebriety() > 2)
 		{
-			use_skill(1,$skill[ode to booze]);
+			use_skill(1,$skill[the ode to booze]);
 			drink(1,$item[Flaming Caipiranha]);
 		}
 	}
@@ -121,10 +121,10 @@ void prepare_for(string type,location loc)
 	if(contains_text(type,"+"))
 		max_str+=", +100 combat";
 
-	if(loc==$location[coral corral])
+	if(loc==$location[The Coral Corral])
 		max_str+=", equip navel ring";
 
-	print("running "+max_str);
+	print("running "+max_str,"blue");
 	cli_execute(max_str);
 	
 	//----------------------buffs-------------------
@@ -154,7 +154,7 @@ void prepare_for(string type,location loc)
 	}
 	
 	//lasso / seahorse
-	if(loc==$location[coral corral])
+	if(loc==$location[The Coral Corral])
 	{
 		if(i_a("sea lasso")<1)
 			buy(1,$item[sea lasso]);
@@ -173,7 +173,7 @@ void prepare_for(string type,location loc)
 	else if(get_property("lassoTraining")!= "expertly")
 	{
 		if(i_a("sea lasso")<1)
-			buy(1,$item[sea lasso]);
+			buy(6,$item[sea lasso]);
 		set_combat_macro_name("lasso");
 	}
 	else if(loc==$location[mer-kin library])
@@ -490,7 +490,7 @@ void MonkeeQuest()
 		if (!contains_text(currentquests,"An Old Guy and The Ocean") && !contains_text(completedquests,"An Old Guy and The Ocean"))
 		{
 			print("Unlocking the sea.");
-			visit_url("oldman.php?action=talk");
+			visit_url("place.php?whichplace=sea_oldman&action=oldman_oldman");
 			currentquests = visit_url("questlog.php?which=1");
 		}
 		if (TS_MONKEE_QUEST > 0 && to_int(vars["seafloor_monkeeStep"]) < TS_MONKEE_QUEST)
@@ -500,7 +500,7 @@ void MonkeeQuest()
 			if (my_adventures() > 0 && !contains_text(seafloor,"monkeycastle.gif"))
 			{
 				print("Finding Little Brother in the Octopus\'s Garden.");
-				prepare_for("i",$location[dire warren]);
+				prepare_for("i",$location[the dire warren]);
 				cli_execute("use legendary beat");
 				if (TS_FAX_NEPTUNE && !get_property("_photocopyUsed").to_boolean() && item_amount($item[wriggling flytrap pellet]) < 1)
 				{
@@ -580,8 +580,8 @@ void MonkeeQuest()
 
 				{
 					print("Finding big brother","lime");
-					prepare_for("-",$location[Wreck of the Edgar Fitzsimmons]);
-					adventure(1,$location[Wreck of the Edgar Fitzsimmons]);
+					prepare_for("-",$location[the Wreck of the Edgar Fitzsimmons]);
+					adventure(1,$location[the Wreck of the Edgar Fitzsimmons]);
 
 
 
@@ -652,11 +652,11 @@ void MonkeeQuest()
 			}
 			if (my_adventures() > 0 && monkeycastle.contains_text("\#gpa\""))
 			{
-				print("Finding Grandma in the Mer-kin Outpost.");
-				while (item_amount($item[Chartreuse Yarn]) < 1)
+				print("Finding Grandma in The Mer-Kin Outpost.");
+				while (item_amount($item[Grandma's Chartreuse Yarn]) < 1)
 				{
-					prepare_for("-i", $location[mer-kin outpost]);
-					adventure(1,$location[mer-kin outpost]);
+					prepare_for("-i", $location[The Mer-Kin Outpost]);
+					adventure(1,$location[The Mer-Kin Outpost]);
 
 
 				}
@@ -671,7 +671,7 @@ void MonkeeQuest()
 						{
 							cli_execute("conditions clear");
 						}
-						adventure(1, $location[ The Mer-kin outpost]);
+						adventure(1, $location[ The Mer-Kin Outpost]);
 						monkeycastle = visit_url("monkeycastle.php");
 					}
 					if (my_adventures() < 2)
@@ -720,7 +720,7 @@ void MonkeeQuest()
 					boolean acomb = true;
 					boolean asweater = true;
 					boolean aunderwear = true;
-					print("Speeding up Mom in the Caliginous Abyss with your equipment choices.");
+					print("Speeding up Mom in The Caliginous Abyss with your equipment choices.");
 					if (TS_ABYSS_EQUIPMENT == 1 && available_amount($item[comb jelly]) < 1)
 					{
 						acomb = false;
@@ -765,11 +765,11 @@ void MonkeeQuest()
 						equip($item[scale-mail underwear]);
 					}
 				}
-				print("Finding Mom in the Caliginous Abyss.");
+				print("Finding Mom in The Caliginous Abyss.");
 				loopcounter = 0;
 				while (my_adventures() > 0 && monkeycastle.contains_text("\#gfolks\"") && loopcounter < 2)
 				{
-					prepare_for("", $location[caliginous abyss]);
+					prepare_for("", $location[The Caliginous Abyss]);
 					loopcounter += 2;
 					obtain(1, "choiceadv", $location[The Caliginous Abyss]);
 					monkeycastle = visit_url("monkeycastle.php");
@@ -816,9 +816,10 @@ void OutfitQuest()
 				
 				while(i_a("mer-kin lockkey")==0)
 				{
-					prepare_for("i", $location[mer-kin outpost]);
+					prepare_for("i", $location[The Mer-Kin Outpost]);
 					print("Farming a lockkey","lime");
-					adventure(1,$location[mer-kin outpost]);
+					cli_execute("conditions clear");
+					adventure(1,$location[The Mer-Kin Outpost]);
 				}
 			}
 			if(i_a("mer-kin stashbox")==0 && i_a("mer-kin trailmap")==0)
@@ -852,8 +853,8 @@ void OutfitQuest()
 					else
 						abort("We shouldn't still be searching for a stashbox if all tent choices are done");
 						
-					prepare_for("-", $location[mer-kin outpost]);
-					adventure(1,$location[mer-kin outpost]);
+					prepare_for("-", $location[The Mer-Kin Outpost]);
+					adventure(1,$location[The Mer-Kin Outpost]);
 					
 					//note if we have explored that choiceadv
 					if(contains_text(get_property("lastEncounter"),"Intent"))
@@ -892,12 +893,12 @@ void OutfitQuest()
 		//while(contains_text(visit_url("seafloor.php?action=currents"),"far too strong for you to swim against"))
 		while(get_property("seahorseName")=="")
 		{
-			prepare_for("i", $location[Coral Corral]);
+			prepare_for("i", $location[The Coral Corral]);
 			//macros don't seem to fire for seahorses so we have to do it this way
 			string txt=visit_url("adventure.php?snarfblat=199");
 			txt=visit_url("fight.php?action=macro&macrotext=&whichmacro=100629&macro=Execute+Macro");
 			
-			//adventure(1,$location[Coral Corral]);
+			//adventure(1,$location[The Coral Corral]);
 		}
 		//if(!contains_text(visit_url("seafloor.php?action=currents"),"far too strong for you to swim against"))
 		if(get_property("seahorseName")=="")
@@ -956,7 +957,11 @@ void gladiator_path()
 		//are we in round 5?
 		boolean round_5=contains_text(txt,">Round 5");
 		
-		if(!contains_text(txt,"past the guards outside the"))
+		if(contains_text(txt,"The Colosseum is empty"))
+		{
+			set_property("_merkin_temple_open","true");	
+		}
+		else
 		{
 			txt=visit_url("fight.php?action=macro&macrotext=&whichmacro=100626&macro=Execute+Macro");
 			if(contains_text(txt,"WINWINWIN"))
@@ -970,7 +975,9 @@ void gladiator_path()
 					
 				//are we done now?
 				if(contains_text(txt,"the medallion becomes a sigil of liquid fire"))
-					set_property("_merkin_temple_open","true");
+				{
+					set_property("_merkin_temple_open","true");	
+				}
 			}
 			else
 			{
@@ -980,6 +987,7 @@ void gladiator_path()
 					set_property("_merkin_colosseum_nextfight","bladeswitcher");
 				else //balldodger
 					set_property("_merkin_colosseum_nextfight","balldodger");
+				print(txt,"red");
 				abort("Failed to kill gladiator.");
 			}
 		}
@@ -1013,7 +1021,7 @@ void get_visions()
 	while(get_property("dreadScroll3")=="")
 	{
 		print("learning deep-dark-visions word","green");
-		use_familiar($familiar[parrot]);
+		use_familiar($familiar[exotic parrot]);
 		cli_execute("maximize spooky resistance, 0.05 hp, 0.01 mp");
 //		if(have_effect($effect[spookyform])==0)
 //			use(1,$item[phial of spookiness]);
@@ -1395,7 +1403,7 @@ void GetAeratedHelmet()
 		{
 #			print("You already have an aerated diving helmet.");
 		}
-		else if (available_amount($item[bubblin stone]) < 1)
+		else if (available_amount($item[bubblin' stone]) < 1)
 		{
 			print("You need a bubblin' stone to make an aerated diving helmet.");
 		}

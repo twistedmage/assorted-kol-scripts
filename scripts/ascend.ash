@@ -96,18 +96,6 @@ void stock_hagnks()
 	//bartender/chef
 	get_item($item[bartender-in-the-box],1);
 	get_item($item[chef-in-the-box],1);
-	//make Ninja pirate zombie robot head
-	get_item($item[Ninja pirate zombie robot head],1);
-	//lime/cherry/jumbo olive
-	buy_item($item[lime],30);
-	buy_item($item[cherry],15);
-	buy_item($item[jumbo olive],15);
-	//tps bases
-	get_item($item[grog],15);
-	get_item($item[dry vodka martini],15);
-	get_item($item[sangria],15);
-	//milk of magnesium
-	get_item($item[milk of magnesium],12);
 	//key lime pies
 	get_item($item[sneaky pete's key lime pie],1);
 	get_item($item[boris's key lime pie],1);
@@ -117,19 +105,12 @@ void stock_hagnks()
 	//wet stunt nut stew
 	get_item($item[wet stew],1);
 	get_item($item[stunt nuts],1);
-	//fold loathing legion screwdriver
-	if(item_amount($item[loathing legion screwdriver])<1)
-		cli_execute("fold loathing legion screwdriver");
-	if(item_amount($item[boris's helm])>0)
-		cli_execute("fold boris's helm (askew)");
 	//chaos butterfly
-	get_item($item[chaos butterfly],2);
+	buy_item($item[chaos butterfly],2);
 	//afeu
 	get_item($item[scroll of ancient forbidden unspeakable evil],3);
 	//thin black candles for ritual
-	get_item($item[thin black candle],3);
-	//make grogtini
-	get_item($item[grogtini],1);
+	buy_item($item[thin black candle],3);
 	//food/drink/spleen
 	buy_item($item[knob goblin lunchbox],5);
 	buy_item($item[glimmering roc feather],15);
@@ -209,7 +190,38 @@ void stock_hagnks()
 	buy_item($item[borrowed time],6);
 	buy_item($item[mullet wig],2);
 	buy_item($item[jar of psychoses (The Crackpot Mystic)],2);
-	buy_item($item[cane-mail shirt],2);
+	buy_item($item[cane-mail shirt],1);
+	buy_item($item[antique machete],1);
+	buy_item($item[spooky mushroom],1);
+	
+	//stuff for twistedmage
+	if(my_name()=="twistedmage")
+	{
+		//fold loathing legion screwdriver
+		if(item_amount($item[loathing legion screwdriver])<1)
+			cli_execute("fold loathing legion screwdriver");
+		if(item_amount($item[boris's helm])>0)
+			cli_execute("fold boris's helm (askew)");
+		//make grogtini
+		get_item($item[grogtini],1);
+		//make Ninja pirate zombie robot head
+		get_item($item[Ninja pirate zombie robot head],1);
+		//lime/cherry/jumbo olive
+		buy_item($item[lime],30);
+		buy_item($item[cherry],15);
+		buy_item($item[jumbo olive],15);
+		//tps bases
+		get_item($item[grog],15);
+		get_item($item[dry vodka martini],15);
+		get_item($item[sangria],15);
+		//milk of magnesium
+		get_item($item[milk of magnesium],12);
+	}
+	else
+	{
+		//milk of magnesium
+		buy_item($item[milk of magnesium],12);
+	}
 }
 
 

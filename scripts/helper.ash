@@ -608,6 +608,8 @@ void advise_food()
 			add_food(con_map,"- Exotic jungle fruit",2.5,0,1);
 		if(available_amount($item[sandwich of the gods])>0)
 			add_drink(con_map,"- sandwich of the gods ",35,0,5);
+		if(available_amount($item[root beer])>0)
+			add_drink(con_map,"- root beer ",4,0,1);
 	}
 	
 	//sort map

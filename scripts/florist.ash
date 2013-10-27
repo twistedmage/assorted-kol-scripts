@@ -16,11 +16,11 @@ record plant
 int zone_type(location loc)
 {
 	//outdoor
-	if($locations[Sonofa Beach, The Battlefield (hippy uniform), 8-bit realm, The Obligatory Pirate's Cove, The Goatlet, The eXtreme Slope, The F'c'le, The Smut Orc Logging Camp, A-Boo Peak, The Spooky Forest, Oil Peak, The Penultimate Fantasy Airship, The Black Forest, The Poop Deck, The Palindome, Whitey's Grove, Desert (ultrahydrated), The Oasis, wartime Frat House, McMillicancuddy's Pond, mcmillicancuddy's back 40, mcmillicancuddy's other back 40, The Themthar Hills, Over Where the Old Tires Are, Out By that Rusted-Out Car, The Hole in the Sky, the outskirts of cobb's knob, The Dark Elbow of the Woods, The Dark Heart of the Woods, The Dark Neck of the Woods, Hippy Camp, The Valley of Rof L'm Fao, Next to that Barrel with Something Burning in it, Near an Abandoned Refrigerator, Twin Peak, Fear Man's Level] contains loc)
+	if($locations[Sonofa Beach, The Battlefield (hippy uniform), 8-bit realm, The Obligatory Pirate's Cove, The Goatlet, The eXtreme Slope, The F'c'le, The Smut Orc Logging Camp, A-Boo Peak, The Spooky Forest, Oil Peak, The Penultimate Fantasy Airship, The Black Forest, The Poop Deck, The Palindome, Whitey's Grove, Desert (ultrahydrated), The Oasis, wartime Frat House, McMillicancuddy's Pond, mcmillicancuddy's back 40, mcmillicancuddy's other back 40, The Themthar Hills, Over Where the Old Tires Are, Out By that Rusted-Out Car, The Hole in the Sky, the outskirts of cobb's knob, The Dark Elbow of the Woods, The Dark Heart of the Woods, The Dark Neck of the Woods, Hippy Camp, The Valley of Rof L'm Fao, Next to that Barrel with Something Burning in it, Near an Abandoned Refrigerator, Twin Peak, Fear Man's Level, The Hidden Park,An Overgrown Shrine (Northwest)] contains loc)
 		return 0;
 	
 	//indoor
-	if($locations[The Haunted Library, The Haunted Conservatory, The Haunted Gallery, The Haunted Bedroom, Barrrney's Barrr, The Haunted Ballroom, The Castle in the Clouds in the Sky (Ground Floor), The Castle in the Clouds in the Sky (Top Floor), Belowdecks, McMillicancuddy's Barn, The Haunted Pantry, Infernal Rackets Backstage, The Laugh Floor, The Haunted Billiards Room, The Haunted Bathroom] contains loc)
+	if($locations[The Haunted Library, The Haunted Conservatory, The Haunted Gallery, The Haunted Bedroom, Barrrney's Barrr, The Haunted Ballroom, The Castle in the Clouds in the Sky (Ground Floor), The Castle in the Clouds in the Sky (Top Floor), Belowdecks, McMillicancuddy's Barn, The Haunted Pantry, Infernal Rackets Backstage, The Laugh Floor, The Haunted Billiards Room, The Haunted Bathroom, The Hidden Apartment Building, The Hidden Office Building, The Hidden Bowling Alley] contains loc)
 		return 1;
 	
 	//underground
@@ -215,17 +215,17 @@ int choose_best_plant(string type, location loc, plant[int] plants)
 			}
 			else if(contains_text(plants[pli].bonus_type,"sleaze"))
 			{
-				if(loc!=$location[The Battlefield (Hippy uniform)] && loc!=$location[The Frat House (Bombed Back to the Stone Age)] && loc!=$location[Frat House] && loc!=$location[The Hole in the sky] && loc!=$location[mcmillicancuddy's other back 40] && loc!=$location[The Purple Light District] && loc!=$location[The eXtreme Slope] && loc!=$location[The Fun House] && loc!=$location[Tower Ruins] && loc!=$location[The Obligatory Pirate's Cove] && loc!=$location[The Road to White Citadel]&& loc!=$location[The Degrassi Knoll Gym]&& loc!=$location[Anemone Mine]&& loc!=$location[Cobb's Knob Harem])
+				if(loc!=$location[The Battlefield (Hippy uniform)] && loc!=$location[The Frat House (Bombed Back to the Stone Age)] && loc!=$location[Frat House] && loc!=$location[The Hole in the sky] && loc!=$location[mcmillicancuddy's other back 40] && loc!=$location[The Purple Light District] && loc!=$location[The eXtreme Slope] && loc!=$location[the \"fun\" house] && loc!=$location[Tower Ruins] && loc!=$location[The Obligatory Pirate's Cove] && loc!=$location[The Road to White Citadel]&& loc!=$location[The Degrassi Knoll Gym]&& loc!=$location[Anemone Mine]&& loc!=$location[Cobb's Knob Harem])
 					return pli;
 			}
 			else if(contains_text(plants[pli].bonus_type,"stench"))
 			{
-				if(loc!=$location[The Heap] && loc!=$location[mcmillicancuddy's bog] && loc!=$location[hippy camp] && loc!=$location[The Hippy Camp (Bombed Back to the Stone Age)] && loc!=$location[ The Battlefield (frat uniform)] && loc!=$location[The Road to White Citadel] && loc!=$location[The F'c'le] && loc!=$location[The eXtreme Slope] && loc!=$location[The Haunted Pantry] && loc!=$location[The Sleazy Back Alley] && loc!=$location[bugbear pens] && loc!=$location[The hatching chamber] && loc!=$location[The Feeding Chamber] && loc!=$location[The Royal Guard Chamber] && loc!=$location[The Filthworm Queen's Chamber])
+				if(loc!=$location[The Heap] && loc!=$location[mcmillicancuddy's bog] && loc!=$location[hippy camp] && loc!=$location[The Hippy Camp (Bombed Back to the Stone Age)] && loc!=$location[ The Battlefield (frat uniform)] && loc!=$location[The Road to White Citadel] && loc!=$location[The F'c'le] && loc!=$location[The eXtreme Slope] && loc!=$location[The Haunted Pantry] && loc!=$location[The Sleazy Back Alley] && loc!=$location[the bugbear pen] && loc!=$location[post-quest bugbear pens] && loc!=$location[The hatching chamber] && loc!=$location[The Feeding Chamber] && loc!=$location[The Royal Guard Chamber] && loc!=$location[The Filthworm Queen's Chamber])
 					return pli;
 			}
 			else if(contains_text(plants[pli].bonus_type,"spooky"))
 			{
-				if(loc!=$location[The Ancient Hobo Burial Ground] && loc!=$location[McMillicancuddy's Family Plot] && loc!=$location[post-cyrpt cemetary] && loc!=$location[pre-cyrpt cemetary] && loc!=$location[The Spooky Gravy Barrow] && loc!=$location[bugbear pens] && loc!=$location[The Haunted library] && loc!=$location[The Haunted billiards room] && loc!=$location[The Fun House] && loc!=$location[The Marinara Trench] && loc!=$location[The Wreck of the Edgar Fitzsimmons] && loc!=$location[The Haunted gallery] && loc!=$location[The Haunted ballroom] && loc!=$location[Spectral Pickle Factory] && loc!=$location[the knob shaft] && loc!=$location[The Haunted bathroom] && loc!=$location[The Haunted bedroom] && loc!=$location[The Haunted conservatory] && loc!=$location[The Haunted kitchen] && loc!=$location[The Spooky Forest] && loc!=$location[The Haunted pantry] && loc!=$location[The Oasis] && loc!=$location[The Middle Chamber] && loc!=$location[The Upper Chamber] && loc!=$location[The Defiled nook] && loc!=$location[The Defiled niche] && loc!=$location[The Defiled cranny] && loc!=$location[The Defiled alcove])
+				if(loc!=$location[The Ancient Hobo Burial Ground] && loc!=$location[McMillicancuddy's Family Plot] && loc!=$location[post-cyrpt cemetary] && loc!=$location[pre-cyrpt cemetary] && loc!=$location[The Spooky Gravy Barrow] && loc!=$location[the bugbear pen] && loc!=$location[post-quest bugbear pens] && loc!=$location[The Haunted library] && loc!=$location[The Haunted billiards room] && loc!=$location[the \"fun\" house] && loc!=$location[The Marinara Trench] && loc!=$location[The Wreck of the Edgar Fitzsimmons] && loc!=$location[The Haunted gallery] && loc!=$location[The Haunted ballroom] && loc!=$location[Spectral Pickle Factory] && loc!=$location[the knob shaft] && loc!=$location[The Haunted bathroom] && loc!=$location[The Haunted bedroom] && loc!=$location[The Haunted conservatory] && loc!=$location[The Haunted kitchen] && loc!=$location[The Spooky Forest] && loc!=$location[The Haunted pantry] && loc!=$location[The Oasis] && loc!=$location[The Middle Chamber] && loc!=$location[The Upper Chamber] && loc!=$location[The Defiled nook] && loc!=$location[The Defiled niche] && loc!=$location[The Defiled cranny] && loc!=$location[The Defiled alcove])
 					return pli;
 			}
 			else if(contains_text(plants[pli].bonus_type,"weapon"))
@@ -256,7 +256,7 @@ void choose_all_plants(string type, location loc)
 	
 	//are we in the location we think we are?
 	//<td>Ah, <b>The Battlefield (Hippy Uniform)</b>! I have a numbe
-	matcher cur_locm = create_matcher("Ah, <b>([,0-9a-zA-Z \\(\\)\\'\\-\\!]*)</b>\\!",friar_str);
+	matcher cur_locm = create_matcher("Ah, <b>([,\\.0-9a-zA-Z \\(\\)\\'\\-\\!]*)</b>\\!",friar_str);
 	if(!cur_locm.find())
 	{
 		print("Couldn't detect location from string ","red");
