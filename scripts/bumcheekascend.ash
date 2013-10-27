@@ -8144,7 +8144,6 @@ boolean bcascMacguffinHiddenCity() {
 	//4 - Dumpster dive until 3 bowling balls or 3 outfit pieces. Then knock over dumpster.
 	while (get_property("relocatePygmyJanitor") != my_ascensions()) {
 		set_property("choiceAdventure789", "2");
-		abort("line 8147 this choiceadv seems to be broken in mafia!");
 		bumAdv($location[The Hidden Park], "", "", "1 choiceadv", "Relocating Pygmy Janitors from the buildings to the park.", "-");
 	}
 
