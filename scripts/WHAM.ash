@@ -187,6 +187,8 @@
 				 Print items when debug printing, but mark them red since they are disallowed
 		13-08-25:Try to blacklist KOHLS-combat items
 		13-09-03:Attempt to abort when we tame a sea horse
+		13-10-22:Add basic handling of Procedurally Generated Skeletons as well as Video Game bosses.
+				 Don't use Noodles to stun with the revamped classes. It won't work.		
 ***********************************************************************************************************************/
 import <SmartStasis.ash>;
 
@@ -292,6 +294,169 @@ void set_unknown_ml(monster foe, string pg) {
 			blacklist["use "+i] = 0;
 }
 
+//Set information for the procedurally generated skeletons
+void set_skeleton_info() {
+	if(contains_text(to_string(last_monster()), "accurate")) {
+		vprint("WHAM: Accurate skeletons don't miss.", "green", 5);
+		nomiss = true;
+	}
+	if(contains_text(to_string(last_monster()), "blazing")) {
+		vprint("WHAM: Blazing skeletons deal hot AoE damage.", "green", 5);		
+		//Blazing ones deal Hot Damage every round by area effect.
+		//The heat coming off of this thing is nearly unbearable. You should probably get out of its kitchen. Or, y'know, kill it. (hot damage) 
+	}
+	if(contains_text(to_string(last_monster()), "charred")) {
+		vprint("WHAM: Charred skeletons are resistant to hot damage.", "green", 5);
+		mres = get_resistance($element[hot]);
+	}
+	if(contains_text(to_string(last_monster()), "dancing")) {
+		vprint("WHAM: Dancing skeletons are ignores items.", "green", 5);
+		noitems = 100;
+	}
+	if(contains_text(to_string(last_monster()), "deadly")) {
+		vprint("WHAM: Deadly skeletons have higher attack than normal (handled by Manuel if you have one).", "green", 5);
+		//Handled by Manuel, impossible to do atm in any other way
+	}
+	if(contains_text(to_string(last_monster()), "disorienting")) {
+		vprint("WHAM: Disorienting skeletons blocks skills some times (assuming 50%).", "green", 5);
+		noskills = 50;
+	}
+	if(contains_text(to_string(last_monster()), "foul-smelling")) {
+		vprint("WHAM: Foul-smelling skeletons are resistant to stench damage.", "green", 5);
+		mres = get_resistance($element[stench]);
+	}
+	if(contains_text(to_string(last_monster()), "frigid")) {
+		vprint("WHAM: Frigid skeletons deal cold AoE damage.", "green", 5);	
+		//Blazing ones deal Cold Damage every round by area effect.
+		//Just being near this thing chills you to the bone. In the cold way, not the scary way. (cold damage) 
+	}
+	if(contains_text(to_string(last_monster()), "frozen")) {
+		vprint("WHAM: Frozen skeletons are resistant to cold damage.", "green", 5);
+		mres = get_resistance($element[cold]);
+	}
+	if(contains_text(to_string(last_monster()), "ghostly")) {
+		vprint("WHAM: Ghostly skeletons are resistant to physical damage.", "green", 5);
+		mres[$element[none]] = 1;
+	}
+	if(contains_text(to_string(last_monster()), "giant")) {
+		vprint("WHAM: Giant skeletons have higher attack and defense (handled by Manuel if you have one).", "green", 5);
+		//Handled by Manuel, impossible to do atm in any other way
+		//Giant ones have 40% more Monster Attack and Defense.
+	}
+	if(contains_text(to_string(last_monster()), "greasy")) {
+		vprint("WHAM: Greasy skeletons are resistant to sleaze damage.", "green", 5);
+		mres = get_resistance($element[sleaze]);
+	}
+	if(contains_text(to_string(last_monster()), "lascivious")) {
+		vprint("WHAM: Lascivious skeletons deal sleaze AoE damage.", "green", 5);	
+		//Blazing ones deal Sleaze Damage every round by area effect.
+		//You really don't like the way this skeleton is looking at you. (sleaze damage)
+	}
+	if(contains_text(to_string(last_monster()), "nimble")) {
+		vprint("WHAM: Nimble skeletons have higher defense (handled by Manuel if you have one).", "green", 5);
+		//Handled by Manuel, impossible to do atm in any other way
+		//Giant ones have 40% more Monster Defense.
+	}
+	if(contains_text(to_string(last_monster()), "scary")) {
+		vprint("WHAM: Scary skeletons are resistant to spooky damage.", "green", 5);		
+		mres = get_resistance($element[spooky]);
+	}
+	if(contains_text(to_string(last_monster()), "shifty")) {
+		vprint("WHAM: Shifty skeletons sometimes block attacks.", "green", 5);
+		//Shifty ones sometimes avoid regular attacks.
+		//The skeleton is too shifty, and your attack misses. Dangit! 
+		//Can we handle that?
+	}
+	if(contains_text(to_string(last_monster()), "shimmering")) {
+		vprint("WHAM: Shimmering skeletons are resistant to elemental damage.", "green", 5);
+		foreach el in $elements[]
+			mres[el] = 1;
+	}
+	if(contains_text(to_string(last_monster()), "shiny")) {
+		vprint("WHAM: Shiny skeletons reduce spell damage to 1.", "green", 5);
+		//Shiny ones reduce spell damage to 1.
+		//Handled in ok()
+	}
+	if(contains_text(to_string(last_monster()), "terrifying")) {
+		vprint("WHAM: Terrifying skeletons deal spooky AoE damage.", "green", 5);	
+		//Terrifying ones deal Spooky Damage every round by area effect.
+		//The aura of terror surrounding this skeleton is palpable. You'd palp it, but you're too scared. (spooky damage) 
+	}
+	if(contains_text(to_string(last_monster()), "thick")) {
+		vprint("WHAM: Thick skeletons have more HP than normal (handled by Manuel if you have one).", "green", 5);
+		//Handled by Manuel, impossible to do atm in any other way
+		//Giant ones have 50% more HP.
+	}    
+	if(contains_text(to_string(last_monster()), "thorny")) {
+		vprint("WHAM: Thorny skeletons deal physical damage when hit with a melee attack.", "green", 5);
+		//Thorny ones deal physical damage when you hit them with a melee attack.
+		//Handled in ok()
+	}
+	if(contains_text(to_string(last_monster()), "unstoppable")) {
+		vprint("WHAM: Unstoppable skeletons cannot be staggered nor stunned.", "green", 5);
+		nostun = true; nomultistun = true;
+	}		
+	if(contains_text(to_string(last_monster()), "unwashed")) {
+		vprint("WHAM: Unwashed skeletons deal stench AoE damage.", "green", 5);	
+		//Unwashed ones deal Stench Damage every round by area effect.
+		//Man. This skeleton hasn't had a bath in centuries! (stench damage) 
+	}
+	if(contains_text(to_string(last_monster()), "vicious")) {
+		vprint("WHAM: Vicious skeletons deal bonus damage. Currently not handled.", "green", 5);
+		//Vicious ones deal bonus damage (500 at 1100 monster attack, compared to a deadly doing ~90 damage at 1600 monster attack). 
+	}
+	build_options();
+}
+
+//Set information for the procedurally generated skeletons
+void set_gameinformboss_info() {
+	switch(get_property("gameProBossSpecialPower")) {
+		case "Cold immunity":
+			vprint("WHAM: This boss is immune to cold damage.", "green", 5);		
+			mres[$element[cold]] = 1;
+			break;
+		case "Cold aura":
+			vprint("WHAM: This boss has a cold aura that does 5-10 damage per turn.", "green", 5);		
+			//res0.pdmg[$element[cold]] += 7;
+			break;
+		case "Hot immunity":
+			vprint("WHAM: This boss is immune to hot damage.", "green", 5);		
+			mres[$element[hot]] = 1;
+			break;
+		case "Hot aura":
+			vprint("WHAM: This boss has a hot aura that does 5-10 damage per turn.", "green", 5);		
+			//res.pdmg[$element[hot]] += 7;		
+			break;		
+		case "Ignores armor":
+			vprint("WHAM: This boss is ignores some of your armor.", "green", 5);	
+			break;		
+		case "Blocks combat items":
+			vprint("WHAM: This boss is blocks items.", "green", 5);
+			noitems = 100;
+			break;		
+		case "Reduced physical damage":
+			vprint("WHAM: This boss is resistant to physical damage.", "green", 5);		
+			mres[$element[none]] = 0.5;		
+			break;
+		case "Reduced damage from spells":
+			vprint("WHAM: This boss is takes 30% less damage from spells.", "green", 5);	
+			break;
+		case "Stun resistance":
+			vprint("WHAM: This boss is cannot be stunned.", "green", 5);
+			nostun = true;
+			break;
+		case "Elemental Reistance":
+			vprint("WHAM: This boss is resistant to elemental damage.", "green", 5);
+			foreach el in $elements[]
+				mres[el] = 0.3;		
+			break;
+		case "Passive damage":
+			vprint("WHAM: This boss deals physical damage when attacked with melee weapons.", "green", 5);	
+			break;
+	}
+	build_options();
+}
+    
 //Calculate number of bees if needed
 int bees(monster foe) {
 	int bees;
@@ -376,6 +541,21 @@ boolean ok(advevent a) {
 	if(m == $monster[Naughty Sorority Nurse] && (dmg_dealt(a.dmg) + (m_hit_chance()*dmg_dealt(retal.dmg) + dmg_dealt(baseround().dmg))) < min(monster_stat("hp"), 90)) {
 		vprint(a.id + " is not OK since the monster heals more than it damages.", "purple", 9);
 		return false;	//These monsters heal too much for this skill
+	}
+	
+	if(contains_text(to_string(m), "shiny") && contains_text(a.id, "skill") && is_spell(to_skill(to_int(excise(a.id,"skill ",""))))) {
+		vprint(a.id + " is not ok since this skeleton blocks spells.", "purple", 9);
+		return false;
+	}
+	
+	if(contains_text(to_string(m), "thorny") && a.id == "attack" && current_hit_stat() != $stat[moxie]) {
+		vprint(a.id + " is not ok since this skeleton blocks attacks.", "purple", 9);
+		return false;
+	}
+	
+	if(contains_text(to_string(m), "shifty") && a.id == "attack") {
+		vprint(a.id + " is not ok since this skeleton dodges attacks.", "purple", 9);
+		return false;
 	}
 	
 	if(a.pdmg[$element[none]] > my_stat("hp")) {
@@ -544,7 +724,7 @@ advevent attack_option(boolean noitems) {
 	
 	foreach i,opt in opts {
 		vprint(opt.id + " does hurt the monster for " + dmg_dealt(opt.dmg) + " and is " + (ok(opt) ? "ok." : "not ok."), "green", 10);
-		if(opt.endscombat == true && !(contains_text(opt.id, "use") && vars["WHAM_noitemsplease"] == "true")) {	//If the action is marked as a combat ender it is an ok action no matter what things say further down
+		if(opt.endscombat == true && !(contains_text(opt.id, "use") && vars["WHAM_noitemsplease"] == "true") && ok(opt)) {	//If the action is marked as a combat ender it is an ok action no matter what things say further down
 			smacks = opt;
 			return opt;
 		}
@@ -609,7 +789,7 @@ advevent delevel_option(boolean nodmg) {
 		if(nodmg && dmg_dealt(opt.dmg) != 0)
 			continue;
 		if(!ok(opt))
-			continue;
+			continue;			
 		if(opt.att < 0) {
 			vprint("WHAM: Your most profitable deleveling option is " + opt.id + ".", "purple", 8);
 			return opt;
@@ -619,7 +799,7 @@ advevent delevel_option(boolean nodmg) {
 }
 
 advevent item_option() {
-	if(ok(get_action("use 2848")) && !happened($item[gnomitronic hyperspatial demodulizer]) && monster_stat("hp") <= dmg_dealt(get_action("use 2848").dmg))
+	if (ok(get_action("use 2848")) && !happened($item[gnomitronic hyperspatial demodulizer]) && monster_stat("hp") <= dmg_dealt(get_action("use 2848").dmg))
 		return get_action("use 2848");
 	float drnd = max(1.0,die_rounds());   // a little extra pessimistic
 	//sort opts by -dmg_dealt(value.dmg);	
@@ -672,7 +852,7 @@ advevent stasis_option() {  // returns most profitable lowest-damage option
 // returns cheapest multi-round stun
 advevent stun_option(float rounds, boolean foritem) {
 	if(my_location().kisses <= 1 && (rounds < 0.90 || die_rounds() > maxround - round || monster_stat("hp") <= 10)) { //Don't stun if we will kill it directly (add a ~10% buffer for swingy actions)
-		vprint("WHAM: No need to stun this monster", "purple", 8);													  //Always attempt to stun if the kiss-value is greater than 1
+		vprint("WHAM: No need to stun this monster", "purple", 8);													  //Always attempt to stun if kisses is larger than 1
 		buytime = new advevent;
 		return buytime;
 	}
@@ -686,6 +866,8 @@ advevent stun_option(float rounds, boolean foritem) {
 		if (opt.stun < (foritem && have_skill($skill[ambidextrous funkslinging]) && contains_text(opt.id, "use") ? 1 : 2))
 			continue;
 		if (hitchance(opt.id) < hitchance)
+			continue;
+		if (opt.id == "skill 3004" && (my_class() == $class[seal clubber] || my_class() == $class[disco bandit]))	//Noodles won't stun for the revamped classes
 			continue;			
 		vprint("WHAM: Stun option chosen: "+opt.id+" (round "+rnum(round)+", profit: "+rnum(opt.profit)+")",8);
 		buytime = opt;
@@ -995,6 +1177,11 @@ string Evaluate_Options() {
 
 	if(monster_stat("hp") <= 0)
 		quit("Unable to get monster HP. Fight the battle yourself");
+		
+	if(my_location() == $location[The Tower of Procedurally-Generated Skeletons])
+		set_skeleton_info();
+	if(m == $monster[Video Game Boss])
+		set_gameinformboss_info();
 
 	if(finished())
 		return "";
@@ -1008,9 +1195,9 @@ string Evaluate_Options() {
 	else {
 		if(to_int(vars["verbosity"]) >= 3) {
 			vprint("WHAM: Unable to determine a valid combat strategy. For your benefit here are the numbers for your combat options.", "purple", 3);
+		
 			allMyOptions(-1);
 			sort iterateoptions by -dmg_dealt(get_action(value).dmg);
-
 			foreach num,sk in iterateoptions {
 				matcher aid = create_matcher("(skill |use |attack|jiggle)(?:(\\d+),?(\\d+)?)?",sk);
 				if(find(aid)) {
@@ -1065,7 +1252,7 @@ void build_custom_WHAM() {
 	//Jarlsbergifaction
 	if(contains_text(vars["ftf_olfact"],to_string(m)) && have_equipped($item[staff of the cream of the cream]) && to_int(get_property("jiggleCream")) < 5 && get_property("_jiggleCreamedMonster") != to_string(m))
 		encustom(get_action($item[staff of the cream of the cream]));
-		
+
 	if(my_location().zone == "The Sea" && item_amount($item[sea lasso]) > 0 && vars["WHAM_UseSeaLasso"] == "true" && get_property("lassoTraining") != "expertly")
 		encustom(get_action($item[sea lasso]));
 
@@ -1098,6 +1285,7 @@ void build_custom_WHAM() {
 		case "bugbear scientist":
 			if(item_amount($item[quantum nanopolymer spider web]) > 0 && my_location() == $location[Science Lab]) {
 				encustom(get_action($item[quantum nanopolymer spider web]));
+
 				return;
 			} else if(bugbear_olfact($location[Science Lab],"biodataScienceLab",6))
 				encustom(get_action($skill[Transcendent Olfaction]));
@@ -1137,6 +1325,7 @@ void build_custom_WHAM() {
 		case "liquid metal bugbear":
 			if(item_amount($item[drone self-destruct chip]) > 0) {
 				encustom(get_action($item[drone self-destruct chip]));
+
 				return;
 			}
 			break;
@@ -1422,6 +1611,14 @@ void main(int initround, monster foe, string pg) {
 	vprint("WHAM: Setting up variables via BatBrain", "purple", 8);
 	act(pg);
 
+	if(my_location() == $location[The Tower of Procedurally-Generated Skeletons]) {
+		vprint("WHAM: Setting Skeleton type.", "purple", 7);
+		set_skeleton_info();
+	}
+	if(m == $monster[Video Game Boss]) {
+		vprint("WHAM: Setting special boss power.", "purple", 7);
+		set_gameinformboss_info();
+	}	
 	//Debug info
 	vprint("WHAM: We currently think that the round number is: " + round + " and that the turn number is " + my_turncount() + ".", "purple", 9);
 	
@@ -1451,7 +1648,7 @@ void main(int initround, monster foe, string pg) {
 	allMyOptions(hitchance);
 	attack_option();
 
-	if(to_int(vars["verbosity"]) < 10 && my_location() != $location[Fernswarthy's Basement]) {
+	if(to_int(vars["verbosity"]) < 10 && my_location() != $location[Fernswarthy's Basement] && my_location() != $location[The Tower of Procedurally-Generated Skeletons]) {
 		//Call SmartStasis to do fun and complicated stuff
 		vprint("WHAM: Running SmartStasis", "purple", 3);
 		SmartStasis();
@@ -1495,7 +1692,7 @@ void main(int initround, monster foe, string pg) {
 		//Debug info
 		vprint("WHAM: We currently think that the round number is: " + round + " and that the turn number is " + my_turncount() + ".", "purple", 9);
 	} until(finished() || die_rounds() <= 1 || round >= min(maxround, WHAM_maxround));
-	
+
 	if(foe == $monster[wild seahorse] && happened($item[sea lasso]))
 		quit("You've tamed a Sea Horse. Aborting so you can decide how to continue.");
 	

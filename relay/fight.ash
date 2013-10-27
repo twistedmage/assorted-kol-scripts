@@ -161,6 +161,9 @@ void handle_post() {
                 "acc2" : to_slot(i))+" "+i+"'><img src='/images/itemimages/"+i.image+"' class=hand></a> ");
 			abox.append("<b>"+rnum(doctot)+" / 5</b> Doctorosity");
             break;
+         case $location[The Filthworm Queen's Chamber]:
+            if (have_outfit("Frat Warrior")) abox.append("<p><a href='bigisland.php?place=orchard&action=stand&pwd' class='clilink through' title='checkpoint; outfit frat warrior fatigues'>visit stand as frat</a>");
+            if (have_outfit("War Hippy")) abox.append("<p><a href='bigisland.php?place=orchard&action=stand&pwd' class='clilink through' title='checkpoint; outfit war hippy fatigues'>visit stand as hippy</a>"); break;
          case $location[Next to that Barrel with Something Burning in it]:
          case $location[Near an Abandoned Refrigerator]:
          case $location[Over Where the Old Tires Are]:
@@ -190,8 +193,8 @@ void handle_post() {
             if (!have_equipped($item[fear condenser]) && item_amount($item[fear condenser]) > 0) abox.append("<p><a href=# class='clilink'>equip fear condenser</a>"); break;
       }
       if (my_location().zone == "The Sea") {
-	     if (get_property("dolphinItem") != "") abox.append("<p><img src='/images/itemimages/"+to_item(get_property("dolphinItem")).image+"' title='"+
-            to_item(get_property("dolphinItem"))+" ("+rnum(sell_val(to_item(get_property("dolphinItem"))))+"&mu;)' height=23 width=23 border=0> <a href=# class='clilink'>use dolphin whistle</a>");
+	     if (get_property("dolphinItem") != "") abox.append("<p><img src='/images/itemimages/"+to_item(get_property("dolphinItem")).image+"' title=\""+
+            to_item(get_property("dolphinItem"))+" ("+rnum(sell_val(to_item(get_property("dolphinItem"))))+"&mu;)\" height=23 width=23 border=0> <a href=# class='clilink'>use dolphin whistle</a>");
          boolean popped;
 		 foreach w in $items[mer-kin dodgeball, mer-kin dragnet, mer-kin switchblade] if (have_equipped(w) && wskils(w) < 3) {
 		    popped = true; abox.append("<p>You have learned <b>"+wskils(w)+"</b> of <b>3</b> "+w+" skills."); break;
@@ -246,7 +249,9 @@ void handle_post() {
        else {
           float gturns = turns_till_goals(false);
           abox.append("<p><b>Goals remaining"+(gturns < 9999 ? " (satisfied in <b>~"+rnum(max(1.0,gturns))+"</b> turns)" : "")+":</b>"+
-             " <a href='#' class='clilink edit' title='conditions set'>add goals</a> <a href=# class='clilink' title='conditions clear'>clear</a>\n<ul>");
+             " <a href='#' class='clilink edit' title='conditions set'>add goals</a> <a href=# class='clilink' title='conditions clear'>clear</a>\n");
+          abox.append("<div style='float: right; margin: 3px'><a href=# class='cliimglink' title='adventure * "+my_location()+
+             "'><img src='images/otherimages/sigils/recyctat.gif' height=30 width=30 title='Automate goal acquisition'></a></div>\n<ul>");
           foreach i,g in get_goals() abox.append("<li>"+g+" <a href=# class='clilink' title=\"conditions remove "+g+"\">remove</a> "+
 		     (is_goal(to_item(excise(g," ",""))) && creatable_amount(to_item(excise(g," ",""))) > 0 ? "<a href=# class='clilink' title=\"create 1 "+to_item(excise(g," ",""))+"\">create</a>" : "")+"</li>");
           abox.append("</ul>");

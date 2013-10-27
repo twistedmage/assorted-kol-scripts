@@ -33,18 +33,20 @@ boolean equals(string s1, string s2) {
    return (length(s1) == length(s2) && contains_text(s1,s2));
 }
 
-// wraps print(), prints message depending on vars["verbosity"] setting
-// has boolean return value -- replaces { print(message); return t/f; }
-// level == 0: abort error
-// level > 0: prints message if verbosity >= level, returns true
-// level < 0: prints message if verbosity >= abs(level), returns false
-// ===== Recommended level scale: ====
-// 0: abort error
-// (-)1: essential (and non-cluttering) information -- use very sparingly, since a verbosity of 1 is basically "silent mode"
-// (-)2: important and useful info -- this should generally be your base level for your most important messages
-// (-)4: interesting but non-essential information
-// (-)6: info which an overly curious person might like to see on their CLI
-// (-)10: details which are only helpful for debugging, such as "begin/end functionname()" or "current value of variable: value"
+/*
+wraps print(), prints message depending on vars["verbosity"] setting
+has boolean return value -- replaces { print(message); return t/f; }
+level == 0: abort error
+level > 0: prints message if verbosity >= level, returns true
+level < 0: prints message if verbosity >= abs(level), returns false
+===== Recommended level scale: ====
+0: abort error
+±1: essential (and non-cluttering) information -- use very sparingly, since a verbosity of 1 is basically "silent mode"
+±2: important and useful info -- this should generally be your base level for your most important messages
+±4: interesting but non-essential information
+±6: info which an overly curious person might like to see on their CLI
+±10: details which are only helpful for debugging, such as "begin/end functionname()" or "current value of variable: value"
+*/
 boolean vprint(string message, string color, int level) {
    if (level == 0) abort(message);
    if (to_int(vars["verbosity"]) >= abs(level)) print(message,color);
@@ -99,10 +101,15 @@ string join(string[int] pieces, string glue) {
    }
    return res;
 }
+// returns true if a glue-delimited list contains needle (case-insensitive)
+boolean list_contains(string list, string needle, string glue) {
+   return create_matcher("(^|"+glue+")"+to_lower_case(needle)+"($|"+glue+")",to_lower_case(list)).find();
+}
+boolean list_contains(string list, string needle) { return list_contains(list, needle, ", "); }
 // adds a unique entry to a glue-delimited list (and so won't add if already exists), returns modified list
 string list_add(string list, string add, string glue) {
    if (length(list) == 0) return add;
-   if (create_matcher("(^|"+glue+")"+to_lower_case(add)+"($|"+glue+")",to_lower_case(list)).find()) return list;
+   if (list_contains(list,add,glue)) return list;
    return list+glue+add;
 }
 string list_add(string list, string add) { return list_add(list, add, ", "); }
@@ -144,25 +151,27 @@ float get_avg(string whichprop) {
    return to_float(substring(initv,0,index_of(initv,":")));
 }
 
-// Evaluates expressions in the format used by variable modifiers:
-//
-// No spaces allowed, except as part of a zone/location name.
-// + - * / ( ) have their usual mathematical meaning and precedence.
-// ^ is exponentiation, with the highest precedence.
-// Math functions: ceil(x) floor(x) sqrt(x) min(x,y) max(x,y)
-// Text functions:
-//   loc(text), zone(text) - 1 if the current adventure location or zone contains the specified text, 0 elsewise.
-//   fam(text) - 1 if the player's familiar type contains the text, else 0.
-//   pref(text) - must be used on preferences with a float value ONLY - merely retrieving an integer pref will corrupt it!
-// Internally-used variables (upper-case letters)
-//	D - drunkenness
-//	F - fullness
-//	G - Grimace darkness (0..5)
-//	L - player level
-//	M - total moonlight (0..9)
-//	S - spleenness
-//	X - gender (-1=male, 1=female)
-// User-defined variables (provided in "values") must begin with lowercase letters/underscores
+/*
+Evaluates expressions in the format used by variable modifiers:
+
+No spaces allowed, except as part of a zone/location name.
++ - * / ( ) have their usual mathematical meaning and precedence.
+^ is exponentiation, with the highest precedence.
+Math functions: ceil(x) floor(x) sqrt(x) min(x,y) max(x,y)
+Text functions:
+  loc(text), zone(text) - 1 if the current adventure location or zone contains the specified text, 0 elsewise.
+  fam(text) - 1 if the player's familiar type contains the text, else 0.
+  pref(text) - must be used on preferences with a float value ONLY - merely retrieving an integer pref will corrupt it!
+Internally-used variables (upper-case letters)
+  D - drunkenness
+  F - fullness
+  G - Grimace darkness (0..5)
+  L - player level
+  M - total moonlight (0..9)
+  S - spleenness
+  X - gender (-1=male, 1=female)
+User-defined variables (provided in "values") must begin with lowercase letters/underscores
+*/
 float eval(string expr, float[string] values) {
    buffer b;
    matcher m = create_matcher("\\b[a-z_][a-zA-Z0-9_]*\\b", expr);
@@ -285,9 +294,8 @@ void setvar(string varname,string dfault,string type) {
       return;
    }
    switch (varname) {
-      case "BatMan_attract": if (vars contains "ftf_olfact") dfault = vars["ftf_olfact"]; remove vars["ftf_olfact"]; break;
-      case "BatMan_yellow": if (vars contains "ftf_yellow") dfault = vars["ftf_yellow"]; remove vars["ftf_yellow"]; break;
-      case "BatMan_banish": if (vars contains "ftf_grin") dfault = vars["ftf_grin"]; remove vars["ftf_grin"]; break;
+      case "BatMan_flyereverything": if (vars contains "flyereverything") dfault = vars["flyereverything"]; remove vars["flyereverything"]; break;
+      case "BatMan_puttybountiesupto": if (vars contains "puttybountiesupto") dfault = vars["puttybountiesupto"]; remove vars["puttybountiesupto"]; break;
    }
    vars[varname] = dfault;
    vprint("New ZLib "+type+" setting: "+varname+" => "+dfault,"purple",4);
@@ -296,19 +304,19 @@ void setvar(string varname,string dfault,string type) {
 
 void setvar(string varname,string dfault)  {  setvar(varname,dfault,"string");  }
 void setvar(string varname,boolean dfault) {  setvar(varname,to_string(dfault),"boolean");  }
-void setvar(string varname,int dfault)     {  setvar(varname,to_string(dfault),"int");  }
+void setvar(string varname,class dfault)   {  setvar(varname,to_string(dfault),"class");  }
+void setvar(string varname,coinmaster dfault){setvar(varname,to_string(dfault),"coinmaster");  }
+void setvar(string varname,effect dfault)  {  setvar(varname,to_string(dfault),"effect");  }
+void setvar(string varname,element dfault) {  setvar(varname,to_string(dfault),"element");  }
+void setvar(string varname,familiar dfault){  setvar(varname,to_string(dfault),"familiar");  }
 void setvar(string varname,float dfault)   {  setvar(varname,to_string(dfault),"float");  }
+void setvar(string varname,int dfault)     {  setvar(varname,to_string(dfault),"int");  }
 void setvar(string varname,item dfault)    {  setvar(varname,to_string(dfault),"item");  }
 void setvar(string varname,location dfault){  setvar(varname,to_string(dfault),"location");  }
 void setvar(string varname,monster dfault) {  setvar(varname,to_string(dfault),"monster");  }
-void setvar(string varname,element dfault) {  setvar(varname,to_string(dfault),"element");  }
-void setvar(string varname,familiar dfault){  setvar(varname,to_string(dfault),"familiar");  }
-void setvar(string varname,skill dfault)   {  setvar(varname,to_string(dfault),"skill");  }
-void setvar(string varname,effect dfault)  {  setvar(varname,to_string(dfault),"effect");  }
-void setvar(string varname,stat dfault)    {  setvar(varname,to_string(dfault),"stat");  }
-void setvar(string varname,class dfault)   {  setvar(varname,to_string(dfault),"class");  }
-void setvar(string varname,coinmaster dfault){setvar(varname,to_string(dfault),"coinmaster");  }
 void setvar(string varname,phylum dfault)  {  setvar(varname,to_string(dfault),"phylum");  }
+void setvar(string varname,skill dfault)   {  setvar(varname,to_string(dfault),"skill");  }
+void setvar(string varname,stat dfault)    {  setvar(varname,to_string(dfault),"stat");  }
 
 
 //                           ADVENTURING ROUTINES
@@ -407,8 +415,8 @@ int have_item(string tolookup) {
 
 // returns true if the given stat is a goal (from setting "level X" or "<stat> X" as a condition), or primestat needed for run
 boolean is_goal(stat gstat) {
-   if (my_primestat() == gstat && my_level() < 13) return true;
    foreach i,g in get_goals() if (create_matcher("\\d+ "+to_lower_case(gstat),g).find()) return true;
+   if (my_primestat() == gstat && my_level() < 13) return true;
    return false;
 }
 

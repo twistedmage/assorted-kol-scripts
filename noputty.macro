@@ -282,6 +282,24 @@ mark kill_the_mob
 	
 	#moxie kill
 	if moxieclass
+		#build up momentum
+		if discobandit
+			if hasskill stealth mistletoe
+				skill stealth mistletoe
+			endif
+			if hasskill Disco Dance of Doom
+				skill Disco Dance of Doom
+			endif
+			if hasskill Disco Dance II: Electric Boogaloo
+				skill Disco Dance II: Electric Boogaloo
+			endif
+			if hasskill Disco Dance 3: Back in the Habit
+				skill Disco Dance 3: Back in the Habit
+			endif
+		endif
+		if hasskill throw shield
+			skill throw shield
+		endif
 		while !missed 2
 			attack
 		endwhile

@@ -203,16 +203,35 @@ final drop chance=0.1759% + 0.2089% = 0.3848%
 item drop from gear = 174.98 + 500 = 674.98
 total chance = 1.05978%
 -----------------------------------------------
+AT + SC
+AT + TT - twistedmage, <asica>
+AT + PM - <asica,anid>
+AT + S
+AT + DB - twistedmage, <anid>
 
-TT + AT - twistedmage, 
-AT + DB - twistedmage
-TT + DB - twistedmage
-PM + TT - 
-PM + AT - 
-PM + DB - 
+DB + SC - 
+DB + TT - twistedmage, <dinala>
+DB + PM - <dinala, anid>
+DB + S  - 
+
+S  + SC - 
+S  + TT - 
+S  + PM - 
+
+PM + SC - 
+PM + TT - <dinala, asica>
+
+TT + SC - 
+
+i go to at, asica goes to sc dinala goes to s
 
 <ASICA HAS A BLOODY KIWITINI>
 
+-----halloween
+anid killed boss
+asica got killed by boss
+dinala got killed
+twistedmage killed boss
 ----------The unkillable skeleton hard mode ---------
 1800 hp
 passive damage only - need 60 per turn base
@@ -241,10 +260,10 @@ familiar mosquito; fold loathing legion helicopter; maximize familiar weight, -0
 
 ----great wolf hard mode------
 familiar disembodied hand;
-maximize 100 dr, 0.01 mainstat, equip moon amber necklace, equip rain-doh green lantern
+maximize 100 dr, 0.01 mainstat, equip moon amber necklace, equip rain-doh green lantern;
+cast frigidalmatian;
+use connery; use serum of; use hair spray; ballpit; telescope high; use foetid seal tear; use silver dreadsylvanian flask; use brass dreadsylvanian flask;
 buy 10 scented massage oil
-cast frigidalmation
-use connery; use serum of; use hair spray; ballpit; telescope high; use foetid seal tear; use silver dreadsylvanian flask; use brass dreadsylvanian flask
 ----mayor ghost hard mode-----
 familiar disembodied; maximize equip dreadsylvania auditors badge,equip Choker of the Ultragoth, equip clown wig, equip giant gym membership card, equip leotarrrd, equip oven mitts, equip plush hamsterpus, equip spork, equip white snakeskin duster; shrug jaba; buy 5 poltergeist; buy 5 brick of sand; buy 5 blue plastic oyster egg; buy 5 tequila grenade; buy 5 fetid feather; buy 5 stone frisbee; buy 5 onion shuriken; buy 30 love song of sugary cuteness; cast frigidalmatian; cast boner bat; use silver dreadsylvanian flask; use brass dreadsylvanian flask
 
@@ -278,27 +297,34 @@ svn checkout https://svn.code.sf.net/p/formhtml/code/;
 svn checkout https://svn.code.sf.net/p/zlib/code/;
 svn checkout https://svn.code.sf.net/p/bestbetweenbattle/code/;
 svn checkout https://svn.code.sf.net/p/guyymafia/code/dreaddrunk/;
-svn checkout https://svn.code.sf.net/p/bale/new-life/code/;
 
-ash import zlib;
-setvar("eatdrink_priceOfNontradeables",999999);
-setvar("eatdrink_priceOfQuestItems",999999);
-setvar("eatdrink_simConsume",false);
-setvar("autoSatisfyWithCoinmasters",false);
-setvar("autoSatisfyWithMall",true);
-setvar("eatdrink_make",true);
-setvar("eatdrink_shrug",true);
-setvar("eatdrink_pause",0);
-setvar("eatdrink_fav_hot_hi_mein",true);
-setvar("eatdrink_fav_mae_west",true);
-setvar("eatdrink_fav_plum_wine",true);
-setvar("eatdrink_fav_groose_grease",true);
-setvar("eatdrink_favUse",true);
-set_property("valueOfAdventure",1000);
-setvar("eatdrink_valueOfPrimeStat",2);
-setvar("eatdrink_valueOfNonPrimeStat",1);
-setvar("eatdrink_priceOfNontradeables",999999);
-setvar("eatdrink_priceOfQuestItems",999999);
+ash set_property("bcasc_unlockHiddenTavern","true");
+
+-----------------------------------------------------
+absolute ofc val
+mi
+ncc
+rvm
+-----------------------------------------------------
+
+zlib eatdrink_priceOfNontradeables = 999999;
+zlib eatdrink_priceOfQuestItems = 999999;
+zlib eatdrink_simConsume = false;
+zlib autoSatisfyWithCoinmasters = false;
+zlib autoSatisfyWithMall = true;
+zlib eatdrink_make = true;
+zlib eatdrink_shrug = true;
+zlib eatdrink_pause = 0;
+zlib eatdrink_fav_hot_hi_mein = true;
+zlib eatdrink_fav_mae_west = true;
+zlib eatdrink_fav_plum_wine = true;
+zlib eatdrink_fav_groose_grease = true;
+zlib eatdrink_favUse = true;
+zlib eatdrink_valueOfPrimeStat = 2;
+zlib eatdrink_valueOfNonPrimeStat = 1;
+zlib eatdrink_priceOfNontradeables = 999999;
+zlib eatdrink_priceOfQuestItems = 999999;
+ash set_property("valueOfAdventure",1000);
 
 ---------------xcom-------------------------------
 <dismantle containment chamber and build gollop chamber>

@@ -1,0 +1,140 @@
+icon saucegeyser
+scrollwhendone
+#pass certain monsters to the consult script
+if monstername gremlin
+	goto gremlinfight
+endif
+abort hppercentbelow 20
+
+if gotjump
+	if moxieclass && !hppercentbelow 90
+		pickpocket
+		if !hppercentbelow 90
+			pickpocket
+		endif
+	endif
+	if mysticalityclass && !hppercentbelow 90
+		summonspirit
+	endif
+endif
+
+if !monstername *Naughty Sorceress* && !monstername *bonerdagon
+	if !monstername * bugbear
+
+		if hascombatitem rock band flyers
+			use rock band flyers
+		endif
+		if hascombatitem jam band flyers
+			use jam band flyers
+		endif
+
+		if monstername * pirate
+			if hascombatitem The Big Book of Pirate Insults
+				use The Big Book of Pirate Insults
+			endif
+			if hascombatitem Massive Manual of Marauder Mockery
+				use Massive Manual of Marauder Mockery
+			endif
+		endif
+	endif #!monstername black ops bugbear && monstername !ancient unspeakable bugbear && !monstername battlesuit bugbear type && !monstername trendy bugbear chef  && !monstername bugaboo  && !monstername bugbear scientist
+endif
+
+#suck out oil
+if monstername oil * && hascombatitem duskwalker syringe
+	use duskwalker syringe
+endif
+
+	
+	
+mark kill_the_mob
+	#moxie kill
+	if moxieclass
+		while !missed 2
+			attack
+		endwhile
+		abort
+	endif
+	#muscle kill
+	if muscleclass
+		if hasskill throw shield
+			skill throw shield
+			attack
+		endif
+
+		if !monstername *naughty sorceress
+			while hasskill shieldbutt
+				skill shieldbutt
+			endwhile
+		endif
+
+		while !missed 2
+			attack
+		endwhile
+		abort
+	endif
+	#myst kill
+	if mysticalityclass
+		#saucespam
+		if sauceror && hasskill Wave of Sauce && hasskill Saucegeyser
+			skill Wave of Sauce
+			if hasskill throw shield
+				skill throw shield
+			endif
+			skill Saucegeyser
+			
+			while !missed 2
+				skill Wave of Sauce
+				skill Saucegeyser
+			endwhile 
+		endif
+		skill salsaball
+		repeat
+	endif
+abort
+
+
+
+mark gremlinfight
+	#banish
+	if monstername A.M.C. gremlin
+		if hasskill banishing shout
+			skill banishing shout
+		endif
+		if hasskill howl of the alpha
+			skill howl of the alpha
+		endif
+		if hasskill creepy grin
+			skill creepy grin 
+		endif
+		if hasskill give your opponent the stinkeye
+			skill give your opponent the stinkeye
+		endif
+		if hascombatitem divine champagne popper
+			use divine champagne popper
+		endif
+		if hascombatitem crystal skull
+			use crystal skull
+		endif
+		if hascombatitem harold's bell
+			use harold's bell
+		endif
+		runaway
+	endif
+	if match "whips out"
+		use molybdenum magnet
+	endif
+	if match "a bombing run over your head" || match "eyeball-peeler" || match "bites you in the fibula" || match "picks a beet off of itself" || match "picks a radish off of itself" || pastround 23
+		if hascombatitem rain-doh
+			use rain-doh indigo cup
+			use rain-doh blue balls
+		endif
+		goto kill_the_mob
+	endif
+	if hppercentbelow 50
+		if hasskill devour minions
+			skill devour minions
+		endif
+	endif
+	use spectre scepter
+goto gremlinfight
+

@@ -79,7 +79,7 @@ if(!get_property("_inv_cleaned_"+my_name()).to_boolean())
 	cli_execute("autosell * The Mariachi's guitar case");
 	cli_execute("autosell * untamable turtle");
 	
-	if(can_interact() && (my_name()=="twistedmage" || my_name()=="bankymcbank"))
+	if(can_interact())
 	{
 		//put all restorers in mall
 		mall_sell($item[carbonated water lily]);
@@ -348,13 +348,6 @@ if(!get_property("_inv_cleaned_"+my_name()).to_boolean())
 						{
 							if(tosell>0)
 							{
-								if(my_name()!="twistedmage" && my_name()!="bankymcbank")
-								{
-									int spare = item_amount(it) - ocd[it].q;
-									print("csend "+spare+" "+it+" to twistedmage","blue");
-									cli_execute("csend "+spare+" "+it+" to twistedmage");
-									continue;
-								}
 								if(item_amount(it) <= ocd[it].q)
 									continue;
 								if(mall_q != 0)

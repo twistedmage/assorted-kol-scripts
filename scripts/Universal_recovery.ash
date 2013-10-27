@@ -2,7 +2,7 @@
 // http://kolmafia.us/showthread.php?t=1780
 script "Universal_recovery.ash";
 notify "Bale";
-string thisver = "3.11";		// This is the script's version!
+string thisver = "3.12.1";		// This is the script's version!
 
 // To use this script, put Universal_recovery in the /script directory. 
 // Then in the Graphical CLI type:
@@ -119,7 +119,7 @@ boolean use_herb = contains_text(hpAutoRecoveryItems, "medicinal herb's medicina
 	|| (my_class() == $class[accordion thief] && my_level() >= 9));
 	// Number of free Disco Rests, HP restored by resting at camp, MP restored by resting at camp.
 int disco = to_int(have_skill($skill[Disco Nap]))
-	+ 2* to_int(have_skill($skill[Disco Power Nap]))
+	+ 2* to_int(have_skill($skill[Adventurer of Leisure]))
 	+ to_int(have_skill($skill[Executive Narcolepsy]))
 	+ 10*to_int(have_skill($skill[Food Coma]))
 	+ 3* to_int(have_familiar($familiar[Unconscious Collective]));
@@ -317,8 +317,8 @@ boolean populate_skills(int target) {
 	mp_gear = mp_gear(target);
 	if(have_skill($skill[Cannelloni Cocoon])) skills[$skill[Cannelloni Cocoon]].ave = 999999999;
 	if(have_skill($skill[Tongue of the Walrus])) skills[$skill[Tongue of the Walrus]].ave = 35;
-	if(have_skill($skill[Disco Power Nap])) skills[$skill[Disco Power Nap]].ave = 40;
-	if(have_skill($skill[Disco Nap])) skills[$skill[Disco Nap]].ave = 20;
+	if(have_skill($skill[Disco Nap])) 
+		skills[$skill[Disco Nap]].ave = have_skill($skill[Adventurer of Leisure])? 40: 20;
 	if(have_skill($skill[Lasagna Bandages])) skills[$skill[Lasagna Bandages]].ave =20;
 	if(have_skill($skill[Laugh It Off])) skills[$skill[Laugh It Off]].ave =1.5;
 	if(have_skill($skill[Bite Minion])) skills[$skill[Bite Minion]].ave =max(my_maxhp()/10, 10);
@@ -661,7 +661,7 @@ boolean use_mall(int q, item it, int amount){
 		set_property("_meatperhp", to_string(historical_price(it)/ (my_maxhp() - my_hp()+.001)));
 	else if(heal[it].avehp > 0 && heal[it].avemp == 0 && !beset($effect[Beaten Up]))
 		set_property("_meatperhp", to_string(historical_price(it)/ heal[it].avehp));
-	use_inv(min(q, for_use(it)), it, amount);
+	use_inv(min(q, available_amount(it)), it, amount);
 	return true;
 }
 
@@ -1601,19 +1601,19 @@ void cure_status() {
 	
 	if(beset($effects[Apathy, Easily Embarrassed, Prestidigysfunction, Tenuous Grip on Reality, 
 	  The Colors...])
-	  && !use_hot_tub() && have_skill($skill[Disco Power Nap]))
-		skill_cure($skill[Disco Power Nap]);
+	  && !use_hot_tub() && have_skill($skill[Disco Nap]) && have_skill($skill[Adventurer of Leisure]))
+		skill_cure($skill[Disco Nap]);
 
 	if(beset($effect[N-Spatial vision]) && my_location() == $location[Navigation]) {
 		if(item_amount($item[bugbear purification pill]) > 0)
 			use(1, $item[bugbear purification pill]);
-		else if(!skill_cure($skill[Disco Power Nap]) && retrieve_item(1, $item[bugbear purification pill]))
+		else if(!(have_skill($skill[Adventurer of Leisure]) && skill_cure($skill[Disco Nap])) && retrieve_item(1, $item[bugbear purification pill]))
 			use(1, $item[bugbear purification pill]);
 	}
 	
 	if(beset($effects[Cunctatitis, Tetanus, Socialismydia]) && !use_hot_tub()) {
-		if(have_skill($skill[Disco Power Nap]))
-			skill_cure($skill[Disco Power Nap]);
+		if(have_skill($skill[Disco Nap]) && have_skill($skill[Adventurer of Leisure]))
+			skill_cure($skill[Disco Nap]);
 		else if(item_amount($item[ancient Magi-Wipes]) > 0
 		  && heal[$item[ancient Magi-Wipes]].avemp < my_maxmp() - my_mp())
 			use(1, $item[ancient Magi-Wipes]);
@@ -1623,8 +1623,8 @@ void cure_status() {
 	  || (my_primestat() == $stat[Mysticality] && beset($effects[Confused, Light-Headed]))) {
 		if(have_skill($skill[Disco Nap]))
 			skill_cure($skill[Disco Nap]);
-		else if(have_skill($skill[Disco Power Nap]))
-			skill_cure($skill[Disco Power Nap]);
+		else if(have_skill($skill[Disco Nap]) && have_skill($skill[Adventurer of Leisure]))
+			skill_cure($skill[Disco Nap]);
 		else if(!tongue && item_amount($item[tiny house]) > 0
 		  && heal[$item[tiny house]].avemp < my_maxmp() - my_mp())
 			use(1, $item[tiny house]);

@@ -13,6 +13,8 @@ float get_efficiency(item it, float return_val)
 
 void main()
 {
+	if(my_name()!="twistedmage")
+		return;
 	cli_execute("inventory refresh");
 	cli_execute("use * Pack of Alice's Army Cards");
 	cli_execute("use * Single Alice's Army Foil");

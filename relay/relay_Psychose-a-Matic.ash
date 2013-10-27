@@ -40,7 +40,7 @@ boolean fetchable(item j) {
 }
 boolean[item] rewards(item j) { switch (j) {
    case $item[jar of psychoses (The Suspicious-Looking Guy)]: return $items[white dragon fang, suspicious-looking fedora];
-   case $item[jar of psychoses (The Captain of the Gourd)]: return $items[truthsayer, fancy gourd potion];
+   case $item[jar of psychoses (The Captain of the Gourd)]: return $items[goblin collarbone, sharp tin strip, wad of spider silk, truthsayer, fancy gourd potion];
    case $item[jar of psychoses (The Crackpot Mystic)]: return $items[byte, anger blaster, doubt cannon, fear condenser, regret hose];
    case $item[jar of psychoses (The Old Man)]: return $items[bloodbath, ornamental sextant, foam commodore's hat, foam naval trousers, miniature deck cannon];
    case $item[jar of psychoses (The Pretentious Artist)]: return $items[ginsu&trade;];
