@@ -2912,9 +2912,15 @@ void defaultMood(boolean castMojo) {
 	{
 		abort("line 2913 fill in thats not a knife stuff");
 		
-		if(my_level()>1000 && available_amount($item[sharpened spoon])<1)
+		if(my_level()>=11 && available_amount($item[soap knife])<1) //11+
 			use_skill(1,$skill[That's not a knife]);
-		else if(my_level()>1000 && available_amount($item[soap knife])<1)
+		else if(my_level()>=8 && available_amount($item[candy knife])<1) //8-10
+			use_skill(1,$skill[That's not a knife]);
+		else if(my_level()>=6 && available_amount($item[sharpened spoon])<1) //6-7
+			use_skill(1,$skill[That's not a knife]);
+		else if(my_level()>=1000 && available_amount($item[broken beer bottle])<1) //?-5
+			use_skill(1,$skill[That's not a knife]);
+		else if(my_level()>=1000 && available_amount($item[boot knife])<1) //?-?
 			use_skill(1,$skill[That's not a knife]);
 	//	else if(my_level()>1000 && available_amount($item[soap knife])<1)
 	//		use_skill(1,$skill[That's not a knife]);
@@ -5799,24 +5805,19 @@ boolean bcascCastle() {
 		set_property("choiceAdventure678", 4);
 		set_property("choiceAdventure679", 1);
 		set_property("choiceAdventure680", 1);
-	}
-
-	int checkFloor() {
-		string result = visit_url("adventure.php?snarfblat=324");
-		if(contains_text(result, "You have to learn to walk before you can learn to fly."))
-			return 0;
-		else if (contains_text(result, "You'll have to figure out some other way to get upstairs."))
-			return 1;
-		else {
-			setCastleChoices();
-			bumRunCombat();
-			return 2;
-		}
-	}
+	}	
 	
+	//0=basement, 1=ground floor, 2=top floor, 3=quest done, 4=hits open
 	int level;
-	if(contains_text(visit_url("questlog.php?which=1"), "The Rain on the Plains is Mainly Garbage"))
-		level = checkFloor();
+	if(get_property("lastCastleGroundUnlock")!=my_ascensions())
+		level = 0;
+	else if(get_property("lastCastleTopUnlock")!=my_ascensions())
+		level = 1;
+	else if(contains_text(visit_url("questlog.php?which=1"), "The Rain on the Plains is Mainly Garbage"))
+	{
+		setCastleChoices();
+		level = 2;
+	}
 	else if (my_path() != "Bugbear Invasion" && i_a("steam-powered model rocketship") == 0)
 		level = 3;
 	else
@@ -8227,6 +8228,9 @@ boolean bcascMacguffinHiddenCity() {
 	if (item_amount($item[stone triangle]) == 3) {
 		//8 - Bowling Alley: Adventure until have scorched stone sphere.
 		while (item_amount($item[scorched stone sphere]) == 0) {
+			//ensure we skip drunk pygmys
+			if(i_a("bowl of scorpions")==0)
+				buy(1,$item[bowl of scorpions]);
 			set_property("choiceAdventure788", "1");
 			bumAdv($location[The Hidden Bowling Alley], "+item drop", "items", "1 scorched stone sphere", "Getting the scorched stone sphere.", "i-");
 		}

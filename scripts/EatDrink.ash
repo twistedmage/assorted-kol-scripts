@@ -475,58 +475,11 @@ int get_starter_items()
 
 int get_accordion()
 {
-  if (equipped_amount($item[the trickster's trikitixa]) > 0) return 20;
-  else if (equipped_amount($item[squeezebox of the ages]) > 0) return 15;
-  else if (equipped_amount($item[rock and roll legend]) > 0) return 10;
-  else if (equipped_amount($item[calavera concertina]) > 0) return 7;
-  else if (equipped_amount($item[stolen accordion]) > 0) return 5;
-  else if (item_amount($item[the trickster's trikitixa]) > 0) return 20;
-  else if (item_amount($item[squeezebox of the ages]) > 0) return 15;
-  else if (item_amount($item[rock and roll legend]) > 0) return 10;
-  if (!EAT_ACCORDION || SIM_CONSUME || my_maxmp() < mp_cost($skill[the ode to booze]))
-  {
-    if (item_amount($item[calavera concertina]) > 0) return 7;
-    else if (item_amount($item[stolen accordion]) > 0) return 5;
-    else return 0;
-  }
-  while (item_amount($item[stolen accordion]) < 1 && get_meat(1) >= ((14 - get_starter_items()) * 50) + (item_amount($item[hermit permit]) > 0 ? 0 : 100))
-    use(1, $item[chewing gum on a string]);
-  if (get_adventures() > 1)
-  {
-   if (creatable_amount($item[rock and roll legend]) < 1)
-    {
-      int neededmeat = 0;
-      if (item_amount($item[big rock]) < 1)
-      {
-        neededmeat += 10;
-        if (item_amount($item[casino pass]) < 1) neededmeat += 100;
-      }
-      if (item_amount($item[big rock]) < 1 && get_meat(1) >= neededmeat && (item_amount($item[ten-leaf clover]) + (item_amount($item[disassembled clover]) * to_int(my_path() != "Bees Hate You") + closet_amount($item[ten-leaf clover]) + (closet_amount($item[disassembled clover]) * to_int(my_path() != "Bees Hate You"))) > 0))
-      {
-        (!retrieve_item(1,$item[casino pass]));
-        boolean oldvalue = get_property("cloverProtectActive").to_boolean();
-        set_property("cloverProtectActive", false);
-        if (item_amount($item[ten-leaf clover]) + (item_amount($item[disassembled clover]) * to_int(my_path() != "Bees Hate You")) < 1)
-        {
-          if (closet_amount($item[ten-leaf clover]) > 0)
-            take_closet(1, $item[ten-leaf clover]);
-          else if (closet_amount($item[disassembled clover]) > 0 && my_path() != "Bees Hate You")
-            take_closet(1, $item[disassembled clover]);
-        }
-        if (retrieve_item(1, $item[ten-leaf clover]))
-          (!adventure(1, $location[Lemon Party]));
-        set_property("cloverProtectActive", oldvalue);
-      }
-      if (creatable_amount($item[rock and roll legend]) > 0) (!retrieve_item(1, $item[rock and roll legend]));
-    }
-    else
-      (!retrieve_item(1, $item[rock and roll legend]));
-  }
-
-  if (item_amount($item[rock and roll legend]) > 0) return 10;
-  else if (item_amount($item[calavera concertina]) > 0) return 7;
-  else if (item_amount($item[stolen accordion]) > 0) return 5;
-  return 0;
+  int turns = turns_per_cast($skill[the ode to booze]);
+  if (turns > 5 || !EAT_ACCORDION || my_meat() < 250) return turns;
+  if (my_meat() < 2500 && turns == 0) buy(1, $item[toy accordion]);
+  else buy(1, $item[antique accordion]);
+  return (turns_per_cast($skill[the ode to booze]));
 }
 
 int get_quality(item checking)
@@ -1951,7 +1904,7 @@ void update_from_mafia(string type)
         if (it.fullness > 0 || it.spleen > 0) continue;
         if (my_class() == $class[Avatar of Jarlsberg] && (it.to_int() < 6176 || it.to_int() > 6236)) continue;
         if (my_class() == $class[Avatar of Jarlsberg] && (it.to_int() < 6176 || it.to_int() > 6236)) continue;
-        if (my_path() == "KOLHS" && !it.notes.contains_text("KOLHS")) continue;
+        if (my_path() == "KOLHS" && !it.notes.contains_text("KOLHS") && special_values(it, 1) == 1) continue;
         totalcost = it.inebriety;
         gainadv = totalcost > 0 ? (averange(set_range(it.adventures)) / totalcost) : 0;
         break;
@@ -2781,8 +2734,10 @@ int eatdrink(int foodMax, int drinkMax, int spleenMax, boolean overdrink)
           {
             summarize(ConsumptionReportIndex+": "+consume_entry);
             ConsumptionReportIndex += 1;
-            if (iteration == 4)
-            { giveup = true; }
+            if (position[nomposition].it == $item[steel lasagna]) { foodMax += 5; }
+            else if (position[nomposition].it == $item[steel margarita]) { drinkMax += 5; }
+            else if (position[nomposition].it == $item[steel-scented air freshener]) { spleenMax += 5; }
+            else if (iteration == 4) { giveup = true; }
           }
           else
           {

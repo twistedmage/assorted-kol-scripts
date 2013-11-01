@@ -326,7 +326,16 @@ zlib eatdrink_favUse = true;
 zlib eatdrink_valueOfPrimeStat = 2;
 zlib eatdrink_valueOfNonPrimeStat = 1;
 ash set_property("valueOfAdventure",1000);
-
+-------------------------uxl
+55 479 874 - garage
+sewer with flashlight
+mrs pennworth
+woman will call with job
+car shop
+pigtails club
+bunny club
+woman in top righht
+-------------------------------
 ---------------xcom-------------------------------
 <dismantle containment chamber and build gollop chamber>
 

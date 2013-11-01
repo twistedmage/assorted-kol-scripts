@@ -310,8 +310,7 @@ boolean can_adv(location where, boolean prep) {
    case $location[The Boss Bat's Lair]: if (prep && !qprop("questL04Bat","step3")) use_upto(3 - (to_int(qprop("questL04Bat","step1")) + to_int(qprop("questL04Bat","step2"))), $item[sonar-in-a-biscuit],true); 
       return get_property("questL04Bat") == "step3" || item_amount($item[sonar-in-a-biscuit]) > 2 - (to_int(qprop("questL04Bat","step1")) + to_int(qprop("questL04Bat","step2")));
   // beach
-   case $location[Desert (Ultrahydrated)]:
-   case $location[Desert (Unhydrated)]: return itemcheck($item[your father's macguffin diary]);
+   case $location[The Arid, Extra-Dry Desert]: return itemcheck($item[your father's macguffin diary]);
    case $location[The Oasis]: return itemcheck($item[your father's macguffin diary]) && qprop("questL11Pyramid","step1");
    case $location[The Shore, Inc. Travel Agency]: if (my_adventures() < 3) return vprint("Not enough adventures to take a "+where+".",-6); return (perm_urlcheck("main.php","map7beach.gif"));
   // beanstalk
