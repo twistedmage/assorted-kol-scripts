@@ -1,10 +1,19 @@
 //Perform all dreadsylvania choiceadventures via quicklinks
 
+string polisher="twistedmage";
+string brewer="twistedmage";
+string keymaker="twistedmage";
+string chef="dinala";
+
+
 void do_choice(int loc, string choice, string choice2)
 {
+	if(get_property("_dreadchoice"+loc))
+		return;
 	string str=visit_url("clan_dreadsylvania.php?action=forceloc&loc=" + to_string(loc) );
 	str=visit_url("choice.php?"+choice);
 	str=visit_url("choice.php?"+choice2);
+	set_property("_dreadchoice"+loc,"true");
 }
 
 void get_key()
@@ -35,9 +44,8 @@ void do_forest()
 	}
 	else if(my_primestat()==$stat[muscle] && item_amount($item[old dry bone])>0 )
 	{
-		abort("unknown choiceadvs for bone floure line 16");
-		//do_choice(1, choice1a, choice1b);
-		send_stuff($item[bone flour],"twistedmage");
+		do_choice(1, "?pwd&whichchoice=721&option=1&choiceform1=Check+out+the+kitchen", "choice.php?pwd&whichchoice=722&option=2&choiceform2=Screw+around+with+the+flour+mill");
+		send_stuff($item[bone flour],chef);
 	}
 	else if(item_amount($item[replica key])>0)
 	{
@@ -49,34 +57,39 @@ void do_forest()
 	{
 		abort("unknown choiceadvs for lock impression line 22");
 		//do_choice(1, choice1a, choice1b);
-		send_stuff($item[complicated lock impression],"dinala");
+		send_stuff($item[complicated lock impression],keymaker);
 	}
 	else if(!already_done("tarragon"))
 	{
 		abort("unknown choiceadvs for dread tarragon line 25");
 		//do_choice(1, choice1a, choice1b);
-		send_stuff($item[dread tarragon],"twistedmage");
+		send_stuff($item[dread tarragon],chef);
 	}
 	else
 		abort("Don't know what to do for cabin");
 		
 	//---------------tallest tree----------------
+	send_stuff($item[blood kiwi],brewer);
 	if(my_primestat()==$stat[muscle] && !already_done("amber"))
 	{
 		abort("unknown choiceadvs for moon amber line 32");
 		//do_choice(2, choice1a, choice1b);
-		send_stuff($item[moon-amber],"twistedmage");
+		send_stuff($item[moon-amber],polisher);
 	}
-	else if(my_primestat()==$stat[muscle])
+	else if(my_primestat()==$stat[muscle] && !already_done("stomp"))
 	{
-		abort("unknown choiceadvs for branch stomping line 35");
-		//do_choice(2, choice1a, choice1b);
+		if(!get_property("_dreadchoice2"))
+		{
+			string str=visit_url("clan_dreadsylvania.php?action=forceloc&loc=2");
+			str=visit_url("choice.php?pwd&whichchoice=725&option=1&choiceform1=Climb+to+the+top");
+			set_property("_dreadchoice"+loc,"true");
+			abort("Waiting to stomp");
+		}
 	}
 	else if(!already_done("stomp"))
 	{
-		abort("unknown choiceadvs for looking up line 38");
-		//do_choice(2, "pwd&whichchoice=725&option=3&choiceform3=Root+around+at+the+base", );
-		send_stuff($item[blood kiwi],"asica");
+		do_choice(2, "choice.php?pwd&whichchoice=725&option=3&choiceform3=Root+around+at+the+base","?pwd&whichchoice=728&option=1&choiceform1=Stand+near+the+base+looking+upward");
+		abort("Waiting to get stomped on");
 	}
 	else
 	{
@@ -111,13 +124,11 @@ void do_village()
 		}
 		else
 		{
-			abort("line 106 choices for freddies");
 			do_choice(5, "pwd&whichchoice=737&option=3&choiceform3=Investigate+the+ticking+shack", "pwd&whichchoice=739&option=1&choiceform1=Rummage+through+the+shelves");
 		}
 	}
 	else
 	{
-		abort("line 101 choices for sewer drenched");
 		do_choice(5, "pwd&whichchoice=737&option=1&choiceform1=Pop+into+the+sewers", "pwd&whichchoice=738&option=2&choiceform2=Slosh+in+the+muck");
 	}
 	
