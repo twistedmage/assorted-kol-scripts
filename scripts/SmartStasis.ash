@@ -284,6 +284,7 @@ void build_custom() {
          if (try_cards(3150,3154,"BUILD DRONE")) break;
          if (item_amount(to_item(3149)) > 4+evdgoals && item_amount(to_item(3146)) > 0 && item_amount(to_item(3155)) > 0 && try_cards(3149,3152,"MODIFY SELF")) break;
          break;
+     // random custom actions
       case $monster[dirty thieving brigand]: encustom($item[meat vortex]); break;      // meat vortices vs. brigands
       case $monster[tomb rat]: encustom($item[tangle of rat tails]); break;            // tomb rat king! (may require safety checks)
       case $monster[clingy pirate]: if (has_goal(m) == 0) encustom($item[cocktail napkin]); break;  // cocktail napkins
@@ -291,6 +292,37 @@ void build_custom() {
       case $monster[wild seahorse]: if (item_amount($item[sea cowbell]) > 2 && get_property("lassoTraining") == "expertly" && 
                                         item_amount($item[sea lasso]) > 0) foreach it in $items[sea cowbell, sea cowbell, sea cowbell, sea lasso] encustom(it);
          encustom(to_event("runaway","endscombat",1)); break;
+     // pretentious artist's psychoses depend on target effect specified in BatMan_pretentioustarget
+      case $monster[bag of Potatoes of Security]: switch (to_effect(vars["BatMan_pretentioustarget"])) {
+         case $effect[my breakfast with andrea]: encustom($item[artist's butterknife of regret],true); break;                // make 
+         case $effect[the champion's breakfast]: encustom($item[artist's cr&egrave;me brul&eacute;e torch of fury],true); break;                // make 
+         case $effect[tiffany's breakfast]: encustom($item[artist's whisk of misery],true); break;                     // make 
+         case $effect[breakfast clubbed]: encustom($item[artist's cookie cutter of loneliness],true); encustom($item[artist's spatula of despair],true); break;    // make 
+      } break;
+      case $monster[box of Batter Mix of Hope]: switch (to_effect(vars["BatMan_pretentioustarget"])) {
+         case $effect[my breakfast with andrea]: encustom($item[artist's spatula of despair],true); break;
+         case $effect[the champion's breakfast]: encustom($item[artist's whisk of misery],true); break;
+         case $effect[tiffany's breakfast]: encustom($item[artist's cookie cutter of loneliness],true); break;
+         case $effect[breakfast clubbed]: encustom($item[artist's butterknife of regret],true); encustom($item[artist's cr&egrave;me brul&eacute;e torch of fury],true); break;
+      } break;
+      case $monster[bundle of Meat of Happiness]: switch (to_effect(vars["BatMan_pretentioustarget"])) {
+         case $effect[my breakfast with andrea]: encustom($item[artist's butterknife of regret],true); break;
+         case $effect[the champion's breakfast]: encustom($item[artist's cookie cutter of loneliness],true); break;
+         case $effect[tiffany's breakfast]: encustom($item[artist's spatula of despair],true); break;
+         case $effect[breakfast clubbed]: encustom($item[artist's cr&egrave;me brul&eacute;e torch of fury],true); encustom($item[artist's whisk of misery],true); break;
+      } break;
+      case $monster[carton of Eggs of Confidence]: switch (to_effect(vars["BatMan_pretentioustarget"])) {
+         case $effect[my breakfast with andrea]: encustom($item[artist's whisk of misery],true); break;
+         case $effect[the champion's breakfast]: encustom($item[artist's cr&egrave;me brul&eacute;e torch of fury],true); break;
+         case $effect[tiffany's breakfast]: encustom($item[artist's spatula of despair],true); break;
+         case $effect[breakfast clubbed]: encustom($item[artist's cookie cutter of loneliness],true); encustom($item[artist's butterknife of regret],true); break;
+      } break;
+      case $monster[loaf of Bread of Wonder]: switch (to_effect(vars["BatMan_pretentioustarget"])) {
+         case $effect[my breakfast with andrea]: encustom($item[artist's butterknife of regret],true); break;
+         case $effect[the champion's breakfast]: encustom($item[artist's cr&egrave;me brul&eacute;e torch of fury],true); break;
+         case $effect[tiffany's breakfast]: encustom($item[artist's cookie cutter of loneliness],true); break;
+         case $effect[breakfast clubbed]: encustom($item[artist's spatula of despair],true); encustom($item[artist's whisk of misery],true); break;
+      } break;
      // skate decoys for goals
       case $monster[grouper groupie]: if (is_goal($item[grouper fangirl]) && item_amount($item[ice skate decoy]) > 0 && !happened($item[ice skate decoy]))
          encustom(to_event("use 4231","item grouper fangirl",1)); break;
@@ -537,8 +569,9 @@ string stasis() {
 
 // NOTE: after running this script, changing these variables here in the script will have no
 // effect.  You can view ("zlib vars") or edit ("zlib <settingname> = <value>") values in the CLI.
-setvar("flyereverything",true);
-setvar("puttybountiesupto",19);
+setvar("BatMan_flyereverything",true);
+setvar("BatMan_puttybountiesupto",19);
+setvar("BatMan_pretentioustarget",$effect[my breakfast with andrea]);
 setvar("BatMan_attract","blooper, dairy goat, shaky clown, zombie waltzers, goth giant, dirty old lihc, hellion, violent fungus","list of monster");
 setvar("BatMan_banish","senile lihc, slick lihc, A.M.C. gremlin","list of monster");
 setvar("BatMan_yellow","knob goblin harem girl, 7-foot dwarf foreman","list of monster");
