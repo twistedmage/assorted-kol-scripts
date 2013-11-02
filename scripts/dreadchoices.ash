@@ -5,6 +5,15 @@ string brewer="twistedmage";
 string keymaker="twistedmage";
 string chef="dinala";
 
+void clean_choices()
+{
+	int i=0;
+	while(i<9)
+	{
+		set_property("_dreadchoice"+i,"false");
+		i+=1;
+	}
+}
 
 void do_choice(int loc, string choice, string choice2)
 {
@@ -64,15 +73,16 @@ void do_forest()
 		do_choice(1, "pwd&whichchoice=721&option=1&choiceform1=Check+out+the+kitchen", "choice.php?pwd&whichchoice=722&option=1&choiceform1=Raid+the+spice+rack");
 		send_stuff($item[dread tarragon],chef);
 	}
-//	else
-//		abort("Don't know what to do for cabin");
+	else //kruegerands
+	{
+		do_choice(1, "?pwd&whichchoice=721&option=2&choiceform2=Go+down+to+the+basement", "?pwd&whichchoice=723&option=1&choiceform1=Look+through+the+newspapers");
+	}
 		
 	//---------------tallest tree----------------
 	send_stuff($item[blood kiwi],brewer);
 	if(my_primestat()==$stat[muscle] && !already_done("amber"))
 	{
-		abort("unknown choiceadvs for moon amber line 32");
-		//do_choice(2, choice1a, choice1b);
+		do_choice(2, "?pwd&whichchoice=725&option=1&choiceform1=Climb+to+the+top", "?pwd&whichchoice=726&option=3&choiceform3=Grab+the+shiny+thing");
 		send_stuff($item[moon-amber],polisher);
 	}
 	else if(my_primestat()==$stat[muscle] && !already_done("kiwi"))
@@ -120,8 +130,7 @@ void do_village()
 		}
 		else if(item_amount($item[complicated lock impression])>0 && item_amount($item[intricate music box parts])>0)
 		{
-			abort("line 100 choices for replica key");
-			do_choice(5, "pwd&whichchoice=737&option=3&choiceform3=Investigate+the+ticking+shack", "");
+			do_choice(5, "pwd&whichchoice=737&option=3&choiceform3=Investigate+the+ticking+shack", "?pwd&whichchoice=739&option=2&choiceform2=Make+a+key+using+the+wax+lock+impression");
 			send_stuff($item[replica key],"twistedmage");
 		}
 		else
@@ -148,8 +157,7 @@ void do_village()
 	}
 	else if(!already_done("drove some zombies out of the village")) //reduce zombies
 	{
-		abort("line 137 choice for closing the gates");
-		do_choice(6, "", "");
+		do_choice(6, "?pwd&whichchoice=741&option=1&choiceform1=Check+out+the+family+plot", "?pwd&whichchoice=742&option=1&choiceform1=Close+the+gates");
 	}
 	else if(!already_done("mort"))
 	{
@@ -179,8 +187,11 @@ void do_castle()
 	}
 	else if(!already_done("roast"))
 	{
-		abort("line 111 choices for dread roas");
-		do_choice(7, "", "");
+		do_choice(7, "?pwd&whichchoice=745&option=3&choiceform3=Investigate+the+dining+room", "?pwd&whichchoice=748&option=1&choiceform1=Grab+the+roast");
+	}
+	else //stay frosty
+	{
+		do_choice(7, "?pwd&whichchoice=745&option=2&choiceform2=Check+out+the+kitchen", "?pwd&whichchoice=747&option=2&choiceform2=Hang+out+in+the+freezer");
 	}
 	
 	//dungeons
@@ -197,12 +208,11 @@ void do_castle()
 	//tower
 	if(my_primestat()==$stat[moxie] && item_amount($item[blood kiwi])>0 && item_amount($item[eau de mort])>0)
 	{
-		abort("line 119 use still");
-		do_choice(8, "", "");
+		do_choice(8, "?pwd&whichchoice=749&option=1&choiceform1=Go+to+the+laboratory", "?pwd&whichchoice=750&option=4&choiceform4=Use+the+still");
 	}
 	else
 	{
-		//abort("skills");
+		abort("skills");
 		do_choice(8, "pwd&whichchoice=749&option=3&choiceform3=Go+to+the+bedroom", "pwd&whichchoice=752&option=2&choiceform2=Check+the+dresser");
 	}
 }

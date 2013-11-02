@@ -607,9 +607,13 @@ void advise_food()
 		if(available_amount($item[Exotic jungle fruit])>0)
 			add_food(con_map,"- Exotic jungle fruit",2.5,0,1);
 		if(available_amount($item[sandwich of the gods])>0)
-			add_drink(con_map,"- sandwich of the gods ",35,0,5);
+			add_food(con_map,"- sandwich of the gods ",35,0,5);
 		if(available_amount($item[root beer])>0)
-			add_drink(con_map,"- root beer ",4,0,1);
+			add_food(con_map,"- root beer ",4,0,1);
+			
+		if(my_fullness() == 0 && (available_amount($item[spaghetti breakfast])>0 || (have_skill($skill[spaghetti breakfast]) && !get_property("_spaghettiBreakfast").to_boolean())))
+			add_food(con_map,"- *** spaghetti breakfast (prefer to drink at higher levels, but must be first food of the day)",6,0,1);
+	
 	}
 	
 	//sort map
@@ -751,6 +755,10 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 			add_drink(con_map,"- bottle of Greedy Dog (chance from artisanal homebrew gift package) ",20,0,3);
 		if(my_primestat()==$stat[moxie] && ((available_amount($item[handful of barley])>2 && available_amount($item[cluster of hops])>2 && available_amount($item[fancy beer bottle])>2 && available_amount($item[fancy beer label])>2) || available_amount($item[bottle of Lambada Lambic])>0))
 			add_drink(con_map,"- bottle of Lambada Lambic (chance from artisanal homebrew gift package) ",20,0,3);
+			
+		
+		if(available_amount($item[cold one])>0 || (have_skill($skill[grab a cold one]) && !get_property("_coldOne").to_boolean())))
+			add_drink(con_map,"- cold one (prefer to drink at higher levels)",6,0,1);
 	}
 	//sort map
 	sort con_map by -value.efficiency;

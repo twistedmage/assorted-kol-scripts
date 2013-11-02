@@ -58,6 +58,10 @@ if !monstername *Naughty Sorceress* && !monstername *bonerdagon
 			skill intimidating bellow
 		endif
 		
+		if hasskill accordion bash
+			skill accordion bash
+		endif
+		
 		if hascombatitem rock band flyers
 			use rock band flyers
 		endif
@@ -74,7 +78,7 @@ if !monstername *Naughty Sorceress* && !monstername *bonerdagon
 			endif
 		endif
 
-		if hasskill transcendent olfaction && !haseffect on the trail          &&    (monstername dairy goat || monstername tomb rat || monstername blooper || monstername Hellion || monstername Bob Racecar || monstername Quiet Healer || monstername Goth Giant || monstername Blur || monstername Green Ops Soldier || monstername Zombie waltzers || monstername Shaky Clown || monstername Knott Yeti || monstername Hellion || monstername Violent Fungus || monstername Endless Conference Call || monstername * survivor)
+		if hasskill transcendent olfaction && !haseffect on the trail          &&    (monstername dairy goat || monstername tomb rat || monstername blooper || monstername Hellion || monstername Bob Racecar || monstername Quiet Healer || monstername Goth Giant || monstername Blur || monstername Green Ops Soldier || monstername Zombie waltzers || monstername Shaky Clown || monstername Knott Yeti || monstername Hellion || monstername Violent Fungus || monstername Endless Conference Call || monstername * survivor || monstername pygmy bowler)
 			skill transcendent olfaction
 		endif
 

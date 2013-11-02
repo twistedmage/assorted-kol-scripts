@@ -639,7 +639,8 @@ void special(boolean bonus_actions) {
 			{
 				pull_and_wear_if_good($item[operation patriot shield]);
 			}
-			pull_and_wear_if_good($item[greatest american pants]);
+			//pull_and_wear_if_good($item[greatest american pants]);
+			pull_and_wear_if_good($item[pantsgiving]);
 			
 			pull_if_good($item[loathing legion universal screwdriver]);
 			boolean screw=item_amount($item[loathing legion universal screwdriver])>0;

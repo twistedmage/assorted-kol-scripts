@@ -2907,6 +2907,13 @@ void defaultMood(boolean castMojo) {
 			drink_booze($item[single swig of vodka]);
 	}
 	
+	//summon dreadsylvania food and booze
+	if(have_skill($skill[spaghetti breakfast]) && !get_property("_spaghettiBreakfast").to_boolean())
+		use_skill(1,$skill[spaghetti breakfast]);
+	if(have_skill($skill[grab a cold one]) && !get_property("_coldOne").to_boolean())
+		use_skill(1,$skill[grab a cold one]);
+	
+	
 	//summon a knife
 	if(have_skill($skill[That's not a knife]))
 	{
@@ -2970,8 +2977,6 @@ if(can_interact())
 				cli_execute("trigger lose_effect, jaba&ntilde;ero saucesphere, cast 1 jaba&ntilde;ero saucesphere");
 			if (have_skill($skill[Jalape&ntilde;o Saucesphere]))
 				cli_execute("trigger lose_effect, jalape&ntilde;o saucesphere, cast 1 jalape&ntilde;o saucesphere");
-			if (have_skill($skill[Scowl of the Auk]))
-				cli_execute("trigger lose_effect, Scowl of the Auk, cast 1 Scowl of the Auk");
 }
 		}
 		switch (my_primestat()) {
@@ -2986,8 +2991,6 @@ if(can_interact())
 				if (have_skill($skill[Patience of the Tortoise]) && my_path() != "BIG!") cli_execute("trigger lose_effect, Patience of the Tortoise, cast 1 Patience of the Tortoise");
 				if (have_skill($skill[Seal Clubbing Frenzy]) && my_path() != "BIG!") cli_execute("trigger lose_effect, Seal Clubbing Frenzy, cast 1 Seal Clubbing Frenzy");
 				if (my_level() > 9 && have_skill($skill[Rage of the Reindeer])) cli_execute("trigger lose_effect, Rage of the Reindeer, cast 1 Rage of the Reindeer");
-				if (have_skill($skill[snarl of the timberwolf]))
-					cli_execute("trigger lose_effect, snarl of the timberwolf, cast 1 snarl of the timberwolf");
 				if (have_skill($skill[tenacity of the snapper]))
 					cli_execute("trigger lose_effect, tenacity of the snapper, cast 1 tenacity of the snapper");
 			break;
@@ -4303,10 +4306,33 @@ void setMood(string combat) {
 			}
 		} 
 		
-		//disco expressions
-		if (contains_text(combat,"m") && have_skill($skill[disco leer]))
+		//choose a dreadsylvania song (mutually exclusive)
+		if(my_maxmp()>150)
+		{
+			if (contains_text(combat,"n") && have_skill($skill[song of slowness])) 
+				cli_execute("trigger lose_effect, song of slowness, cast 1 song of slowness"); //init is the only directly useful one
+			else if ((my_primestat()==$stat[muscle] || my_primestat()==$stat[moxie]) && have_skill($skill[song of the north]))
+				cli_execute("trigger lose_effect, song of the north, cast 1 song of the north"); //wep dmg
+			else if (my_primestat()==$stat[mysticality] && have_skill($skill[song of sauce]))
+				cli_execute("trigger lose_effect, song of sauce, cast 1 song of sauce"); //spell dmg
+			else if (have_skill($skill[song of bravado]))
+				cli_execute("trigger lose_effect, song of bravado, cast 1 song of bravado"); //all stats
+			else if (have_skill($skill[song of starch]))
+				cli_execute("trigger lose_effect, song of starch, cast 1 song of starch"); //hp
+		}
+		
+		//facil expressions (mutually exclusive)
+		if (contains_text(combat,"m") && have_skill($skill[disco leer])) //meat
 			cli_execute("trigger lose_effect, Disco Leer, cast 1 Disco Leer");
-		else if(have_skill($skill[disco smirk]))
+		else if (contains_text(combat,"n") && have_skill($skill[Suspicious Gaze])) //initiative
+			cli_execute("trigger lose_effect, Suspicious Gaze, cast 1 Suspicious Gaze");
+		else if (my_primestat()==$stat[moxie] && have_skill($skill[knowing smile])) //moxie stats
+			cli_execute("trigger lose_effect, knowing smile, cast 1 knowing smile");
+		else if (my_primestat()!=$stat[mysticality] && have_skill($skill[snarl of the timberwolf])) //spooky damage
+			cli_execute("trigger lose_effect, snarl of the timberwolf, cast 1 snarl of the timberwolf");
+		else if (my_primestat()!=$stat[mysticality] && have_skill($skill[Scowl of the Auk])) //weapon damage
+			cli_execute("trigger lose_effect, Scowl of the Auk, cast 1 Scowl of the Auk");			
+		else if(have_skill($skill[disco smirk])) //moxie
 			cli_execute("trigger lose_effect, disco smirk, cast 1 disco smirk");
 			
 		//ranged damage for moxies
