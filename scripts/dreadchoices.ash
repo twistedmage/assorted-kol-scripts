@@ -27,6 +27,7 @@ boolean already_done(string action)
 void do_forest()
 {
 	//---------------cabin----------------
+	print("Doing forest","blue");
 	if(my_class()==$class[accordion thief])
 	{
 		get_key();
@@ -132,6 +133,11 @@ void do_village()
 		abort("line 126 choices for making ghost shawl");
 		do_choice(6, "", "");
 	}
+	else if(!already_done("gates")) //reduce zombies
+	{
+		abort("line 137 choice for closing the gates");
+		do_choice(6, "", "");
+	}
 	else if(!already_done("mort"))
 	{
 		abort("line 131 choices for eau de mort");
@@ -141,7 +147,6 @@ void do_village()
 	{
 		do_choice(6, "pwd&whichchoice=741&option=1&choiceform1=Check+out+the+family+plot", "pwd&whichchoice=742&option=2&choiceform2=Rob+some+graves");
 	}
-	<close gates to reduce zombies>
 }
 
 void do_castle()
