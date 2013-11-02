@@ -613,6 +613,22 @@ void advise_food()
 			
 		if(my_fullness() == 0 && (available_amount($item[spaghetti breakfast])>0 || (have_skill($skill[spaghetti breakfast]) && !get_property("_spaghettiBreakfast").to_boolean())))
 			add_food(con_map,"- *** spaghetti breakfast (prefer to drink at higher levels, but must be first food of the day)",6,0,1);
+			
+			
+		if(available_amount($item[can of sardines])>0)
+			add_food(con_map,"- can of sardines ",3.5,0,1);
+		if(available_amount($item[Cold mashed potatoes])>0)
+			add_food(con_map,"- Cold mashed potatoes ",3.5,0,1);
+		if(available_amount($item[High-calorie sugar substitute])>0)
+			add_food(con_map,"- High-calorie sugar substitute ",3.5,0,1);
+		if(available_amount($item[Deviled egg])>0)
+			add_food(con_map,"- Deviled egg ",5.5,0,1);
+		if(available_amount($item[Dinner roll])>0)
+			add_food(con_map,"- Dinner roll ",4,0,1);
+		if(available_amount($item[pat of butter])>0)
+			add_food(con_map,"- pat of butter ",3.5,0,1);
+		if(available_amount($item[whole turkey leg])>0)
+			add_food(con_map,"- whole turkey leg ",4.5,0,1);
 	
 	}
 	

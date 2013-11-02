@@ -2945,6 +2945,12 @@ void defaultMood(boolean castMojo) {
 		use(1,$item[flavored foot massage oil]);
 	if(i_a("white candy heart")>0 && have_effect($effect[heart of white])==0)
 		use(1,$item[white candy heart]);
+		
+	//random pant item buffs
+	if(i_a("Gym membership card")>0)
+		use(1,$item[Gym membership card]);
+	if(i_a("Old candy wrapper")>0 && have_effect($effect[litterbug])==0)
+		use(1,$item[Old candy wrapper]);
 	
 	//have to be a bit conservative in wosf
 	if(my_path() == "Way of the Surprising Fist") {
@@ -9141,10 +9147,12 @@ boolean bcascPirateFledges() {
 			
 			if (my_path() != "Bees Hate You") {
 				if (i_a("the big book of pirate insults") == 0) {
+					if(i_a("post-holiday sale coupon")>0)use(1,$item[post-sale holiday coupon]);
 					buy(1, $item[the big book of pirate insults]);
 				}
 			} else {
 				if (i_a("Massive Manual of Marauder Mockery") == 0) {
+					if(i_a("post-holiday sale coupon")>0)use(1,$item[post-sale holiday coupon]);
 					buy(1, $item[Massive Manual of Marauder Mockery]);
 				}
 			}

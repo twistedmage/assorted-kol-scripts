@@ -91,6 +91,9 @@ if !monstername *Naughty Sorceress* && !monstername *bonerdagon
 		if hasskill entangling noodles
 			skill entangling noodles
 		endif
+		if hasskill pocket crumbs
+			skill pocket crumbs
+		endif
 	endif #!monstername black ops bugbear && monstername !ancient unspeakable bugbear && !monstername battlesuit bugbear type && !monstername trendy bugbear chef  && !monstername bugaboo  && !monstername bugbear scientist
 	
 	if hascombatitem quantum nanopolymer spider web && monstername bugbear scientist
@@ -169,6 +172,9 @@ if  !monstername *Naughty Sorceress* && !monstername *bonerdagon
 		endif
 		if hascombatitem harold's bell
 			use harold's bell
+		endif
+		if hasskill talk about politics
+			skill talk about politics
 		endif
 	endif
 
@@ -454,6 +460,9 @@ mark gremlinfight
 		endif
 		if hascombatitem harold's bell
 			use harold's bell
+		endif
+		if hasskill talk about politics
+			skill talk about politics
 		endif
 		runaway
 	endif
