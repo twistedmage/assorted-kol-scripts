@@ -8,7 +8,7 @@ string chef="dinala";
 
 void do_choice(int loc, string choice, string choice2)
 {
-	if(get_property("_dreadchoice"+loc))
+	if(get_property("_dreadchoice"+loc).to_boolean())
 		return;
 	string str=visit_url("clan_dreadsylvania.php?action=forceloc&loc=" + to_string(loc) );
 	str=visit_url("choice.php?"+choice);
@@ -61,12 +61,11 @@ void do_forest()
 	}
 	else if(!already_done("tarragon"))
 	{
-		abort("unknown choiceadvs for dread tarragon line 25");
-		//do_choice(1, choice1a, choice1b);
+		do_choice(1, "pwd&whichchoice=721&option=1&choiceform1=Check+out+the+kitchen", "choice.php?pwd&whichchoice=722&option=1&choiceform1=Raid+the+spice+rack");
 		send_stuff($item[dread tarragon],chef);
 	}
-	else
-		abort("Don't know what to do for cabin");
+//	else
+//		abort("Don't know what to do for cabin");
 		
 	//---------------tallest tree----------------
 	send_stuff($item[blood kiwi],brewer);
@@ -76,20 +75,23 @@ void do_forest()
 		//do_choice(2, choice1a, choice1b);
 		send_stuff($item[moon-amber],polisher);
 	}
-	else if(my_primestat()==$stat[muscle] && !already_done("stomp"))
+	else if(my_primestat()==$stat[muscle] && !already_done("kiwi"))
 	{
-		if(!get_property("_dreadchoice2"))
+		if(!get_property("_dreadchoice2").to_boolean())
 		{
 			string str=visit_url("clan_dreadsylvania.php?action=forceloc&loc=2");
 			str=visit_url("choice.php?pwd&whichchoice=725&option=1&choiceform1=Climb+to+the+top");
-			set_property("_dreadchoice"+loc,"true");
+			set_property("_dreadchoice2","true");
 			abort("Waiting to stomp");
 		}
 	}
-	else if(!already_done("stomp"))
+	else if(!already_done("kiwi"))
 	{
-		do_choice(2, "choice.php?pwd&whichchoice=725&option=3&choiceform3=Root+around+at+the+base","?pwd&whichchoice=728&option=1&choiceform1=Stand+near+the+base+looking+upward");
-		abort("Waiting to get stomped on");
+		if(!get_property("_dreadchoice2").to_boolean())
+		{
+			do_choice(2, "choice.php?pwd&whichchoice=725&option=3&choiceform3=Root+around+at+the+base","?pwd&whichchoice=728&option=1&choiceform1=Stand+near+the+base+looking+upward");
+			abort("Waiting to get stomped on");
+		}
 	}
 	else
 	{
@@ -102,11 +104,11 @@ void do_forest()
 
 void do_village()
 {
+	print("doing village","blue");
 	//village square
 	//get_key();
 	//do_choice(4, "pwd&whichchoice=733&option=1&choiceform1=The+schoolhouse","pwd&whichchoice=734&option=2&choiceform2=Rummage+through+the+teacher%27s+desk");
-	abort("line 87 freddies");
-	do_choice(4, "","");
+	do_choice(4, "?pwd&whichchoice=733&option=2&choiceform2=The+blacksmith%27s+shop","?pwd&whichchoice=735&option=2&choiceform2=Dig+through+the+till");
 	
 	//skid row
 	if(my_primestat()==$stat[moxie])
@@ -142,17 +144,17 @@ void do_village()
 	{
 		get_key();
 		abort("line 126 choices for making ghost shawl");
-		do_choice(6, "", "");
+		do_choice(6, "pwd&whichchoice=741&option=3&choiceform3=Make+your+way+to+the+master+suite", "");
 	}
-	else if(!already_done("gates")) //reduce zombies
+	else if(!already_done("drove some zombies out of the village")) //reduce zombies
 	{
 		abort("line 137 choice for closing the gates");
 		do_choice(6, "", "");
 	}
 	else if(!already_done("mort"))
 	{
-		abort("line 131 choices for eau de mort");
-		do_choice(6, "", "");
+		get_key();
+		do_choice(6, "?pwd&whichchoice=741&option=3&choiceform3=Make+your+way+to+the+master+suite", "?pwd&whichchoice=744&option=2&choiceform2=Check+the+nightstand");
 	}
 	else
 	{
@@ -162,8 +164,9 @@ void do_village()
 
 void do_castle()
 {
+	print("doing castle","blue");
 	//great hall
-	if(item_amount($item[muddy skirt])>0 && item_amount($item[dreadsylvanian seed pod])>0)
+	if(item_amount($item[muddy skirt])>0 && item_amount($item[dreadsylvanian seed pod])>0 && my_basestat($stat[moxie])>=200)
 	{
 		equip($item[muddy skirt]);
 		get_key();
@@ -172,13 +175,23 @@ void do_castle()
 	}
 	else if(my_primestat()==$stat[mysticality])
 	{
-		abort("line 106 choices for wax banana");
-		do_choice(7, "", "");
+		do_choice(7, "?pwd&whichchoice=745&option=3&choiceform3=Investigate+the+dining+room", "?pwd&whichchoice=748&option=3&choiceform3=Levitate+up+to+the+rafters");
 	}
 	else if(!already_done("roast"))
 	{
 		abort("line 111 choices for dread roas");
 		do_choice(7, "", "");
+	}
+	
+	//dungeons
+	if(!already_done("agaric"))
+	{
+		do_choice(9, "?pwd&whichchoice=753&option=3&choiceform3=Check+out+the+guardroom", "?pwd&whichchoice=756&option=1&choiceform1=Break+off+some+choice+bits");
+		send_stuff($item[stinking agaricus],chef);
+	}
+	else
+	{
+		do_choice(9, "pwd&whichchoice=753&option=2&choiceform2=Head+for+the+boiler+room", "pwd&whichchoice=755&option=2&choiceform2=Check+in+the+incinerator");
 	}
 	
 	//tower
@@ -189,19 +202,8 @@ void do_castle()
 	}
 	else
 	{
+		//abort("skills");
 		do_choice(8, "pwd&whichchoice=749&option=3&choiceform3=Go+to+the+bedroom", "pwd&whichchoice=752&option=2&choiceform2=Check+the+dresser");
-	}
-	
-	//dungeons
-	if(!already_done("agaricus"))
-	{
-		abort("line 155 choices for agaricus");
-		do_choice(9, "", "");
-		send_stuff($item[stinking agaricus],"twistedmage");
-	}
-	else
-	{
-		do_choice(9, "pwd&whichchoice=753&option=2&choiceform2=Head+for+the+boiler+room", "pwd&whichchoice=755&option=2&choiceform2=Check+in+the+incinerator");
 	}
 }
 
