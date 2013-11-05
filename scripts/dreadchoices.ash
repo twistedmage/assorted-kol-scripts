@@ -59,13 +59,12 @@ void do_forest()
 	else if(item_amount($item[replica key])>0)
 	{
 		abort("unknown choiceadvs for auditors badge line 19");
-		//do_choice(1, choice1a, choice1b);
+		//do_choice(1, "?pwd&whichchoice=721&option=2&choiceform2=Go+down+to+the+basement", choice1b);
 		send_stuff($item[dreadsylvania auditor's badge],"twistedmage");
 	}
 	else if(item_amount($item[wax banana])>0)
 	{
-		abort("unknown choiceadvs for lock impression line 22");
-		//do_choice(1, choice1a, choice1b);
+		do_choice(1, "?pwd&whichchoice=721&option=2&choiceform2=Go+down+to+the+basement", "?pwd&whichchoice=723&option=4&choiceform4=Stick+a+wax+banana+in+the+lock");
 		send_stuff($item[complicated lock impression],keymaker);
 	}
 	else if(!already_done("tarragon"))
