@@ -773,7 +773,7 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 			add_drink(con_map,"- bottle of Lambada Lambic (chance from artisanal homebrew gift package) ",20,0,3);
 			
 		
-		if(available_amount($item[cold one])>0 || (have_skill($skill[grab a cold one]) && !get_property("_coldOne").to_boolean())))
+		if(available_amount($item[cold one])>0 || (have_skill($skill[grab a cold one]) && !get_property("_coldOne").to_boolean()))
 			add_drink(con_map,"- cold one (prefer to drink at higher levels)",6,0,1);
 	}
 	//sort map

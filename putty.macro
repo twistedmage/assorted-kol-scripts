@@ -94,6 +94,9 @@ if !monstername *Naughty Sorceress* && !monstername *bonerdagon
 		if hasskill pocket crumbs
 			skill pocket crumbs
 		endif
+		if hasskill steal accordion
+			skill steal accordion
+		endif
 	endif #!monstername black ops bugbear && monstername !ancient unspeakable bugbear && !monstername battlesuit bugbear type && !monstername trendy bugbear chef  && !monstername bugaboo  && !monstername bugbear scientist
 	
 	if hascombatitem quantum nanopolymer spider web && monstername bugbear scientist
@@ -175,6 +178,9 @@ if  !monstername *Naughty Sorceress* && !monstername *bonerdagon
 		endif
 		if hasskill talk about politics
 			skill talk about politics
+		endif
+		if hascombatitem short writ of habeas corpus && (monstername pygmy shaman || monstername pygmy witch lawyer || monstername pygmy orderlies || monstername pygmy witch nurse || monstername pygmy witch surgeon || monstername pygmy headhunter || monstername drunk pygmy)
+			use short writ of habeas corpus
 		endif
 	endif
 

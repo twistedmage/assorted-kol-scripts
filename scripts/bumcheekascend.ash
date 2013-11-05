@@ -2913,7 +2913,6 @@ void defaultMood(boolean castMojo) {
 	if(have_skill($skill[grab a cold one]) && !get_property("_coldOne").to_boolean())
 		use_skill(1,$skill[grab a cold one]);
 	
-	
 	//summon a knife
 	if(have_skill($skill[That's not a knife]))
 	{
@@ -2945,6 +2944,12 @@ void defaultMood(boolean castMojo) {
 		use(1,$item[flavored foot massage oil]);
 	if(i_a("white candy heart")>0 && have_effect($effect[heart of white])==0)
 		use(1,$item[white candy heart]);
+	if(i_a("white candy heart")>0 && have_effect($effect[heart of white])==0)
+		use(1,$item[white candy heart]);
+	if(i_a("Effermint tablets")>0 && have_effect($effect[winning smile])==0)
+		use(1,$item[Effermint tablets]);
+	if(i_a("Ogres and Oubliettes module")>0 && have_effect($effect[Ogred and Oublietted])==0)
+		use(1,$item[Ogres and Oubliettes module]);
 		
 	//random pant item buffs
 	if(i_a("Gym membership card")>0)
