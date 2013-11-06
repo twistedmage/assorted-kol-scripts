@@ -2,7 +2,7 @@
 // http://kolmafia.us/showthread.php?t=1780
 script "Universal_recovery.ash";
 notify "Bale";
-string thisver = "3.12.1";		// This is the script's version!
+string thisver = "3.13";		// This is the script's version!
 
 // To use this script, put Universal_recovery in the /script directory. 
 // Then in the Graphical CLI type:
@@ -122,6 +122,7 @@ int disco = to_int(have_skill($skill[Disco Nap]))
 	+ 2* to_int(have_skill($skill[Adventurer of Leisure]))
 	+ to_int(have_skill($skill[Executive Narcolepsy]))
 	+ 10*to_int(have_skill($skill[Food Coma]))
+	+ 5*to_int(have_skill($skill[Dog Tired]))
 	+ 3* to_int(have_familiar($familiar[Unconscious Collective]));
 int rest_hp = numeric_modifier("Base Resting HP") * (numeric_modifier("Resting HP Percent")+100) / 100 + numeric_modifier("Bonus Resting HP");
 int rest_mp = numeric_modifier("Base Resting MP") * (numeric_modifier("Resting MP Percent")+100) / 100 + numeric_modifier("Bonus Resting MP");
@@ -1424,14 +1425,9 @@ boolean purchase_hp(int target) {
 	return (my_hp() >= target);
 }
 
-// This returns true if the character is currently mining, or Unhydrated.
+// This returns true if the character is currently mining
 boolean noncom() {
 	switch(my_location()) {
-	case $location[Desert (Unhydrated)]:
-		if(get_property("lastEncounter") == "Let's Make a Deal!"
-		  || gameday_to_int() == 34 || gameday_to_int() == 87) // Today is FoB or El Dia. HP will be needed for combats.
-			return false;
-		return $familiars[Artistic Goth Kid, Mini-Hipster] contains my_familiar();
 	#case $location[The Gummi Mine]:
 	case $location[Itznotyerzitz Mine (in Disguise)]:
 		if(string_modifier("outfit") == "Dwarvish War Uniform") return true;
@@ -1773,8 +1769,7 @@ string check_version() {
 // Once per day check to see if the version is current, data is current and pricelist updating for mallcore mode
 // Much of this routine is very much owed to zarqon
 void daily_handling() {
-	string current_ver = get_property("_version_BalesUniversalRecovery");
-	if(current_ver == "") {
+	if(get_property("_version_BalesUniversalRecovery") == "") {
 		// This is zarqon's automatic map updating: http://kolmafia.us/showthread.php?t=1515
 		string curr = visit_url("http://zachbardon.com/mafiatools/autoupdate.php?f="+fname+"&act=getver");
 		if(!file_to_map(fname+".txt",heal) || count(heal) == 0
@@ -1789,7 +1784,11 @@ void daily_handling() {
 		// Set _meatpermp and meatperhp today so they can be used by other scripts right away
 		restore_values();
 		meatper();
-		check_version();
+		if(svn_exists("mafiarecovery")) {
+			cli_execute("svn update mafiarecovery");
+			set_property("_version_BalesUniversalRecovery", thisver);
+		}
+		else check_version();
 	}
 }
 

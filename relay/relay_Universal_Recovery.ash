@@ -1,6 +1,6 @@
 // UI for Universal_recovery.ash by Bale
 // http://kolmafia.us/showthread.php?t=1780
-string thisver = "1.3";
+string thisver = "1.4";
 
 // Beginning of copy-paste from jasonharper's htmlform.ash from http://kolmafia.us/showthread.php?3842
 
@@ -310,6 +310,10 @@ string check_version() {
 	string soft = "Universal Recovery Configuration";
 	string prop = "_version_BalesUniversalRecoveryUI";
 	int thread = 1780;
+	if(svn_exists("mafiarecovery") && get_property(prop) == "") {
+		cli_execute("svn update mafiarecovery");
+		set_property(prop,thisver);
+	}
 	string page;
 	boolean sameornewer(string local, string server) {
 		if (local == server) return true;

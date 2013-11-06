@@ -3886,7 +3886,6 @@ save [$item[ph balancer]] = 0;
 save [$item[mysterious chemical residue]] = 0;
 save [$item[nugget of sodium]] = 0;
 save [$item[Mountain Stream Code Black Alert]] = 0;
-
 save [$item[tin tam]] = 2;
 save [$item[tin foil]] = 3;
 save [$item[Gummi-DNA]] = 0;
@@ -3903,6 +3902,7 @@ save [$item[Spooky Surprise Egg]] = 0;
 
 
 //stuff to sell later
+save [$item[skewered cherry]] = -1;
 save [$item[PEEZ dispenser]] = -1;
 save [$item[Junk-Bond]] = -1;
 save [$item[tangle of copper wire]] = -1;
