@@ -90,7 +90,7 @@ void do_forest()
 		{
 			string str=visit_url("clan_dreadsylvania.php?action=forceloc&loc=2");
 			str=visit_url("choice.php?pwd&whichchoice=725&option=1&choiceform1=Climb+to+the+top");
-			if(!contains_text(str,"You are the top of the tallest tree in the Dreadsylvanian Woods"))
+			if(!contains_text(str,"You are at the top of the tallest tree in the Dreadsylvanian Woods"))
 				abort("Tried to get up to stomping branch but seems like we failed");
 			set_property("_dreadchoice2","true");
 			abort("Waiting to stomp");
@@ -219,7 +219,7 @@ void do_castle()
 	}
 	else
 	{
-		abort("skills");
+//		abort("skills");
 		do_choice(8, "pwd&whichchoice=749&option=3&choiceform3=Go+to+the+bedroom", "pwd&whichchoice=752&option=2&choiceform2=Check+the+dresser");
 	}
 }

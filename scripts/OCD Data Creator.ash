@@ -3907,6 +3907,28 @@ save [$item[spirit sheet]] = 0;
 save [$item[spirit mattress]] = 0;
 save [$item[spirit blanket]] = 0;
 save [$item[eel skin]] = 0;
+save [$item[surgical mask]] = 3;
+save [$item[bloodied surgical dungarees]] = 2;
+save [$item[bone abacus]] = 1;
+save [$item[sphygmomanometer]] = 3;
+cli_execute("use * gold Boozehounds Anonymous token");
+save [$item[disco horoscope (Pisces)]] = 0;
+save [$item[disco horoscope (Aries)]] = 0;
+save [$item[disco horoscope (Cancer)]] = 0;
+save [$item[disco horoscope (Libra)]] = 0;
+save [$item[eleven-foot pole]] = 1;
+save [$item[clutch of dodecapede eggs]] = 0;
+save [$item[flavorless gruel]] = 0;
+save [$item[pencil stub]] = 0;
+save [$item[giant giant moth dust]] = 0;
+save [$item[glob of spoiled mayo]] = 0;
+save [$item[ribbon candy]] = 0;
+save [$item[chocolate pasta spoon]] = 0;
+save [$item[chocolate stolen accordion]] = 0;
+save [$item[fancy ball mask]] = 2;
+save [$item[Angry Farmer's Wife Candy]] = 0;
+
+
 
 
 
