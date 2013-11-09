@@ -3004,6 +3004,8 @@ if(can_interact())
 				if (my_level() > 9 && have_skill($skill[Rage of the Reindeer])) cli_execute("trigger lose_effect, Rage of the Reindeer, cast 1 Rage of the Reindeer");
 				if (have_skill($skill[tenacity of the snapper]))
 					cli_execute("trigger lose_effect, tenacity of the snapper, cast 1 tenacity of the snapper");
+				if (have_skill($skill[spiky shell]))
+					cli_execute("trigger lose_effect, spiky shell, cast 1 spiky shell");
 			break;
 			
 			case $stat[Mysticality] :
@@ -3021,6 +3023,8 @@ if(can_interact())
 					if ((i_a("saucepan") + i_a("5-alarm saucepan") + i_a("17-alarm saucepan") > 0) && have_skill($skill[Jalape&ntilde;o Saucesphere]) && my_class() == $class[sauceror]) cli_execute("trigger lose_effect, Jalape&ntilde;o Saucesphere, cast 1 Jalape&ntilde;o Saucesphere");
 					if (have_skill($skill[Flavour of magic]) && have_effect($effect[Spirit of Peppermint]) == 0) use_skill(1, $skill[Spirit of Peppermint]);
 					if (have_skill($skill[Springy Fusilli]) && my_class() == $class[Pastamancer]) cli_execute("trigger lose_effect, Springy Fusilli, cast 1 Springy Fusilli");
+					if (have_skill($skill[spiky shell]))
+						cli_execute("trigger lose_effect, spiky shell, cast 1 spiky shell");
 				}
 			break;
 			
@@ -4332,19 +4336,32 @@ void setMood(string combat) {
 				cli_execute("trigger lose_effect, song of starch, cast 1 song of starch"); //hp
 		}
 		
-		//facil expressions (mutually exclusive)
+		//facial expressions (mutually exclusive)
 		if (contains_text(combat,"m") && have_skill($skill[disco leer])) //meat
 			cli_execute("trigger lose_effect, Disco Leer, cast 1 Disco Leer");
 		else if (contains_text(combat,"n") && have_skill($skill[Suspicious Gaze])) //initiative
 			cli_execute("trigger lose_effect, Suspicious Gaze, cast 1 Suspicious Gaze");
 		else if (my_primestat()==$stat[moxie] && have_skill($skill[knowing smile])) //moxie stats
 			cli_execute("trigger lose_effect, knowing smile, cast 1 knowing smile");
+		else if(my_primestat()==$stat[muscle] && have_skill($skill[Patient Smile])) //mus stats
+			cli_execute("trigger lose_effect, Patient Smile, cast 1 Patient Smile");
 		else if (my_primestat()!=$stat[mysticality] && have_skill($skill[snarl of the timberwolf])) //spooky damage
 			cli_execute("trigger lose_effect, snarl of the timberwolf, cast 1 snarl of the timberwolf");
 		else if (my_primestat()!=$stat[mysticality] && have_skill($skill[Scowl of the Auk])) //weapon damage
-			cli_execute("trigger lose_effect, Scowl of the Auk, cast 1 Scowl of the Auk");			
+			cli_execute("trigger lose_effect, Scowl of the Auk, cast 1 Scowl of the Auk");	
+		else if(my_primestat()!=$stat[moxie] && have_skill($skill[Stiff Upper Lip])) //da use it if we don't need moxie
+			cli_execute("trigger lose_effect, Stiff Upper Lip, cast 1 Stiff Upper Lip");		
 		else if(have_skill($skill[disco smirk])) //moxie
 			cli_execute("trigger lose_effect, disco smirk, cast 1 disco smirk");
+
+		//tt blessings
+		if (contains_text(combat,"n") && have_skill($skill[Blessing of the Storm Tortoise])) //init + mp
+			cli_execute("trigger lose_effect, Blessing of the Storm Tortoise, cast 1 Blessing of the Storm Tortoise");
+		else if (have_skill($skill[Blessing of the War Snapper])) //weapon daamge + muscle
+			cli_execute("trigger lose_effect, Blessing of the War Snapper, cast 1 Blessing of the War Snapper");
+		else if (have_skill($skill[Blessing of She-Who-Was])) //myst + spooky damage
+			cli_execute("trigger lose_effect, Blessing of She-Who-Was, cast 1 Blessing of She-Who-Was");
+	
 			
 		//ranged damage for moxies
 		if(my_primestat()==$stat[moxie] && have_skill($skill[disco fever]))

@@ -100,7 +100,9 @@ void do_forest()
 	{
 		if(!get_property("_dreadchoice2").to_boolean())
 		{
-			do_choice(2, "choice.php?pwd&whichchoice=725&option=3&choiceform3=Root+around+at+the+base","?pwd&whichchoice=728&option=1&choiceform1=Stand+near+the+base+looking+upward");
+			string str=visit_url("clan_dreadsylvania.php?action=forceloc&loc=2");
+			str=visit_url("choice.php?pwd&whichchoice=725&option=3&choiceform3=Root+around+at+the+base");
+			str=visit_url("choice.php?pwd&whichchoice=728&option=1&choiceform1=Stand+near+the+base+looking+upward");
 			if(!contains_text(str,"You are standing at the base of a tall tall tree, staring upwards"))
 				abort("Tried to wait at bottom of tree but seems we failed");
 			set_property("_dreadchoice2","true");
@@ -129,8 +131,7 @@ void do_village()
 	{
 		if(item_amount($item[moon-amber])>0)
 		{
-			abort("choices for polishing");
-			do_choice(5, "pwd&whichchoice=737&option=3&choiceform3=Investigate+the+ticking+shack", "");
+			do_choice(5, "pwd&whichchoice=737&option=3&choiceform3=Investigate+the+ticking+shack", "pwd&whichchoice=739&option=3&choiceform3=Polish+the+moon-amber");
 		}
 		else if(item_amount($item[complicated lock impression])>0 && item_amount($item[intricate music box parts])>0)
 		{
@@ -167,6 +168,7 @@ void do_village()
 	{
 		get_key();
 		do_choice(6, "?pwd&whichchoice=741&option=3&choiceform3=Make+your+way+to+the+master+suite", "?pwd&whichchoice=744&option=2&choiceform2=Check+the+nightstand");
+		send_stuff($item[eau de mort],brewer);
 	}
 	else
 	{
@@ -180,10 +182,11 @@ void do_castle()
 	//great hall
 	if(item_amount($item[muddy skirt])>0 && item_amount($item[dreadsylvanian seed pod])>0 && my_basestat($stat[moxie])>=200)
 	{
+		item prev_pants= equipped_item($slot[pants]);
 		equip($item[muddy skirt]);
 		get_key();
 		do_choice(7, "pwd&whichchoice=745&option=1&choiceform1=Head+to+the+ballroom", "pwd&whichchoice=746&option=2&choiceform2=Trip+the+light+fantastic");
-		cli_execute("outfit dread");
+		equip(prev_pants);
 	}
 	else if(my_primestat()==$stat[mysticality])
 	{

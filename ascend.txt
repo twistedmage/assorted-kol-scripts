@@ -203,8 +203,8 @@ final drop chance=0.1759% + 0.2089% = 0.3848%
 item drop from gear = 174.98 + 500 = 674.98
 total chance = 1.05978%
 -----------------------------------------------
-AT + SC
-AT + TT - twistedmage, 
+AT + SC - <anid>
+AT + TT - twistedmage, <asica, dinala>
 AT + PM - 
 AT + S
 AT + DB - twistedmage, 
@@ -229,11 +229,10 @@ i go to at, asica goes to sc dinala goes to s
 
 <ASICA HAS A BLOODY KIWITINI>
 
------halloween
-anid killed boss
-asica got killed by boss
-dinala got killed
-twistedmage killed boss
+----------Zombie homeowners association---------
+
+-------------------------------------------------
+
 ----------The unkillable skeleton hard mode ---------
 1800 hp
 passive damage only - need 60 per turn base
@@ -298,7 +297,7 @@ svn checkout https://svn.code.sf.net/p/formhtml/code/;
 svn checkout https://svn.code.sf.net/p/zlib/code/;
 svn checkout https://svn.code.sf.net/p/bestbetweenbattle/code/;
 svn checkout https://svn.code.sf.net/p/guyymafia/code/dreaddrunk/;
-
+svn checkout https://svn.code.sf.net/p/mafiarecovery/code/
 
 ash set_property("bcasc_unlockHiddenTavern","true");
 

@@ -21,7 +21,7 @@
 script "PriceAdvisor.ash"
 
 import <SmashLib.ash>
-import <sims_lib.ash>;
+//import <sims_lib.ash>;
 
 check_version("PriceAdvisor", "priceadvisor", "1.62", 3110);
 
@@ -682,7 +682,7 @@ price_advice [int] price_advisor(item it, boolean consider_more)
 					case "SSAUCE":
 					case "SSAUCE, SX3":
 					case "DSAUCE":
-						if (!simons_have_chef()) opportunity_cost = adv_val;  // chef-in-a-box
+						if (!have_chef()) opportunity_cost = adv_val;  // chef-in-a-box
 						else if (campground[$item[clockwork chef-in-the-box]] > 0)
 						{ opportunity_cost = best_advice($item[clockwork chef-in-the-box], false).price / 360; }
 						else
@@ -704,7 +704,7 @@ price_advice [int] price_advisor(item it, boolean consider_more)
 						temp = concocted_advice(concoct, 1, it, ingreds, gain, opportunity_cost);
 						break;
 					case "MIX":
-						if (!simons_have_bartender()) opportunity_cost = adv_val;  // bartender
+						if (!have_bartender()) opportunity_cost = adv_val;  // bartender
 						else opportunity_cost = best_advice($item[bartender-in-the-box], false).price / 90.0;
 						
 						if ($items[bottle of gin, bottle of rum, bottle of sake, bottle of tequila, bottle of whiskey, bottle of vodka, boxed wine] contains concoct)
@@ -720,7 +720,7 @@ price_advice [int] price_advisor(item it, boolean consider_more)
 					case "ACOCK":
 					case "SCOCK":
 					case "SACOCK":
-						if (!simons_have_bartender()) opportunity_cost = adv_val;
+						if (!have_bartender()) opportunity_cost = adv_val;
 						else if (campground[$item[clockwork bartender-in-the-box]] > 0)
 						{ opportunity_cost = best_advice($item[clockwork bartender-in-the-box], false).price / 360; }
 						else 

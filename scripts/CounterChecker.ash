@@ -89,7 +89,7 @@ item [location] semi_rare;
 	semi_rare[$location[Exposure Esplanade]] = $item[bowl of fishysoisse];
 	semi_rare[$location[The Heap]] = $item[concentrated garbage juice];
 	semi_rare[$location[The Ancient Hobo Burial Ground]] = $item[deadly lampshade];
-	semi_rare[$location[Chapel]] = $item[pixel stopwatch];
+	semi_rare[$location[Vanya's Castle Chapel]] = $item[pixel stopwatch];
 	semi_rare[$location[A-Boo Peak]] = $item[death blossom];
 	semi_rare[$location[Twin Peak]] = $item[miniature boiler];
 	semi_rare[$location[Oil Peak]] = $item[unnatural gas];
@@ -216,7 +216,7 @@ boolean canadv(location loc) {
 		return get_property("questL11Worship") != "unstarted";
 	case $location[8-Bit Realm]:
 		return my_buffedstat(my_primestat()) >= 20 && available_amount($item[continuum transfunctioner]) > 0;
-	case $location[Chapel]:
+	case $location[Vanya's Castle Chapel]:
 		return available_amount($item[continuum transfunctioner]) > 0 && available_amount($item[map to Vanya's Castle]) > 0
 			&& (available_amount($item[pixel whip]) > 0 || available_amount($item[pixel chain whip]) > 0 || available_amount($item[pixel morning star]) > 0);
 	case $location[The Spooky Forest]:
@@ -339,7 +339,7 @@ void get_semirare() {
 		cli_execute("checkpoint");
 		pixelize(false);
 		break;
-	case $location[Chapel]:
+	case $location[Vanya's Castle Chapel]:
 		cli_execute("checkpoint");
 		pixelize(true);
 		break;
@@ -393,7 +393,7 @@ void get_semirare() {
 		cli_execute("outfit checkpoint");
 		break;
 	case $location[8-Bit Realm]:
-	case $location[Chapel]:
+	case $location[Vanya's Castle Chapel]:
 	case $location[The Obligatory Pirate's Cove]:
 		cli_execute("outfit checkpoint");
 	}

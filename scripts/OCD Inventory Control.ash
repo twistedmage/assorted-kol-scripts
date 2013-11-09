@@ -1,6 +1,6 @@
 // OCD Inventory Control v2.1
 import <PriceAdvisor.ash>;
-import <sims_lib.ash>;
+//import <sims_lib.ash>;
 
 if(!get_property("_inv_cleaned_"+my_name()).to_boolean())
 {

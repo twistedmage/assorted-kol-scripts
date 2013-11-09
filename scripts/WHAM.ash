@@ -188,7 +188,8 @@
 		13-08-25:Try to blacklist KOHLS-combat items
 		13-09-03:Attempt to abort when we tame a sea horse
 		13-10-22:Add basic handling of Procedurally Generated Skeletons as well as Video Game bosses.
-				 Don't use Noodles to stun with the revamped classes. It won't work.		
+				 Don't use Noodles to stun with the revamped classes. It won't work.	
+		13-11-09:Try to steal accordions if we can. RFemove more classes from noodling.				 
 ***********************************************************************************************************************/
 import <SmartStasis.ash>;
 
@@ -867,7 +868,7 @@ advevent stun_option(float rounds, boolean foritem) {
 			continue;
 		if (hitchance(opt.id) < hitchance)
 			continue;
-		if (opt.id == "skill 3004" && (my_class() == $class[seal clubber] || my_class() == $class[disco bandit]))	//Noodles won't stun for the revamped classes
+		if (opt.id == "skill 3004" && (my_class() == $class[seal clubber] || my_class() == $class[disco bandit] || my_class() == $class[accordion thief] || my_class() == $class[turtle tamer]))	//Noodles won't stun for the revamped classes
 			continue;			
 		vprint("WHAM: Stun option chosen: "+opt.id+" (round "+rnum(round)+", profit: "+rnum(opt.profit)+")",8);
 		buytime = opt;
@@ -1255,7 +1256,8 @@ void build_custom_WHAM() {
 
 	if(my_location().zone == "The Sea" && item_amount($item[sea lasso]) > 0 && vars["WHAM_UseSeaLasso"] == "true" && get_property("lassoTraining") != "expertly")
 		encustom(get_action($item[sea lasso]));
-
+	if(has_option($skill[steal accordion]))
+		encustom(get_action($skill[steal accordion]));
 	switch (to_string(m)) {
 		//Boss actions
 		case "conjoined zmombie":	for i from 1 upto item_amount($item[half-rotten brain])
