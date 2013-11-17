@@ -3955,7 +3955,7 @@ save [$item[linoleum meat stack]] = 0;
 save [$item[old candy wrapper]] = 0;
 save [$item[gym membership card]] = 0;
 save [$item[post-holiday sale coupon]] = 0;
-
+save [$item[pixel energy tank]] = 0;
 
 
 
