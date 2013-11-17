@@ -4438,7 +4438,22 @@ void setMood(string combat) {
 			cli_execute("trigger lose_effect, Bind Vermincelli, cast 1 Bind Vermincelli");
 		else if (have_skill($skill[Bind Penne Dreadful])) //upgrade mox to mys, delevel, dr
 			cli_execute("trigger lose_effect, Bind Penne Dreadful, cast 1 Bind Penne Dreadful");
+		
+		//level up the thrall
+		int thrall_level=get_property().to_int();
+		if(thrall_level>1 && thrall_level<9)
+			if(i_a("Experimental carbon fiber pasta additive")>0)
+				use(1,$item[Experimental carbon fiber pasta additive]);
+			else
+				cli_execute("pull 1 Experimental carbon fiber pasta additive");
 
+		//soul sauce
+		if(contains_text(combat,"n") && have_skill($skill[Soul Rotation]))
+			cli_execute("trigger lose_effect, soulerskates, ash if(<num souls> >= 25){cli_execute(\"cast 1 Soul Rotation\");}");
+		
+		if(contains_text(combat,"n") && have_skill($skill[Soul Rotation]) && souls > 25)
+			cli_execute("trigger lose_effect, soulerskates, cast 1 Soul Rotation");
+		
 			
 	} else if(my_path() == "Avatar of Boris"){
 		print("setting boris paths mood","lime");

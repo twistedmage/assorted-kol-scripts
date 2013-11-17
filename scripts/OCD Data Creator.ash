@@ -3956,6 +3956,18 @@ save [$item[old candy wrapper]] = 0;
 save [$item[gym membership card]] = 0;
 save [$item[post-holiday sale coupon]] = 0;
 save [$item[pixel energy tank]] = 0;
+save [$item[tongue depressor]] = 0;
+save [$item[smirking shrunken head]] = 1;
+save [$item[chocolate seal-clubbing club]] = 0;
+save [$item[Steal This Candy]] = 0;
+save [$item[gilded ancient cursed chest]] = 0;
+save [$item[dead guy's piece of double-sided tape]] = 0;
+save [$item[Now and Earlier]] = 0;
+save [$item[Pain Dip]] = 0;
+save [$item[candy skeleton]] = 0;
+save [$item[double-ice gum]] = 0;
+
+
 
 
 

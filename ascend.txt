@@ -229,6 +229,34 @@ i go to at, asica goes to sc dinala goes to s
 
 <ASICA HAS A BLOODY KIWITINI>
 
+12.11
+12.6
+13.9
+13.11
+
+13.1
+12.10
+13.2
+
+hd 7670
+
+new one (2 dvi) - hd 4890
+
+
+w86a
+c8
+ch
+
+w8
+cw
+cl
+ce
+<not for win8>
+
+
+a25
+
+
 ----------Zombie homeowners association---------
 
 -------------------------------------------------
@@ -270,7 +298,8 @@ make hot clusterbombs, mixing fuse with hot cluster
 get sharpened hubcap from hobopolis
 eat spooky hi mein
 ----falls from sky hard mode----
-use glowing syringe; eat bag of gorf; eat cursed black pearl onion; maximize moxie, equip sleep mask, equip cup of infinite pencils
+eat bag of gorf; eat cursed black pearl onion; 
+use glowing syringe; maximize moxie, equip cup of infinite pencils
 init
 get cursed voodoo skulls to do damage
 familiar bandersnatch; drink white lightning
