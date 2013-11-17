@@ -3927,14 +3927,42 @@ save [$item[chocolate pasta spoon]] = 0;
 save [$item[chocolate stolen accordion]] = 0;
 save [$item[fancy ball mask]] = 2;
 save [$item[Angry Farmer's Wife Candy]] = 0;
-
-
+save [$item[swordzall]] = 3;
+save [$item[can of sardines]] = 0;
+save [$item[high-calorie sugar substitute]] = 0;
+save [$item[pat of butter]] = 0;
+save [$item[dinner roll]] = 0;
+save [$item[cold mashed potatoes]] = 0;
+save [$item[whole turkey leg]] = 0;
+save [$item[deviled egg]] = 0;
+save [$item[finger exerciser]] = 0;
+save [$item[dented spoon]] = 0;
+save [$item[old love note]] =0 ;
+save [$item[old-school beer pull tab]] = 0;
+save [$item[nail file]] = 0;
+save [$item[moustache sock]] = 1;
+save [$item[spoonful of Linguine-Os]] = 0;
+save [$item[freezer-burned frost-bitten tortellini]] = 0;
+save [$item[blob of Alphredo&trade;]] = 0;
+save [$item[handful of crafty noodles]] = 0;
+save [$item[tangled mass of creepy pasta]] = 0;
+save [$item[wriggling severed nose]] = 0;
+save [$item[robot reindeer protocol R.U.D.O.L.P.H.]] = 0;
+save [$item[Temps Tempranillo]] = 0;
+save [$item[superamplified boom box]] = 0;
+save [$item[rum barrel charrrm bracelet]] = 3;
+save [$item[linoleum meat stack]] = 0;
+save [$item[old candy wrapper]] = 0;
+save [$item[gym membership card]] = 0;
+save [$item[post-holiday sale coupon]] = 0;
 
 
 
 
 
 //stuff to sell later
+save [$item[dry cleaning receipt]] = -1;
+save [$item[pocket lint (blue)]] = -1;
 save [$item[moon-amber]] = -1;
 save [$item[polished moon-amber]] = -1;
 save [$item[skewered cherry]] = -1;

@@ -49,11 +49,11 @@ void do_forest()
 	if(my_class()==$class[accordion thief])
 	{
 		get_key();
-		do_choice(1, "pwd&whichchoice=721&option=3&choiceform3=Try+the+attic", "pwd&whichchoice=724&option=1&choiceform1=Turn+off+the+music+box");
+		do_choice(1, "?pwd&whichchoice=721&option=3&choiceform3=Try+the+attic", "?pwd&whichchoice=724&option=1&choiceform1=Turn+off+the+music+box");
 	}
 	else if(my_primestat()==$stat[muscle] && item_amount($item[old dry bone])>0 )
 	{
-		do_choice(1, "?pwd&whichchoice=721&option=1&choiceform1=Check+out+the+kitchen", "choice.php?pwd&whichchoice=722&option=2&choiceform2=Screw+around+with+the+flour+mill");
+		do_choice(1, "?pwd&whichchoice=721&option=1&choiceform1=Check+out+the+kitchen", "?pwd&whichchoice=722&option=2&choiceform2=Screw+around+with+the+flour+mill");
 		send_stuff($item[bone flour],chef);
 	}
 	else if(item_amount($item[replica key])>0)
@@ -69,7 +69,7 @@ void do_forest()
 	}
 	else if(!already_done("tarragon"))
 	{
-		do_choice(1, "pwd&whichchoice=721&option=1&choiceform1=Check+out+the+kitchen", "choice.php?pwd&whichchoice=722&option=1&choiceform1=Raid+the+spice+rack");
+		do_choice(1, "?pwd&whichchoice=721&option=1&choiceform1=Check+out+the+kitchen", "?pwd&whichchoice=722&option=1&choiceform1=Raid+the+spice+rack");
 		send_stuff($item[dread tarragon],chef);
 	}
 	else //kruegerands
@@ -111,11 +111,11 @@ void do_forest()
 	}
 	else
 	{
-		do_choice(2, "pwd&whichchoice=725&option=3&choiceform3=Root+around+at+the+base", "pwd&whichchoice=728&option=2&choiceform2=Stand+near+the+base+looking+downward");
+		do_choice(2, "?pwd&whichchoice=725&option=3&choiceform3=Root+around+at+the+base", "?pwd&whichchoice=728&option=2&choiceform2=Stand+near+the+base+looking+downward");
 	}
 	
 	//---------------burrows----------------
-	do_choice(3,"pwd&whichchoice=729&option=3&choiceform3=Go+toward+the+smelly", "pwd&whichchoice=732&option=2&choiceform2=Dig+through+the+garbage");
+	do_choice(3,"?pwd&whichchoice=729&option=3&choiceform3=Go+toward+the+smelly", "?pwd&whichchoice=732&option=2&choiceform2=Dig+through+the+garbage");
 }
 
 void do_village()
@@ -129,23 +129,36 @@ void do_village()
 	//skid row
 	if(my_primestat()==$stat[moxie])
 	{
-		if(item_amount($item[moon-amber])>0)
+		boolean polish=item_amount($item[moon-amber])>0;
+		boolean replica_key=min(item_amount($item[complicated lock impression]), item_amount($item[intricate music box parts]))>0;
+		if(polish && replica_key) //if we can do both, choose which we need more
 		{
-			do_choice(5, "pwd&whichchoice=737&option=3&choiceform3=Investigate+the+ticking+shack", "pwd&whichchoice=739&option=3&choiceform3=Polish+the+moon-amber");
+			int polished = available_amount($item[moon-amber necklace]) + available_amount($item[polished moon-amber]);
+			int keys = available_amount($item[replica key]) + available_amount($item[dreadsylvania auditor's badge]);
+			if(keys>polished)
+				replica_key=false;
+			else
+				polish=false;
 		}
-		else if(item_amount($item[complicated lock impression])>0 && item_amount($item[intricate music box parts])>0)
+		
+		if(polish)
 		{
-			do_choice(5, "pwd&whichchoice=737&option=3&choiceform3=Investigate+the+ticking+shack", "?pwd&whichchoice=739&option=2&choiceform2=Make+a+key+using+the+wax+lock+impression");
+			do_choice(5, "?pwd&whichchoice=737&option=3&choiceform3=Investigate+the+ticking+shack", "?pwd&whichchoice=739&option=3&choiceform3=Polish+the+moon-amber");
+			cli_execute("inventory refresh; make moon amber necklace");
+		}
+		else if(replica_key)
+		{
+			do_choice(5, "?pwd&whichchoice=737&option=3&choiceform3=Investigate+the+ticking+shack", "?pwd&whichchoice=739&option=2&choiceform2=Make+a+key+using+the+wax+lock+impression");
 			send_stuff($item[replica key],"twistedmage");
 		}
 		else
 		{
-			do_choice(5, "pwd&whichchoice=737&option=3&choiceform3=Investigate+the+ticking+shack", "pwd&whichchoice=739&option=1&choiceform1=Rummage+through+the+shelves");
+			do_choice(5, "?pwd&whichchoice=737&option=3&choiceform3=Investigate+the+ticking+shack", "?pwd&whichchoice=739&option=1&choiceform1=Rummage+through+the+shelves");
 		}
 	}
 	else
 	{
-		do_choice(5, "pwd&whichchoice=737&option=1&choiceform1=Pop+into+the+sewers", "pwd&whichchoice=738&option=2&choiceform2=Slosh+in+the+muck");
+		do_choice(5, "?pwd&whichchoice=737&option=1&choiceform1=Pop+into+the+sewers", "?pwd&whichchoice=738&option=2&choiceform2=Slosh+in+the+muck");
 	}
 	
 	//duke
@@ -158,7 +171,7 @@ void do_village()
 	{
 		get_key();
 		abort("line 126 choices for making ghost shawl");
-		do_choice(6, "pwd&whichchoice=741&option=3&choiceform3=Make+your+way+to+the+master+suite", "");
+		do_choice(6, "?pwd&whichchoice=741&option=3&choiceform3=Make+your+way+to+the+master+suite", "");
 	}
 	else if(!already_done("drove some zombies out of the village")) //reduce zombies
 	{
@@ -185,7 +198,7 @@ void do_castle()
 		item prev_pants= equipped_item($slot[pants]);
 		equip($item[muddy skirt]);
 		get_key();
-		do_choice(7, "pwd&whichchoice=745&option=1&choiceform1=Head+to+the+ballroom", "pwd&whichchoice=746&option=2&choiceform2=Trip+the+light+fantastic");
+		do_choice(7, "?pwd&whichchoice=745&option=1&choiceform1=Head+to+the+ballroom", "?pwd&whichchoice=746&option=2&choiceform2=Trip+the+light+fantastic");
 		equip(prev_pants);
 	}
 	else if(my_primestat()==$stat[mysticality])
@@ -209,18 +222,19 @@ void do_castle()
 	}
 	else
 	{
-		do_choice(9, "pwd&whichchoice=753&option=2&choiceform2=Head+for+the+boiler+room", "pwd&whichchoice=755&option=2&choiceform2=Check+in+the+incinerator");
+		do_choice(9, "?pwd&whichchoice=753&option=2&choiceform2=Head+for+the+boiler+room", "?pwd&whichchoice=755&option=2&choiceform2=Check+in+the+incinerator");
 	}
 	
 	//tower
 	if(my_primestat()==$stat[moxie] && item_amount($item[blood kiwi])>0 && item_amount($item[eau de mort])>0)
 	{
+		get_key();
 		do_choice(8, "?pwd&whichchoice=749&option=1&choiceform1=Go+to+the+laboratory", "?pwd&whichchoice=750&option=4&choiceform4=Use+the+still");
 	}
 	else
 	{
 //		abort("skills");
-		do_choice(8, "pwd&whichchoice=749&option=3&choiceform3=Go+to+the+bedroom", "pwd&whichchoice=752&option=2&choiceform2=Check+the+dresser");
+		do_choice(8, "/pwd&whichchoice=749&option=3&choiceform3=Go+to+the+bedroom", "?pwd&whichchoice=752&option=2&choiceform2=Check+the+dresser");
 	}
 }
 

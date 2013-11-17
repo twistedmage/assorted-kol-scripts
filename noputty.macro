@@ -85,15 +85,37 @@ if !monstername *Naughty Sorceress* && !monstername *bonerdagon
 		if hasskill Fire a badly romantic arrow&&  !monstername Battlie Knight Ghost && !monstername ghost miner && !monstername Claybender Sorcerer Ghost && !monstername Dusken Raider Ghost && !monstername Space Tourist Explorer Ghost && !monstername Whatsian Commando Ghost && (monstername lobsterfrogman || monstername ghost || monstername bricko bat || monstername angry bassist || monstername blue-haired girl || monstername evil ex-girlfriend || monstername peeved roommate || monstername random scenester || monstername black crayon * || monstername smut orc pervert)
 			skill Fire a badly romantic arrow
 		endif
-		
 		if sealclubber
 			#should really be only with fury
 			if hasskill club foot
 				skill club foot
 			endif
 		endif
-		if hasskill entangling noodles
-			skill entangling noodles
+		if pastamancer
+			if hasskill entangling noodles
+				skill entangling noodles
+			endif
+		endif
+		if accordionthief
+			if hasskill Accordion Bash
+				skill Accordion Bash
+			endif
+		endif
+		if turtletamer
+			if hasskill shell up
+				skill shell up
+			endif
+			#activate an avatar
+			if hasskill turtle power && haseffect glorious blessing of *
+				skill turtle power
+			endif
+			#use avatar skills
+			if hasskill will of the storm tortoise
+				skill will of the storm tortoise
+			endif
+			if hasskill Voice of She-Who-Was
+				skill Voice of She-Who-Was
+			endif
 		endif
 		if hasskill pocket crumbs
 			skill pocket crumbs

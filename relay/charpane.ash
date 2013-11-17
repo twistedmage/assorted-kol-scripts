@@ -506,29 +506,33 @@ string helperSemiRare() {
 		rewards[$location[The Limerick Dungeon]] = "eyedrops.gif|cyclops eyedrops|21";
 		rewards[$location[The Valley of Rof L'm Fao]] = "scroll2.gif|Fight Bad ASCII Art|68";
 		rewards[$location[The Castle in the Clouds in the Sky (Top Floor)]] = "inhaler.gif|Mick's IcyVapoHotness Inhaler|95";
-		rewards[$location[Cobb's Knob Kitchens]] = "elitehelm.gif|Fight KGE Guard Captain|20";
 		rewards[$location[The Outskirts of Cobb's Knob]] = "lunchbox.gif|Knob Goblin lunchbox|0";
-		rewards[$location[The Hidden Temple]] = "stonewool.gif|Fight Baa'baa'bu'ran|5";
-	if(can_interact())
+	if(can_interact()) {
 		rewards[$location[An Octopus's Garden]] = "bigpearl.gif|Fight a moister oyster|200";
+	} else {
+		rewards[$location[The Hidden Temple]] = "stonewool.gif|Fight Baa'baa'bu'ran|5";
+		if(!have_outfit("Knob Goblin Elite Guard Uniform"))
+			rewards[$location[Cobb's Knob Kitchens]] = "elitehelm.gif|Fight KGE Guard Captain|20";
+		if(!have_outfit("Mining Gear"))
+			rewards[$location[Itznotyerzitz Mine]] = "mattock.gif|Fight Dwarf Foreman|53";
+	}
 		
-	int lastCounter = to_int(get_property("semirareCounter"));
-	string lastLocation = lastCounter == 0? "none": get_property("semirareLocation");
-	location lastZone = to_location(lastLocation);
-	string message = lastCounter == 0? "No semirare so far during this ascension"
-		: ("Last semirare found " + (turns_played()-lastCounter) + " turns ago (on turn " + lastCounter + ") in " + lastZone);
+	int semirareCounter = to_int(get_property("semirareCounter"));
+	location semirareLocation = semirareCounter == 0? $location[none]: get_property("semirareLocation").to_location();
+	string message = semirareCounter == 0? "No semirare so far during this ascension"
+		: ("Last semirare found " + (turns_played()-semirareCounter) + " turns ago (on turn " + semirareCounter + ") in " + semirareLocation);
 	
 	//Iterate through all the predefined zones
 	string[3] reward;
 	buffer rowdata;
 	int rows = 0;
-	foreach zone, value in rewards {
+	foreach loc, value in rewards {
 		reward = split_string(value, "\\|");
-		if (zone != lastZone) {
+		if (loc != semirareLocation) {
 			if (my_basestat(my_primestat()) >= to_int(reward[2])) {
 				rowdata.append('<tr class="section">');
 				rowdata.append('<td class="icon" title="' + reward[1] + '"><img src="images/itemimages/' + reward[0] + '"></td>');
-				rowdata.append('<td class="location" title="' + reward[1] + '"><a class="visit" target="mainpane" href="' + to_url(zone) + '">' + to_string(zone) + '</a>' + reward[1] + '</td>');
+				rowdata.append('<td class="location" title="' + reward[1] + '"><a class="visit" target="mainpane" href="' + to_url(loc) + '">' + to_string(loc) + '</a>' + reward[1] + '</td>');
 				rowdata.append('</tr>');
 				rows = rows + 1;
 			}
@@ -1837,6 +1841,37 @@ void bakeFamiliar() {
 	
 }
 
+void bakeThrall() {
+	if(chitSource["thrall"].length() == 0) return;
+	string famimage, click, famname, famtype, actortype;
+	string equiptype = "<font color=blue size=2><b>Click to Summon a Thrall</b></font>";
+	# <b>Pasta Thrall:</b></font><br><img onClick='javascript:window.open("desc_guardian.php","","height=200,width=300")' src=/images/itemimages/t_vampieroghi.gif width=30 height=30><br><font size=2><b>Wally</b><br>the Lvl. 3 Vampieroghi</font>
+	matcher thrall = create_matcher("<b>Pasta Thrall:</b></font><br>(<img (onClick='[^']+')[^>]+>)<br><font size=2>(<b>([^<]+)</b><br>[^\\d]+(\\d+) *([^<]+))</font>", chitSource["thrall"]);
+	if(find(thrall)) {
+		famimage = thrall.group(1);
+		click = thrall.group(2);
+		actortype = thrall.group(3);
+		famname = thrall.group(4);
+		famtype = thrall.group(6);
+		#equiptype = thrall.group(4);
+	} else {
+		famimage = '<img src="images/adventureimages/blank.gif">';
+		actortype = "(No Thrall)";
+		#equiptype = "<font color=blue size=2><b>Click to Summon a Thrall</b></font>";
+	}
+	buffer result;
+	result.append('<table id="chit_thrall" class="chit_brick nospace">');
+	result.append('<tr><th colspan="2" title="Thrall">Pasta Thrall</th></tr>');
+	
+	result.append('<tr><td class="icon" title="Playing with this food">');
+	result.append('<a class="chit_launcher" rel="chit_pickerthrall" href="#">');
+	result.append(famimage + '</a></td>');
+	result.append('<td class="info"><a class="hand" '+click+'>' + actortype + '</a></td>');
+	result.append('</tr></table>');
+	
+	chitBricks["thrall"] = result;
+}
+
 string currentMood() {
 	matcher pattern = create_matcher(">mood (.*?)</a>", chitSource["mood"]);
 	if(find(pattern))
@@ -2241,7 +2276,7 @@ void addFury(buffer result) {
 			wrap.append("</span>");
 		}
 	}
-	matcher fury = create_matcher("Fury:.*?<font color=red>(<span[^>]*>)?((\\d+) gal.)", chitSource["stats"]);
+	matcher fury = create_matcher("Fury:.*?<font color[^>]*>(<span[^>]*>)?((\\d+) gal.)", chitSource["stats"]);
 	if(fury.find()) {
 		result.append('<tr>');
 		result.append('<td class="label">');
@@ -2251,11 +2286,24 @@ void addFury(buffer result) {
 		result.append('</td>');
 		if(to_boolean(vars["chit.stats.showbars"])) {
 			result.append('<td class="progress">');
-			result.spanWrap('<div class="progressbox"><div class="progressbar" style="width:' + (100.0 * my_fury() / my_maxfury()) + '%"></div></div></td>', fury.group(1));
+			result.spanWrap('<div class="progressbox" title="' + my_fury() + ' / ' + my_maxfury() + '"><div class="progressbar" style="width:' + (100.0 * my_fury() / my_maxfury()) + '%"></div></div></td>', fury.group(1));
 			result.append('</td>');
 		}
 		result.append('</tr>');
 	}
+}
+
+void addSauce(buffer result) {
+	result.append('<tr>');
+	result.append('<td class="label">Sauce</td><td class="info">');
+	result.append(my_soulsauce());
+	result.append('</td>');
+	if(to_boolean(vars["chit.stats.showbars"])) {
+		result.append('<td class="progress">');
+		result.append('<div class="progressbox" title="' + my_soulsauce() + ' / 100"><div class="progressbar" style="width:' + my_soulsauce() + '%"></div></div></td>');
+		result.append('</td>');
+	}
+	result.append('</tr>');
 }
 
 void addOrgan(buffer result, string organ, boolean showBars, int current, int limit, boolean eff) {
@@ -2517,13 +2565,6 @@ void addTrail(buffer result) {
 	}
 	result.append('</tr>');
 	
-	// Should I auto-add Florist after trail? Do it if florist not defined elsewhere
-	if(florist_available()) {
-		foreach layout in $strings[roof, walls, floor, toolbar, stats]
-			if(vars["chit." + layout + ".layout"].contains_text("florist"))
-				return;
-		result.addFlorist(false);
-	}
 }
 
 void bakeStats() {
@@ -2705,8 +2746,10 @@ void bakeStats() {
 				default:
 			}
 		}
-		if(section.contains_text("muscle") && chitSource["stats"].contains_text("Fury:"))
+		if(my_fury() > 0 && section.contains_text("muscle"))
 			result.addFury();
+		if(my_soulsauce() > 0 && section.contains_text("myst"))
+			result.addSauce();
 		result.append("</tbody>");
 	}
 
@@ -2886,6 +2929,8 @@ void pickOutfit() {
 		special.addGear("equip acc3 Talisman o\' Nam;equip acc1 Mega+Gem", "Talisman & Mega Gem");
 	if(get_property("questL11Worship") == "step3" && item_amount($item[antique machete]) > 0)
 		special.addGear("equip antique machete", "antique machete");
+	if(get_property("questL11Pyramid") == "started" && item_amount($item[UV-resistant compass]) > 0)
+		special.addGear("equip UV-resistant compass", "UV-resistant compass");
 	
 	if(length(special) > 0) {
 		picker.append('<tr class="pickitem"><td style="color:white;background-color:blue;font-weight:bold;">Equip for Quest</td></tr>');
@@ -3633,9 +3678,11 @@ void bakeTracker() {
 			result.append(", ");
 			result.append(item_report($item[hard rock candy]));
 			result.append(", ");
+			result.append(item_report($item[hard-boiled ostrich egg]));
+			result.append(", ");
 			result.append(item_report($item[ketchup hound]));
 			result.append(", ");
-			result.append(item_report($item[hard-boiled ostrich egg]));
+			result.append(item_report($item[stunt nuts]));
 		}
 		// get wet stunt nut stew, mega gem
 		if (available_amount($item[Mega Gem])==0) {
@@ -3645,29 +3692,69 @@ void bakeTracker() {
 	}
 	
 	if(started("questL11Worship")) {
+		// How many McClusky file pages are present?
+		int files() {
+			for f from 6693 downto 6689
+				if(to_item(f).available_amount() > 0)
+					return f - 6688;
+			return 0;
+		}
 		result.append("<tr><td>");
-		if(get_property("questL11Worship") == "step3") {
-			int spheres, altars;
-			for s from 2174 to 2177
-				if(item_amount(to_item(s)) > 0 || get_property("lastStoneSphere"+s) != "")
-					spheres += 1;
-			if(get_property("lastHiddenCityAscension") == my_ascensions())
-				foreach cc in $strings[N, W, L, F]
-					if(get_property("hiddenCityLayout").contains_text(cc))
-						altars += 1;
-			if(spheres + altars < 8) {
-				result.append('Explore <a target="mainpane" href="hiddencity.php">Hidden City</a><br>Spheres found: ');
-				result.append(item_report(spheres == 4, spheres+"/4"));
-				result.append("<br>Altars found: ");
-				result.append(item_report(altars == 4, altars+"/4"));
-			} else {
-				if(get_property("hiddenCityLayout").contains_text("T"))
-					result.append('<a target="mainpane" href="hiddencity.php">Hidden City</a>: Kill Spectre');
-				else
-					result.append('Search for Temple at <a target="mainpane" href="hiddencity.php">Hidden City</a>');
-			}
-		} else
+		switch(get_property("questL11Worship")) {
+		case "started": case "step1": case "step2":
 			result.append('Search <a target="mainpane" href="woods.php">Temple</a> for Hidden City');
+			break;
+		case "step3":
+			result.append('Explore <a target="mainpane" href="hiddencity.php">Hidden City</a>:<br>');
+			boolean relocatePygmyJanitor = get_property("relocatePygmyJanitor").to_int() == my_ascensions();
+			if(available_amount($item[antique machete]) == 0 || !relocatePygmyJanitor) {
+				result.append("Hidden Park: ");
+				result.append(item_report($item[antique machete]));
+				result.append(", ");
+				result.append(item_report(relocatePygmyJanitor, "relocate janitors"));
+				result.append("<br>");
+			}
+			foreach loc in $strings[Hospital, BowlingAlley, Apartment, Office] {
+				result.append(loc+": ");
+				int prog = get_property("hidden"+loc+"Progress").to_int();
+				if(prog == 0)
+					result.append(item_report(false, "Explore Shrine<br>"));
+				else if(prog < 7) {
+					switch(loc) {
+					case "Hospital":
+						result.append(item_report(false, "Surgeonosity ("+to_string(numeric_modifier("surgeonosity"), "%.0f")+"/5)<br>"));
+						break;
+					case "BowlingAlley":
+						result.append(item_report($item[bowling ball]));
+						result.append(", ");
+						result.append(item_report(false, "Bowled ("+(prog - 1)+"/5)<br>"));
+						break;
+					case "Apartment":
+						result.append(item_report(get_property("relocatePygmyLawyer").to_int() == my_ascensions(), "relocate Lawyers, "));
+						result.append(item_report(false, "Search for Boss<br>"));
+						break;
+					case "Office":
+						if(available_amount($item[McClusky file (complete)]) > 0)
+							result.append(item_report(false, "Kill Boss!"));
+						else {
+							int f = files();
+							result.append(item_report(f >=5, "McClusky files (" + f + "/5), "));
+							result.append(item_report($item[boring binder clip], "binder clip"));
+						}
+						result.append("<br>");
+						break;
+					}
+				} else if(prog == 7)
+					result.append(item_report(false, "Use Sphere<br>"));
+				else
+					result.append(item_report(true, "Done!<br>"));
+			}
+			if(get_property("hiddenTavernUnlock") == "false") {
+				result.append("Tavern: ");
+				result.append(item_report($item[book of matches]));
+				result.append("<br>");
+			}
+		}
 		result.append("</td></tr>");
 	}
 	
@@ -3675,15 +3762,10 @@ void bakeTracker() {
 	if(started("questL11Pyramid")) {
 		string questL11Pyramid = get_property("questL11Pyramid");
 		result.append("<tr><td>");
-		// Header for steps 1 to 10
-		switch(questL11Pyramid) {
-		case "started": case "step11": case "step12":
-		default:
-			result.append('Find the pyramid at the <a target="mainpane" href="beach.php">Beach</a><br>');
-		}
 		// Step-by-step
 		switch(questL11Pyramid) {
 		case "started":
+			result.append('Find the pyramid at the <a target="mainpane" href="beach.php">Beach</a><br>');
 			int desertExploration = get_property("desertExploration").to_int();
 			if(desertExploration < 10)
 				result.append('Find Gnasir at the <a target="mainpane" href="beach.php">Desert</a><br>');
@@ -4074,14 +4156,12 @@ boolean parsePage(buffer original) {
 		switch(loc) {	// Some of these are really tough for KoLmafia to deal with!
 		case "(none)":
 			return $location[none];
-		case "The Arid, Extra-Dry Desert":
-			return $location[The Arid\, Extra-Dry Desert];
 		case "The Orcish Frat House":
 			return $location[Frat House];
 		case "The Hippy Camp":
 			return $location[Hippy Camp];
 		}
-		return my_location();
+		return get_property("lastAdventure").to_location();
 	}
 	// Recent Adventures: May or may not be present
 	parse = create_matcher("(<center><font size=2>.+?Last Adventure:.+?</center>)", source);
@@ -4124,6 +4204,13 @@ boolean parsePage(buffer original) {
 	if(find(parse)) {
 		chitSource["mood"] = parse.group(1) + parse.group(3); 						// Only one of those might contain useful data
 		chitSource["effects"] = parse.group(2) + parse.group(4) + parse.group(5); 	// Effects plus Instrinsics, plus recently expired effects
+		source = parse.replace_first("");
+	}
+	
+	// Pasta Thrall?
+	parse = create_matcher('(<center><font size=2><b>Pasta Thrall:</b></font>.+?</font>)', source);
+	if(find(parse)) {
+		chitSource["thrall"] = parse.group(1);
 		source = parse.replace_first("");
 	}
 
@@ -4290,6 +4377,7 @@ void bakeBricks() {
 						case "modifiers":	bakeModifiers();	break;
 						case "elements":	bakeElements();		break;
 						case "tracker":		bakeTracker();		break;
+						case "thrall":		bakeThrall();		break;
 						
 						// Reserved words
 						case "helpers": case "update": break;
@@ -4448,13 +4536,24 @@ buffer modifyPage(buffer source) {
 	setvar("chit.helpers.dancecard", true);
 	setvar("chit.helpers.semirare", true);
 	setvar("chit.roof.layout","character,stats");
-	setvar("chit.walls.layout","helpers,effects");
+	setvar("chit.walls.layout","helpers,thrall,effects");
 	setvar("chit.floor.layout","update,familiar");
 	setvar("chit.stats.showbars",true);
 	setvar("chit.stats.layout","muscle,myst,moxie|hp,mp,axel|mcd|trail,florist");
 	setvar("chit.toolbar.layout","trail,quests,modifiers,elements,organs");
 	setvar("chit.toolbar.moods","true");
 	setvar("chit.kol.coolimages",true);
+	
+	// Check var version.
+	if(get_property("chitVarVer").to_int() < 1) {
+		if(!vars["chit.stats.layout"].contains_text("florist") && vars["chit.stats.layout"].contains_text("trail"))
+			vars["chit.stats.layout"] = vars["chit.stats.layout"].replace_string("trail", "trail,florist");
+		if(substring(vars["chit.walls.layout"], 0, 7) == "helpers")
+			vars["chit.walls.layout"] = vars["chit.walls.layout"].replace_string("helpers", "helpers,thrall");
+		else vars["chit.walls.layout"] = "thrall,"+vars["chit.stats.layout"];
+		updatevars();
+		set_property("chitVarVer", "1");
+	}
 	
 	//Check for updates (once a day)
 	if(svn_exists("mafiachit")) {

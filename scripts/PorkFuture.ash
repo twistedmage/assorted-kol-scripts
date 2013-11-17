@@ -40,14 +40,14 @@ string tween_text(string searchme, string pre, string post)
 
 void noncombat_mood()
 {
-	if (my_familiar() == $familiar[hound dog])
+	if (my_familiar() == $familiar[Jumpsuited Hound Dog])
 		use_familiar($familiar[none]);
 	cli_execute("maximize -combat");
 	cli_execute("mood porkfuture");
 	cli_execute("mood clear");
 	if (have_skill($skill[smooth movement]))
 		cli_execute("trigger lose_effect, smooth movements, cast 1 smooth movement");
-	if (have_skill($skill[sonata of sneakiness]))
+	if (have_skill($skill[the sonata of sneakiness]))
 		cli_execute("trigger lose_effect, sonata of sneakiness, cast 1 sonata of sneakiness");
 	cli_execute("trigger gain_effect, musk of the moose, uneffect musk of the moose");
 	cli_execute("trigger gain_effect, cantata of confrontation, uneffect cantata of confrontation");
@@ -88,9 +88,9 @@ void bottle_iku(int past_present_fuschia)
 	}
 	cli_execute("mood execute");
 	if (past_present_fuschia == 1)
-		adventure(1,$location[Primordial Soup]);
+		adventure(1,$location[The Primordial Soup]);
 	else if (past_present_fuschia == 2)
-		adventure(1,$location[Jungles of Ancient Loathing]);
+		adventure(1,$location[The Jungles of Ancient Loathing]);
 	else if (past_present_fuschia == 3)
 		adventure(1,$location[Seaside Megalopolis]);
 	else
@@ -810,10 +810,10 @@ void futurella()
 					else
 						manual_noncom(349,3);
 				}
-				if (contains_text(advstring,"the soup's bounty failed you") || retrieve_item(1,$item[delicious amino acids]))
+				if (contains_text(advstring,"the soup's bounty failed you") || retrieve_item(1,$item[memory of some delicious amino acids]))
 				{
-					if (item_amount($item[delicious amino acids]) > 0)
-						use(1,$item[delicious amino acids]);
+					if (item_amount($item[memory of some delicious amino acids]) > 0)
+						use(1,$item[memory of some delicious amino acids]);
 					bottle_iku(204);
 					manual_noncom(349,1);
 				}
@@ -884,9 +884,9 @@ void futurella()
 				}
 				if (last_pair != "" || length(used_pairs) >= 36)
 				{
-					while (item_amount($item[delicious amino acids]) > 0)
+					while (item_amount($item[memory of some delicious amino acids]) > 0)
 					{
-						if (!use(1,$item[delicious amino acids]))
+						if (!use(1,$item[memory of some delicious amino acids]))
 						{
 							use(item_amount($item[ten-leaf clover]),$item[ten-leaf clover]);
 							break;
@@ -1374,8 +1374,8 @@ void futurella()
 		{
 			if (retrieve_item(1,$item[fat stacks of cash]))
 				return $item[fat stacks of cash];
-			else if (retrieve_item(1,$item[3898]))  // Gu-Gone
-				return $item[3898];
+			else if (retrieve_item(1,$item[bottle of G&uuml;-Gone]))  // Gu-Gone
+				return $item[bottle of G&uuml;-Gone];
 			else if (retrieve_item(1,$item[facsimile dictionary]))
 				return $item[facsimile dictionary];
 			else if (retrieve_item(1,$item[dictionary]))

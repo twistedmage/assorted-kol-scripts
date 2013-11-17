@@ -477,8 +477,8 @@ int get_accordion()
 {
   int turns = turns_per_cast($skill[the ode to booze]);
   if (turns > 5 || !EAT_ACCORDION || my_meat() < 250) return turns;
-  if (my_meat() < 2500 && turns == 0) buy(1, $item[toy accordion]);
-  else buy(1, $item[antique accordion]);
+  if (my_meat() > 2500 && npc_price($item[antique accordion]) > 0) buy(1, $item[antique accordion]);
+  else if (my_meat() > 250 && turns == 0 && npc_price($item[toy accordion]) > 0) buy(1, $item[toy accordion]);
   return (turns_per_cast($skill[the ode to booze]));
 }
 

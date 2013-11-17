@@ -189,7 +189,8 @@
 		13-09-03:Attempt to abort when we tame a sea horse
 		13-10-22:Add basic handling of Procedurally Generated Skeletons as well as Video Game bosses.
 				 Don't use Noodles to stun with the revamped classes. It won't work.	
-		13-11-09:Try to steal accordions if we can. RFemove more classes from noodling.				 
+		13-11-09:Try to steal accordions if we can. RFemove more classes from noodling.
+		13-11-10:Fix steal accordion and remove most of the special handling for procedural skeletons		
 ***********************************************************************************************************************/
 import <SmartStasis.ash>;
 
@@ -669,12 +670,12 @@ void allMyOptions(float hitlimit) {
 	sort opts by -to_profit(value);
 	sort opts by kill_rounds(value.dmg)*-(min(value.profit,-1));
 	foreach i,opt in opts {
+		vprint("WHAM: Currently checking " + (contains_text(opt.id, "skill") ? to_string(to_skill(to_int(excise(opt.id,"skill ","")))) : to_string(to_item(to_int(excise(opt.id,"use ",""))))) + " which has a reported damage of " + dmg_dealt(opt.dmg) + " and is " + (ok(opt) ? "ok." : "not ok."), "blue", 11);
 		if(dmg_dealt(opt.dmg) > 0) {
-			vprint("WHAM: Currently checking " + (contains_text(opt.id, "skill") ? to_string(to_skill(to_int(excise(opt.id,"skill ","")))) : to_string(to_item(to_int(excise(opt.id,"use ",""))))) + " which has a reported damage of " + dmg_dealt(opt.dmg) + " and is " + (ok(opt) ? "ok." : "not ok."), "blue", 11);
 			vprint("WHAM: Raw damage is estimated at " + opt.dmg[$element[cold]] + " (cold), " + opt.dmg[$element[hot]] + " (hot), " + opt.dmg[$element[stench]]+ " (stench), " + opt.dmg[$element[spooky]] + " (spooky), " + opt.dmg[$element[sleaze]] + " (sleazy) and  " + opt.dmg[$element[none]] + " (physical).", "purple", 11);
 		}
 
-		if ((hitlimit != -1 ? ok(opt) : true) && hitchance(opt.id) >= hitlimit) {
+		if (((hitlimit != -1 ? ok(opt) : true) && hitchance(opt.id) >= hitlimit) || opt.custom != "") {
 			iterateoptions[count(iterateoptions)] = opt.id;
 			myoptions[n] = opt;
 			n += 1;
@@ -1256,8 +1257,11 @@ void build_custom_WHAM() {
 
 	if(my_location().zone == "The Sea" && item_amount($item[sea lasso]) > 0 && vars["WHAM_UseSeaLasso"] == "true" && get_property("lassoTraining") != "expertly")
 		encustom(get_action($item[sea lasso]));
-	if(has_option($skill[steal accordion]))
+
+	if(has_option($skill[steal accordion])) {
+		vprint("WHAM: Trying to steal an accordion", "purple", 5);
 		encustom(get_action($skill[steal accordion]));
+	}
 	switch (to_string(m)) {
 		//Boss actions
 		case "conjoined zmombie":	for i from 1 upto item_amount($item[half-rotten brain])
