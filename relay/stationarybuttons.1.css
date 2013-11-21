@@ -1,0 +1,23 @@
+#page {
+	height: 100%;
+}
+#mafiabuttons {
+	position: absolute;
+	width: 100%;
+	top: 0px;
+	left: 0px;
+}
+#content_ {
+	position: fixed;
+	top: 66px;
+	margin: 0px;
+	padding: 0px;	
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
+	width: 100%;
+	overflow: auto;
+}
+#btnwrap{
+    width: 100%;
+}

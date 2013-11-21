@@ -511,9 +511,9 @@ string helperSemiRare() {
 		rewards[$location[An Octopus's Garden]] = "bigpearl.gif|Fight a moister oyster|200";
 	} else {
 		rewards[$location[The Hidden Temple]] = "stonewool.gif|Fight Baa'baa'bu'ran|5";
-		if(!have_outfit("Knob Goblin Elite Guard Uniform"))
+		if(!have_outfit("Knob Goblin Elite Guard Uniform") && my_path() != "Way of the Surprising Fist")
 			rewards[$location[Cobb's Knob Kitchens]] = "elitehelm.gif|Fight KGE Guard Captain|20";
-		if(!have_outfit("Mining Gear"))
+		if(!have_outfit("Mining Gear") && my_path() != "Way of the Surprising Fist")
 			rewards[$location[Itznotyerzitz Mine]] = "mattock.gif|Fight Dwarf Foreman|53";
 	}
 		
@@ -1474,9 +1474,112 @@ void pickerCompanion(string famname, string famtype) {
 	}
 	
 	picker.append('</table></div>');
-
 	chitPickers["equipment"] = picker;
+}
+
+static { string [string] [int] pasta;
+	pasta["Vampieroghi"][1] = "Attacks and heals you";
+	pasta["Vampieroghi"][5] = "Dispels bad effects";
+	pasta["Vampieroghi"][10] = "+60 max HP";
+	pasta["Vermincelli"][1] = "Restores MP";
+	pasta["Vermincelli"][5] = "Attacks enemy";
+	pasta["Vermincelli"][10] = "+30 max MP";
+	pasta["Angel Hair Wisp"][1] = "Combat Initiative";
+	pasta["Angel Hair Wisp"][5] = "Prevents enemy crits";
+	pasta["Angel Hair Wisp"][10] = "Blocks enemy attacks";
+	pasta["Elbow Macaroni"][1] = "Muscle matches Myst";
+	pasta["Elbow Macaroni"][5] = "+ Weapon damage";
+	pasta["Elbow Macaroni"][10] = "+10% Critical hits";
+	pasta["Penne Dreadful"][1] = "Moxie matches Myst";
+	pasta["Penne Dreadful"][5] = "Delevels enemy";
+	pasta["Penne Dreadful"][10] = "Damage Reduction: 10";
+	pasta["Spaghetti Elemental"][1] = "Increases stat gains";
+	pasta["Spaghetti Elemental"][5] = "Blocks first attack";
+	pasta["Spaghetti Elemental"][10] = "Spell damage +5";
+	pasta["Lasagmbie"][1] = "Increase meat drops";
+	pasta["Lasagmbie"][5] = "Attacks with Spooky";
+	pasta["Lasagmbie"][10] = "Spooky spells +10";
+	pasta["Spice Ghost"][1] = "Increases item drops";
+	pasta["Spice Ghost"][5] = "Drops spice";
+	pasta["Spice Ghost"][10] = "Better Entangling";
+}
+
+void pickerThrall(string famname, string famtype) {
+
+	record binder {
+		string name;
+		string img;
+	};
+	static { binder [skill] bind;
+		bind [$skill[Bind Vampieroghi]] = new binder("Vampieroghi", "t_vampieroghi");
+		bind [$skill[Bind Vermincelli]] = new binder("Vermincelli", "t_vermincelli");
+		bind [$skill[Bind Angel Hair Wisp]] = new binder("Angel Hair Wisp", "t_wisp");
+		bind [$skill[Bind Undead Elbow Macaroni]] = new binder("Elbow Macaroni", "t_elbowmac");
+		bind [$skill[Bind Penne Dreadful]] = new binder("Penne Dreadful", "t_dreadful");
+		bind [$skill[Bind Spaghetti Elemental]] = new binder("Spaghetti Elemental", "t_spagdemon");
+		bind [$skill[Bind Lasagmbie]] = new binder("Lasagmbie", "t_lasagmbie");
+		bind [$skill[Bind Spice Ghost]] = new binder("Spice Ghost", "t_spiceghost");
+	}
+	skill [int] orderedBinds;
+	foreach s in bind
+		orderedBinds[count(orderedBinds)] = s;
+	sort orderedBinds by mp_cost(value);
+
+	string color(skill s) {
+		if(my_mp() >= mp_cost(s)) return "inventory"; 	// Green
+		if(my_maxmp() >= mp_cost(s)) return "make";		// Orange
+		return "remove";								// Red
+	}
+	
+	void addThrall(buffer result, skill s) {
+		buffer url;
+		url.append('<a class="change" href="');
+		url.append(sideCommand("cast " + s));
+		url.append('" title="');
+		url.append(s);
+		url.append(' for ');
+		url.append(mp_cost(s));
+		url.append('mp">');
 		
+		result.append('<tr class="pickitem"><td class="');
+		result.append(color(s));
+		result.append('">');
+		result.append(url);
+		result.append('<b>');
+		result.append(bind[s].name);
+		result.append('</b> <span style="float:right;color:#707070">');
+		result.append(mp_cost(s));
+		result.append('mp<br /></span>');
+		result.append('<span style="font-weight:100;color:blue">');
+		result.append(pasta[bind[s].name][1]);
+		result.append('</span></a></td>');
+		result.append('<td class="icon">');
+		result.append(url);
+		result.append('<img src="/images/itemimages/');
+		result.append(bind[s].img);
+		result.append('.gif"></a></td></tr>');
+	}
+
+	buffer picker;
+	picker.pickerStart("thrall", "Bind thy Thrall");
+	
+	// Check for all companions
+	picker.addLoader("Binding Thrall...");
+	boolean sad = true;
+	foreach x,s in orderedBinds
+		if(have_skill(s) && bind[s].name != famtype) {
+			picker.addThrall(s);
+			sad = false;
+		}
+	if(sad) {
+		if(famname == "")
+			picker.addSadFace("You haven't yet learned how to play with your food.<br /><br />How sad.");
+		else
+			picker.addSadFace("Poor "+famname+" has no other food to play with.");
+	}
+	
+	picker.append('</table></div>');
+	chitPickers["thrall"] = picker;
 }
 
 void bakeFamiliar() {
@@ -1842,34 +1945,51 @@ void bakeFamiliar() {
 }
 
 void bakeThrall() {
-	if(chitSource["thrall"].length() == 0) return;
-	string famimage, click, famname, famtype, actortype;
+	if(my_class() != $class[Pastamancer]) return;
+	string famimage, click, famname, famtype;
+	buffer actor;
+	int famweight;
 	string equiptype = "<font color=blue size=2><b>Click to Summon a Thrall</b></font>";
 	# <b>Pasta Thrall:</b></font><br><img onClick='javascript:window.open("desc_guardian.php","","height=200,width=300")' src=/images/itemimages/t_vampieroghi.gif width=30 height=30><br><font size=2><b>Wally</b><br>the Lvl. 3 Vampieroghi</font>
-	matcher thrall = create_matcher("<b>Pasta Thrall:</b></font><br>(<img (onClick='[^']+')[^>]+>)<br><font size=2>(<b>([^<]+)</b><br>[^\\d]+(\\d+) *([^<]+))</font>", chitSource["thrall"]);
+	matcher thrall = create_matcher("<b>Pasta Thrall:</b></font><br><img (onClick='[^']+') *([^ ]+)[^>]+><br><font size=2>(<b>([^<]+)[^\\d]+(\\d+) *([^<]+))</font>", chitSource["thrall"]);
 	if(find(thrall)) {
-		famimage = thrall.group(1);
-		click = thrall.group(2);
-		actortype = thrall.group(3);
+		famimage = thrall.group(2);
+		click = thrall.group(1);
 		famname = thrall.group(4);
+		famweight = thrall.group(5).to_int();
 		famtype = thrall.group(6);
-		#equiptype = thrall.group(4);
+		actor.append('<span style="color:blue;font-weight:bold">');
+		foreach i,s in pasta[famtype]
+			if(famweight >= i) {
+				actor.append(s);
+				actor.append('<br>');
+			}
+		actor.append('</span>');
 	} else {
 		famimage = '<img src="images/adventureimages/blank.gif">';
-		actortype = "(No Thrall)";
-		#equiptype = "<font color=blue size=2><b>Click to Summon a Thrall</b></font>";
+		actor.append("(No Thrall)");
 	}
 	buffer result;
 	result.append('<table id="chit_thrall" class="chit_brick nospace">');
-	result.append('<tr><th colspan="2" title="Thrall">Pasta Thrall</th></tr>');
+	result.append('<tr><th title="Thrall Level">Lvl. ');
+	result.append(famweight);
+	result.append('</th><th colspan="2" title="Pasta Thrall"><a title="');
+	result.append(famname);
+	result.append('" class="hand" ');
+	result.append(click);
+	result.append('>');
+	result.append(famtype);
+	result.append('</a></th></tr>');
 	
-	result.append('<tr><td class="icon" title="Playing with this food">');
+	result.append('<tr><td class="icon" title="Thrall">');
 	result.append('<a class="chit_launcher" rel="chit_pickerthrall" href="#">');
-	result.append(famimage + '</a></td>');
-	result.append('<td class="info"><a class="hand" '+click+'>' + actortype + '</a></td>');
+	result.append('<img title="Bind thy Thrall" ');
+	result.append(famimage + '></a></td>');
+	result.append('<td class="info"><a title="Click for Thrall description" class="hand" '+click+'>' + actor + '</a></td>');
 	result.append('</tr></table>');
 	
 	chitBricks["thrall"] = result;
+	pickerThrall(famname, famtype);
 }
 
 string currentMood() {
@@ -2417,7 +2537,7 @@ void addMCD(buffer result, boolean bake) {
 		mcdpage = "gnomes.php?place=machine";
 		mcdchange = "gnomes.php?action=changedial&whichlevel=";
 		mcdbusy = "Changing Dial...";
-		if ((item_amount($item[bitchin' meatcar]) + item_amount($item[Desert Bus pass]) + item_amount($item[pumpkin carriage])) == 0
+		if((item_amount($item[bitchin' meatcar]) + item_amount($item[Desert Bus pass]) + item_amount($item[pumpkin carriage]) + item_amount($item[tin lizzie])) == 0
 		 && get_property("questG01Meatcar") != "finished") {
 			mcdSettable = false;			
 			progress = '<span title="The Gnomad camp has not been unlocked yet">No Beach?</span>';
@@ -4548,9 +4668,11 @@ buffer modifyPage(buffer source) {
 	if(get_property("chitVarVer").to_int() < 1) {
 		if(!vars["chit.stats.layout"].contains_text("florist") && vars["chit.stats.layout"].contains_text("trail"))
 			vars["chit.stats.layout"] = vars["chit.stats.layout"].replace_string("trail", "trail,florist");
-		if(substring(vars["chit.walls.layout"], 0, 7) == "helpers")
-			vars["chit.walls.layout"] = vars["chit.walls.layout"].replace_string("helpers", "helpers,thrall");
-		else vars["chit.walls.layout"] = "thrall,"+vars["chit.stats.layout"];
+		if(!contains_text(vars["chit.walls.layout"], "thrall")) {
+			if(length(vars["chit.walls.layout"]) >= 7 && substring(vars["chit.walls.layout"], 0, 7) == "helpers")
+				vars["chit.walls.layout"] = vars["chit.walls.layout"].replace_string("helpers", "helpers,thrall");
+			else vars["chit.walls.layout"] = "thrall,"+vars["chit.stats.layout"];
+		}
 		updatevars();
 		set_property("chitVarVer", "1");
 	}

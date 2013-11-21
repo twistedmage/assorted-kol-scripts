@@ -123,6 +123,12 @@ boolean can_adv(location where, boolean prep) {
       if (!orig) cli_execute("outfit checkpoint");
       return prep;
    }
+   boolean seafloor_check(string url) {
+      string page = visit_url("seafloor.php");
+	  vprint("Visited seafloor.php (length: "+length(page)+")",9);
+      if (contains_text(page,url+"a.gif") || contains_text(page,url+"b.gif")) return add_unlocked();
+      return false;
+   }
    boolean jarcheck(string who) {
       item jar = to_item("jar of psychoses ("+who+")");
       return (get_campground() contains jar) || itemcheck(jar);
@@ -449,16 +455,16 @@ boolean can_adv(location where, boolean prep) {
    case $location[Battlefield (Cloaca Uniform)]: return outfitcheck("cloaca-cola uniform");
    case $location[Battlefield (Dyspepsi Uniform)]: return outfitcheck("dyspepsi-cola uniform");
   // sea
-   case $location[The Wreck of the Edgar Fitzsimmons]: buffer floor = visit_url("seafloor.php"); return (floor.contains_text("shipwrecka.gif") || floor.contains_text("shipwreckb.gif"));
-   case $location[Madness Reef]: buffer floor = visit_url("seafloor.php"); return (floor.contains_text("reefa.gif") || floor.contains_text("reefb.gif"));
-   case $location[The Marinara Trench]: buffer floor = visit_url("seafloor.php"); return (floor.contains_text("trencha.gif") || floor.contains_text("trenchb.gif"));
+   case $location[The Wreck of the Edgar Fitzsimmons]: return seafloor_check("shipwreck");
+   case $location[Madness Reef]: return seafloor_check("reef");
+   case $location[The Marinara Trench]: return seafloor_check("trench");
    case $location[Anemone Mine]:
-   case $location[Anemone Mine (Mining)]: buffer floor = visit_url("seafloor.php"); return (floor.contains_text("minea.gif") || floor.contains_text("mineb.gif"));
-   case $location[The Dive Bar]: buffer floor = visit_url("seafloor.php"); return (floor.contains_text("divebara.gif") || floor.contains_text("divebarb.gif"));
-   case $location[The Skate Park]: buffer floor = visit_url("seafloor.php"); return (floor.contains_text("skateparka.gif") || floor.contains_text("skateparkb.gif"));
-   case $location[The Mer-Kin Outpost]: buffer floor = visit_url("seafloor.php"); return (floor.contains_text("outposta.gif") || floor.contains_text("outpostb.gif"));
-   case $location[The Coral Corral]: buffer floor = visit_url("seafloor.php"); return (floor.contains_text("corrala.gif") || floor.contains_text("corralb.gif"));
-   case $location[The Caliginous Abyss]: buffer floor = visit_url("seafloor.php"); return (floor.contains_text("abyssa.gif") || floor.contains_text("abyssb.gif"));
+   case $location[Anemone Mine (Mining)]: return seafloor_check("mine");
+   case $location[The Dive Bar]: return seafloor_check("divebar");
+   case $location[The Skate Park]: return seafloor_check("skatepark");
+   case $location[The Mer-Kin Outpost]: return seafloor_check("outpost");
+   case $location[The Coral Corral]: return seafloor_check("corral");
+   case $location[The Caliginous Abyss]: return seafloor_check("abyss");
    case $location[Mer-kin Elementary School]:
    case $location[Mer-kin Gymnasium]: return get_property("seahorseName") != "" && outfitcheck("Crappy Mer-kin Disguise");
    case $location[Mer-kin Library]: return get_property("seahorseName") != "" && outfitcheck("Mer-kin Scholar's Vestments");

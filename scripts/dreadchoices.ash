@@ -4,6 +4,7 @@ string polisher="twistedmage";
 string brewer="twistedmage";
 string keymaker="twistedmage";
 string chef="dinala";
+string chest_opener="asica";
 
 void clean_choices()
 {
@@ -149,7 +150,7 @@ void do_village()
 		else if(replica_key)
 		{
 			do_choice(5, "?pwd&whichchoice=737&option=3&choiceform3=Investigate+the+ticking+shack", "?pwd&whichchoice=739&option=2&choiceform2=Make+a+key+using+the+wax+lock+impression");
-			send_stuff($item[replica key],"twistedmage");
+			send_stuff($item[replica key],chest_opener);
 		}
 		else
 		{
@@ -164,14 +165,13 @@ void do_village()
 	//duke
 	if(my_primestat()==$stat[mysticality] && item_amount($item[dread tarragon])>0 && item_amount($item[dreadful roast])>0 && item_amount($item[stinking agaricus])>0 && item_amount($item[bone flour])>0)
 	{
-		abort("line 120 choices for cooking shepherds pie");
+		abort("line 167 choices for cooking shepherds pie");
 		do_choice(6, "", "");
 	}
 	else if(item_amount($item[ghost thread])>9)
 	{
 		get_key();
-		abort("line 126 choices for making ghost shawl");
-		do_choice(6, "?pwd&whichchoice=741&option=3&choiceform3=Make+your+way+to+the+master+suite", "");
+		do_choice(6, "?pwd&whichchoice=741&option=3&choiceform3=Make+your+way+to+the+master+suite", "?pwd&whichchoice=744&option=3&choiceform3=Mess+with+the+loom");
 	}
 	else if(!already_done("drove some zombies out of the village")) //reduce zombies
 	{

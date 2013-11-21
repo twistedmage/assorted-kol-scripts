@@ -486,17 +486,8 @@ string normalize_dmgtype(string dmgt) {
       case "pasta": foreach i in $items[chester's aquarius medallion, sinful desires, slime-covered staff] if (have_equipped(i)) return "sleaze";
          foreach i in $items[necrotelicomnicon, the necbromancer's stein] if (have_equipped(i)) return "spooky";
          foreach i in $items[cookbook of the damned, wand of oscus] if (have_equipped(i)) return "stench";
-      case "sauce": foreach i in $items[codex of capsaicin conjuration, ol' scratch's ash can, ol' scratch's manacles, snapdragon pistil] if (have_equipped(i)) return "hot";
+         foreach i in $items[codex of capsaicin conjuration, ol' scratch's ash can, ol' scratch's manacles, snapdragon pistil] if (have_equipped(i)) return "hot";
          foreach i in $items[double-ice box, enchanted fire extinguisher, gazpacho's glacial grimoire] if (have_equipped(i)) return "cold";
-         if (dmgt == "sauce") {
-            if (have_skill($skill[immaculate seasoning])) {
-               if (mres[$element[hot]] < mres[$element[cold]]) return "hot";
-               if (mres[$element[cold]] < mres[$element[hot]]) return "cold";
-			   if (dmg_dealt(to_spread((1+spell_elem_bonus("hot"))+" hot")) != dmg_dealt(to_spread((1+spell_elem_bonus("cold"))+" cold")))
-                  return (dmg_dealt(to_spread((1+spell_elem_bonus("hot"))+" hot")) > dmg_dealt(to_spread((1+spell_elem_bonus("cold"))+" cold"))) ? "hot" : "cold";
-            }			   
-            return "hot,cold";
-         }
          if (have_effect($effect[spirit of cayenne]) > 0) return "hot";
          if (have_effect($effect[spirit of peppermint]) > 0) return "cold";
          if (have_effect($effect[spirit of garlic]) > 0) return "stench";
@@ -505,6 +496,12 @@ string normalize_dmgtype(string dmgt) {
          string res = "hot,cold,spooky,sleaze,stench,none";
          if (res.contains_text(m.defense_element)) res.replace_string(m.defense_element+",","");
          return res;
+      case "sauce":   // this now only applies to saucegeyser, and is non-tuneable
+         if (mres[$element[hot]] < mres[$element[cold]]) return "hot";
+         if (mres[$element[cold]] < mres[$element[hot]]) return "cold";
+         if (dmg_dealt(to_spread((1+spell_elem_bonus("hot"))+" hot")) != dmg_dealt(to_spread((1+spell_elem_bonus("cold"))+" cold")))
+            return (dmg_dealt(to_spread((1+spell_elem_bonus("hot"))+" hot")) > dmg_dealt(to_spread((1+spell_elem_bonus("cold"))+" cold"))) ? "hot" : "cold";
+         return "hot,cold";
       case "perfect": element[int] ranks;
          foreach el in $elements[] ranks[count(ranks)] = el;
          sort ranks by mres[value];

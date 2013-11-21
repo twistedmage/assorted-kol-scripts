@@ -117,6 +117,15 @@ if !monstername *Naughty Sorceress* && !monstername *bonerdagon
 				skill Voice of She-Who-Was
 			endif
 		endif
+		if sauceror
+			#curse
+			if hasskill 
+				skill 
+				Curse of the Thousand Islands - ?
+				Curse of Marinara - lifedrain + hp explosion (3 rounds)
+				Curse of Weaksauce - delevel + mp explosion (final spell dmg)
+			endif
+		endif
 		if hasskill pocket crumbs
 			skill pocket crumbs
 		endif
@@ -204,6 +213,9 @@ if  !monstername *Naughty Sorceress* && !monstername *bonerdagon
 		endif
 		if hasskill talk about politics
 			skill talk about politics
+		endif
+		if hasskill Batter Up
+			skill Batter Up
 		endif
 		if hascombatitem short writ of habeas corpus && (monstername pygmy shaman || monstername pygmy witch lawyer || monstername pygmy orderlies || monstername pygmy witch nurse || monstername pygmy witch surgeon || monstername pygmy headhunter || monstername drunk pygmy)
 			use short writ of habeas corpus
@@ -370,18 +382,11 @@ mark kill_the_mob
 	
 		#saucespam
 		if sauceror
-			if monsterhpabove 75
-				skill Wave of Sauce
-			endif
 			if hasskill throw shield
 				skill throw shield
 			endif
-			skill Saucegeyser
 			
 			while !missed 2
-				if monsterhpabove 75
-					skill Wave of Sauce
-				endif
 				skill Saucegeyser
 			endwhile 
 		endif
@@ -468,6 +473,9 @@ mark gremlinfight
 		endif
 		if hasskill talk about politics
 			skill talk about politics
+		endif
+		if hasskill Batter Up
+			skill Batter Up
 		endif
 		runaway
 	endif

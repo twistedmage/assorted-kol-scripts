@@ -641,7 +641,7 @@ void OutfitQuest()
 				}
 				else
 				{
-					run_combat();
+					adventure(1, $location[the coral corral]);
 				}
 			}
 		}
@@ -714,7 +714,8 @@ void OutfitQuest()
 		switch(TS_OUTFIT_QUEST)
 		{
 			case 1:
-				if (!have_outfit("mer-kin gladiatorial gear") && !have_outfit("crappy mer-kin disguise"))
+				if (is_wearing_outfit("mer-kin gladiatorial gear") || is_wearing_outfit("crappy mer-kin disguise")) ;
+				else if (!have_outfit("mer-kin gladiatorial gear") && !have_outfit("crappy mer-kin disguise"))
 				{
 					print("Getting your crappy disguise together.");
 					getsome(1, $item[crappy mer-kin mask]);
@@ -1159,7 +1160,8 @@ void OutfitQuest()
 				print("Time for the boss fight! Make sure you remove any sources of elemental damage first.");
 				break;
 			case 2:
-				if (!have_outfit("mer-kin scholar's vestment") && !have_outfit("crappy mer-kin disguise"))
+				if (is_wearing_outfit("mer-kin scholar's vestment") || is_wearing_outfit("crappy mer-kin disguise")) ;
+				else if (!have_outfit("mer-kin scholar's vestment") && !have_outfit("crappy mer-kin disguise"))
 				{
 					print("Getting your crappy disguise together.");
 					getsome(1, $item[crappy mer-kin mask]);

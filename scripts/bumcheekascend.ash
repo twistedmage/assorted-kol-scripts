@@ -2282,7 +2282,7 @@ string consultMyst(int round, string opp, string text) {
 	}
 	//Checks if the monster is weak against whatever Sauce element would be appropriate. The actual string is ignored.
 	int isWeak(string ignored) {
-		if (have_skill($skill[Immaculate Seasoning])) {
+		if (have_skill($skill[Saucegeyser])) {
 			if ($elements[spooky, stench, sleaze, cold] contains monster_element()) return 2;
 		}
 		return isWeak($element[none]);
@@ -2986,8 +2986,6 @@ if(can_interact())
 			if (have_skill($skill[scarysauce]))
 				cli_execute("trigger lose_effect, scarysauce, cast 1 scarysauce");
 			//these are guaranteed for myst, but others can use them to spend mana
-			if (have_skill($skill[Jaba&ntilde;ero Saucesphere]))
-				cli_execute("trigger lose_effect, jaba&ntilde;ero saucesphere, cast 1 jaba&ntilde;ero saucesphere");
 			if (have_skill($skill[Jalape&ntilde;o Saucesphere]))
 				cli_execute("trigger lose_effect, jalape&ntilde;o saucesphere, cast 1 jalape&ntilde;o saucesphere");
 }
@@ -3021,7 +3019,6 @@ if(can_interact())
 					if (my_level() < 7  && have_skill($skill[Springy Fusilli])) cli_execute("trigger lose_effect, Springy Fusilli, cast 1 Springy Fusilli");
 					if (have_skill($skill[Manicotti Meditation]) && my_level() < 5) cli_execute("trigger lose_effect, Pasta Oneness, cast 1 Manicotti Meditation");
 					if (have_skill($skill[Sauce Contemplation]) && my_level() < 5) cli_execute("trigger lose_effect, Saucemastery, cast 1 Sauce Contemplation");
-					if ((i_a("saucepan") + i_a("5-alarm saucepan") + i_a("17-alarm saucepan") > 0) && have_skill($skill[Jaba&ntilde;ero Saucesphere]) && my_class() == $class[sauceror]) cli_execute("trigger lose_effect, Jaba&ntilde;ero Saucesphere, cast 1 Jaba&ntilde;ero Saucesphere");
 					if ((i_a("saucepan") + i_a("5-alarm saucepan") + i_a("17-alarm saucepan") > 0) && have_skill($skill[Jalape&ntilde;o Saucesphere]) && my_class() == $class[sauceror]) cli_execute("trigger lose_effect, Jalape&ntilde;o Saucesphere, cast 1 Jalape&ntilde;o Saucesphere");
 					if (have_skill($skill[Flavour of magic]) && have_effect($effect[Spirit of Peppermint]) == 0) use_skill(1, $skill[Spirit of Peppermint]);
 					if (have_skill($skill[Springy Fusilli]) && my_class() == $class[Pastamancer]) cli_execute("trigger lose_effect, Springy Fusilli, cast 1 Springy Fusilli");
@@ -4440,20 +4437,20 @@ void setMood(string combat) {
 			cli_execute("trigger lose_effect, Bind Penne Dreadful, cast 1 Bind Penne Dreadful");
 		
 		//level up the thrall
-		int thrall_level=get_property().to_int();
+/*		int thrall_level=get_property().to_int();
 		if(thrall_level>1 && thrall_level<9)
-			if(i_a("Experimental carbon fiber pasta additive")>0)
+			if(i_a("Experimental carbon fiber pasta additive")>0 && !get_property("_pastaAdditive").to_boolean())
 				use(1,$item[Experimental carbon fiber pasta additive]);
 			else
 				cli_execute("pull 1 Experimental carbon fiber pasta additive");
 
 		//soul sauce
-		if(contains_text(combat,"n") && have_skill($skill[Soul Rotation]))
+		if(contains_text(combat,"n") && have_skill($skill[Soul Saucery]))
 			cli_execute("trigger lose_effect, soulerskates, ash if(<num souls> >= 25){cli_execute(\"cast 1 Soul Rotation\");}");
 		
-		if(contains_text(combat,"n") && have_skill($skill[Soul Rotation]) && souls > 25)
-			cli_execute("trigger lose_effect, soulerskates, cast 1 Soul Rotation");
-		
+		if(have_skill($skill[Soul Saucery])) //if we get full, burn some off
+			cli_execute("trigger lose_effect, Soul Funk, ash if(<num souls> >= 100){cli_execute(\"cast 1 Soul Funk\");}");
+		<>;*/
 			
 	} else if(my_path() == "Avatar of Boris"){
 		print("setting boris paths mood","lime");
@@ -6773,7 +6770,7 @@ void bcascEpicWeapons() {
 					return;
 		}
 		
-		if (my_class() == $class[Sauceror] && my_basestat(my_primestat()) > 10 && ((have_skill($skill[jaba&ntilde;ero saucesphere]) || have_skill($skill[jalape&ntilde;o saucesphere])) || bcasc_bartender || bcasc_chef) && i_a("5-alarm Saucepan") == 0 && i_a("17-alarm Saucepan") == 0 && i_a("Windsor Pan of the Source") == 0) {
+		if (my_class() == $class[Sauceror] && my_basestat(my_primestat()) > 10 && ((have_skill($skill[jalape&ntilde;o saucesphere])) || bcasc_bartender || bcasc_chef) && i_a("5-alarm Saucepan") == 0 && i_a("17-alarm Saucepan") == 0 && i_a("Windsor Pan of the Source") == 0) {
 			if (getEpic("S", "saucepan", "jaba&ntilde;ero pepper", "5-alarm Saucepan"))
 				return;
 		}
@@ -7184,7 +7181,7 @@ boolean bcascFunHouse() {
 		return getLegendaryEpic("P", "Pasta of Peril", "high-octane olive oil", "Greek Pasta of Peril");
 	}
 
-	if (my_class() == $class[Sauceror] && my_buffedstat(my_primestat()) > 15 && ((have_skill($skill[jaba&ntilde;ero saucesphere]) || have_skill($skill[jalape&ntilde;o saucesphere])) || bcasc_bartender || bcasc_chef) && i_a("5-alarm Saucepan") == 1 && i_a("17-alarm Saucepan") == 0 && i_a("Windsor Pan of the Source") == 0) {
+	if (my_class() == $class[Sauceror] && my_buffedstat(my_primestat()) > 15 && ((have_skill($skill[jalape&ntilde;o saucesphere])) || bcasc_bartender || bcasc_chef) && i_a("5-alarm Saucepan") == 1 && i_a("17-alarm Saucepan") == 0 && i_a("Windsor Pan of the Source") == 0) {
 		return getLegendaryEpic("S", "5-Alarm Saucepan", "Peppercorns of Power", "17-alarm Saucepan");
 	}
 
@@ -9711,7 +9708,6 @@ boolean bcascTrapper() {
 
 			setMood("+n");
 			if(my_class() == $class[Pastamancer] && have_skill($skill[flavour of magic])) use_skill(1, $skill[spirit of cayenne]);
-			 if ((i_a("saucepan") + i_a("5-alarm saucepan") + i_a("17-alarm saucepan") > 0) && have_skill($skill[Jaba&ntilde;ero Saucesphere]) && my_class() == $class[sauceror]) cli_execute("trigger lose_effect, Jaba&ntilde;ero Saucesphere, cast 1 Jaba&ntilde;ero Saucesphere");
 			 if ((i_a("saucepan") + i_a("5-alarm saucepan") + i_a("17-alarm saucepan") > 0) && have_skill($skill[Jalape&ntilde;o Saucesphere]) && my_class() == $class[sauceror]) cli_execute("trigger lose_effect, Jalape&ntilde;o Saucesphere, cast 1 Jalape&ntilde;o Saucesphere");
 			buMax("initiative");
 			

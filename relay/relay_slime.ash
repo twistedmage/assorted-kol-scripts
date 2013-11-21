@@ -95,7 +95,7 @@ boolean write_rcheck(boolean ov, string name, string label) {
 }
 
 float[11] slime_percent;
-slime_percent[0] = 0;
+slime_percent[0] = .01;
 slime_percent[1] = 5.334167;
 slime_percent[2] = 4.001677;
 slime_percent[3] = 2.9025;
@@ -148,14 +148,14 @@ int expected_rounds_needed()
 	boolean shurikens = false;
 	boolean cannon = false;
 	boolean mortar = false;
+	boolean stringozzi = false;
+	boolean wotpl = false;
+	boolean ff = false;
 	
 	boolean stream = false;
 	boolean storm = false;
 	boolean wave = false;
 	boolean saucegeyser = false;
-	
-	boolean wotpl = false;
-	boolean ff = false;
 	
 	boolean mm = false;
 	boolean vts = false;
@@ -221,6 +221,9 @@ int expected_rounds_needed()
 			case "skill stuffed mortar shell":
 				mortar = true;
 				break;
+			case "skill stringozzi serpent":
+				stringozzi = true;
+				break;
 			case "skill stream of sauce":
 				stream = true;
 				break;
@@ -239,18 +242,15 @@ int expected_rounds_needed()
 			case "skill fearful fettucini":
 				ff = true;
 				break;
-			case "skill moxious maneuver":
-				mm = true;
-				break;
 			case "skill vicious talon slash":
 				vts = true;
 				break;
 		}
 	}
 
-	int musc_dam = max( 0 , ( my_buffedstat( $stat[muscle] ) ) - monster_defense( $monster[slime1] ) );
-	if( mm ) musc_dam = max( 0 , ( my_buffedstat( $stat[moxie] ) ) - monster_defense( $monster[slime1] ) );
-	if( have_skill( $skill[Eye of the Stoat] ) && lts_factor == 3 )
+	int musc_dam = max( 0 , my_buffedstat( $stat[muscle] ) - monster_defense( $monster[slime1] ) );
+	if( current_hit_stat() == $stat[Moxie] ) musc_dam = max( 0 , my_buffedstat( $stat[moxie] ) - monster_defense( $monster[slime1] ) );
+	if( lts_factor == 3 )
 	{
 		if( my_class() == $class[Seal Clubber] )
 			musc_dam = max( 0 , ( my_buffedstat( $stat[muscle] ) * 1.3 ) - monster_defense( $monster[slime1] ) );
@@ -260,11 +260,24 @@ int expected_rounds_needed()
 	if( weapon_type( equipped_item( $slot[weapon] ) ) == $stat[none] ) musc_dam = musc_dam * .25;
 	if( shieldbutt ) offhand_damage = get_power( equipped_item( $slot[off-hand] ) ) * .1;
 	spell_per = ( 100 + numeric_modifier( "Spell Damage Percent" ) ) / 100;
-	float elem_spell_damage;
-	foreach elem in $elements[]
-	{
-		elem_spell_damage += numeric_modifier( elem.to_string() + " Spell Damage" );
-	}
+	// Old elem spell damage calc was misinformed. Needs redone
+	float elem_spell_damage = 0;
+	/*
+	[5:13:10 PM] Cannonfire40: Stringozzi is now 16-32+.25*myst, with poison = initial damage
+	[5:13:20 PM] Cannonfire40: Before it was 16-40+.25*myst, with poison = initial damage/2
+	[5:13:34 PM] Cannonfire40: Cannon now has double base damage and scales to .25*myst instead of .15*myst
+	[5:13:51 PM] Cannonfire40: WotP has identical base damage and scales to .5*myst instead of .35
+	[5:14:03 PM] Cannonfire40: And saucegeyser is now 60-70 + .4*myst
+	*/
+	
+	/*
+	[8:18:53 PM] Cannonfire40: Mortar isn't *bad*
+	[8:18:56 PM] Cannonfire40: but it's bad for slime tube
+	[8:19:03 PM] Cannonfire40: it deals the same damage as WotP now
+	[8:19:05 PM] Cannonfire40: BUT
+	[8:19:11 PM] Cannonfire40: it fires the round AFTER you cast it.
+	[8:19:18 PM] Cannonfire40: and it's once per combat
+	*/
 	switch
 	{
 		case noisemaker:
@@ -276,30 +289,33 @@ int expected_rounds_needed()
 		case sillystring:
 			damage = my_buffedstat( $stat[mysticality] ) * ( 1 + funk.to_int() );
 			break;
+		// Shurikens needs spaded
 		case shurikens:
 			damage = floor( spell_per * ( 3 + max( .07 * my_buffedstat( $stat[mysticality] ) , 15 ) + min( numeric_modifier( "Spell Damage" ) , 25 ) + elem_spell_damage ) );
 			break;
 		case cannon:
-			damage = floor( spell_per * ( 8 + max( .15 * my_buffedstat( $stat[mysticality] ) , 20 ) + min( numeric_modifier( "Spell Damage" ) , 40 ) + elem_spell_damage ) );
+			damage = floor( spell_per * ( 16 + max( .25 * my_buffedstat( $stat[mysticality] ) , 20 ) + min( numeric_modifier( "Spell Damage" ) , 40 ) + elem_spell_damage ) );
 			break;
-		case mortar:
-			damage = floor( spell_per * ( 16 + max( .25 * my_buffedstat( $stat[mysticality] ) , 30 ) + min( numeric_modifier( "Spell Damage" ) , 60 ) + elem_spell_damage ) );
-			break;
+		case stringozzi:
+			damage = floor( spell_per * ( 16 + max( .25 * my_buffedstat( $stat[mysticality] ) , 20 ) + min( numeric_modifier( "Spell Damage" ) , 40 ) + elem_spell_damage ) ) * 2;
+		// Stream needs spaded
 		case stream:
 			damage = floor( spell_per * ( 3 + max( .1 * my_buffedstat( $stat[mysticality] ) , 10 ) + min( numeric_modifier( "Spell Damage" ) , 10 ) ) );
 			break;
+		// Storm needs spaded
 		case storm:
 			damage = floor( spell_per * ( 14 + max( .2 * my_buffedstat( $stat[mysticality] ) , 25 ) + min( numeric_modifier( "Spell Damage" ) , 15 ) ) );
 			break;
+		// Wave needs spaded
 		case wave:
 			damage = floor( spell_per * ( 20 + max( .3 * my_buffedstat( $stat[mysticality] ) , 30 ) + min( numeric_modifier( "Spell Damage" ) , 25 ) ) );
 			break;
 		case saucegeyser:
-			damage = floor( spell_per * ( 35 + ( .35 * my_buffedstat( $stat[mysticality] ) ) + numeric_modifier( "Spell Damage" ) ) );
+			damage = floor( spell_per * ( 60 + ( .4 * my_buffedstat( $stat[mysticality] ) ) + numeric_modifier( "Spell Damage" ) ) );
 			break;
 		case wotpl:
 		case ff:
-			damage = floor( spell_per * ( 32 + ( .35 * my_buffedstat( $stat[mysticality] ) ) + numeric_modifier( "Spell Damage" ) ) );
+			damage = floor( spell_per * ( 32 + ( .5 * my_buffedstat( $stat[mysticality] ) ) + numeric_modifier( "Spell Damage" ) ) );
 			break;
 		case vts:
 			damage = floor( .75 * my_buffedstat( $stat[muscle] ) );
@@ -560,21 +576,10 @@ string familiar_select(string ov, string name, string label) {
 	return ov;
 }
 
-string get_clan()
-{
-	string page_text = visit_url( "clan_hall.php" );
-	matcher m = create_matcher( "whichclan\=\\d+\">([^<]+)" , visit_url( "showplayer.php?who=" + my_id().to_string() ) );
-	if( m.find() )
-	{
-		return m.group( 1 );
-	}
-	return "Error! Clan not found!";
-}
-
 void main() {
 	write_page();
 	writeln( "<center><b><font size=5 color=\"blue\">Slime.ash Relay Version</font></b></center><br>" );
-	writeln( "<center><font size=4><b>Clan:</b> " + get_clan() + "</font></center><br>" );
+	writeln( "<center><font size=4><b>Clan:</b> " + get_clan_name() + "</font></center><br>" );
 	writeln("<center><table border=0 cellpadding=2>");
 	writeln("<tr><th></th><th align=left>Minimum ML Settings</th><th align=left>Maximal ML Settings</th></tr>");
 	write("<tr><th align=right>Outfit name:</th><td>");
