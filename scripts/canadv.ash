@@ -297,7 +297,7 @@ boolean can_adv(location where, boolean prep) {
    case $location[The Briniest Deepests]:
    case $location[An Octopus's Garden]:
    case $location[The Sleazy Back Alley]:               // town
-   case $location[Foyer]:                               // vanya's castle
+   case $location[Vanya's Castle Foyer]:                // vanya's castle
    case $location[Vanya's Castle Chapel]:
    case $location[The Spooky Forest]:                   // woods
    case $location[The Stately Pleasure Dome]:           // wormwood

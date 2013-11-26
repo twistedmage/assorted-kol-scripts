@@ -326,8 +326,13 @@ void checkTowerMonsters()
 
 void checkAccordion()
 {
-	foreach accordion in $items[calavera concertina,Rock and Roll Legend,stolen accordion,
-					The Trickster's Trikitixa,Squeezebox of the Ages]
+	foreach thing in $items[]
+	{
+		if ( thing.image.substring(0,3) == "acc" && available_amount( thing ) > 0 ) return;
+	}
+
+	foreach accordion in $items[calavera concertina,Rock and Roll Legend,
+			The Trickster's Trikitixa,Squeezebox of the Ages,antique accordion]
 	{
 		if ( available_amount( accordion ) > 0 ) return;
 	}

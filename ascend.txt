@@ -1,3 +1,40 @@
+Wednesday 18th dec
+guildford 23:18 - plat 4
+redhill 23:58
+
+redhill 00:05 plat 3
+gatwick 00:14
+
+
+thursday 19th
+06:20 - gatwick (terminal s)
+09:25 - oslo
+34.90
+
+13:05 - oslo
+14:00 - krist
+67.50
+
+<bus>
+
+
+
+sunday 12 jan
+14:25 - krist
+15:20 - oslo
+£87.80
+
+18:10 - oslo
+19:30 - gatwick
+32.30
+
+
+gatwick 20:08 / 21:08 - plat 2
+guildford 20:57 / 21:50
+
+
+
+
 Next ascension plan
 --------------------
 energy drinks in zombiecore / boris
@@ -258,7 +295,7 @@ a25
 
 
 ----------Zombie homeowners association---------
-
+familiar magic dragonfish; maximize muscle, equip weedy skirt; uneffect jaba; uneffect scarysauce; ballpit; telescope high; use silver dreadsylvanian flask; use brass dreadsylvanian flask; use ferrigno; use philter;
 -------------------------------------------------
 
 ----------The unkillable skeleton hard mode ---------
@@ -305,7 +342,7 @@ get cursed voodoo skulls to do damage
 familiar bandersnatch; drink white lightning
 skeleton warrior; skeleton wizard; skeleton rogue; skeletal cleric; use silver dreadsylvanian flask; use brass dreadsylvanian flask
 -----drunkula hard mode---
-maximize spell damage percent, equip ghost shawl, equip rain-doh green lantern; use 300 potion of inebriety; use silver dreadsylvanian flask; use brass dreadsylvanian flask;use jackass plumber home game; pool 2; cast deep dark visions; hatter 11; use black sheepskin; use glittery mascara; ballpit; telescope high;use silver dreadsylvanian flask; use brass dreadsylvanian flask
+familiar ;maximize spell damage percent, equip ghost shawl, equip rain-doh green lantern; use 300 potion of inebriety; use silver dreadsylvanian flask; use brass dreadsylvanian flask;use jackass plumber home game; pool 2; cast deep dark visions; hatter 11; use black sheepskin; use glittery mascara; ballpit; telescope high;use silver dreadsylvanian flask; use brass dreadsylvanian flask
 ----------svns----------
 svn checkout https://svn.code.sf.net/p/therazekolmafia/eatdrink/code/;
 svn checkout https://svn.code.sf.net/p/winterbay-mafia/autobasement/code/;
@@ -352,6 +389,8 @@ zlib eatdrink_fav_groose_grease = true;
 zlib eatdrink_favUse = true;
 zlib eatdrink_valueOfPrimeStat = 2;
 zlib eatdrink_valueOfNonPrimeStat = 1;
+zlib eatdrink_valueOfAdventure = 1000;
+zlib eatdrink_budget = 40000;
 ash set_property("valueOfAdventure",1000);
 -------------------------uxl
 55 479 874 - garage
@@ -413,26 +452,6 @@ fireworks 8m
 elvish sunglasses 9,
 
 
-12 to 27 oct
-
-go back through trondheim
-
-lgw 9:10
-oslo 12:15
-39gbp
-
-oslo 17:35
-kristiansund 18:30
-85.10gbp
-
-
-kristiansund 14:25
-oslo  15:20
-95.90gbp
-
-oslo 18:10
-gatwick 19:30
-34.20 gbp
 ---------------------------------
 
 

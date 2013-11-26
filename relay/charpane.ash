@@ -556,6 +556,30 @@ string helperSemiRare() {
 	return result;
 }
 
+// elements2.gif or elements3.gif are valid values for img
+void addElementMap(buffer result, string img) {
+	result.append('<img src="');
+	result.append(imagePath);
+	result.append(img);
+	result.append('" width="190" height="190"');
+	if(have_skill($skill[Flavour of Magic])) {
+		result.append('" width="190" height="190" alt="Cast Flavour of Magic" usemap="#flavmap">');
+		result.append('<map id="flavmap" name="flavmap"><area shape="circle" alt="Bacon Grease (Sleaze)" title="Bacon Grease (Sleaze)" coords="86,33,22" href="');
+		result.append(sideCommand('cast spirit of bacon grease'));
+		result.append('" target="" /><area shape="circle" alt="Peppermint (Cold)" title="Peppermint (Cold)" coords="156,84,22" href="');
+		result.append(sideCommand('cast spirit of peppermint'));
+		result.append('" target="" /><area shape="circle" alt="Wormwood (Spooky)" title="Wormwood (Spooky)" coords="133,155,22" href="');
+		result.append(sideCommand('cast spirit of wormwood'));
+		result.append('" target="" /><area shape="circle" alt="Cayenne (Hot)" title="Cayenne (Hot)" coords="39,155,22" href="');
+		result.append(sideCommand('cast spirit of cayenne'));
+		result.append('" target="" /><area shape="circle" alt="Garlic (Stench)" title="Garlic (Stench)" coords="25,84,22" href="');
+		result.append(sideCommand('cast spirit of garlic'));
+		result.append('" target="" /><area shape="circle" alt="Cancel Flavour of Magic" title="Cancel Flavour of Magic" coords="86,95,22" href="');
+		result.append(sideCommand('cast spirit of nothing'));
+		result.append('" target="" /></map>');
+	} else
+		result.append('>');
+}
 
 record buff {
 	string effectName;
@@ -575,7 +599,7 @@ buff parseBuff(string source) {
 	string columnIcon, columnTurns, columnArrow;
 	string spoiler, style;
 
-	matcher parse = create_matcher('(?:<td[^>]*>(.*?)</td>)?<td[^>]*>(<.*?itemimages/([^"]*).*?)</td><td[^>]*>[^>]*>(.*?) \\((?:(.*?), )?(<a[^>]*>(\\d+)</a>|&infin;|\\d+)\\)(?:(?:</font>)?&nbsp;(<a.*?</a>))?.*?</td>', source);
+	matcher parse = create_matcher('(?:<td[^>]*>(.*?)</td>)?<td[^>]*>(<.*?itemimages/([^"]*).*?)</td><td[^>]*>[^>]*>(.*?) \\((?:(.*?), )?((?:<a[^>]*>)?(\\d+||&infin;)(?:</a>)?)\\)(?:(?:</font>)?&nbsp;(<a.*?</a>))?.*?</td>', source);
 	// The ? stuff at the end is because those arrows are a mafia option that might not be present
 	if(parse.find()) {
 		columnIcon = parse.group(2);	// This is full html for the icon
@@ -583,7 +607,7 @@ buff parseBuff(string source) {
 		myBuff.effectName = parse.group(4);
 		spoiler = parse.group(5);		// This appears for "Form of...Bird!" and "On the Trail"
 		columnTurns = parse.group(6);
-		if(columnTurns == "&infin;") {	// Is it intrinsic?
+		if(parse.group(7) == "&infin;") {	// Is it intrinsic?
 			myBuff.effectTurns = -1;
 			myBuff.isIntrinsic = true;
 		} else
@@ -657,29 +681,34 @@ buff parseBuff(string source) {
 	result.append('>');
 	if(showIcons) 
 		result.append('<td class="icon">' + columnIcon + '</td>');
+	result.append('<td class="info"');
+	if(doArrows && myBuff.isIntrinsic)
+		result.append(' colspan="2"');
+	result.append('>');
+	result.append(effectAlias);
+	result.append('</td>');
 	if(myBuff.isIntrinsic) {
-		if (doArrows) {
-			result.append('<td class="info" colspan="2">' + effectAlias + '</td>');
-			result.append('<td class="infinity">&infin;</td>');
-		} else {
-			result.append('<td class="info">' + effectAlias + '</td>');
-			result.append('<td class="infinity right">&infin;</td>');
-		}
+		result.append('<td class="infinity');
+		if(!doArrows)
+			result.append(' right');
+		result.append('">');
 	} else {
-		result.append('<td class="info">' + effectAlias + '</td>');
-		if (!doArrows) {
-			result.append('<td class="right">' + columnTurns + '</td>');
-		} else if (columnTurns != "") {
-			result.append('<td class="shrug">' + columnTurns + '</td>');
-		} else {
-			result.append('<td class="noshrug">' + myBuff.effectTurns + '</td>');
-		}
-		if (doArrows) {
-			if (columnArrow == "") {
-				result.append('<td>&nbsp;</td>');
-			} else {
-				result.append('<td class="powerup">' + columnArrow + '</td>');
-			}
+		if(!doArrows)
+			result.append('<td class="right">');
+		else if (columnTurns != "")
+			result.append('<td class="shrug">');
+		else
+			result.append('<td class="noshrug">');
+	}
+	result.append(columnTurns);
+	result.append('</td>');
+	if(doArrows && !myBuff.isIntrinsic) {
+		if(columnArrow == "")
+			result.append('<td>&nbsp;</td>');
+		else {
+			result.append('<td class="powerup">');
+			result.append(columnArrow);
+			result.append('</td>');
 		}
 	}
 	result.append('</tr>');
@@ -799,7 +828,8 @@ void bakeElements() {
 	result.append(imagePath);
 	result.append('elements.png">Elements</th></tr></thead>');
 	result.append("<tr><td>");
-	result.append('<img src="' + imagePath + 'Elements2.gif"></tr></table>');
+	result.addElementMap("elements2.gif");
+	result.append('</tr></table>');
 	
 	chitBricks["elements"] = result;
 }
@@ -1477,53 +1507,39 @@ void pickerCompanion(string famname, string famtype) {
 	chitPickers["equipment"] = picker;
 }
 
-static { string [string] [int] pasta;
-	pasta["Vampieroghi"][1] = "Attacks and heals you";
-	pasta["Vampieroghi"][5] = "Dispels bad effects";
-	pasta["Vampieroghi"][10] = "+60 max HP";
-	pasta["Vermincelli"][1] = "Restores MP";
-	pasta["Vermincelli"][5] = "Attacks enemy";
-	pasta["Vermincelli"][10] = "+30 max MP";
-	pasta["Angel Hair Wisp"][1] = "Combat Initiative";
-	pasta["Angel Hair Wisp"][5] = "Prevents enemy crits";
-	pasta["Angel Hair Wisp"][10] = "Blocks enemy attacks";
-	pasta["Elbow Macaroni"][1] = "Muscle matches Myst";
-	pasta["Elbow Macaroni"][5] = "+ Weapon damage";
-	pasta["Elbow Macaroni"][10] = "+10% Critical hits";
-	pasta["Penne Dreadful"][1] = "Moxie matches Myst";
-	pasta["Penne Dreadful"][5] = "Delevels enemy";
-	pasta["Penne Dreadful"][10] = "Damage Reduction: 10";
-	pasta["Spaghetti Elemental"][1] = "Increases stat gains";
-	pasta["Spaghetti Elemental"][5] = "Blocks first attack";
-	pasta["Spaghetti Elemental"][10] = "Spell damage +5";
-	pasta["Lasagmbie"][1] = "Increase meat drops";
-	pasta["Lasagmbie"][5] = "Attacks with Spooky";
-	pasta["Lasagmbie"][10] = "Spooky spells +10";
-	pasta["Spice Ghost"][1] = "Increases item drops";
-	pasta["Spice Ghost"][5] = "Drops spice";
-	pasta["Spice Ghost"][10] = "Better Entangling";
+static { string [thrall] [int] pasta;
+	pasta[$thrall[Vampieroghi]][1] = "Attacks and heals you";
+	pasta[$thrall[Vampieroghi]][5] = "Dispels bad effects";
+	pasta[$thrall[Vampieroghi]][10] = "+60 max HP";
+	pasta[$thrall[Vermincelli]][1] = "Attacks and restores MP";
+	pasta[$thrall[Vermincelli]][5] = "Attacks enemy";
+	pasta[$thrall[Vermincelli]][10] = "+30 max MP";
+	pasta[$thrall[Angel Hair Wisp]][1] = "Combat Initiative";
+	pasta[$thrall[Angel Hair Wisp]][5] = "Prevents enemy crits";
+	pasta[$thrall[Angel Hair Wisp]][10] = "Blocks enemy attacks";
+	pasta[$thrall[Elbow Macaroni]][1] = "Muscle matches Myst";
+	pasta[$thrall[Elbow Macaroni]][5] = "+ Weapon damage";
+	pasta[$thrall[Elbow Macaroni]][10] = "+10% Critical hits";
+	pasta[$thrall[Penne Dreadful]][1] = "Moxie matches Myst";
+	pasta[$thrall[Penne Dreadful]][5] = "Delevels enemy";
+	pasta[$thrall[Penne Dreadful]][10] = "Damage Reduction: 10";
+	pasta[$thrall[Spaghetti Elemental]][1] = "Increases exp";
+	pasta[$thrall[Spaghetti Elemental]][5] = "Blocks first attack";
+	pasta[$thrall[Spaghetti Elemental]][10] = "Spell damage +5";
+	pasta[$thrall[Lasagmbie]][1] = "Increase meat drops";
+	pasta[$thrall[Lasagmbie]][5] = "Attacks with Spooky";
+	pasta[$thrall[Lasagmbie]][10] = "Spooky spells +10";
+	pasta[$thrall[Spice Ghost]][1] = "Increases item drops";
+	pasta[$thrall[Spice Ghost]][5] = "Drops spices";
+	pasta[$thrall[Spice Ghost]][10] = "Better Entangling";
 }
 
-void pickerThrall(string famname, string famtype) {
+void pickerThrall() {
 
-	record binder {
-		string name;
-		string img;
-	};
-	static { binder [skill] bind;
-		bind [$skill[Bind Vampieroghi]] = new binder("Vampieroghi", "t_vampieroghi");
-		bind [$skill[Bind Vermincelli]] = new binder("Vermincelli", "t_vermincelli");
-		bind [$skill[Bind Angel Hair Wisp]] = new binder("Angel Hair Wisp", "t_wisp");
-		bind [$skill[Bind Undead Elbow Macaroni]] = new binder("Elbow Macaroni", "t_elbowmac");
-		bind [$skill[Bind Penne Dreadful]] = new binder("Penne Dreadful", "t_dreadful");
-		bind [$skill[Bind Spaghetti Elemental]] = new binder("Spaghetti Elemental", "t_spagdemon");
-		bind [$skill[Bind Lasagmbie]] = new binder("Lasagmbie", "t_lasagmbie");
-		bind [$skill[Bind Spice Ghost]] = new binder("Spice Ghost", "t_spiceghost");
-	}
-	skill [int] orderedBinds;
-	foreach s in bind
-		orderedBinds[count(orderedBinds)] = s;
-	sort orderedBinds by mp_cost(value);
+	thrall [int] binds;
+	foreach s in $thralls[]
+		binds[count(binds)] = s;
+	sort binds by mp_cost(value.skill);
 
 	string color(skill s) {
 		if(my_mp() >= mp_cost(s)) return "inventory"; 	// Green
@@ -1531,10 +1547,18 @@ void pickerThrall(string famname, string famtype) {
 		return "remove";								// Red
 	}
 	
-	void addThrall(buffer result, skill s) {
+	void addThrall(buffer result, thrall t) {
+		skill s = t.skill;
 		buffer url;
-		url.append('<a class="change" href="');
-		url.append(sideCommand("cast " + s));
+		if(t.level == 0) { // If this is a first time summmons, I want to see it in mainpaine!
+			url.append('<a target=mainpane class="change" href="skills.php?action=Skillz&whichskill=');
+			url.append(to_int(s));
+			url.append('&skillform=Use+Skill&quantity=1&pwd=');
+			url.append(my_hash());
+		} else {
+			url.append('<a class="change" href="');
+			url.append(sideCommand("cast " + s));
+		}
 		url.append('" title="');
 		url.append(s);
 		url.append(' for ');
@@ -1546,18 +1570,36 @@ void pickerThrall(string famname, string famtype) {
 		result.append('">');
 		result.append(url);
 		result.append('<b>');
-		result.append(bind[s].name);
+		result.append(t);
 		result.append('</b> <span style="float:right;color:#707070">');
 		result.append(mp_cost(s));
-		result.append('mp<br /></span>');
-		result.append('<span style="font-weight:100;color:blue">');
-		result.append(pasta[bind[s].name][1]);
-		result.append('</span></a></td>');
-		result.append('<td class="icon">');
+		result.append('mp</span><br /><span style="color:blue">');
+		result.append(pasta[t][1]);
+		result.append('</span></a></td><td class="icon">');
 		result.append(url);
 		result.append('<img src="/images/itemimages/');
-		result.append(bind[s].img);
-		result.append('.gif"></a></td></tr>');
+		result.append(t.tinyimage);
+		result.append('"></a></td></tr>');
+	}
+
+	void dismissThrall(buffer result) {
+		skill s = $skill[Dismiss Pasta Thrall];
+		buffer url;
+		url.append('<a class="change" href="');
+		url.append(sideCommand("cast Dismiss Pasta Thrall"));
+		url.append('" title="Dismiss Pasta Thrall">');
+		
+		result.append('<tr class="pickitem"><td class="retrieve">');
+		result.append(url);
+		result.append('<b>Dismiss ');
+		result.append(my_thrall());
+		result.append('</b><br /><span style="color:blue">Goodbye ');
+		result.append(my_thrall().name);
+		result.append('</span></a></td><td class="icon">');
+		result.append(url);
+		result.append('<img src="/images/itemimages/');
+		result.append(my_thrall().tinyimage);
+		result.append('"></a></td></tr>');
 	}
 
 	buffer picker;
@@ -1566,16 +1608,18 @@ void pickerThrall(string famname, string famtype) {
 	// Check for all companions
 	picker.addLoader("Binding Thrall...");
 	boolean sad = true;
-	foreach x,s in orderedBinds
-		if(have_skill(s) && bind[s].name != famtype) {
-			picker.addThrall(s);
+	foreach x,t in binds
+		if(have_skill(t.skill) && t != my_thrall()) {
+			picker.addThrall(t);
 			sad = false;
 		}
+	if(my_thrall() != $thrall[none])
+		picker.dismissThrall();
 	if(sad) {
-		if(famname == "")
-			picker.addSadFace("You haven't yet learned how to play with your food.<br /><br />How sad.");
+		if(my_thrall() == $thrall[none])
+			picker.addSadFace("You haven't yet learned how to summon Thralls.<br /><br />How sad.");
 		else
-			picker.addSadFace("Poor "+famname+" has no other food to play with.");
+			picker.addSadFace("Poor "+my_thrall().name+" has no other thralls to play with.");
 	}
 	
 	picker.append('</table></div>');
@@ -1946,50 +1990,44 @@ void bakeFamiliar() {
 
 void bakeThrall() {
 	if(my_class() != $class[Pastamancer]) return;
-	string famimage, click, famname, famtype;
-	buffer actor;
-	int famweight;
-	string equiptype = "<font color=blue size=2><b>Click to Summon a Thrall</b></font>";
-	# <b>Pasta Thrall:</b></font><br><img onClick='javascript:window.open("desc_guardian.php","","height=200,width=300")' src=/images/itemimages/t_vampieroghi.gif width=30 height=30><br><font size=2><b>Wally</b><br>the Lvl. 3 Vampieroghi</font>
-	matcher thrall = create_matcher("<b>Pasta Thrall:</b></font><br><img (onClick='[^']+') *([^ ]+)[^>]+><br><font size=2>(<b>([^<]+)[^\\d]+(\\d+) *([^<]+))</font>", chitSource["thrall"]);
-	if(find(thrall)) {
-		famimage = thrall.group(2);
-		click = thrall.group(1);
-		famname = thrall.group(4);
-		famweight = thrall.group(5).to_int();
-		famtype = thrall.group(6);
-		actor.append('<span style="color:blue;font-weight:bold">');
-		foreach i,s in pasta[famtype]
-			if(famweight >= i) {
-				actor.append(s);
-				actor.append('<br>');
-			}
-		actor.append('</span>');
-	} else {
-		famimage = '<img src="images/adventureimages/blank.gif">';
-		actor.append("(No Thrall)");
-	}
 	buffer result;
-	result.append('<table id="chit_thrall" class="chit_brick nospace">');
-	result.append('<tr><th title="Thrall Level">Lvl. ');
-	result.append(famweight);
-	result.append('</th><th colspan="2" title="Pasta Thrall"><a title="');
-	result.append(famname);
-	result.append('" class="hand" ');
-	result.append(click);
-	result.append('>');
-	result.append(famtype);
-	result.append('</a></th></tr>');
+	void bake(string lvl, string name, string type, string img) {
+		result.append('<table id="chit_thrall" class="chit_brick nospace">');
+		result.append('<tr><th title="Thrall Level">');
+		if(lvl != "")
+			result.append('Lvl. ');
+		result.append(lvl);
+		result.append('</th><th colspan="2" title="Pasta Thrall"><a title="');
+		result.append(name);
+		result.append('" class="hand" onClick=\'javascript:window.open("desc_guardian.php","","height=200,width=300")\'>');
+		result.append(type);
+		result.append('</a></th></tr>');
+		
+		result.append('<tr><td class="icon" title="Thrall">');
+		result.append('<a class="chit_launcher" rel="chit_pickerthrall" href="#">');
+		result.append('<img title="Bind thy Thrall" src=/images/itemimages/');
+		result.append(img);
+		result.append('></a></td>');
+		if(lvl != "") {
+			result.append('<td class="info"><a title="Click for Thrall description" class="hand" onClick=\'javascript:window.open("desc_guardian.php","","height=200,width=300")\'><span style="color:blue;font-weight:bold">');
+			foreach i,s in pasta[my_thrall()]
+				if(my_thrall().level >= i) {
+					result.append(s);
+					result.append('<br>');
+				}
+			result.append('</span></a></td>');
+		} else {
+			result.append('<td class="info"><a class="chit_launcher" rel="chit_pickerthrall" href="#"><span style="color:blue;font-weight:bold">(Click to Summon a Thrall)</span></a></td>');
+		}
+		result.append('</tr></table>');
+	}
 	
-	result.append('<tr><td class="icon" title="Thrall">');
-	result.append('<a class="chit_launcher" rel="chit_pickerthrall" href="#">');
-	result.append('<img title="Bind thy Thrall" ');
-	result.append(famimage + '></a></td>');
-	result.append('<td class="info"><a title="Click for Thrall description" class="hand" '+click+'>' + actor + '</a></td>');
-	result.append('</tr></table>');
-	
+	if(my_thrall() == $thrall[none])
+		bake("", "No Thrall", "No Thrall", "blank.gif");
+	else
+		bake(my_thrall().level, my_thrall().name, my_thrall(), my_thrall().tinyimage);
 	chitBricks["thrall"] = result;
-	pickerThrall(famname, famtype);
+	pickerThrall();
 }
 
 string currentMood() {
@@ -3825,55 +3863,60 @@ void bakeTracker() {
 			result.append('Search <a target="mainpane" href="woods.php">Temple</a> for Hidden City');
 			break;
 		case "step3":
-			result.append('Explore <a target="mainpane" href="hiddencity.php">Hidden City</a>:<br>');
-			boolean relocatePygmyJanitor = get_property("relocatePygmyJanitor").to_int() == my_ascensions();
-			if(available_amount($item[antique machete]) == 0 || !relocatePygmyJanitor) {
+			if(item_amount($item[stone triangle]) < 4) {
+				result.append('Explore <a target="mainpane" href="hiddencity.php">Hidden City</a>:<br>');
+				boolean relocatePygmyJanitor = get_property("relocatePygmyJanitor").to_int() == my_ascensions();
 				result.append("Hidden Park: ");
-				result.append(item_report($item[antique machete]));
-				result.append(", ");
-				result.append(item_report(relocatePygmyJanitor, "relocate janitors"));
-				result.append("<br>");
-			}
-			foreach loc in $strings[Hospital, BowlingAlley, Apartment, Office] {
-				result.append(loc+": ");
-				int prog = get_property("hidden"+loc+"Progress").to_int();
-				if(prog == 0)
-					result.append(item_report(false, "Explore Shrine<br>"));
-				else if(prog < 7) {
-					switch(loc) {
-					case "Hospital":
-						result.append(item_report(false, "Surgeonosity ("+to_string(numeric_modifier("surgeonosity"), "%.0f")+"/5)<br>"));
-						break;
-					case "BowlingAlley":
-						result.append(item_report($item[bowling ball]));
-						result.append(", ");
-						result.append(item_report(false, "Bowled ("+(prog - 1)+"/5)<br>"));
-						break;
-					case "Apartment":
-						result.append(item_report(get_property("relocatePygmyLawyer").to_int() == my_ascensions(), "relocate Lawyers, "));
-						result.append(item_report(false, "Search for Boss<br>"));
-						break;
-					case "Office":
-						if(available_amount($item[McClusky file (complete)]) > 0)
-							result.append(item_report(false, "Kill Boss!"));
-						else {
-							int f = files();
-							result.append(item_report(f >=5, "McClusky files (" + f + "/5), "));
-							result.append(item_report($item[boring binder clip], "binder clip"));
-						}
-						result.append("<br>");
-						break;
-					}
-				} else if(prog == 7)
-					result.append(item_report(false, "Use Sphere<br>"));
-				else
+				if(available_amount($item[antique machete]) == 0 || !relocatePygmyJanitor) {
+					result.append(item_report($item[antique machete]));
+					result.append(", ");
+					result.append(item_report(relocatePygmyJanitor, "relocate janitors"));
+					result.append("<br>");
+				} else 
 					result.append(item_report(true, "Done!<br>"));
-			}
-			if(get_property("hiddenTavernUnlock") == "false") {
+				foreach loc in $strings[Hospital, BowlingAlley, Apartment, Office] {
+					result.append(loc+": ");
+					int prog = get_property("hidden"+loc+"Progress").to_int();
+					if(prog == 0)
+						result.append(item_report(false, "Explore Shrine<br>"));
+					else if(prog < 7) {
+						switch(loc) {
+						case "Hospital":
+							result.append(item_report(false, "Surgeonosity ("+to_string(numeric_modifier("surgeonosity"), "%.0f")+"/5)<br>"));
+							break;
+						case "BowlingAlley":
+							result.append(item_report($item[bowling ball]));
+							result.append(", ");
+							result.append(item_report(false, "Bowled ("+(prog - 1)+"/5)<br>"));
+							break;
+						case "Apartment":
+							result.append(item_report(get_property("relocatePygmyLawyer").to_int() == my_ascensions(), "relocate Lawyers, "));
+							result.append(item_report(false, "Search for Boss<br>"));
+							break;
+						case "Office":
+							if(available_amount($item[McClusky file (complete)]) > 0)
+								result.append(item_report(false, "Kill Boss!"));
+							else {
+								int f = files();
+								result.append(item_report(f >=5, "McClusky files (" + f + "/5), "));
+								result.append(item_report($item[boring binder clip], "binder clip"));
+							}
+							result.append("<br>");
+							break;
+						}
+					} else if(prog == 7)
+						result.append(item_report(false, "Use Sphere<br>"));
+					else
+						result.append(item_report(true, "Done!<br>"));
+				}
 				result.append("Tavern: ");
-				result.append(item_report($item[book of matches]));
-				result.append("<br>");
-			}
+				if(get_property("hiddenTavernUnlock") == "false") {
+					result.append(item_report($item[book of matches]));
+					result.append("<br>");
+				} else
+					result.append(item_report(true, "Unlocked<br>"));
+			} else
+				result.append('<a target="mainpane" href="hiddencity.php">Hidden City</a>: Kill the Protector Spectre');
 		}
 		result.append("</td></tr>");
 	}
@@ -3884,29 +3927,31 @@ void bakeTracker() {
 		result.append("<tr><td>");
 		// Step-by-step
 		switch(questL11Pyramid) {
-		case "started":
+		case "started": case "step1": case "step2": case "step3": case "step4": case "step5": case "step6": case "step7": case "step8": case "step9":
 			result.append('Find the pyramid at the <a target="mainpane" href="beach.php">Beach</a><br>');
 			int desertExploration = get_property("desertExploration").to_int();
 			if(desertExploration < 10)
 				result.append('Find Gnasir at the <a target="mainpane" href="beach.php">Desert</a><br>');
-			else if(desertExploration < 100) {
+			if(desertExploration < 100) {
 				result.append("Exploration: "+desertExploration+"%<br>");
 				result.append(item_report($item[worm-riding manual page], 15));
 				result.append("<br>");
 				result.append(item_report($item[stone rose], "stone rose, "));
 				result.append(item_report($item[drum machine], "drum machine, "));
 				result.append(item_report($item[worm-riding hooks], "worm-riding hooks, "));
+				result.append(item_report($item[killing jar], "killing jar, "));
 				result.append(item_report($item[can of black paint]));
 				result.append('<br><a target="mainpane" href="place.php?whichplace=desertbeach&action=db_pyramid1&pwd='+my_hash()+'">Ride the Worm !</a>');
 			}
 			break;
 		// Open the Bottom Chamber of the Pyramid
-		case "step11":
+		case "step10":
 				result.append('Open the <a target="mainpane" href="beach.php?action=woodencity">Pyramid</a><br>');
 				result.append(item_report($item[Staff of Fats], "Staff of Fats, "));
 				result.append(item_report($item[ancient amulet], "amulet, "));
 				result.append(item_report($item[Eye of Ed], "Eye of Ed"));
 				result.append("<br>");
+		case "step11":
 		case "step12":
 			if(get_property("pyramidBombUsed")=="false") {
 				result.append('Find Ed in the <a target="mainpane" href="pyramid.php">Pyramid</a><br>');

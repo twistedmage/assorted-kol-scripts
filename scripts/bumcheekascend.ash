@@ -4437,8 +4437,8 @@ void setMood(string combat) {
 			cli_execute("trigger lose_effect, Bind Penne Dreadful, cast 1 Bind Penne Dreadful");
 		
 		//level up the thrall
-/*		int thrall_level=get_property().to_int();
-		if(thrall_level>1 && thrall_level<9)
+		thrall thr=my_thrall();
+		if(thr.level>1 && thr.level<9)
 			if(i_a("Experimental carbon fiber pasta additive")>0 && !get_property("_pastaAdditive").to_boolean())
 				use(1,$item[Experimental carbon fiber pasta additive]);
 			else
@@ -4450,7 +4450,7 @@ void setMood(string combat) {
 		
 		if(have_skill($skill[Soul Saucery])) //if we get full, burn some off
 			cli_execute("trigger lose_effect, Soul Funk, ash if(<num souls> >= 100){cli_execute(\"cast 1 Soul Funk\");}");
-		<>;*/
+		<>;
 			
 	} else if(my_path() == "Avatar of Boris"){
 		print("setting boris paths mood","lime");
@@ -4968,12 +4968,7 @@ void use_putty()
 					setFamiliar("items");
 					reputty = (i_a("digital key")<1 && i_a("white pixel")<26); //only putty if we need all 5 pixels
 					break;
-//				case $monster[rampaging adding machine]:
-//					reputty = <>;
-//					break;
-//				case $monster[bad ascii art]:
-//					reputty = <>;
-//					break;
+
 				case $monster[gaudy pirate]:
 					setMood("");
 					buMax();

@@ -4,7 +4,8 @@ string polisher="twistedmage";
 string brewer="twistedmage";
 string keymaker="twistedmage";
 string chef="dinala";
-string chest_opener="asica";
+string chest_opener="twistedmage";
+string grinder="asica";
 
 void clean_choices()
 {
@@ -47,36 +48,35 @@ void do_forest()
 {
 	//---------------cabin----------------
 	print("Doing forest","blue");
-	if(my_class()==$class[accordion thief])
-	{
-		get_key();
-		do_choice(1, "?pwd&whichchoice=721&option=3&choiceform3=Try+the+attic", "?pwd&whichchoice=724&option=1&choiceform1=Turn+off+the+music+box");
-	}
-	else if(my_primestat()==$stat[muscle] && item_amount($item[old dry bone])>0 )
+	if(my_primestat()==$stat[muscle] && item_amount($item[old dry bone])>0 )
 	{
 		do_choice(1, "?pwd&whichchoice=721&option=1&choiceform1=Check+out+the+kitchen", "?pwd&whichchoice=722&option=2&choiceform2=Screw+around+with+the+flour+mill");
 		send_stuff($item[bone flour],chef);
-	}
-	else if(item_amount($item[replica key])>0)
-	{
-		abort("unknown choiceadvs for auditors badge line 19");
-		//do_choice(1, "?pwd&whichchoice=721&option=2&choiceform2=Go+down+to+the+basement", choice1b);
-		send_stuff($item[dreadsylvania auditor's badge],"twistedmage");
-	}
-	else if(item_amount($item[wax banana])>0)
-	{
-		do_choice(1, "?pwd&whichchoice=721&option=2&choiceform2=Go+down+to+the+basement", "?pwd&whichchoice=723&option=4&choiceform4=Stick+a+wax+banana+in+the+lock");
-		send_stuff($item[complicated lock impression],keymaker);
 	}
 	else if(!already_done("tarragon"))
 	{
 		do_choice(1, "?pwd&whichchoice=721&option=1&choiceform1=Check+out+the+kitchen", "?pwd&whichchoice=722&option=1&choiceform1=Raid+the+spice+rack");
 		send_stuff($item[dread tarragon],chef);
 	}
+//	else if(item_amount($item[replica key])>0)
+//	{
+//		do_choice(1, "?pwd&whichchoice=721&option=2&choiceform2=Go+down+to+the+basement", "?pwd&whichchoice=723&option=3&choiceform3=Check+out+the+lockbox");
+//	}
+	else if(my_class()==$class[accordion thief])
+	{
+		get_key();
+		do_choice(1, "?pwd&whichchoice=721&option=3&choiceform3=Try+the+attic", "?pwd&whichchoice=724&option=1&choiceform1=Turn+off+the+music+box");
+	}
+	else if(item_amount($item[wax banana])>0)
+	{
+		do_choice(1, "?pwd&whichchoice=721&option=2&choiceform2=Go+down+to+the+basement", "?pwd&whichchoice=723&option=4&choiceform4=Stick+a+wax+banana+in+the+lock");
+		send_stuff($item[complicated lock impression],keymaker);
+	}	
 	else //kruegerands
 	{
 		do_choice(1, "?pwd&whichchoice=721&option=2&choiceform2=Go+down+to+the+basement", "?pwd&whichchoice=723&option=1&choiceform1=Look+through+the+newspapers");
 	}
+	send_stuff($item[old dry bone],grinder);
 		
 	//---------------tallest tree----------------
 	send_stuff($item[blood kiwi],brewer);
@@ -226,16 +226,16 @@ void do_castle()
 	}
 	
 	//tower
-	if(my_primestat()==$stat[moxie] && item_amount($item[blood kiwi])>0 && item_amount($item[eau de mort])>0)
+/*	if(my_primestat()==$stat[moxie] && item_amount($item[blood kiwi])>0 && item_amount($item[eau de mort])>0)
 	{
 		get_key();
 		do_choice(8, "?pwd&whichchoice=749&option=1&choiceform1=Go+to+the+laboratory", "?pwd&whichchoice=750&option=4&choiceform4=Use+the+still");
 	}
 	else
-	{
+	{*/
 //		abort("skills");
-		do_choice(8, "/pwd&whichchoice=749&option=3&choiceform3=Go+to+the+bedroom", "?pwd&whichchoice=752&option=2&choiceform2=Check+the+dresser");
-	}
+		do_choice(8, "?pwd&whichchoice=749&option=3&choiceform3=Go+to+the+bedroom", "?pwd&whichchoice=752&option=2&choiceform2=Check+the+dresser");
+//	}
 }
 
 void main()

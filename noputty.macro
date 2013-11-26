@@ -50,6 +50,14 @@ endwhile
 if !monstername *Naughty Sorceress* && !monstername *bonerdagon
 	if !(monstername black ops bugbear || monstername ancient unspeakable bugbear || monstername battlesuit bugbear type || monstername trendy bugbear chef || monstername bugaboo || monstername bugbear scientist)
 
+		#insta-curse
+		if sauceror && hasskill Curse of Weaksauce
+			skill Curse of Weaksauce
+		endif
+		if !sauceror && hasskill Curse of the Thousand Islands
+			skill Curse of the Thousand Islands
+		endif
+	
 		if hascombatitem rain-doh blue balls 
 			use rain-doh blue balls
 		endif

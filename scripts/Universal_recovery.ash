@@ -1188,7 +1188,7 @@ boolean fullheal() {
 		case use_herb && my_spleen_use() < (spleenfam? (spleen_limit()%4): spleen_limit())
 		  && (item_amount($item[Medicinal Herb's medicinal herbs]) >0 || (my_meat() >=100 && my_primestat() == $stat[muscle] && buy_npc)):
 			if(item_amount($item[Medicinal Herb's medicinal herbs]) < 1)
-				buy(1, $item[Medicinal Herb's medicinal herbs]);
+				retrieve_item(1, $item[Medicinal Herb's medicinal herbs]);
 			return use(1, $item[Medicinal Herb's medicinal herbs]);
 		case skills[cheap_skill].ave + my_hp() >= my_maxhp() && (my_mp() >= skills[cheap_skill].mp
 		  || (my_maxmp() >= skills[cheap_skill].mp && mp_heal(skills[cheap_skill].mp))):
@@ -1551,7 +1551,7 @@ boolean unpoison() {
 	// Won't purchase antidotes if not allowed to purchase from NPC stores.
 	void acquire_antidote(int howmany) {
 		if(howmany > item_amount($item[anti-anti-antidote]))
-			buy(howmany - item_amount($item[anti-anti-antidote]), $item[anti-anti-antidote]);
+			retrieve_item(howmany, $item[anti-anti-antidote]);
 	}
 	
 	if(poisoned()) {
@@ -1704,7 +1704,7 @@ void reserve_healing() {
 		case $item[magical mystery juice]:
 		default:
 			print("Purchasing some "+ to_plural(reserve_purch) + " for use as a combat restorative.", "blue");
-			buy((reserve_num - purch_have), reserve_purch);
+			retrieve_item(reserve_num, reserve_purch);
 		}
 		set_property("_meatpermp", meatpermp());   // Access to MMJ or seltzer might have just changed.
 	}

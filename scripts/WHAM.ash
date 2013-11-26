@@ -190,7 +190,8 @@
 		13-10-22:Add basic handling of Procedurally Generated Skeletons as well as Video Game bosses.
 				 Don't use Noodles to stun with the revamped classes. It won't work.	
 		13-11-09:Try to steal accordions if we can. RFemove more classes from noodling.
-		13-11-10:Fix steal accordion and remove most of the special handling for procedural skeletons		
+		13-11-10:Fix steal accordion and remove most of the special handling for procedural skeletons
+		13-11-21:Throw Pocket Crumbs at opponents because why not?
 ***********************************************************************************************************************/
 import <SmartStasis.ash>;
 
@@ -1258,10 +1259,18 @@ void build_custom_WHAM() {
 	if(my_location().zone == "The Sea" && item_amount($item[sea lasso]) > 0 && vars["WHAM_UseSeaLasso"] == "true" && get_property("lassoTraining") != "expertly")
 		encustom(get_action($item[sea lasso]));
 
+	//Steal accordions, because why not
 	if(has_option($skill[steal accordion])) {
 		vprint("WHAM: Trying to steal an accordion", "purple", 5);
 		encustom(get_action($skill[steal accordion]));
 	}
+	
+	//Pocket Crumbs
+	if(has_option($skill[Pocket Crumbs])) {
+		vprint("WHAM: Throwing some pocket crumbs at yoru opponent", "purple", 5);
+		encustom(get_action($skill[Pocket Crumbs]));		
+	}
+		
 	switch (to_string(m)) {
 		//Boss actions
 		case "conjoined zmombie":	for i from 1 upto item_amount($item[half-rotten brain])
