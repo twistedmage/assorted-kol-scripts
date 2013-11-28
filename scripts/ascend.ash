@@ -1,6 +1,6 @@
 import <improve.ash>;
 import <zlib.ash>;
-import <alt_farm.ash>;
+//import <alt_farm.ash>;
 //import <sims_lib.ash>;
 import <pvp.ash>;
 
@@ -306,7 +306,7 @@ void main()
 	do_fights();
 	
 	visit_url("lair2.php?preaction=key&whichkey=436"); //get easter egg balloon
-	return_gear();
+//	return_gear();
 	cli_execute("train.ash");
 //check we can ascend============================================
 	if(!contains_text(visit_url("lair6.php"),"gash.gif") || 
@@ -322,7 +322,7 @@ void main()
 	{
 		if(!have_skill($skill[powers of observatiogn]) || !have_skill($skill[gnefarious pickpocketing]) || !have_skill($skill[torso awaregness]))
 		{
-			train_moxie_skills();
+//			train_moxie_skills();
 		}
 	}
 //blow up your zap wand=================================================

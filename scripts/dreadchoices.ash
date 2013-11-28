@@ -62,10 +62,16 @@ void do_forest()
 //	{
 //		do_choice(1, "?pwd&whichchoice=721&option=2&choiceform2=Go+down+to+the+basement", "?pwd&whichchoice=723&option=3&choiceform3=Check+out+the+lockbox");
 //	}
-	else if(my_class()==$class[accordion thief])
+//	else if(my_class()==$class[accordion thief])
+//	{
+//		get_key();
+//		do_choice(1, "?pwd&whichchoice=721&option=3&choiceform3=Try+the+attic", "?pwd&whichchoice=724&option=1&choiceform1=Turn+off+the+music+box");
+//	}
+	else if(!already_done("sdafsafs"))
 	{
+		abort("line 72 choices for less vampires");
 		get_key();
-		do_choice(1, "?pwd&whichchoice=721&option=3&choiceform3=Try+the+attic", "?pwd&whichchoice=724&option=1&choiceform1=Turn+off+the+music+box");
+		do_choice(1, "?pwd&whichchoice=721&option=3&choiceform3=Try+the+attic", "");
 	}
 	else if(item_amount($item[wax banana])>0)
 	{
@@ -85,7 +91,7 @@ void do_forest()
 		do_choice(2, "?pwd&whichchoice=725&option=1&choiceform1=Climb+to+the+top", "?pwd&whichchoice=726&option=3&choiceform3=Grab+the+shiny+thing");
 		send_stuff($item[moon-amber],polisher);
 	}
-	else if(my_primestat()==$stat[muscle] && !already_done("kiwi"))
+/*	else if(my_primestat()==$stat[muscle] && !already_done("kiwi"))
 	{
 		if(!get_property("_dreadchoice2").to_boolean())
 		{
@@ -109,7 +115,7 @@ void do_forest()
 			set_property("_dreadchoice2","true");
 			abort("Waiting to get stomped on");
 		}
-	}
+	}*/
 	else
 	{
 		do_choice(2, "?pwd&whichchoice=725&option=3&choiceform3=Root+around+at+the+base", "?pwd&whichchoice=728&option=2&choiceform2=Stand+near+the+base+looking+downward");
@@ -173,10 +179,10 @@ void do_village()
 		get_key();
 		do_choice(6, "?pwd&whichchoice=741&option=3&choiceform3=Make+your+way+to+the+master+suite", "?pwd&whichchoice=744&option=3&choiceform3=Mess+with+the+loom");
 	}
-	else if(!already_done("drove some zombies out of the village")) //reduce zombies
-	{
-		do_choice(6, "?pwd&whichchoice=741&option=1&choiceform1=Check+out+the+family+plot", "?pwd&whichchoice=742&option=1&choiceform1=Close+the+gates");
-	}
+//	else if(!already_done("drove some zombies out of the village")) //reduce zombies
+//	{
+//		do_choice(6, "?pwd&whichchoice=741&option=1&choiceform1=Check+out+the+family+plot", "?pwd&whichchoice=742&option=1&choiceform1=Close+the+gates");
+//	}
 	else if(!already_done("mort"))
 	{
 		get_key();
@@ -192,6 +198,7 @@ void do_village()
 void do_castle()
 {
 	print("doing castle","blue");
+	send_stuff($item[dreadful roast],chef);
 	//great hall
 	if(item_amount($item[muddy skirt])>0 && item_amount($item[dreadsylvanian seed pod])>0 && my_basestat($stat[moxie])>=200)
 	{
@@ -233,7 +240,7 @@ void do_castle()
 	}
 	else
 	{*/
-//		abort("skills");
+		abort("skills");
 		do_choice(8, "?pwd&whichchoice=749&option=3&choiceform3=Go+to+the+bedroom", "?pwd&whichchoice=752&option=2&choiceform2=Check+the+dresser");
 //	}
 }

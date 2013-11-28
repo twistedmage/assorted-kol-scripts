@@ -192,6 +192,7 @@
 		13-11-09:Try to steal accordions if we can. RFemove more classes from noodling.
 		13-11-10:Fix steal accordion and remove most of the special handling for procedural skeletons
 		13-11-21:Throw Pocket Crumbs at opponents because why not?
+		13-11-28:WHen using Drunkula's Wineglass anything but attack is futile
 ***********************************************************************************************************************/
 import <SmartStasis.ash>;
 
@@ -299,111 +300,6 @@ void set_unknown_ml(monster foe, string pg) {
 
 //Set information for the procedurally generated skeletons
 void set_skeleton_info() {
-	if(contains_text(to_string(last_monster()), "accurate")) {
-		vprint("WHAM: Accurate skeletons don't miss.", "green", 5);
-		nomiss = true;
-	}
-	if(contains_text(to_string(last_monster()), "blazing")) {
-		vprint("WHAM: Blazing skeletons deal hot AoE damage.", "green", 5);		
-		//Blazing ones deal Hot Damage every round by area effect.
-		//The heat coming off of this thing is nearly unbearable. You should probably get out of its kitchen. Or, y'know, kill it. (hot damage) 
-	}
-	if(contains_text(to_string(last_monster()), "charred")) {
-		vprint("WHAM: Charred skeletons are resistant to hot damage.", "green", 5);
-		mres = get_resistance($element[hot]);
-	}
-	if(contains_text(to_string(last_monster()), "dancing")) {
-		vprint("WHAM: Dancing skeletons are ignores items.", "green", 5);
-		noitems = 100;
-	}
-	if(contains_text(to_string(last_monster()), "deadly")) {
-		vprint("WHAM: Deadly skeletons have higher attack than normal (handled by Manuel if you have one).", "green", 5);
-		//Handled by Manuel, impossible to do atm in any other way
-	}
-	if(contains_text(to_string(last_monster()), "disorienting")) {
-		vprint("WHAM: Disorienting skeletons blocks skills some times (assuming 50%).", "green", 5);
-		noskills = 50;
-	}
-	if(contains_text(to_string(last_monster()), "foul-smelling")) {
-		vprint("WHAM: Foul-smelling skeletons are resistant to stench damage.", "green", 5);
-		mres = get_resistance($element[stench]);
-	}
-	if(contains_text(to_string(last_monster()), "frigid")) {
-		vprint("WHAM: Frigid skeletons deal cold AoE damage.", "green", 5);	
-		//Blazing ones deal Cold Damage every round by area effect.
-		//Just being near this thing chills you to the bone. In the cold way, not the scary way. (cold damage) 
-	}
-	if(contains_text(to_string(last_monster()), "frozen")) {
-		vprint("WHAM: Frozen skeletons are resistant to cold damage.", "green", 5);
-		mres = get_resistance($element[cold]);
-	}
-	if(contains_text(to_string(last_monster()), "ghostly")) {
-		vprint("WHAM: Ghostly skeletons are resistant to physical damage.", "green", 5);
-		mres[$element[none]] = 1;
-	}
-	if(contains_text(to_string(last_monster()), "giant")) {
-		vprint("WHAM: Giant skeletons have higher attack and defense (handled by Manuel if you have one).", "green", 5);
-		//Handled by Manuel, impossible to do atm in any other way
-		//Giant ones have 40% more Monster Attack and Defense.
-	}
-	if(contains_text(to_string(last_monster()), "greasy")) {
-		vprint("WHAM: Greasy skeletons are resistant to sleaze damage.", "green", 5);
-		mres = get_resistance($element[sleaze]);
-	}
-	if(contains_text(to_string(last_monster()), "lascivious")) {
-		vprint("WHAM: Lascivious skeletons deal sleaze AoE damage.", "green", 5);	
-		//Blazing ones deal Sleaze Damage every round by area effect.
-		//You really don't like the way this skeleton is looking at you. (sleaze damage)
-	}
-	if(contains_text(to_string(last_monster()), "nimble")) {
-		vprint("WHAM: Nimble skeletons have higher defense (handled by Manuel if you have one).", "green", 5);
-		//Handled by Manuel, impossible to do atm in any other way
-		//Giant ones have 40% more Monster Defense.
-	}
-	if(contains_text(to_string(last_monster()), "scary")) {
-		vprint("WHAM: Scary skeletons are resistant to spooky damage.", "green", 5);		
-		mres = get_resistance($element[spooky]);
-	}
-	if(contains_text(to_string(last_monster()), "shifty")) {
-		vprint("WHAM: Shifty skeletons sometimes block attacks.", "green", 5);
-		//Shifty ones sometimes avoid regular attacks.
-		//The skeleton is too shifty, and your attack misses. Dangit! 
-		//Can we handle that?
-	}
-	if(contains_text(to_string(last_monster()), "shimmering")) {
-		vprint("WHAM: Shimmering skeletons are resistant to elemental damage.", "green", 5);
-		foreach el in $elements[]
-			mres[el] = 1;
-	}
-	if(contains_text(to_string(last_monster()), "shiny")) {
-		vprint("WHAM: Shiny skeletons reduce spell damage to 1.", "green", 5);
-		//Shiny ones reduce spell damage to 1.
-		//Handled in ok()
-	}
-	if(contains_text(to_string(last_monster()), "terrifying")) {
-		vprint("WHAM: Terrifying skeletons deal spooky AoE damage.", "green", 5);	
-		//Terrifying ones deal Spooky Damage every round by area effect.
-		//The aura of terror surrounding this skeleton is palpable. You'd palp it, but you're too scared. (spooky damage) 
-	}
-	if(contains_text(to_string(last_monster()), "thick")) {
-		vprint("WHAM: Thick skeletons have more HP than normal (handled by Manuel if you have one).", "green", 5);
-		//Handled by Manuel, impossible to do atm in any other way
-		//Giant ones have 50% more HP.
-	}    
-	if(contains_text(to_string(last_monster()), "thorny")) {
-		vprint("WHAM: Thorny skeletons deal physical damage when hit with a melee attack.", "green", 5);
-		//Thorny ones deal physical damage when you hit them with a melee attack.
-		//Handled in ok()
-	}
-	if(contains_text(to_string(last_monster()), "unstoppable")) {
-		vprint("WHAM: Unstoppable skeletons cannot be staggered nor stunned.", "green", 5);
-		nostun = true; nomultistun = true;
-	}		
-	if(contains_text(to_string(last_monster()), "unwashed")) {
-		vprint("WHAM: Unwashed skeletons deal stench AoE damage.", "green", 5);	
-		//Unwashed ones deal Stench Damage every round by area effect.
-		//Man. This skeleton hasn't had a bath in centuries! (stench damage) 
-	}
 	if(contains_text(to_string(last_monster()), "vicious")) {
 		vprint("WHAM: Vicious skeletons deal bonus damage. Currently not handled.", "green", 5);
 		//Vicious ones deal bonus damage (500 at 1100 monster attack, compared to a deadly doing ~90 damage at 1600 monster attack). 
@@ -551,15 +447,9 @@ boolean ok(advevent a) {
 		return false;
 	}
 	
-	if(contains_text(to_string(m), "thorny") && a.id == "attack" && current_hit_stat() != $stat[moxie]) {
-		vprint(a.id + " is not ok since this skeleton blocks attacks.", "purple", 9);
+	//Drunkula's Wineglass prohibits use of skills, items and spells
+	if(equipped_item($slot[off-hand]) == $item[drunkula's wineglass] && a.id != "attack")
 		return false;
-	}
-	
-	if(contains_text(to_string(m), "shifty") && a.id == "attack") {
-		vprint(a.id + " is not ok since this skeleton dodges attacks.", "purple", 9);
-		return false;
-	}
 	
 	if(a.pdmg[$element[none]] > my_stat("hp")) {
 		vprint(a.id + " is not OK since it will hurt you more than the monster.", "purple", 9);

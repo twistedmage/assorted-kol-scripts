@@ -853,7 +853,7 @@ void formatDreadOptions(){
     }
     if((zone=='DreadVillage')&&(e=='Hot')&&(data[".data",zone,".Cold"]==0))contexts[zone+"_"+e]+=", callback: function(key, options){if(confirm('Cold has not been banished yet, banishing Hot now will make this impossible, do you wish to continue?')){window.location='clan_raidlogs.ash?cmd=g621';}}";
     contexts[zone+"_"+e]+='},';
-    if(keyOp)contexts[zone+"_"+e]+='"toggle": {name: "Use Dreadsylvania Key", callback: function() {this.data(\''+nc.noSpaces()+'Disabled\', !this.data(\''+nc.noSpaces()+'Disabled\')); return false;}}';
+    if(keyOp)contexts[zone+"_"+e]+='"toggle": {name: "Permit Dreadsylvania Key", callback: function() {this.data(\''+nc.noSpaces()+'Disabled\', !this.data(\''+nc.noSpaces()+'Disabled\')); return false;}}';
     contexts[menu]+='},';
    }
    if(!first)contexts[menu]+='}},';
@@ -886,6 +886,7 @@ void formatDreadOptions(){
      contexts[menu]+='"g123": {name: "Collect Auditor\'s Badge"'+((item_amount($item[replica key])>0)&&(data[".data",zone,"+"+nc+".Auditor's Badge"]<1)?"":", disabled: true")+'},';
      contexts[menu]+='"g124": {name: "Make Lock Impression"'+(item_amount($item[wax banana])>0?"":", disabled: true")+'}}},';
      contexts[menu]+='"atticList": {name: "Attic", '+(keyLocked(nc,30)?'icon: "key", disabled: function(key, opt){return !this.data(\''+nc.noSpaces()+'Disabled\');}, ':"")+'items:{';
+     if(keyLocked(nc,30))contexts[menu]+='"g136": {name: "Unlock Attic"},';
      contexts[menu]+='"g131": {name: "Banish Spooky"'+(data[".data",zone,".Spooky"]==0?"":", disabled: true")+'},';
      contexts[menu]+='"g132": {name: "Banish Werewolves"'+(data[".data",zone,"+"+nc+".-Werewolves"]==0?"":", disabled: true")+'},';
      contexts[menu]+='"g133": {name: "Banish Vampires"'+(data[".data",zone,"+"+nc+".-Vampires"]==0?"":", disabled: true")+'},';
@@ -897,6 +898,7 @@ void formatDreadOptions(){
      contexts[menu]+='"g212": {name: "Banish Sleaze"'+(data[".data",zone,".Sleaze"]==0?"":", disabled: true")+'},';
      contexts[menu]+='"g213": {name: "Collect Moon-Amber"'+(data[".data",zone,"+"+nc+".Moon-Amber"]>0?", disabled: true":"")+'}}},';
      contexts[menu]+='"towerList": {name: "Fire Tower", '+(keyLocked(nc,20)?'icon: "key", disabled: function(key, opt){return !this.data(\''+nc.noSpaces()+'Disabled\');}, ':"")+'items:{';
+     if(keyLocked(nc,20))contexts[menu]+='"g226": {name: "Unlock Watchtower"},';
      contexts[menu]+='"g221": {name: "Banish Ghosts"'+(data[".data",zone,"+"+nc+".-Ghosts"]==0?"":", disabled: true")+'},';
      contexts[menu]+='"g222": {name: "Collect Freddies"'+(data[".data",zone,"+"+nc+".Freddies"]<10?"":", disabled: true")+'},';
      contexts[menu]+='"g223": {name: "Muscle Stats"}}},';
@@ -920,6 +922,7 @@ void formatDreadOptions(){
      break;
     case"Square":
      contexts[menu]+='"schoolList": {name: "Schoolhouse", '+(keyLocked(nc,10)?'icon: "key", disabled: function(key, opt){return !this.data(\''+nc.noSpaces()+'Disabled\');}, ':"")+'items:{';
+     if(keyLocked(nc,10))contexts[menu]+='"g416": {name: "Unlock Schoolhouse"},';
      contexts[menu]+='"g411": {name: "Banish Ghosts"'+(data[".data",zone,"+"+nc+".-Ghosts"]==0?"":", disabled: true")+'},';
      contexts[menu]+='"g412": {name: "Collect Ghost Pencil"'+(data[".data",zone,"+"+nc+".Ghost Pencil"]<10?"":", disabled: true")+'},';
      contexts[menu]+='"g413": {name: "Mysticality Stats"}}},';
@@ -957,12 +960,14 @@ void formatDreadOptions(){
      contexts[menu]+='"g622": {name: "Make Pie"'+((item_amount($item[dread tarragon])>0)&&(item_amount($item[bone flour])>0)&&(item_amount($item[dreadful roast])>0)&&(item_amount($item[stinking agaricus])>0)?"":", disabled: true")+'},';
      contexts[menu]+='"g623": {name: "Moxie Stats"}}},';
      contexts[menu]+='"suiteList": {name: "Master Suite", '+(keyLocked(nc,30)?'icon: "key", disabled: function(key, opt){return !this.data(\''+nc.noSpaces()+'Disabled\');}, ':"")+'items:{';
+     if(keyLocked(nc,30))contexts[menu]+='"g636": {name: "Unlock Suite"},';
      contexts[menu]+='"g631": {name: "Banish Werewolves"'+(data[".data",zone,"+"+nc+".-Werewolves"]==0?"":", disabled: true")+'},';
      contexts[menu]+='"g632": {name: "Collect Eau de Mort"},';
      contexts[menu]+='"g633": {name: "Sew Ghost Shawl"'+(item_amount($item[ghost thread])>9?"":", disabled: true")+'}}},';
      break;
     case"Great Hall":
      contexts[menu]+='"ballroomList": {name: "Ballroom", '+(keyLocked(nc,10)?'icon: "key", disabled: function(key, opt){return !this.data(\''+nc.noSpaces()+'Disabled\');}, ':"")+'items:{';
+     if(keyLocked(nc,10))contexts[menu]+='"g716": {name: "Unlock Ballroom"},';
      contexts[menu]+='"g711": {name: "Banish Vampires"'+(data[".data",zone,"+"+nc+".-Vampires"]==0?"":", disabled: true")+'},';
      contexts[menu]+='"g712": {name: "Moxie Stats"}}},';
      contexts[menu]+='"kitchenList": {name: "Kitchen", items:{';
@@ -975,6 +980,7 @@ void formatDreadOptions(){
      break;
     case"Tower":
      contexts[menu]+='"labratoryList": {name: "Laboratory", '+(keyLocked(nc,10)?'icon: "key", disabled: function(key, opt){return !this.data(\''+nc.noSpaces()+'Disabled\');}, ':"")+'items:{';
+     if(keyLocked(nc,10))contexts[menu]+='"g816": {name: "Unlock Laboratory"},';
      contexts[menu]+='"g811": {name: "Banish Bugbears"'+(data[".data",zone,"+"+nc+".-Bugbears"]==0?"":", disabled: true")+'},';
      contexts[menu]+='"g812": {name: "Banish Zombies"'+(data[".data",zone,"+"+nc+".-Zombies"]==0?"":", disabled: true")+'},';
      contexts[menu]+='"g813": {name: "'+(data[".data"] contains ".machine"?"Visit":"Repair")+' the Machine"'+((data[".data"] contains ".machine")||(item_amount($item[skull capacitor])>0)?"":", disabled: true")+'},';
@@ -1002,7 +1008,7 @@ void formatDreadOptions(){
      contexts[menu]+='"g932": {name: "Gain Spore-Wreathed"}}},';
      break;
    }
-   if(keyOp)contexts[menu]+='"sep2": "---------", "toggle": {name: "Use Dreadsylvania Key", callback: function() {this.data(\''+nc.noSpaces()+'Disabled\', !this.data(\''+nc.noSpaces()+'Disabled\')); return false;}}';
+   if(keyOp)contexts[menu]+='"sep2": "---------", "toggle": {name: "Permit Dreadsylvania Key", callback: function() {this.data(\''+nc.noSpaces()+'Disabled\', !this.data(\''+nc.noSpaces()+'Disabled\')); return false;}}';
   }
  }
 }
@@ -2305,6 +2311,11 @@ boolean executeCommand(string cmd){
   m.reset(p);
   if(!m.find())return false;
   p=visit_url("choice.php?pwd="+my_hash()+"&whichchoice="+m.group(1)+"&option="+cmd.char_at(2));
+  if(cmd.char_at(2)=='6'){
+   m.reset(p);
+   if(!m.find())return false;
+   p=visit_url("choice.php?pwd="+my_hash()+"&whichchoice="+m.group(1)+"&option="+cmd.char_at(2));
+  }
   if(moveTo){
    write(p);
    return true;
