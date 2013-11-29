@@ -4486,13 +4486,16 @@ void setMood(string combat) {
 		}
 		
 		//level up the thrall
-		thrall thr=my_thrall();
-		if(thr.level>1 && thr.level<9)
-			if(i_a("Experimental carbon fiber pasta additive")>0 && !get_property("_pastaAdditive").to_boolean())
-				use(1,$item[Experimental carbon fiber pasta additive]);
-			else
-				cli_execute("pull 1 Experimental carbon fiber pasta additive");
-
+		if(my_class()==$class[pastamancer])
+		{
+			thrall thr=my_thrall();
+			if(thr.level>1 && thr.level<9)
+				if(i_a("Experimental carbon fiber pasta additive")>0 && !get_property("_pastaAdditive").to_boolean())
+					use(1,$item[Experimental carbon fiber pasta additive]);
+				else
+					cli_execute("pull 1 Experimental carbon fiber pasta additive");
+		}
+		
 		//soul sauce
 		if(contains_text(combat,"n") && have_skill($skill[Soul Saucery]))
 			cli_execute("trigger lose_effect, soulerskates, ash if(my_soulsauce() >= 25){cli_execute(\"cast 1 Soul Rotation\");}");

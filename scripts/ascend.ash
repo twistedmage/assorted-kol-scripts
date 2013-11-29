@@ -255,6 +255,8 @@ void main()
 		visit_url("shop.php?pwd&whichshop=elvishp3&action=buyitem&whichrow=207&bigform=Buy+Item&quantity=2");
 //		int new_wg=item_amount($item[wrecked generator]);
 //		if(new_wg - prev_wg < 2)
+		if(have_effect($effect[transpondent])<1)
+			use(1,$item[transporter transponder]);
 		if(!contains_text(visit_url("place.php?whichplace=spaaacegrimace"),"elvishparadise.gif"))
 			abort("spaaace doesn't seem to be done!");
 	}
