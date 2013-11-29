@@ -1610,15 +1610,16 @@ int cloversAvailable(boolean makeOneTenLeafClover) {
 		else if(item_amount($item[ten-leaf clover]) > 0)
 			put_closet(item_amount($item[ten-leaf clover]), $item[ten-leaf clover]);
 		print("BCC: You have the option for a cloverless ascention turned on, so we won't be using them.", "purple");
+print("a","lime");
 		return 0;
 	}
 	
 	if (get_property("bcasc_lastHermitCloverGet") != today_to_string()) {
 		print("BCC: Getting Clovers", "purple");
 		if (my_path() != "Zombie Slayer")
-			while (hermit(1, $item[Ten-leaf clover]) && my_meat() > 50) {}
+			while (buys_item($coinmaster[Hermit],$item[Ten-leaf clover]) && my_meat() > 50) {}
 		else
-			if (hermit(1, $item[Ten-leaf clover])) {}
+			if (buys_item($coinmaster[Hermit],$item[Ten-leaf clover])) {}
 		set_property("bcasc_lastHermitCloverGet", today_to_string());
 	} else {
 		print("BCC: We've already got Clovers Today", "purple");
@@ -5531,13 +5532,16 @@ boolean bcascBats1() {
 		if (my_path() != "Bees Hate You") {
 			while (item_amount($item[sonar-in-a-biscuit]) < 1 && !contains_text(visit_url("bathole.php"), "bathole_4.gif")) {
 				//Let's use a clover if we can.
+				print("trying to get sonars ","lime");
 				if (i_a("sonar-in-a-biscuit") == 0 && cloversAvailable(true) > 0) {
+					print("trying to clover bat hole","lime");
 					clover_result[0] = visit_url("adventure.php?snarfblat=31&confirm=on");
 					if(!contains_text(clover_result[0], "but you see a few biscuits left over from whatever bizarre tea party")) {
 						map_to_file(clover_result, "BCCDebug.txt");
 						abort("BCC: There was a problem using your clover. Please try it manually.");
 					}
 				} else {
+					print("adventuring for sonars","lime");
 					bumAdv($location[Guano Junction], "+10stench res", "items", "1 sonar-in-a-biscuit", "Getting a Sonars");
 				}
 				if (cli_execute("use * sonar-in-a-biscuit")) {}

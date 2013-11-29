@@ -37,9 +37,6 @@ if gotjump
 			pickpocket
 		endif
 	endif
-	if mysticalityclass && !hppercentbelow 90
-		summonspirit
-	endif
 endif
 	
 #meat shield bosses
