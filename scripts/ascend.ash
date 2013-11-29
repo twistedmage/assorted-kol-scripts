@@ -255,7 +255,7 @@ void main()
 		visit_url("shop.php?pwd&whichshop=elvishp3&action=buyitem&whichrow=207&bigform=Buy+Item&quantity=2");
 //		int new_wg=item_amount($item[wrecked generator]);
 //		if(new_wg - prev_wg < 2)
-		if(!contains_text("place.php?whichplace=spaaacegrimace","elvishparadise.gif"))
+		if(!contains_text(visit_url("place.php?whichplace=spaaacegrimace"),"elvishparadise.gif"))
 			abort("spaaace doesn't seem to be done!");
 	}
 	cli_execute("guild unlock");
