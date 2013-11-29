@@ -261,8 +261,10 @@ void main()
 	cli_execute("guild unlock");
 	if(my_adventures()>30 && my_inebriety()<=inebriety_limit())
 	{
-		abort("Farm some manuel monsters!");
-		cli_execute("alt_farm");
+		if(my_name()=="twistedmage")
+			abort("Farm some manuel monsters!");
+		else
+			cli_execute("hotdog_unlock");
 	}
 	if(my_level()<15)
 	{
