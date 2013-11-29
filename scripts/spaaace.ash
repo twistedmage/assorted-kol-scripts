@@ -772,7 +772,7 @@ boolean HamburglarisAdventureManually(item step)
             repairComplete = PlayPorkoToSaveTheWorld();
             sprint("repairComplete = " + repairComplete, 10);
 
-            string reward = visit_url("spaaace.php?place=grimace"); // get reward
+            string reward = visit_url("place.php?whichplace=spaaacegrimace"); // get reward
             if(!repairComplete || !reward.contains_text("lunar isotopes"))
             {
                 sprint("Lost Porko. This should not happen and probably indicates lag/and or a bug.", 0);
