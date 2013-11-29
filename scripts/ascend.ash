@@ -251,10 +251,11 @@ void main()
 	{
 		cli_execute("spaaace.ash");
 		print("spaaace should be done now","lime");
-		int prev_wg=item_amount($item[wrecked generator]);
+//		int prev_wg=item_amount($item[wrecked generator]);
 		visit_url("shop.php?pwd&whichshop=elvishp3&action=buyitem&whichrow=207&bigform=Buy+Item&quantity=2");
-		int new_wg=item_amount($item[wrecked generator]);
-		if(new_wg - prev_wg < 2)
+//		int new_wg=item_amount($item[wrecked generator]);
+//		if(new_wg - prev_wg < 2)
+		if(!contains_text("place.php?whichplace=spaaacegrimace","elvishparadise.gif"))
 			abort("spaaace doesn't seem to be done!");
 	}
 	cli_execute("guild unlock");
