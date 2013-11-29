@@ -3966,14 +3966,17 @@ save [$item[Now and Earlier]] = 0;
 save [$item[Pain Dip]] = 0;
 save [$item[candy skeleton]] = 0;
 save [$item[double-ice gum]] = 0;
-
-
-
-
+save [$item[cube of ectoplasm]] = 0;
+save [$item[root beer]] = 0;
+save [$item[bottle of moontan lotion]] = 1;
+save [$item[sangria del diablo]] = 1;
+save [$item[sprocket assembly]] = 0;
+save [$item[necklace chain]] = 0;
 
 
 //stuff to sell later
 save [$item[dry cleaning receipt]] = -1; //use as mus class for power sock, and myst class for wool sock
+save [$item[Alice's Army Foil Dervish]] = -1;
 save [$item[pocket lint (blue)]] = -1;
 save [$item[moon-amber]] = -1;
 save [$item[polished moon-amber]] = -1;

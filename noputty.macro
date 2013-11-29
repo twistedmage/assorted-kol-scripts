@@ -125,15 +125,6 @@ if !monstername *Naughty Sorceress* && !monstername *bonerdagon
 				skill Voice of She-Who-Was
 			endif
 		endif
-		if sauceror
-			#curse
-			if hasskill 
-				skill 
-				Curse of the Thousand Islands - ?
-				Curse of Marinara - lifedrain + hp explosion (3 rounds)
-				Curse of Weaksauce - delevel + mp explosion (final spell dmg)
-			endif
-		endif
 		if hasskill pocket crumbs
 			skill pocket crumbs
 		endif

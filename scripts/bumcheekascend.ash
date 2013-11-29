@@ -2629,14 +2629,21 @@ string consultGMOB(int round, string opp, string text) {
 
 item thingToGet = $item[none];
 string consultHeBo(int round, string opp, string text) {
+	abort("line 2632 - need to check hebo use");
 	print("in consultHeBo fighting "+opp+" round "+round,"lime");
-	if (my_location() != $location[itznotyerzitz mine]) {if (!isExpectedMonster(opp)) return ((my_primestat() == $stat[Mysticality]) ? consultMyst(round, opp, text) : get_ccs_action(round));}
+	if (my_location() != $location[itznotyerzitz mine]) {
+		if (!isExpectedMonster(opp))
+		{
+			print("Wasn't expected monster (whatever that means) skipping","lime");
+			return ((my_primestat() == $stat[Mysticality]) ? consultMyst(round, opp, text) : get_ccs_action(round));
+		}
+	}
 	//If we're under the effect "Everything Looks Yellow", then ignore everything and attack.
 	if (have_effect($effect[Everything Looks Yellow]) > 0) {
 		print("BCC: We would LIKE to use a Yellow Ray somewhere in this zone, but we can't because Everything Looks Yellow.", "purple");
 		return ((my_primestat() == $stat[Mysticality] && in_hardcore()) ? consultMyst(round, opp, text) : get_ccs_action(round)); 
 	}
-
+	print("Checking if monster is valid for hebo","purple");
 
 	boolean isGateItemMonster = contains_text(text, "A.M.C. gremlin") || contains_text(text, "batwinged gremlin") || contains_text(text, "erudite gremlin")
 		|| contains_text(text, "spider gremlin") || contains_text(text, "vegetable gremlin") || contains_text(text, "W imp")
@@ -2924,12 +2931,10 @@ void defaultMood(boolean castMojo) {
 			use_skill(1,$skill[That's not a knife]);
 		else if(my_level()>=6 && available_amount($item[sharpened spoon])<1) //6-7
 			use_skill(1,$skill[That's not a knife]);
-		else if(my_level()>=1000 && available_amount($item[broken beer bottle])<1) //?-5
+		else if(my_level()>=4 && available_amount($item[broken beer bottle])<1) //4-5
 			use_skill(1,$skill[That's not a knife]);
-		else if(my_level()>=1000 && available_amount($item[boot knife])<1) //?-?
+		else if(available_amount($item[boot knife])<1) //1-3
 			use_skill(1,$skill[That's not a knife]);
-	//	else if(my_level()>1000 && available_amount($item[soap knife])<1)
-	//		use_skill(1,$skill[That's not a knife]);
 	}
 	
 	//use some stat buffs
@@ -4419,22 +4424,66 @@ void setMood(string combat) {
 			cli_execute("trigger lose_effect, Shield of the Pastalord, cast 1 Shield of the Pastalord");
 			
 		//summon a pasta thrall
-		if (contains_text(combat,"i") && have_skill($skill[Bind Spice Ghost])) //item drops, free spices, longer entangling noodles
-			cli_execute("trigger lose_effect, Bind Spice Ghost, cast 1 Bind Spice Ghost");
-		else if (contains_text(combat,"n") && have_skill($skill[Bind Angel Hair Wisp])) //initiative, block crits, block attacks
-			cli_execute("trigger lose_effect, Bind Angel Hair Wisp, cast 1 Bind Angel Hair Wisp");
-		else if (contains_text(combat,"m") && have_skill($skill[Bind Lasagmbie])) //meat drops, spooky damage, spooky spell damage
-			cli_execute("trigger lose_effect, Bind Lasagmbie, cast 1 Bind Lasagmbie");
-		else if (have_skill($skill[Bind Spaghetti Elemental])) //stats, block first hit, spell damage
-			cli_execute("trigger lose_effect, Bind Spaghetti Elemental, cast 1 Bind Spaghetti Elemental");
-		else if (my_primestat()==$stat[muscle] && have_skill($skill[Bind Undead Elbow Macaroni])) //upgrade mus to myst, weapon damage, crit chance
-			cli_execute("trigger lose_effect, Bind Undead Elbow Macaroni, cast 1 Bind Undead Elbow Macaroni");
-		else if (have_skill($skill[Bind Vampieroghi])) //life drain, remove negative effects, extra hp
-			cli_execute("trigger lose_effect, Bind Vampieroghi, cast 1 Bind Vampieroghi");
-		else if (have_skill($skill[Bind Vermincelli])) //mp regen, poison foe, extra mp
-			cli_execute("trigger lose_effect, Bind Vermincelli, cast 1 Bind Vermincelli");
-		else if (have_skill($skill[Bind Penne Dreadful])) //upgrade mox to mys, delevel, dr
-			cli_execute("trigger lose_effect, Bind Penne Dreadful, cast 1 Bind Penne Dreadful");
+		if(my_class()==$class[pastamancer])
+		{
+			if (contains_text(combat,"i") && have_skill($skill[Bind Spice Ghost])) //item drops, free spices, longer entangling noodles
+			{
+				if(my_thrall()!=$thrall[spice ghost])
+					use_skill($skill[Bind Spice Ghost]);
+			}
+			else if (contains_text(combat,"n") && have_skill($skill[Bind Angel Hair Wisp])) //initiative, block crits, block attacks
+			{
+				if(my_thrall()!=$thrall[angel hair wisp])
+					use_skill($skill[Bind Angel Hair Wisp]);
+			}
+			else if (contains_text(combat,"m") && have_skill($skill[Bind Lasagmbie])) //meat drops, spooky damage, spooky spell damage
+			{
+				if(my_thrall()!=$thrall[lasagmbie])
+					use_skill($skill[Bind Lasagmbie]);
+			}
+			else if (have_skill($skill[Bind Spaghetti Elemental])) //stats, block first hit, spell damage
+			{
+				if(my_thrall()!=$thrall[Spaghetti Elemental])
+					use_skill($skill[Bind Spaghetti Elemental]);
+			}
+			else if (my_primestat()==$stat[muscle] && have_skill($skill[Bind Undead Elbow Macaroni])) //upgrade mus to myst, weapon damage, crit chance
+			{
+				if(my_thrall()!=$thrall[Elbow Macaroni])
+					use_skill($skill[Bind Undead Elbow Macaroni]);
+			}
+			else if (have_skill($skill[Bind Vampieroghi])) //life drain, remove negative effects, extra hp
+			{
+				if(my_thrall()!=$thrall[Vampieroghi])
+					use_skill($skill[Bind Vampieroghi]);
+			}
+			else if (have_skill($skill[Bind Vermincelli])) //mp regen, poison foe, extra mp
+			{
+				if(my_thrall()!=$thrall[Vermincelli])
+					use_skill($skill[Bind Vermincelli]);
+			}
+			else if (have_skill($skill[Bind Penne Dreadful])) //upgrade mox to mys, delevel, dr
+			{
+				if(my_thrall()!=$thrall[Penne Dreadful])
+					use_skill($skill[Bind Penne Dreadful]);
+			}
+		}
+		else
+		{		
+			if (contains_text(combat,"i") && have_skill($skill[Bind Spice Ghost])) //item drops
+				cli_execute("trigger lose_effect, Spice Haze, cast 1 Bind Spice Ghost");
+			else if (contains_text(combat,"m") && have_skill($skill[Bind Lasagmbie])) //meat
+				cli_execute("trigger lose_effect, Pasta Eyeball, cast 1 Bind Lasagmbie");
+			else if (contains_text(combat,"n") && have_skill($skill[Bind Angel Hair Wisp])) //initiative
+				cli_execute("trigger lose_effect, whispering strands, cast 1 Bind Angel Hair Wisp");
+			else if (my_primestat()==$stat[muscle] && have_skill($skill[Bind Undead Elbow Macaroni])) //muscle
+				cli_execute("trigger lose_effect, Macaroni Coating, cast 1 Bind Undead Elbow Macaroni");
+			else if (have_skill($skill[Bind Penne Dreadful])) //mox
+				cli_execute("trigger lose_effect, Penne Fedora, cast 1 Bind Penne Dreadful");
+			else if (have_skill($skill[Bind Vampieroghi])) //hp regen
+				cli_execute("trigger lose_effect, bloody potato bits, cast 1 Bind Vampieroghi");
+			else if (have_skill($skill[Bind Vermincelli])) //max mp
+				cli_execute("trigger lose_effect, stinking noodle glob, cast 1 Bind Vermincelli");
+		}
 		
 		//level up the thrall
 		thrall thr=my_thrall();
@@ -4446,11 +4495,10 @@ void setMood(string combat) {
 
 		//soul sauce
 		if(contains_text(combat,"n") && have_skill($skill[Soul Saucery]))
-			cli_execute("trigger lose_effect, soulerskates, ash if(<num souls> >= 25){cli_execute(\"cast 1 Soul Rotation\");}");
+			cli_execute("trigger lose_effect, soulerskates, ash if(my_soulsauce() >= 25){cli_execute(\"cast 1 Soul Rotation\");}");
 		
 		if(have_skill($skill[Soul Saucery])) //if we get full, burn some off
-			cli_execute("trigger lose_effect, Soul Funk, ash if(<num souls> >= 100){cli_execute(\"cast 1 Soul Funk\");}");
-		<>;
+			cli_execute("trigger lose_effect, Soul Funk, ash if(my_soulsauce() >= 100){cli_execute(\"cast 1 Soul Funk\");}");
 			
 	} else if(my_path() == "Avatar of Boris"){
 		print("setting boris paths mood","lime");
@@ -5453,9 +5501,6 @@ boolean bcascBats1() {
 
 	if (checkStage("bats1")) return true;
 	if (use(3, $item[sonar-in-a-biscuit])) {}
-	if (contains_text(visit_url("bathole.php"), "bathole_4.gif")) {
-		return checkStage("bats1", true);
-	}
 	//Guano
 	if (!contains_text(visit_url("questlog.php?which=2"), "slain the Boss Bat")) {
 		//There's no need to get the air freshener if you have the Stench Resist Skill
@@ -5481,7 +5526,7 @@ boolean bcascBats1() {
 		
 		buMax("+10 stench res");
 		if (my_path() != "Bees Hate You") {
-			while (item_amount($item[sonar-in-a-biscuit]) < 1 && contains_text(visit_url("bathole.php"), "action=rubble")) {
+			while (item_amount($item[sonar-in-a-biscuit]) < 1 && !contains_text(visit_url("bathole.php"), "bathole_4.gif")) {
 				//Let's use a clover if we can.
 				if (i_a("sonar-in-a-biscuit") == 0 && cloversAvailable(true) > 0) {
 					clover_result[0] = visit_url("adventure.php?snarfblat=31&confirm=on");
@@ -5497,7 +5542,7 @@ boolean bcascBats1() {
 			if (cli_execute("use * sonar-in-a-biscuit")) {}
 		} else {
 			//The screambat should show up every 8 turns, but make it 9 to account for potential bees
-			if(count(split_string(visit_url("bathole.php"), "action=rubble")) == 4) {
+			if(!contains_text(visit_url("bathole.php"), "snarfblat=32")) {
 				print("BCC: Hunting for the first screambat.");
 				repeat {
 					//place florist friar plants
@@ -5506,7 +5551,7 @@ boolean bcascBats1() {
 					bumminiAdv(1, $location[Guano Junction], "");
 				} until(last_monster() == $monster[screambat]);
 			}
-			if(count(split_string(visit_url("bathole.php"), "action=rubble")) == 3) {
+			if(!contains_text(visit_url("bathole.php"), "snarfblat=33")) {
 				print("BCC: Hunting for a second screambat.");
 				repeat {
 					//place florist friar plants
@@ -5515,7 +5560,7 @@ boolean bcascBats1() {
 					bumminiAdv(1, $location[The Batrat and Ratbat Burrow], "");
 				} until(last_monster() == $monster[screambat]);
 			}
-			if(count(split_string(visit_url("bathole.php"), "action=rubble")) == 2) {
+			if(!contains_text(visit_url("bathole.php"), "snarfblat=34")) {
 				print("BCC: Hunting for a third screambat.");
 				repeat {
 					//place florist friar plants
@@ -5527,7 +5572,7 @@ boolean bcascBats1() {
 		}
 	}
 		
-	if (!contains_text(visit_url("bathole.php"), "action=rubble")) {
+	if (contains_text(visit_url("questlog.php?which=2"), "slain the Boss Bat")) {
 		checkStage("bats1", true);
 		return true;
 	}

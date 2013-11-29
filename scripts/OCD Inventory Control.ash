@@ -40,9 +40,9 @@ if(!get_property("_inv_cleaned_"+my_name()).to_boolean())
 	// Now strip, so I can dispose of EVERYTHING!
 	cli_execute("outfit birthday suit");
 
-	void take_shop(item i) {
-	   visit_url("managestore.php?action=take&whichitem="+i.to_int()+"&pwd");
-	}
+//	void take_shop(item i) {
+//	   visit_url("managestore.php?action=take&whichitem="+i.to_int()+"&pwd");
+//	}
 
 	void take_shop_all(item i) {
 	   visit_url("managestore.php?action=takeall&whichitem="+i.to_int()+"&pwd");
