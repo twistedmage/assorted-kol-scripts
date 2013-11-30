@@ -8,16 +8,13 @@
 #
 #*******************************************************************************/
 #
-#	Thanks to Zarqon, Bale, Rinn, Alhifar Mr Purple and many others for posting
+#	Thanks to Zarqon, Bale, Rinn, Alhifar, Mr Purple and many others for posting
 #	so much helpful code for us to stea--- plund--- cop--- be inspired by!
 #
 #*******************************************************************************/
 script "Nemesis Quest Script";
 notify slyz ;
 import "zlib.ash";
-
-string thisver = "v2.7";
-check_version( "Nemesis.ash", "nemesis", thisver, 4761 );
 
 #/*****************************************************************************************\#
 #																							#
@@ -30,7 +27,7 @@ check_version( "Nemesis.ash", "nemesis", thisver, 4761 );
 // NOTE: after running this script, changing these variables here in the script will have no
 // effect. You can view ("zlib vars") or edit ("zlib <settingname> = <value>") values in the CLI.
 setvar( "nemesis_farm", true );
-setvar( "nemesis_farm_location", $location[ Giant's Castle (top floor ) ] );
+setvar( "nemesis_farm_location", $location[ The Castle in the Clouds in the Sky (Top Floor) ] );
 setvar( "nemesis_farm_familiar", $familiar[ none ] );
 setvar( "nemesis_farm_outfit", "");
 setvar( "nemesis_farm_mood", "");
@@ -286,20 +283,18 @@ boolean get_FUN( item FUN )
 		return vprint( "More Clownosity needed!",-1 );
 
 	// crude mood
-	if ( have_skill( to_skill( $effect[ Sonata ] ) ) && have_effect( $effect[ Sonata ] ) == 0 && current_at() <  max_at() )
-		use_skill( 1, to_skill( $effect[ Sonata ] ) );
-	if ( have_skill( to_skill( $effect[ Smooth Movement ] ) ) && have_effect( $effect[ Smooth Movement ] ) == 0  )
-		use_skill( 1, to_skill( $effect[ Smooth Movement ] ) );
+	if ( have_skill( to_skill( $effect[ The Sonata of Sneakiness ] ) ) && have_effect( $effect[ The Sonata of Sneakiness ] ) == 0 && current_at() <  max_at() )
+		use_skill( 1, to_skill( $effect[ The Sonata of Sneakiness ] ) );
+	if ( have_skill( to_skill( $effect[ Smooth Movements ] ) ) && have_effect( $effect[ Smooth Movements ] ) == 0  )
+		use_skill( 1, to_skill( $effect[ Smooth Movements ] ) );
 
-	// adventure in the Fun House until you beat Beelzebozo
+	// adventure in the The "Fun" House until you beat Beelzebozo
 	setadv( 151,1 ); // fight the Clownlord
 
-	set_property( "battleAction", "attack with weapon" );
-	set_property( "autoSteal", "true" );
 	cli_execute ( "mood apathetic" );
 	use_familiar( previous_familiar );
 
-	return ( test_combat( $location[ Fun House ] ) && obtain( 1,to_string(FUN),$location[ Fun House ] ) );
+	return ( test_combat( $location[ The "Fun" House ] ) && obtain( 1,to_string(FUN),$location[ The "Fun" House ] ) );
 }
 
 // get LEW
@@ -444,9 +439,9 @@ boolean caveDoors()
 			{
 				if ( current_at() >=  max_at() )
 					return vprint( "You have too many AT songs to get Polka of Plenty for door n°3", -1 );
-				if ( !have_skill( $skill[ Polka of Plenty ] ) )
+				if ( !have_skill( $skill[ The Polka of Plenty ] ) )
 					return vprint( "You need to get buffed with 15 turns of Polka of Plenty to open door n°3.",-1 );
-				use_skill( 1, $skill[ Polka of Plenty ] ) ;
+				use_skill( 1, $skill[ The Polka of Plenty ] ) ;
 				if ( have_effect( $effect[ Polka of Plenty ] ) < 15 )
 					return vprint( "Something happened when trying to cast Polka of Plenty.",-1 );
 			}
@@ -482,8 +477,6 @@ boolean gatherPaperStrips()
 
 	use_familiar( best_fam("items") );
 	maximize( "item drop -familiar -tie", false );
-	set_property( "battleAction", "attack with weapon" );
-	set_property( "autoSteal","true" );
 	set_location( $location[ Nemesis Cave ] );
 	cli_execute( "conditions clear; conditions set 8 any paper strip" );
 
@@ -588,7 +581,6 @@ boolean caveLastDoor()
 	equip( LEW );
 	use_familiar( best_fam("combat") );
 	set_property( "battleAction", "attack with weapon" );
-	set_property( "autoSteal","false" );
 	cli_execute( "mood apathetic" );
 	restore_hp( 0 );
 	restore_mp( 0 );
@@ -598,6 +590,7 @@ boolean caveLastDoor()
 	if ( !response.contains_text( "WINWINWIN" ) )
 		return vprint( "Failed to beat your Nemesis in the cave!",-1 );
 
+	set_property( "battleAction", previous_battleaction );
 	return vprint( "Nemesis Cave quest done!","green",1 );
 }
 
@@ -738,22 +731,25 @@ boolean getVolcanoMap()
 	}
 	else
 	{
-		set_property( "battleAction",previous_battleaction );
-		set_property( "customCombatScript",previous_CCS );
+		set_property( "battleAction", previous_battleaction );
+		set_property( "customCombatScript", previous_CCS );
 	}
 
-	set_property( "autoSteal",previous_autoSteal );
+	set_property( "autoSteal", previous_autoSteal );
 
 	// add an abort in the mood if the previous monster dropped the map but you didn't get it
 	cli_execute( "trigger unconditional, , ashq if (get_property('lastEncounter').to_monster().item_drops() contains $item["+MAP+"] && item_amount($item["+MAP+"])==0)abort('You were beaten up by the last hitman - aborting');" );
 
 	// farm until you have the map or run out of advs
-	return ( test_combat(farm_location) && obtain( 1,to_string(MAP),farm_location ) );
+	return ( test_combat(farm_location) && obtain( 1, MAP.to_string(), farm_location ) );
 }
 
 boolean openVolcanoIsland()
 {
 	if ( !getVolcanoMap() ) return vprint( "Could not get the Volcano Map.",-1 );
+
+	set_property( "battleAction", previous_battleaction );
+	set_property( "customCombatScript", previous_CCS );
 
 	//make sure the island isn't available
 	if ( !visit_url("volcanoisland.php").contains_text( "There's no island out there." ) )
@@ -782,7 +778,7 @@ boolean openVolcanoIsland()
 		equip( $slot[ acc2 ], $item[ Ring of Conflict ] );
 	if ( available_amount( $item[ Space Trip safety headphones ] ) > 0 )
 		equip( $slot[ acc3 ], $item[ Space Trip safety headphones ] );
-	foreach eff in $effects[Cantata, Musk]
+	foreach eff in $effects[Carlweather's Cantata of Confrontation, Musk of the Moose]
 		if ( have_effect( eff ) > 0 ) cli_execute( "uneffect " + eff );
 
 	// adventure in the Poop Deck
@@ -792,10 +788,10 @@ boolean openVolcanoIsland()
 		// Crude mood maintenance
 		restore_hp( 0 );
 		restore_mp( 0 );
-		if ( have_skill( to_skill( $effect[ Sonata ] ) ) && have_effect( $effect[ Sonata ] ) == 0 && current_at() <  max_at() )
-			use_skill( 1, to_skill( $effect[ Sonata ] ) );
-		if ( have_skill( to_skill( $effect[ Smooth Movement ] ) ) && have_effect( $effect[ Smooth Movement ] ) == 0  )
-			use_skill( 1, to_skill( $effect[ Smooth Movement ] ) );
+		if ( have_skill( to_skill( $effect[ The Sonata of Sneakiness ] ) ) && have_effect( $effect[ The Sonata of Sneakiness ] ) == 0 && current_at() <  max_at() )
+			use_skill( 1, to_skill( $effect[ The Sonata of Sneakiness ] ) );
+		if ( have_skill( to_skill( $effect[ Smooth Movements ] ) ) && have_effect( $effect[ Smooth Movements ] ) == 0  )
+			use_skill( 1, to_skill( $effect[ Smooth Movements ] ) );
 
 		print( "" );
 		response = visit_url( "adventure.php?snarfblat=159" );
@@ -892,7 +888,7 @@ float LTS_damage( int mother_level, item wpn )
 
 	// calculate minimum damage due to difference between attack and defense
 	float mus = numeric_modifier( "_spec", "Buffed Muscle" );
-	float musadj = 1.0 + 2.0 * have_skill( $skill[ Eye of the Stoat ] ).to_int();
+	float musadj = 1.0;
 	float ml = numeric_modifier( "_spec", "Monster Level" );
 	float basemondef = 150 * 1.385 ** mother_level ;
 	float mondef = 0.9 * ( basemondef + ml + min( 5, floor( basemondef * 0.05 ) ) );
@@ -1077,10 +1073,8 @@ boolean get_hellseal_disguise()
 
 	// obtain passive damage sources from data file_to_map
 	string [ string ] passive_damage_sources_map;
-	if ( !file_to_map( "passive_damage_sources.txt", passive_damage_sources_map ) )
-		return vprint( "Please download passive_damage_sources.txt here <a href='http://kolmafia.us/showthread.php?4761' target='_blank'><u>http://kolmafia.us/showthread.php?4761</u></a> and place it in Mafia's /data folder.", -1 );
-	//if ( !load_current_map( "passive_damage_sources", passive_damage_sources_map ) )
-	//	return vprint( "Something happened while loading the passive damage sources data file.", -1 );
+	if ( !file_to_map( "nemesis_passive_damage_sources.txt", passive_damage_sources_map ) )
+		return vprint( "Something happened while trying to load nemesis_passive_damage_sources.txt.", -1 );
 
 	effect [ int ] passive_damage_effects;
 	item [ int ] passive_damage_gear;
@@ -1331,8 +1325,6 @@ boolean get_decoded_doc()
 	if ( my_buffedstat( $stat[ moxie ] ) < ( 155 + monster_level_adjustment() ) )
 		maximize( "item, moxie, -melee, -ML, -familiar -tie", false );
 	use_familiar( best_fam("item") );
-	set_property( "battleAction", "attack" );
-	set_property( "autoEntangle", "true" );
 	cli_execute( "conditions clear" );
 
 	while ( my_adventures() > 0 )
@@ -1390,8 +1382,6 @@ boolean get_cult_robe()
 	if ( my_buffedstat( $stat[ moxie ] ) < ( 155 + monster_level_adjustment() ) )
 		maximize( "item, moxie, -ML, -familiar -tie", false );
 	use_familiar( previous_familiar );
-	set_property( "battleAction", "attack" );
-	set_property( "autoEntangle", "true" );
 	cli_execute( "conditions clear" );
 
 	int ghost_level;
@@ -1465,8 +1455,8 @@ boolean get_slimeform()
 	vprint( "Obtaining the slimeform effect...","green",2 );
 
 	boolean[item] tertiary = $items[
-		vermilion slime, amber slime, chartreuse slime,
-		teal slime, purple slime, indigo slime,
+		vial of vermilion slime, vial of amber slime, vial of chartreuse slime,
+		vial of teal slime, vial of purple slime, vial of indigo slime,
 	];
 
 	// check if the vial that gives slimeform is known:
@@ -2086,8 +2076,8 @@ boolean get_keys()
 		if ( have_effect( $effect[ Fishily Speeding ] ) == 0 && item_amount( $item[ potion of fishy speed ] ) > 0 )
 			use( 1, $item[ potion of fishy speed ] );
 		// NC
-		if ( have_effect( $effect[ Sonata of Sneakiness ] ) == 0 && have_skill( $skill[ Sonata of Sneakiness ] ) && current_at() < max_at() )
-			use_skill( 1, $skill[ Sonata of Sneakiness ] );
+		if ( have_effect( $effect[ The Sonata of Sneakiness ] ) == 0 && have_skill( $skill[ The Sonata of Sneakiness ] ) && current_at() < max_at() )
+			use_skill( 1, $skill[ The Sonata of Sneakiness ] );
 		if ( have_effect( $effect[ Smooth Movements ] ) == 0 && have_skill( $skill[ Smooth Movement ] ) )
 			use_skill( 1, $skill[ Smooth Movement ] );
 		if ( have_effect( $effect[ Inky Camouflage ] ) == 0 && item_amount( $item[ vial of squid ink ] ) > 0 )
@@ -2253,9 +2243,6 @@ boolean nemesisLair()
 	command += " -weapon, -ML, -familiar, -tie";
 	maximize( command, false );
 	equip( LEW );
-	set_property( "battleAction", "attack with weapon" );
-	set_property( "autoSteal","false" );
-	set_property( "autoEntangle", "true" );
 	restore_hp( 0 );
 	restore_mp( 0 );
 

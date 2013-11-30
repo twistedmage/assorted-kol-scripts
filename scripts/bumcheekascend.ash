@@ -8365,6 +8365,8 @@ boolean bcascMacguffinHiddenCity() {
 		while (item_amount($item[moss-covered stone sphere]) == 0) {
 			set_property("choiceAdventure780", "1");
 			bumAdv($location[The Hidden Apartment Building], "", "", "1 choiceadv", "Getting the moss-covered stone sphere.", "-");
+			if(my_thrall()==$thrall[Vampieroghi])
+				abort("We can't get thrice cursed with a Vampieroghi thrall... (fixme line 8369)");
 		}
 		while (item_amount($item[moss-covered stone sphere]) == 1) {
 			bumMiniAdv(1, $location[An Overgrown Shrine (Northwest)], "");
@@ -8418,15 +8420,15 @@ boolean bcascMacguffinHiddenCity() {
 
 			string eq = "";
 			if (item_amount($item[bloodied surgical dungarees]) > 0) {
-				eq += "+equip bloodied surgical dungarees, ";
+				eq += "+equip bloodied surgical dungarees ";
 			} else if (item_amount($item[surgical apron]) > 0) {
-				eq += "+equip surgical apron, ";
+				eq += "+equip surgical apron ";
 			} else if (item_amount($item[half-size scalpel]) > 0) {
-				eq += "+equip half-size scalpel, ";
+				eq += "+equip half-size scalpel ";
 			} else if (item_amount($item[head mirror]) > 0) {
-				eq += "+equip head mirror, ";
+				eq += "+equip head mirror ";
 			} else if (item_amount($item[surgical mask]) > 0) {
-				eq += "+equip surgical mask, ";
+				eq += "+equip surgical mask ";
 			}
 
 			set_property("choiceAdventure784", "1");

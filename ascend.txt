@@ -355,6 +355,7 @@ skeleton warrior; skeleton wizard; skeleton rogue; skeletal cleric; use silver d
 -----drunkula hard mode---
 familiar magic dragonfish;maximize spell damage percent, equip ghost shawl, equip rain-doh green lantern; use silver dreadsylvanian flask; use brass dreadsylvanian flask;use jackass plumber home game; pool 2; cast deep dark visions; hatter 11; use black sheepskin; use glittery mascara; ballpit; telescope high;use hawking;use concentrated cor;use 300 potion of inebriety; 
 ----------svns----------
+svn checkout https://svn.code.sf.net/p/slyz-nemesis/code/
 svn checkout https://svn.code.sf.net/p/therazekolmafia/eatdrink/code/;
 svn checkout https://svn.code.sf.net/p/winterbay-mafia/autobasement/code/;
 svn checkout https://svn.code.sf.net/p/bale/counterchecker/code/;
