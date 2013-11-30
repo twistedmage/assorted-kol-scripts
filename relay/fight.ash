@@ -23,7 +23,7 @@ float turns_till_goals(boolean usespec) {
    }
    return totalgoalitems / max(has_goal(my_location(),usespec),0.0001);
 }
-boolean is_banished(monster m) {
+/*boolean is_banished(monster m) {
    if (m == $monster[none] || m.boss) return false;
    if (m == to_monster(get_property("_nanorhinoBanishedMonster"))) return true;
    switch (my_class()) {
@@ -33,7 +33,7 @@ boolean is_banished(monster m) {
    }
    if (get_counters(m+" banished",0,20) != "") return true;
    return false;
-}
+}*/
 boolean is_set_to(monster m, string attban) {
    string[int] ms = split_string(vars[(attban == "attract" ? "BatMan_attract" : "BatMan_banish")],", ");
    foreach i,foe in ms if (to_monster(foe) == m) return true;

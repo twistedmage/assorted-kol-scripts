@@ -129,7 +129,8 @@ void custom_fight(string roundString, string encounterString, string pageString)
 			{
 				if(my_mp()>12)
 				{
-					pagestring=use_skill($skill[Head + Knee + Shield Combo]);
+					abort("a");
+//					pagestring=use_skill($skill[Head + Knee + Shield Combo]);
 				}
 				else
 				{

@@ -193,6 +193,8 @@
 		13-11-10:Fix steal accordion and remove most of the special handling for procedural skeletons
 		13-11-21:Throw Pocket Crumbs at opponents because why not?
 		13-11-28:WHen using Drunkula's Wineglass anything but attack is futile
+		13-11-29:Remove code for saucesplashing as that is no longer a thing
+				 Entangling Noodles are only useful for Pastamancers, adapt stunning logic for the new class specific stun skills		
 ***********************************************************************************************************************/
 import <SmartStasis.ash>;
 
@@ -760,8 +762,10 @@ advevent stun_option(float rounds, boolean foritem) {
 			continue;
 		if (hitchance(opt.id) < hitchance)
 			continue;
-		if (opt.id == "skill 3004" && (my_class() == $class[seal clubber] || my_class() == $class[disco bandit] || my_class() == $class[accordion thief] || my_class() == $class[turtle tamer]))	//Noodles won't stun for the revamped classes
-			continue;			
+		if (opt.id == "skill 3004" && my_class() != $class[pastamancer])
+			continue;
+		if (opt.id == "skill 1033" && my_class() != $class[seal clubber])
+			continue;
 		vprint("WHAM: Stun option chosen: "+opt.id+" (round "+rnum(round)+", profit: "+rnum(opt.profit)+")",8);
 		buytime = opt;
 		return opt;
@@ -769,37 +773,6 @@ advevent stun_option(float rounds, boolean foritem) {
 	buytime = new advevent;
 	vprint("WHAM: No profitable stun option", "purple", 8);
 	return buytime;
-}
-
-//Returns if you can use sauce splash effectively
-boolean can_splash() {
-	if(my_location() == $location[Fernswarthy's Basement] || my_class() != $class[sauceror] || !has_option($skill[Wave of Sauce]) || !has_option($skill[Saucegeyser])
-		|| !(have_effect($effect[Jaba&ntilde;ero Saucesphere]) >0 || have_effect($effect[Jalape&ntilde;o Saucesphere]) >0)
-		|| dmg_dealt(get_action($skill[Wave of Sauce]).dmg) >= monster_stat("hp") || have_effect($effect[temporary amnesia]) > 0)
-	{
-		vprint("WHAM: We can't Saucesplash.", -8);
-		vprint(to_string(my_class() != $class[sauceror]) + ", " + to_string(!have_skill($skill[Wave of Sauce])) + ", " + to_string(!have_skill($skill[Saucegeyser]))
-			+ ", " + to_string(!(have_effect($effect[Jaba&ntilde;ero Saucesphere]) >0 || have_effect($effect[Jalape&ntilde;o Saucesphere]) >0))
-			+ ", " + to_string(dmg_dealt(get_action($skill[Wave of Sauce]).dmg) >= monster_stat("hp")), -9);
-		return false;
-	}
-	switch(normalize_dmgtype("sauce")) {
-		case "hot":		if(numeric_modifier("spell damage") + numeric_modifier("hot spell damage") >= 25)
-							vprint("WHAM: We can do a hot Saucesplash.", 9);
-						else
-							vprint("WHAM: We can't Saucesplash due to too little bonus spell damage.", -9);
-						return numeric_modifier("spell damage") + numeric_modifier("hot spell damage") >= 25;
-		case "cold":	if(numeric_modifier("spell damage") + numeric_modifier("cold spell damage") >= 25)
-							vprint("WHAM: We can do a cold Saucesplash.", 9);
-						else
-							vprint("WHAM: We can't Saucesplash due to too little bonus spell damage.", -9);
-						return numeric_modifier("spell damage") + numeric_modifier("cold spell damage") >= 25;
-	}
-	if(numeric_modifier("spell damage") >= 25)
-		vprint("WHAM: We can do a untyped Saucesplash.", 9);
-	else
-		vprint("WHAM: We can't Saucesplash since you have too little bonus spell damage.", -9);
-	return numeric_modifier("spell damage") >= 25;
 }
 
 //Calculate options for all available spells, take damage from familiars, equipments and other sources into account
@@ -833,7 +806,7 @@ actions[int] Calculate_Options(float base_hp) {
 			kill_it[i].profit = (i == 0 ? get_action(killer).profit : kill_it[i-1].profit + get_action(killer).profit);
 			kill_it[i].options = killer.id;	
 		}
-	} else if(!(can_splash() && die_rounds() > 1 && (my_mp() + 0.25 * mp_cost($skill[Wave of Sauce])) >= mp_cost($skill[Wave of Sauce]) + mp_cost($skill[Saucegeyser]))) {
+	} else {
 		while(monster_stat("hp") > 0) {
 			vprint("WHAM: We estimate the round number to currently be " + round + " (loop variable " + i + ")", "purple", 9);
 			if(stun.id != "" && !stun_enqueued) {
@@ -924,9 +897,6 @@ actions[int] Calculate_Options(float base_hp) {
 					break;
 			}
 		}
-	} else {
-		vprint("WHAM: We can saucesplash and so will do that.", "purple", 8);
-		kill_it[i].hp = monster_stat("hp");	//Set something in kill_it so that perform_actions gets called.
 	}
 		
 	reset_queue();
@@ -968,11 +938,10 @@ string Perform_Actions() {
 		string readableid;
 	};
 	action[int] cast;
-	int splashcost;
 	int go = 0, j = 0;
 	buffer print_this;
 	string result;
-	boolean splashing, bitten;
+	boolean bitten;
 	
 	for n from 0 to count(kill_it)-1 {
 		if(kill_it[n].options == "skill 12000")
@@ -1009,52 +978,32 @@ string Perform_Actions() {
 	
 	//Between each cast, make sure we have MP to cast it
 	for n from go to count(cast) - 1 {
-		
-		//If we can splash, do so, but not if not one-shotting will kill us
-		if(can_splash() && die_rounds() > 1 && (my_mp() + 0.25 * mp_cost($skill[Wave of Sauce])) >= mp_cost($skill[Wave of Sauce]) + mp_cost($skill[Saucegeyser])) {
-			if(enqueue($skill[Wave of Sauce]))
-				vprint("WHAM: Enqueueing Wave of Sauce.", "purple",8);
-			else
-				vprint("WHAM: Unable to enqueue Wave of Sauce.", "purple",5);
-			if(enqueue($skill[Saucegeyser]))
-				vprint("WHAM: Enqueueing Saucegeyser.", "purple",8);
-			else
-				vprint("WHAM: Unable to enqueue Saucegeyser.", "purple",5);				
-			if(count(queue) > 0)
-				splashing = true;
-			break;
-		} else {
-			vprint("WHAM: Enqueueing " + cast[n].readableid + " (macroid " + cast[n].macroid + ")." + (vars["verbosity"] > 7 ? " Estimated damage: " + dmg_dealt(get_action(cast[n].macroid).dmg) + "." : ""), "purple", 7);
-			if(!enqueue(get_action(cast[n].macroid))) {
-				if(count(queue) == 0) {
-					quit("Failed to enqueue " + cast[n].readableid + ". Aborting to let you figure this out.");
-				} else {
-					vprint("WHAM: Failed to enqueue " + cast[n].readableid + " (entry " + (n+1) + " in the strategy).", 3);
-					vprint("WHAM: The following combat strategy was attempted: ", 3);
-					foreach entry in cast
-						vprint(cast[entry].readableid, 3);
-					quit("Failed to enqueue " + cast[n].readableid + ". There's more detailed information in the gCLI.");
-				}
-			} else
-				vprint("WHAM: Successfully enqueued " + cast[n].readableid + ".", "purple", 8);
-		}
+		vprint("WHAM: Enqueueing " + cast[n].readableid + " (macroid " + cast[n].macroid + ")." + (vars["verbosity"] > 7 ? " Estimated damage: " + dmg_dealt(get_action(cast[n].macroid).dmg) + "." : ""), "purple", 7);
+		if(!enqueue(get_action(cast[n].macroid))) {
+			if(count(queue) == 0) {
+				quit("Failed to enqueue " + cast[n].readableid + ". Aborting to let you figure this out.");
+			} else {
+				vprint("WHAM: Failed to enqueue " + cast[n].readableid + " (entry " + (n+1) + " in the strategy).", 3);
+				vprint("WHAM: The following combat strategy was attempted: ", 3);
+				foreach entry in cast
+					vprint(cast[entry].readableid, 3);
+				quit("Failed to enqueue " + cast[n].readableid + ". There's more detailed information in the gCLI.");
+			}
+		} else
+			vprint("WHAM: Successfully enqueued " + cast[n].readableid + ".", "purple", 8);
 	}
 		
 	//Print the strategy
 	if(to_int(vars["verbosity"]) > 2) {
-		if(!splashing) {
-			append(print_this,"WHAM: We are going to " + count(cast) + "-shot with ");
-			for n from 0 to count(cast) - 1 {
-				append(print_this,cast[n].readableid);
-				if(n == count(cast) - 2)
-					append(print_this," and ");
-				else if(n == count(cast) - 1)
-					append(print_this,".");
-				else
-					append(print_this,", ");
-			}
-		} else {
-			append(print_this,"WHAM: We are going to Saucesplash with Wave of Sauce and Saucegeyser");
+		append(print_this,"WHAM: We are going to " + count(cast) + "-shot with ");
+		for n from 0 to count(cast) - 1 {
+			append(print_this,cast[n].readableid);
+			if(n == count(cast) - 2)
+				append(print_this," and ");
+			else if(n == count(cast) - 1)
+				append(print_this,".");
+			else
+				append(print_this,", ");
 		}
 		vprint(print_this,"purple",3);
 	}

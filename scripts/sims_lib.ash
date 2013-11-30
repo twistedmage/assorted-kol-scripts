@@ -264,7 +264,7 @@ boolean have_buff_equip()
 		}
 	}
 	//have saucepan
-	if(have_skill($skill[Jalape&ntilde;o Saucesphere]) || have_skill($skill[Jaba&ntilde;ero Saucesphere]) || have_skill($skill[Elemental Saucesphere]) || have_skill($skill[Scarysauce]) )
+	if(have_skill($skill[Jalape&ntilde;o Saucesphere]) || have_skill($skill[Elemental Saucesphere]) || have_skill($skill[Scarysauce]) )
 	{
 		if(item_amount($item[saucepan])==0 && item_amount($item[5-alarm saucepan])==0 && item_amount($item[17-alarm saucepan])==0 && item_amount($item[windsor pan of the source])==0)
 		{
@@ -300,7 +300,7 @@ void get_buff_equip()
 		}
 	}
 	//get saucepan
-	if(have_skill($skill[Jalape&ntilde;o Saucesphere]) || have_skill($skill[Jaba&ntilde;ero Saucesphere]) || have_skill($skill[Elemental Saucesphere]) || have_skill($skill[Scarysauce]) )
+	if(have_skill($skill[Jalape&ntilde;o Saucesphere]) || have_skill($skill[Elemental Saucesphere]) || have_skill($skill[Scarysauce]) )
 	{
 		if(item_amount($item[saucepan])==0 && item_amount($item[5-alarm saucepan])==0 && item_amount($item[17-alarm saucepan])==0 && item_amount($item[windsor pan of the source])==0)
 		{

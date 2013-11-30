@@ -16,7 +16,7 @@ record plant
 int zone_type(location loc)
 {
 	//outdoor
-	if($locations[Sonofa Beach, The Battlefield (hippy uniform), 8-bit realm, The Obligatory Pirate's Cove, The Goatlet, The eXtreme Slope, The F'c'le, The Smut Orc Logging Camp, A-Boo Peak, The Spooky Forest, Oil Peak, The Penultimate Fantasy Airship, The Black Forest, The Poop Deck, The Palindome, Whitey's Grove, Desert (ultrahydrated), The Oasis, wartime Frat House, McMillicancuddy's Pond, mcmillicancuddy's back 40, mcmillicancuddy's other back 40, The Themthar Hills, Over Where the Old Tires Are, Out By that Rusted-Out Car, The Hole in the Sky, the outskirts of cobb's knob, The Dark Elbow of the Woods, The Dark Heart of the Woods, The Dark Neck of the Woods, Hippy Camp, The Valley of Rof L'm Fao, Next to that Barrel with Something Burning in it, Near an Abandoned Refrigerator, Twin Peak, Fear Man's Level, The Hidden Park,An Overgrown Shrine (Northwest)] contains loc)
+	if($locations[Sonofa Beach, The Battlefield (hippy uniform), 8-bit realm, The Obligatory Pirate's Cove, The Goatlet, The eXtreme Slope, The F'c'le, The Smut Orc Logging Camp, A-Boo Peak, The Spooky Forest, Oil Peak, The Penultimate Fantasy Airship, The Black Forest, The Poop Deck, The Palindome, Whitey's Grove, The Arid\, Extra-Dry Desert, The Oasis, wartime Frat House, McMillicancuddy's Pond, mcmillicancuddy's back 40, mcmillicancuddy's other back 40, The Themthar Hills, Over Where the Old Tires Are, Out By that Rusted-Out Car, The Hole in the Sky, the outskirts of cobb's knob, The Dark Elbow of the Woods, The Dark Heart of the Woods, The Dark Neck of the Woods, Hippy Camp, The Valley of Rof L'm Fao, Next to that Barrel with Something Burning in it, Near an Abandoned Refrigerator, Twin Peak, Fear Man's Level, The Hidden Park,An Overgrown Shrine (Northwest)] contains loc)
 		return 0;
 	
 	//indoor
@@ -68,8 +68,6 @@ location mafia_style_zone(string loc)
 		loc="The Laugh Floor";
 	else */ if(loc=="Hidden City")
 		loc="Hidden City (Automatic)";
-	else if(loc=="The Arid, Extra-Dry Desert")
-		loc="Desert (ultrahydrated)";
 	else if(loc=="The Orcish Frat House")
 		loc="wartime Frat House";
 	
@@ -210,7 +208,7 @@ int choose_best_plant(string type, location loc, plant[int] plants)
 			}
 			else if(contains_text(plants[pli].bonus_type,"hot"))
 			{
-				if(loc!=$location[Burnbarrel Blvd.] && loc!=$location[mcmillicancuddy's back 40] && loc!=$location[The Dark neck of the woods] && loc!=$location[The Dark heart of the woods] && loc!=$location[The Dark elbow of the woods] && loc!=$location[Infernal Rackets Backstage] && loc!=$location[The Laugh Floor] && loc!=$location[pandamonium slums] && loc!=$location[cobb's knob kitchens] && loc!=$location[The Haunted pantry] && loc!=$location[The Outskirts of Cobb's Knob] && loc!=$location[desert (ultrahydrated)])
+				if(loc!=$location[Burnbarrel Blvd.] && loc!=$location[mcmillicancuddy's back 40] && loc!=$location[The Dark neck of the woods] && loc!=$location[The Dark heart of the woods] && loc!=$location[The Dark elbow of the woods] && loc!=$location[Infernal Rackets Backstage] && loc!=$location[The Laugh Floor] && loc!=$location[pandamonium slums] && loc!=$location[cobb's knob kitchens] && loc!=$location[The Haunted pantry] && loc!=$location[The Outskirts of Cobb's Knob] && loc!=$location[The Arid\, Extra-Dry Desert])
 					return pli;
 			}
 			else if(contains_text(plants[pli].bonus_type,"sleaze"))
