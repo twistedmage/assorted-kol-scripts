@@ -782,10 +782,6 @@ void new_ascension() {
 	set_property("ready_for_ascension",false);	
 	set_property("rave_open",false);	
 	cli_execute("inventory refresh");
-	if(my_name()!="twistedmage")
-	{
-		cli_execute("awake");
-	}
 }
 
 // These are default values here. To change for each character, edit their vars file in /data direcory or use the zlib commands.

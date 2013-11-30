@@ -4504,13 +4504,15 @@ void setMood(string combat) {
 		{
 			thrall thr=my_thrall();
 			if(thr.level>1 && thr.level<9)
-				if(i_a("Experimental carbon fiber pasta additive")>0)
+			{
+				if(i_a("experimental carbon fiber pasta additive")>0)
 				{
 					if(!get_property("_pastaAdditive").to_boolean())
 						use(1,$item[Experimental carbon fiber pasta additive]);
 				}
 				else
 					cli_execute("pull 1 Experimental carbon fiber pasta additive");
+			}
 		}
 		
 		//soul sauce
@@ -5552,6 +5554,7 @@ boolean bcascBats1() {
 			}
 		}
 		
+		
 		buMax("+10 stench res");
 		if (my_path() != "Bees Hate You") {
 			while (item_amount($item[sonar-in-a-biscuit]) < 1 && !contains_text(visit_url("place.php?whichplace=bathole"), "bathole_bg4")) {
@@ -5562,7 +5565,7 @@ boolean bcascBats1() {
 					clover_result[0] = visit_url("adventure.php?snarfblat=31&confirm=on");
 					if(!contains_text(clover_result[0], "but you see a few biscuits left over from whatever bizarre tea party")) {
 						map_to_file(clover_result, "BCCDebug.txt");
-						abort("BCC: There was a problem using your clover. Please try it manually.");
+						abort("BCC: There was a problem using your clover (probably not enough stench detection, page written to data/bccdebug.txt). Please try it manually.");
 					}
 				} else {
 					print("adventuring for sonars","lime");
@@ -5602,8 +5605,7 @@ boolean bcascBats1() {
 			}
 		}
 	}
-		
-	if (contains_text(visit_url("questlog.php?which=2"), "slain the Boss Bat")) {
+	if(contains_text(visit_url("place.php?whichplace=bathole"), "bathole_bg4")) {
 		checkStage("bats1", true);
 		return true;
 	}
@@ -8801,76 +8803,195 @@ boolean bcascMacguffinSpooky() {
 }
 
 boolean bcascMacguffinPyramid() {
+	void get_drum_machine()
+	{
+		if(i_a("drum machine")>0) return;
+		if (can_interact())
+		{
+			buy(1, $item[drum machine]);
+			return;
+		}
+		if(!in_hardcore())
+		{		
+			cli_execute("pull drum machine");
+			if(i_a("drum machine")>0)
+				return;
+		}
+		while(i_a("drum machine") == 0)
+		{
+			bumAdv($location[The Oasis], "", "items", "1 drum machine", "Getting drum machine");
+		}
+	}
+
+
 	if (checkStage("macguffinpyramid")) return true;
 	
 	if (!contains_text(visit_url("questlog.php?which=1"),"A Pyramid Scheme") || contains_text(visit_url("questlog.php?which=1"),"found the little pyramid") || contains_text(visit_url("questlog.php?which=1"),"found the hidden buried pyramid")) {
 		//We've done the pyramid
 	} else {
-		print("BCC: This script currently does not support the revamped pyramid quest. Reveal the pyramid manually, and then run this script again to continue.", "purple");
-		abort();
-		/*
+		//get uv watch
+		if(i_a("UV-resistant compass")==0)
+		{
+			if (item_amount($item[Shore Inc. Ship Trip Scrip]) < 1) {
+				switch(my_primestat())
+				{
+					case $stat[Muscle] :
+						set_property("choiceAdventure793", "1");
+						break;
+					case $stat[Mysticality] :
+						set_property("choiceAdventure793", "2");
+						break;
+					case $stat[Moxie] :
+						set_property("choiceAdventure793", "3");
+						break;
+				}
+				adventure(1, $location[The Shore, Inc. Travel Agency]);
+			}
+			buy($coinmaster[The Shore\, Inc. Gift Shop], 1, ($item[UV-resistant compass]));
+		}
+		
+		//unlock oasis
+		if(!contains_text(visit_url("place.php?whichplace=desertbeach"),"oasis.gif"))
+		{
+			print("unlocking oasis for the first time","purple");
+			adventure(1,$location[The arid\, extra-dry desert]);
+		}
+		
+		//meet gnasir
+		while(get_property("desertExploration").to_int()<11)
+		{
+			if(have_effect($effect[ultrahydrated])==0)
+				adventure(1,$location[The Oasis]);
+			print("meeting gnasir","purple");
+			adventure(1,$location[The arid\, extra-dry desert]);
+		}
+		
+		//use any mysteriously obtained pamphlets
+		if(i_a("desert sightseeing pamphlet")>0)
+			use(i_a("desert sightseeing pamphlet"),$item[desert sightseeing pamphlet]);
+		
+		//get stone rose in oasis, with hipster, maybe drum machine
+		if(get_property("stone_rose_handed_gnasir").to_int()< my_ascensions())
+		{
+			while(i_a("stone rose")==0)
+				bumAdv($location[The Oasis], "i", "hipster", "1 stone rose", "Getting the stone rose");
 
-		while (contains_text(visit_url("questlog.php?which=1"),"your desert explorations")) {
-			bumAdv($location[The Arid\, Extra-Dry Desert], "", "", "", "Meeting Gnasir for the First Time");
-		}
-		
-		while ((contains_text(visit_url("questlog.php?which=1"), "stone rose") && i_a("stone rose") == 0))
-		{
-			bumAdv($location[The Oasis], "", "items", "1 stone rose", "Getting the stone rose");
-		}
-		if (can_interact()) buy(1, $item[drum machine]);
-		if(!in_hardcore() && i_a("drum machine")<1)
-			cli_execute("pull drum machine");
-		while ((contains_text(visit_url("questlog.php?which=1"), "stone rose") && i_a("stone rose") == 1) && i_a("drum machine") == 0)
-		{
-			bumAdv($location[The Oasis], "", "items", "1 drum machine", "Getting drum machine");
-		}
-		
-		print("BCC: Turning in the stone rose", "purple");
-		while (item_amount($item[stone rose]) > 0) {
-			if (i_a("can of black paint") == 0) {
-				if (my_path() == "Way of the Surprising Fist") cli_execute("refresh inventory");
-				if (my_meat() < 1000) abort("You need 1000 meat for a can of black paint");
-				cli_execute("buy can of black paint");
+			string txt=visit_url("place.php?whichplace=desertbeach&action=db_gnasir");
+			txt=visit_url("choice.php?pwd&whichchoice=805&option=2&choiceform2=%22I+found+your+stone+rose.%22");
+			visit_url("choice.php?pwd&whichchoice=805&option=1&choiceform1=%22No%2C+that%27s+all.%22");
+			if(contains_text(txt,"give the stone rose to Gnasir"))
+			{
+				set_property("stone_rose_handed_gnasir",my_ascensions());
 			}
-	
-			//place florist friar plants
-			choose_all_plants("", $location[desert (ultrahydrated)]);
-			
-			bumMiniAdv(1, $location[The Arid\, Extra-Dry Desert]);
+			else
+				abort("something went wrong handing in stone rose");
+			use(1,$item[desert sightseeing pamphlet]);
 		}
-		
-		//This part deals with meeting Gnasir for the second time and/or using the black paint if you didn't do it the first time. 
-		while ((contains_text(visit_url("questlog.php?which=1"), "prove your honor and dedication")) || contains_text(visit_url("questlog.php?which=1"), "Gnasir seemed satisfied")) {
-			if (i_a("can of black paint") == 0 && contains_text(visit_url("questlog.php?which=1"), "prove your honor and dedication")) {
-				cli_execute("buy can of black paint");
+
+		//buy + hand in black paint
+		if(get_property("black_paint_handed_gnasir").to_int()< my_ascensions())
+		{
+			buy(1, $item[can of black paint]);
+			
+			string txt=visit_url("place.php?whichplace=desertbeach&action=db_gnasir");
+			txt=visit_url("choice.php?pwd&whichchoice=805&option=2&choiceform2=%22I+brought+some+black+paint+for+your+door.%22");
+			visit_url("choice.php?pwd&whichchoice=805&option=1&choiceform1=%22No%2C+that%27s+all.%22");
+			if(contains_text(txt,"ou hold up the bucket of black paint"))
+			{
+				set_property("black_paint_handed_gnasir",my_ascensions());
 			}
-			print("BCC: Painting Gnasir's Door or just spending some turns waiting for him to want us to get his pages.", "purple");
-	
-			//place florist friar plants
-			choose_all_plants("", $location[desert (ultrahydrated)]);
+			else
+				abort("something went wrong handing in black paint");
+				
+			use(1,$item[desert sightseeing pamphlet]);
+		}
+		
+		//get a killing jar in library?
+		//worthwhile only if <7 turns, which is what standard exploring will take
+		if(get_property("killing_jar_handed_gnasir").to_int()< my_ascensions())
+		{
+			if(!in_hardcore() && i_a("killing jar")==0)	
+				cli_execute("pull killing jar");
 			
-			bumMiniAdv(1, $location[The Arid\, Extra-Dry Desert]);
+			//get one, if it will take <7.5 turns
+			if(i_a("killing jar")==0)
+			{
+				buMax("+i");
+				setFamiliar("items");
+				//75+x% combat chance, 1/3 chance of librarian, 0.1*items chance of drop
+				float com=0.75 + numeric_modifier("combat rate")/100.0;
+				float drop_chance=0.1*(1.0 + numeric_modifier("item drop")/100.0);
+				float chance_per_adv= com * 0.3333 * drop_chance;
+				
+				//chance of finishing in <8 turns = 1-(1-cpa)^8
+				//accept if chance is more than 95%
+				float chance_of_finishing_in_time=1.0-((1.0-chance_per_adv)**8);
+				if(chance_of_finishing_in_time>0.95)
+				{
+					while(i_a("killing jar")==0)
+						bumAdv($location[The haunted library], "+i", "items", "1 killing jar", "Getting a killing jar");
+				}
+				else
+				{
+					print("Current modifiers mean we have only a "+chance_of_finishing_in_time*100.0+"% chance of the killing jar being worthwhile, so we are skipping it (req 95%+)","green");
+				}
+			}
+			
+			if(i_a("killing jar")>0)
+			{
+				abort("line 8943 links for handing in killing jar");
+				string txt=visit_url("place.php?whichplace=desertbeach&action=db_gnasir");
+//				txt=visit_url(<>);
+				visit_url("choice.php?pwd&whichchoice=805&option=1&choiceform1=%22No%2C+that%27s+all.%22");
+//				if(contains_text(txt,<>))
+//				{
+//					set_property("killing_jar_handed_gnasir",my_ascensions());
+//				}
+//				else
+//					abort("something went wrong handing in killing jar");
+				use(1,$item[desert sightseeing pamphlet]);
+			}
 		}
 		
-		//Now we need the worm riding manual. So get it.
-		while (i_a("worm-riding manual pages 3-15") == 0) {
-			if (contains_text(visit_url("questlog.php?which=1"), "worm-riding manual") || contains_text(visit_url("questlog.php?which=1"), "missing manual pages"))
-				bumAdv($location[The Oasis], "", "", "worm-riding manual pages 3-15", "Getting the pages of the worm-riding manual");
+		//fight mobs to unlock
+		while(get_property("desertExploration").to_int()<100)
+		{
+			if(have_effect($effect[ultrahydrated])==0)
+			{
+				cli_execute("conditions clear");
+				adventure(1,$location[The Oasis]);
+			}
+			//explore in desert with compass
+			bumAdv($location[The arid\, extra-dry desert], "+equip uv-resistant compass", "items", "i", "Exploring the desert");
+
+			//if we get all the worm riding pages, go worm riding
+			if(i_a("worm riding manual page")>=15)
+			{
+				print("Collected worm manual pages","purple");
+				get_drum_machine();
+				string txt=visit_url("place.php?whichplace=desertbeach&action=db_gnasir");
+				txt=visit_url("choice.php?pwd&whichchoice=805&option=2&choiceform2=%22I+think+I+found+all+the+missing+pages+of+your+book.%22");
+				visit_url("choice.php?pwd&whichchoice=805&option=1&choiceform1=%22No%2C+that%27s+all.%22");
+				if (item_amount($item[worm-riding hooks]) == 0) abort("something went wrong handing in manual pages.");
+			}
+			
+			//ride
+			if (item_amount($item[worm-riding hooks]) > 0)
+			{
+				print("Wormriding","purple");
+				if (my_path() != "Way of the Surprising Fist" && my_path() != "Avatar of Boris") {
+					cli_execute("checkpoint; equip worm-riding hooks; use drum machine; outfit checkpoint");
+				} else {
+					cli_execute("use drum machine");
+				}
+				cli_execute("inventory refresh");
+				if (item_amount($item[worm-riding hooks]) != 0) abort("something went wrong trying to wormride.");
+			}	
 		}
-		
-		while (contains_text(visit_url("questlog.php?which=1"), "found all of Gnasir's missing manual pages"))
-			bumAdv($location[The Arid\, Extra-Dry Desert], "", "", "worm-riding hooks", "Giving Gnasir his pages back");
-		
-		if (item_amount($item[worm-riding hooks]) == 0) abort("Unable to get worm-riding hooks.");
-		if (my_path() != "Way of the Surprising Fist" && my_path() != "Avatar of Boris") {
-			cli_execute("checkpoint; equip worm-riding hooks; use drum machine; outfit checkpoint");
-		} else {
-			cli_execute("use drum machine");
-		}
-		*/
 	}
 	
+	if(get_property("desertExploration").to_int()<100)
+		abort("something went wrong discovering the pyramid");
 	checkStage("macguffinpyramid", true);
 	return true;
 }
@@ -10083,6 +10204,7 @@ void bcs1() {
 	bcCouncil();
 	bcascKnob();
 	bcascPantry();
+	cli_execute("guild"); //if we are lucky we may just have to hand in now
 	levelMe(5, true);
 }
 

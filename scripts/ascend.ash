@@ -104,7 +104,7 @@ void stock_hagnks()
 	get_item($item[digital key lime pie],3);
 	//wet stunt nut stew
 	get_item($item[wet stew],1);
-	get_item($item[stunt nuts],1);
+	buy_item($item[stunt nuts],1);
 	//chaos butterfly
 	buy_item($item[chaos butterfly],2);
 	//afeu
@@ -193,6 +193,7 @@ void stock_hagnks()
 	buy_item($item[cane-mail shirt],1);
 	buy_item($item[antique machete],1);
 	buy_item($item[spooky mushroom],1);
+	buy_item($item[killing jar],1);
 	
 	//stuff for twistedmage
 	if(my_name()=="twistedmage")
