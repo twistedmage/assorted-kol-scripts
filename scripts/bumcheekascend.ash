@@ -8936,7 +8936,6 @@ boolean bcascMacguffinPyramid() {
 			
 			if(i_a("killing jar")>0)
 			{
-				abort("line 8943 links for handing in killing jar");
 				string txt=visit_url("place.php?whichplace=desertbeach&action=db_gnasir");
 				txt=visit_url("choice.php?pwd&whichchoice=805&option=2&choiceform2=%22I+brought+you+that+killing+jar+you+wanted.%22");
 				visit_url("choice.php?pwd&whichchoice=805&option=1&choiceform1=%22No%2C+that%27s+all.%22");
