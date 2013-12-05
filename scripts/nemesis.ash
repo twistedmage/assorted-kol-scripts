@@ -1344,14 +1344,15 @@ boolean get_spaghetti()
 	vprint( "Making sure the Spaghetti Elemental is our guardian...","green",2 );
 
 	record { string player; string orb; } guardian;
-	guardian.orb = orb_look();
+	guardian.player=my_thrall().to_string();
+	/*guardian.orb = orb_look();
 
 	if ( item_amount( $item[ crystal orb of spirit wrangling ] ) > 0 )
 	{
 		use( 1 , $item[ crystal orb of spirit wrangling ] );
 		guardian.player = guardian.orb;
 		guardian.orb = orb_look();
-	}
+	}*/
 
 	// if we have a Spaghetti Elemental with us
 	if ( guardian.player == "Spaghetti Elemental" ) return true;

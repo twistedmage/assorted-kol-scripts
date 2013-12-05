@@ -32,7 +32,10 @@ void main(string wumpii)
 			target_wumpii = 1;
 		if (target_wumpii < 0)
 		{
-			cli_execute("maximize ml");
+			if (equipped_item($slot[pants]) == $item[Pantsgiving])
+				cli_execute("maximize ml -pants");
+			else
+				cli_execute("maximize ml");
 			target_wumpii *= -1;
 		}
 		if (combat_rate_modifier() > -25 && can_interact())

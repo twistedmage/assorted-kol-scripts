@@ -630,6 +630,10 @@ void advise_food()
 		if(available_amount($item[whole turkey leg])>0)
 			add_food(con_map,"- whole turkey leg ",4.5,0,1);
 	
+	//	if(i_a("handful of smithereens")>0  || i_a("miserable pie")>0 || get_property("tomeSummons").to_int()<3)
+	//		add_food(con_map,"- miserable pie (smithereens) ",7,0,2);
+		if(i_a("handful of smithereens")>0  || i_a("this charming flan")>0 || get_property("tomeSummons").to_int()<3)
+			add_food(con_map,"- miserable pie (smithereens) ",11,0,2);
 	}
 	
 	//sort map
@@ -775,6 +779,8 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 		
 		if(available_amount($item[cold one])>0 || (have_skill($skill[grab a cold one]) && !get_property("_coldOne").to_boolean()))
 			add_drink(con_map,"- cold one (prefer to drink at higher levels)",6,0,1);
+		if(i_a("handful of smithereens")>0  || i_a("Paint A Vulgar Pitcher")>0 || get_property("tomeSummons").to_int()<3)
+			add_food(con_map,"- Paint A Vulgar Pitcher (smithereens) ",12,0,2);
 	}
 	//sort map
 	sort con_map by -value.efficiency;
@@ -812,6 +818,8 @@ void advise_spleen()
 		{
 			print("- Fill up with wads from pulverizing (1.0)","gray");
 		}
+		if(i_a("handful of smithereens")>0  || i_a("Paint A Vulgar Pitcher")>0 || get_property("tomeSummons").to_int()<3)
+			print("- handfuls of smithereens (1.5)","gray");
 	}
 }
 

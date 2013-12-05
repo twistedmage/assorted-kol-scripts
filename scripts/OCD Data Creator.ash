@@ -3975,7 +3975,7 @@ save [$item[necklace chain]] = 0;
 
 
 //stuff to sell later
-save [$item[dry cleaning receipt]] = -1; //use as mus class for power sock, and myst class for wool sock
+save [$item[dry cleaning receipt]] = -1; //use as mus class for power sock
 save [$item[Alice's Army Foil Dervish]] = -1;
 save [$item[pocket lint (blue)]] = -1;
 save [$item[moon-amber]] = -1;

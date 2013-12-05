@@ -6577,15 +6577,14 @@ boolean bcascCyrpt() {
 	if (!contains_text(visit_url("questlog.php?which=2"), "defeated the Bonerdagon")) {
 		set_property("choiceAdventure523", "4");
 		use(1, $item[evilometer]);
-		
-		while (!stageDone("Nook")) {
-		
 if(!get_property("_nookwarned").to_boolean())
 {
 set_property("_nookwarned","true");
 abort("nook - get debonair deboners from choiceadv, line 6137");
-}
-return false;
+	
+		while (!stageDone("Nook")) {
+		
+
 			setFamiliar("item");
 			buMax("items");
 			setMood("i");
@@ -6594,6 +6593,7 @@ return false;
 			bumAdv($location[The Defiled Nook], "item", "items", "1 evil eye", "Un-Defiling the Nook (1/4)", "i");
 			if (item_amount($item[evil eye]) > 0) use(1, $item[evil eye]);
 		}
+}
 		while (!stageDone("Alcove")) {	//Kill modern zmobies (+initiative) to decrease evil
 			setFamiliar("init");
 			eat_hot_dog("Wet dog",$location[The Defiled Alcove]);
@@ -8626,6 +8626,7 @@ boolean bcascMacguffinPrelim() {
 		}
 		
 		print("BCC: Obtaining and Reading the Diary", "purple");
+		if(my_meat()<5000) abort("not enough meat (5000) to get forged id");
 		if(!retrieve_item(1,$item[forged identification documents])) abort("BCC: You failed to acquire the forged identification documents. Do you lack the funds?");
 		while (item_amount($item[your father's MacGuffin diary]) < 1 && my_adventures() > 2) {
 			switch (my_primestat()) {
@@ -8821,7 +8822,7 @@ boolean bcascMacguffinPyramid() {
 		}
 		while(i_a("drum machine") == 0)
 		{
-			bumAdv($location[The Oasis], "", "items", "1 drum machine", "Getting drum machine");
+			bumAdv($location[The Oasis], "", "items", "1 drum machine", "Getting drum machine", "i");
 		}
 	}
 
@@ -8860,6 +8861,7 @@ boolean bcascMacguffinPyramid() {
 		}
 		
 		//meet gnasir
+		set_property("choiceAdventure805","1");
 		while(get_property("desertExploration").to_int()<11)
 		{
 			if(have_effect($effect[ultrahydrated])==0)
@@ -8873,36 +8875,28 @@ boolean bcascMacguffinPyramid() {
 			use(i_a("desert sightseeing pamphlet"),$item[desert sightseeing pamphlet]);
 		
 		//get stone rose in oasis, with hipster, maybe drum machine
-		if(get_property("stone_rose_handed_gnasir").to_int()< my_ascensions())
+		if((get_property("gnasirProgress").to_int() & 1) == 0)
 		{
 			while(i_a("stone rose")==0)
-				bumAdv($location[The Oasis], "i", "hipster", "1 stone rose", "Getting the stone rose");
+				bumAdv($location[The Oasis], "", "hipster", "1 stone rose", "Getting the stone rose", "i");
 
 			string txt=visit_url("place.php?whichplace=desertbeach&action=db_gnasir");
 			txt=visit_url("choice.php?pwd&whichchoice=805&option=2&choiceform2=%22I+found+your+stone+rose.%22");
 			visit_url("choice.php?pwd&whichchoice=805&option=1&choiceform1=%22No%2C+that%27s+all.%22");
-			if(contains_text(txt,"give the stone rose to Gnasir"))
-			{
-				set_property("stone_rose_handed_gnasir",my_ascensions());
-			}
-			else
+			if(!contains_text(txt,"give the stone rose to Gnasir"))
 				abort("something went wrong handing in stone rose");
 			use(1,$item[desert sightseeing pamphlet]);
 		}
 
 		//buy + hand in black paint
-		if(get_property("black_paint_handed_gnasir").to_int()< my_ascensions())
+		if((get_property("gnasirProgress").to_int() & 2)==0)
 		{
 			buy(1, $item[can of black paint]);
 			
 			string txt=visit_url("place.php?whichplace=desertbeach&action=db_gnasir");
 			txt=visit_url("choice.php?pwd&whichchoice=805&option=2&choiceform2=%22I+brought+some+black+paint+for+your+door.%22");
 			visit_url("choice.php?pwd&whichchoice=805&option=1&choiceform1=%22No%2C+that%27s+all.%22");
-			if(contains_text(txt,"ou hold up the bucket of black paint"))
-			{
-				set_property("black_paint_handed_gnasir",my_ascensions());
-			}
-			else
+			if(!contains_text(txt,"ou hold up the bucket of black paint"))
 				abort("something went wrong handing in black paint");
 				
 			use(1,$item[desert sightseeing pamphlet]);
@@ -8910,7 +8904,7 @@ boolean bcascMacguffinPyramid() {
 		
 		//get a killing jar in library?
 		//worthwhile only if <7 turns, which is what standard exploring will take
-		if(get_property("killing_jar_handed_gnasir").to_int()< my_ascensions())
+		if((get_property("gnasirProgress").to_int() & 4)==0)
 		{
 			if(!in_hardcore() && i_a("killing jar")==0)	
 				cli_execute("pull killing jar");
@@ -8931,7 +8925,7 @@ boolean bcascMacguffinPyramid() {
 				if(chance_of_finishing_in_time>0.95)
 				{
 					while(i_a("killing jar")==0)
-						bumAdv($location[The haunted library], "+i", "items", "1 killing jar", "Getting a killing jar");
+						bumAdv($location[The haunted library], "", "items", "1 killing jar", "Getting a killing jar", "+i");
 				}
 				else
 				{
@@ -8943,14 +8937,10 @@ boolean bcascMacguffinPyramid() {
 			{
 				abort("line 8943 links for handing in killing jar");
 				string txt=visit_url("place.php?whichplace=desertbeach&action=db_gnasir");
-//				txt=visit_url(<>);
+				txt=visit_url("choice.php?pwd&whichchoice=805&option=2&choiceform2=%22I+brought+you+that+killing+jar+you+wanted.%22");
 				visit_url("choice.php?pwd&whichchoice=805&option=1&choiceform1=%22No%2C+that%27s+all.%22");
-//				if(contains_text(txt,<>))
-//				{
-//					set_property("killing_jar_handed_gnasir",my_ascensions());
-//				}
-//				else
-//					abort("something went wrong handing in killing jar");
+				if(!contains_text(txt,"hand Gnasir the glass jar"))
+					abort("something went wrong handing in killing jar");
 				use(1,$item[desert sightseeing pamphlet]);
 			}
 		}
@@ -8964,7 +8954,7 @@ boolean bcascMacguffinPyramid() {
 				adventure(1,$location[The Oasis]);
 			}
 			//explore in desert with compass
-			bumAdv($location[The arid\, extra-dry desert], "+equip uv-resistant compass", "items", "i", "Exploring the desert");
+			bumAdv($location[The arid\, extra-dry desert], "+equip uv-resistant compass", "items", "", "Exploring the desert", "i");
 
 			//if we get all the worm riding pages, go worm riding
 			if(i_a("worm riding manual page")>=15)

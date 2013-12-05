@@ -1,7 +1,7 @@
 script "TheSea.ash";
 notify "Theraze";
-import <bumcheekascend.ash>;
 import <zlib.ash>;
+import <bumcheekascend.ash>;
 
 
 //predeclare
@@ -1121,18 +1121,17 @@ void scholar_path()
 
 void dad_path()
 {
-	outfit("cloathing of loathing");
+	outfit("clothing of loathing");
 //	cli_execute("maximize +sea, +equip Goggles of Loathing, +equip Stick-Knife of Loathing, +equip Scepter of Loathing, +equip Jeans of Loathing, +equip Belt of Loathing, +equip Treads of Loathing, +100 hp, +spell damage");
-	cli_execute("maximize +sea, +equip Goggles of Loathing, +equip Stick-Knife of Loathing, +equip Scepter of Loathing, +equip Jeans of Loathing, +equip Belt of Loathing, +equip Pocket Square of Loathing, +100 hp, +spell damage");
+	cli_execute("maximize +sea, +equip Goggles of Loathing, +equip Stick-Knife of Loathing, +equip Scepter of Loathing, +equip Jeans of Loathing, +equip Belt of Loathing, +equip Treads of Loathing, +100 hp, +spell damage");
 	
 	//<no point in buffs>
 	clear_combat_macro();
 	cli_execute("restore hp; restore mp");
-	abort("line 1339 choiceadv sequence for dad sea monkey");
 	visit_url("sea_merkin.php?action=temple");
 	visit_url("choice.php?pwd&whichchoice=714&option=1&choiceform1=Go+Inside");
-	visit_url("choice.php?pwd&whichchoice=715&option=1&choiceform1=Eat");
-	visit_url("choice.php?pwd&whichchoice=716&option=1&choiceform1=Go+Inside");
+	visit_url("choice.php?pwd&whichchoice=715&option=1&choiceform1=%3F+Eat");
+	visit_url("choice.php?pwd&whichchoice=716&option=1&choiceform1=%3F+Go+Inside");
 	//<fight>
 }
 
@@ -1299,42 +1298,42 @@ void BootQuest()
 			{
 				print("Buying the boot and collecting our well-earned reward.");
 				if (available_amount($item[damp old boot]) < 1) create(1, $item[damp old boot]);
-				visit_url("oldman.php?action=talk");
+				visit_url("place.php?whichplace=sea_oldman&action=oldman_oldman");
 				switch(TS_BOOT_QUEST)
 				{
 					case 1:
-						visit_url("oldman.php?action=pickreward&whichreward=3609");
+						visit_url("place.php?whichplace=sea_oldman&action=oldman_oldman&preaction=pickreward&whichreward=3609");
 						break;
 					case 2:
-						visit_url("oldman.php?action=pickreward&whichreward=6314");
+						visit_url("place.php?whichplace=sea_oldman&action=oldman_oldman&preaction=pickreward&whichreward=6314");
 						break;
 					case 3:
-						visit_url("oldman.php?action=pickreward&whichreward=6312");
+						visit_url("place.php?whichplace=sea_oldman&action=oldman_oldman&preaction=pickreward&whichreward=6312");
 						use(1, $item[crate of fish meat]);
 						break;
 					case 4:
-						visit_url("oldman.php?action=pickreward&whichreward=6313");
+						visit_url("place.php?whichplace=sea_oldman&action=oldman_oldman&preaction=pickreward&whichreward=6313");
 						use(1, $item[damp old wallet]);
 						break;
 					case 5:
 						if (available_amount($item[das boot]) < 1)
-							visit_url("oldman.php?action=pickreward&whichreward=3609");
+							visit_url("place.php?whichplace=sea_oldman&action=oldman_oldman&preaction=pickreward&whichreward=3609");
 						else if (available_amount($item[fishy pipe]) < 1)
-							visit_url("oldman.php?action=pickreward&whichreward=6314");
+							visit_url("place.php?whichplace=sea_oldman&action=oldman_oldman&preaction=pickreward&whichreward=6314");
 						else
 						{
-							visit_url("oldman.php?action=pickreward&whichreward=6312");
+							visit_url("place.php?whichplace=sea_oldman&action=oldman_oldman&preaction=pickreward&whichreward=6312");
 							use(1, $item[crate of fish meat]);
 						}
 						break;
 					case 6:
 						if (available_amount($item[das boot]) < 1)
-							visit_url("oldman.php?action=pickreward&whichreward=3609");
+							visit_url("place.php?whichplace=sea_oldman&action=oldman_oldman&preaction=pickreward&whichreward=3609");
 						else if (available_amount($item[fishy pipe]) < 1)
-							visit_url("oldman.php?action=pickreward&whichreward=6314");
+							visit_url("place.php?whichplace=sea_oldman&action=oldman_oldman&preaction=pickreward&whichreward=6314");
 						else
 						{
-							visit_url("oldman.php?action=pickreward&whichreward=6313");
+							visit_url("place.php?whichplace=sea_oldman&action=oldman_oldman&preaction=pickreward&whichreward=6313");
 							use(1, $item[damp old wallet]);
 						}
 						break;

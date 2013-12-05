@@ -249,8 +249,8 @@ final drop chance=0.1759% + 0.2089% = 0.3848%
 item drop from gear = 174.98 + 500 = 674.98
 total chance = 1.05978%
 -----------------------------------------------
-AT + SC - <anid>
-AT + TT - twistedmage, <asica, dinala>
+AT + SC - anid
+AT + TT - twistedmage, asica, dinala
 AT + PM - 
 AT + S
 AT + DB - twistedmage, 
@@ -277,6 +277,42 @@ asica at
 twisted = pm
 
 
+------landfill--------
+junk band * 3 - wire + glue
+junk trunks	* 2			- wire
+junk-mail shirt		* 1	 - glue
+arm buzzer		* 1 - wire + glue + battery
+boilgun * 1 (all done)
+swordzall * 3 (2 done) - wire + glue + battery
+battery on it's own
+
+-----------thesea left
+Sauceror = gladiator
+Turtle Tamer = gladiator
+Disco     Bandit = gladiator
+Accordion Thief = gladiator
+Sauceror = scholar
+Disco Bandit =     scholar
+Accordion Thief = scholar
+<dad manuel?>
+
+----create brit stuff
+3 shiela take a crossbow - init
+(created) A Light that Never Goes Out - items <summon for f'cle?>
+3 Shakespeare's Sister's Accordion - moxie%
+(created) half a purse - meat <summon for nuns?>
+3 Frankly Mr. Shank - moxie% <>
+3 Saucepanic - <>
+3 Hand that Rocks the Ladle - myst%
+3 Meat Tenderizer is Murder - musc% <>
+
+
+MS4wMzkzfHwxMzg1OTE2NDA5MTE2OzEzODU5MTY0MDkxMTY7MTM4NjIwNDgwMzM1OXwxMTExMTF8MzQ2NDAwNDUwMDMyMTEuMzQ0OzI3NTIwNDMyOTc5MjI5MC42OzU0MjI4OzI0Mjs4ODgyODE5ODgyOTA3Ny44NjsxMjE7LTE7LTE7MDswOzA7MDswOy0xOzA7MjQyOzA7MHwxNTAsMTUwLDQ1MjcyMjQ5OTEwLDA7MTUwLDE1MCwxOTkwNjUyMTYzODcsMDsxMDAsMTAwLDIzOTY0NDEyOCwwOzEwMCwxMDAsNTkyMzIyNTEwLDA7MTAwLDEwMCwyMTE1NDI5MDMzLDA7MTAwLDEwMCw0NDU0MzMxNTgyLDA7MTAwLDEwMCwxNjUyOTYyMDk1NiwwOzEwMCwxMDAsMzM3MTYxMzI1Mjc0LDA7NzksNzksMjI5MTMyMDQwOTAyOCwwOzU0LDU0LDc2MTY1Nzg3NzQxNzcsMDt8NDUwMzU5OTYyNzM3MDQ5NTs0NTAzMTg3MzEwNTEwMDc5OzIyNTI4OTkzMjUzMTMwMjM7Mzk0MDY1MjUxNzcxODUyNzsyMjUzNDgzNDM4ODEyMDk1OzEzNzQzODk1MzQ3M3w0NTAxOTQ4MjQ1OTAxMzExOzIyNTI2NDY0NTI3NDAwOTU7MTA2Mw%3D%3D%21END%21
+
+
+
+
+MS4wMzkzfHwxMzg1OTE2NDA5MTE2OzEzODU5MTY0MDkxMTY7MTM4NjIwNTgwMzgwNXwxMTExMTF8MzAwNjY4NzI3MzU0NS44NTI1OzI4MzI3OTYzNDgxODUyNC4zOzU1NDYxOzI0OTs4OTM3Mzc1ODI0NjQ1My44NDsxMjI7LTE7LTE7MDsyOzA7MDswOy0xOzA7MjQ5OzkyMjcyMzQ0MDMuOTk1MjE7Mjd8MTgxLDE4MSw0OTE5ODY2NDIxMiwwOzE1MCwxNTAsMjI1MDA4MzYyODgzLDA7MTAwLDEwMCwyNDc2NDc1OTUsMDsxMDAsMTAwLDYxNDczMjIxNywwOzEwMCwxMDAsMjE5NTQ2MzcwMCwwOzEwMCwxMDAsNDY2MjQyMTcxNSwwOzEwMCwxMDAsMTczMjk5Njc2MjMsMDsxMDAsMTAwLDM1MDQ5ODMwMjEyNywwOzgyLDgyLDIzNjIxMzQ4NDM1ODcsMDs1NCw1NCw3ODU0MjgxMzAxOTc4LDA7fDQ1MDM1OTk2MjczNzA0OTU7NDUwMzU5OTYyNzM3MDQ5NTsyNTMzMjc0NzkwMzk1OTAzOzM5NDA2NTI1MTc3MTg1Mjc7MjI1MzQ4MzQzODgxMjA5NTsxMzc0NDA1MjYzMzd8NDUwMTk0ODI0NTkwMTMxMTsyMjUyNjQ2NDUyNzQwMDk1OzExMjc%3D%21END%21
 12.11
 12.6
 13.9

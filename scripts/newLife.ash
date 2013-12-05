@@ -698,7 +698,12 @@ void special(boolean bonus_actions) {
 			}
 			else //not big
 			{
-				pull_and_wear_if_good($item[ice sickle]);
+				if(my_class()==$class[sauceror])
+				{
+					abort("create a saucepanic, better stats than  ice sickle");
+				}
+				else
+					pull_and_wear_if_good($item[ice sickle]);
 				pull_and_wear_if_good($item[juju mojo mask],$slot[acc2]);
 				//if we have no astral belt, wear fangs. Else pull fangs as superclover but dont wear 
 				if(available_amount($item[astral belt])<1)

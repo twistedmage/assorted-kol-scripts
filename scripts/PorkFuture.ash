@@ -42,7 +42,7 @@ void noncombat_mood()
 {
 	if (my_familiar() == $familiar[Jumpsuited Hound Dog])
 		use_familiar($familiar[none]);
-	cli_execute("maximize -combat");
+	cli_execute("maximize -combat -tie");
 	cli_execute("mood porkfuture");
 	cli_execute("mood clear");
 	if (have_skill($skill[smooth movement]))
