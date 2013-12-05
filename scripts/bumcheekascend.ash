@@ -6630,7 +6630,8 @@ abort("nook - get debonair deboners from choiceadv, line 6137");
 			}
 			
 			set_property("choiceAdventure527", "1");
-			bumAdv($location[Haert of the Cyrpt], "", "meatboss");
+			if(stageDone("Nook") && stageDone("Alove") && stageDone("Niche") && stageDone("Cranny"))
+				bumAdv($location[Haert of the Cyrpt], "", "meatboss");
 			visit_url("council.php");
 			set_property("lastCouncilVisit", my_level());
 			if (item_amount($item[chest of the Bonerdagon]) > 0) {
