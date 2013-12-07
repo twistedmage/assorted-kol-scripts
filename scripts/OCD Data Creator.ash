@@ -3973,12 +3973,36 @@ save [$item[sangria del diablo]] = 1;
 save [$item[sprocket assembly]] = 0;
 save [$item[necklace chain]] = 0;
 save [$item[killing jar]] = 1;
-
-
+save [$item[crystal skull]] = 0;
+save [$item[toasted brie]] = 0;
+save [$item[Star Spawn]] = 0;
+save [$item[surgical apron]] = 1;
+save [$item[junk yard]] = 0;
+save [$item[boilgun]] = 1;
+save [$item[wool sock]] = 1;
+save [$item[candied nuts]] = 0;
+save [$item[candied bolts]] = 0;
+save [$item[Work is a Four Letter Sword]] = 3;
+save [$item[Staff of the Headmaster's Victuals]] = 1;
+save [$item[A Light that Never Goes Out]] = 1;
+save [$item[Half a Purse]] = 1;
+save [$item[Hairpiece On Fire]] = 2;
+save [$item[Vicar's Tutu]] = 2;
+save [$item[Hand in Glove]] = 1;
+save [$item[Ouija Board, Ouija Board]] = 1;
+save [$item[sheila take a crossbow]] = 3;
+save [$item[A Light that Never Goes Out]] = 1;
+save [$item[Shakespeare's Sister's Accordion]] = 3;
+save [$item[half a purse]] = 1;
+save [$item[Frankly Mr. Shank]] = 3;
+save [$item[Flaskfull of Hollow]] = 0;
+save [$item[handful of Smithereens]] = 0;
 
 //stuff to sell later
+save [$item[lump of Brituminous coal]] = -1;
 save [$item[dry cleaning receipt]] = -1; //use as mus class for power sock
 save [$item[Alice's Army Foil Dervish]] = -1;
+save [$item[pocket lint (white)]] = -1;
 save [$item[pocket lint (blue)]] = -1;
 save [$item[moon-amber]] = -1;
 save [$item[polished moon-amber]] = -1;

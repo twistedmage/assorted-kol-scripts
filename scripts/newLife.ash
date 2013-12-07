@@ -700,7 +700,8 @@ void special(boolean bonus_actions) {
 			{
 				if(my_class()==$class[sauceror])
 				{
-					abort("create a saucepanic, better stats than  ice sickle");
+					print("creating a saucepanic, better stats than  ice sickle","purple");
+					create(1,$item[saucepanic]);
 				}
 				else
 					pull_and_wear_if_good($item[ice sickle]);

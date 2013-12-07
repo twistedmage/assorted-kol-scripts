@@ -4623,6 +4623,46 @@ void setMood(string combat) {
 		if (i_a("green candy hear") > 0) cli_execute("trigger unconditional, ,ashq if(item_amount($item[green candy heart]) > 0 && have_effect($effect[Heart of Green]) <= 1) {use(1, $item[green candy heart]);}");
 		get_kolhs_buff("items");
 	}
+	
+	//if we are wearing smith gear, boost smithness
+	//flask is best boost, so always try for that. Suggest food/drink after
+	if(equipped_amount($item[A Light that Never Goes Out])>0 || equipped_amount($item[half a purse])>0)
+	{
+		//number of speen/flask/summons
+		int ns=i_a("handful of smithereens");
+		int nf=i_a("flaskfull of hollow");
+		int nu=get_property("tomeSummons").to_int();
+		
+		//if we have not enough spleen of flasks, but some summons, use one
+		while(nf==0 && ns<2 && nu>0)
+		{
+			print("summoning some smithness","purple");
+			use_skill(1,$skill[summon smithness]);
+			ns=i_a("handful of smithereens");
+			nf=i_a("flaskfull of hollow");
+			nu=nu-1;
+		}
+		
+		//if we have no flasks, but some spleen, make a flask
+		if(nf==0 && ns>2)
+		{
+			cli_execute("create flaskfull of hollow");
+			nf=nf+1;
+			ns=ns-2;
+		}
+		
+		//if we have a flask now, put it on mood
+		if(nf>0)
+			cli_execute("trigger lose_effect, merry smithsness, use 1 flaskfull of hollow");
+			
+		//if we have smithereens left, suggest the user eats/drink/snorts them
+		if(ns>0 && !get_property("_smith_food_suggested").to_boolean())
+		{
+			set_property("_smith_food_suggested","true");
+			abort("Maybe try eating a \"miserable pie\", drinking a \"Strikes Again Bigmouth\" or snorting some smithereens to boost smithsness. (total smithereens = "+ns+")");
+		}
+	}
+	
 }
 
 //Where is it best to level?
@@ -8365,9 +8405,9 @@ boolean bcascMacguffinHiddenCity() {
 		//5 - Apartment: Get cursed three times. If we hit the NC without 3, get cursed, else fight spirit.
 		while (item_amount($item[moss-covered stone sphere]) == 0) {
 			set_property("choiceAdventure780", "1");
-			bumAdv($location[The Hidden Apartment Building], "", "", "1 choiceadv", "Getting the moss-covered stone sphere.", "-");
 			if(my_thrall()==$thrall[Vampieroghi])
 				abort("We can't get thrice cursed with a Vampieroghi thrall... (fixme line 8369)");
+			bumAdv($location[The Hidden Apartment Building], "", "", "1 choiceadv", "Getting the moss-covered stone sphere.", "-");
 		}
 		while (item_amount($item[moss-covered stone sphere]) == 1) {
 			bumMiniAdv(1, $location[An Overgrown Shrine (Northwest)], "");
@@ -9431,9 +9471,17 @@ boolean bcascPirateFledges() {
 				cli_execute("closet put big book of pirate insults");
 			if(i_a("massive manual of marauder mockery")>1)
 				cli_execute("closet put massive manual of marauder mockery");
-				
+			
 			if(my_path() != "Avatar of Boris")
-				buMax("+outfit swashbuckling getup");
+				string maxstr="+outfit swashbuckling getup";
+				//try to make a light and add it to maxstr
+				if(i_a("A Light that Never Goes Out")<1)
+					cli_execute("create a light that never goes out");
+				if(i_a("A Light that Never Goes Out")<1)
+					cli_execute("pull a light that never goes out");
+				if(i_a("A Light that Never Goes Out")>0)
+					maxstr=maxtr+", +equip A Light that Never Goes Out";
+				buMax(maxstr);
 			else {
 				outfit("swashbuckling getup");
 				equip($item[Trusty]);
@@ -10642,6 +10690,11 @@ void bcs12() {
 				if (dispensary_available()) cli_execute("trigger lose_effect, Wasabi Sinuses, use 1 Knob Goblin nasal spray");
 				if (dispensary_available()) cli_execute("trigger lose_effect, Heavy Petting, use 1 Knob Goblin pet-buffing spray");
 				
+				//try to make a half purse
+				if(i_a("half a purse")<1)
+					cli_execute("create half a purse");
+				if(i_a("half a purse")<1)
+					cli_execute("pull half a purse");
 				//Put on the outfit and adventure, printing debug information each time. 
 				buMax("nuns");
 				cli_execute("condition clear");
