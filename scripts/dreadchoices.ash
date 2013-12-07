@@ -3,9 +3,9 @@
 string polisher="twistedmage";
 string brewer="twistedmage";
 string keymaker="twistedmage";
-string chef="dinala";
+string chef="twistedmage";
 string chest_opener="twistedmage";
-string grinder="asica";
+string grinder="anid";
 
 void clean_choices()
 {
@@ -67,11 +67,10 @@ void do_forest()
 //		get_key();
 //		do_choice(1, "?pwd&whichchoice=721&option=3&choiceform3=Try+the+attic", "?pwd&whichchoice=724&option=1&choiceform1=Turn+off+the+music+box");
 //	}
-	else if(!already_done("sdafsafs"))
+	else if(!already_done("drove some vampires out"))
 	{
-		abort("line 72 choices for less vampires");
 		get_key();
-		do_choice(1, "?pwd&whichchoice=721&option=3&choiceform3=Try+the+attic", "");
+		do_choice(1, "?pwd&whichchoice=721&option=3&choiceform3=Try+the+attic", "?pwd&whichchoice=724&option=3&choiceform3=Poke+around+in+the+rafters");
 	}
 	else if(item_amount($item[wax banana])>0)
 	{
