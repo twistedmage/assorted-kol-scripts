@@ -3972,6 +3972,8 @@ save [$item[bottle of moontan lotion]] = 1;
 save [$item[sangria del diablo]] = 1;
 save [$item[sprocket assembly]] = 0;
 save [$item[necklace chain]] = 0;
+save [$item[killing jar]] = 1;
+
 
 
 //stuff to sell later
