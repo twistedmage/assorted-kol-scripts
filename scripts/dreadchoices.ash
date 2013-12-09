@@ -170,8 +170,7 @@ void do_village()
 	//duke
 	if(my_primestat()==$stat[mysticality] && item_amount($item[dread tarragon])>0 && item_amount($item[dreadful roast])>0 && item_amount($item[stinking agaricus])>0 && item_amount($item[bone flour])>0)
 	{
-		abort("line 167 choices for cooking shepherds pie");
-		do_choice(6, "", "");
+		do_choice(6, "?pwd&whichchoice=741&option=2&choiceform2=Investigate+the+servant%27s+quarters", "?pwd&whichchoice=743&option=2&choiceform2=Make+a+shepherd%27s+pie");
 	}
 	else if(item_amount($item[ghost thread])>9)
 	{

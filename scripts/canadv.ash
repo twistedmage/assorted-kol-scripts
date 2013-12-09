@@ -494,7 +494,7 @@ boolean can_adv(location where, boolean prep) {
   // woods
    case $location[8-Bit Realm]: return primecheck(20);
    case $location[A Barroom Brawl]:
-   case $location[Tavern Cellar]: return levelcheck(3) && qprop("questL03Rat","started");
+   case $location[The Typical Tavern Cellar]: return levelcheck(3) && qprop("questL03Rat","started");
    case $location[The Black Forest]: return levelcheck(11) && qprop("questL11MacGuffin","started");
    case $location[The Hidden Temple]: return get_property("lastTempleUnlock").to_int() == my_ascensions();
    case $location[The Road to White Citadel]: return (!white_citadel_available() && qprop("questG02Whitecastle","step1"));
