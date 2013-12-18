@@ -586,7 +586,7 @@ void addSadFace(buffer picker, string message) {
 	picker.append('</td></tr>');
 }
 
-// elements2.gif or elements3.gif are valid values for img
+// elementchart1.gif or elementchart2.gif are valid values for img
 void addElementMap(buffer result, string img) {
 	result.append('<img src="');
 	result.append(imagePath);
@@ -617,7 +617,7 @@ void pickerFlavour() {
 	
 	picker.addLoader("Spiriting flavours...");
 	picker.append('<tr class="pickitem"><td>');
-	picker.addElementMap("elements3.gif");
+	picker.addElementMap("elementchart2.gif");
 	picker.append('</td></tr>');
 	
 	picker.append('</table></div>');
@@ -736,6 +736,17 @@ buff parseBuff(string source) {
 		result.append(' colspan="2"');
 	result.append('>');
 	result.append(effectAlias);
+	
+	//ckb: Add modification details for buffs and effects
+	if(vars["chit.effects.describe"] == "true") {
+		string effectMod = string_modifier(myBuff.effectName,"Evaluated Modifiers");
+		if(length(effectMod)>0) {
+			result.append('<br><small style="color:gray">');
+			result.append(effectMod);
+			result.append('</small>');
+		}
+	}
+	
 	result.append('</td>');
 	if(myBuff.isIntrinsic) {
 		result.append('<td class="infinity');
@@ -841,12 +852,25 @@ void bakeEffects() {
 	if(have_skill($skill[flavour of magic]) && !have_flavour()) {
 		intrinsics.append('<tr class="effect">');
 		if(vars["chit.effects.showicons"] == "true" && !isCompact)
-			intrinsics.append('<td class="icon"><a class="chit_launcher" rel="chit_pickerflavour" href="#"><img height=20 width=20 src="/images/itemimages/flavorofmagic.gif"></a></td>');
+			intrinsics.append('<td class="icon"><img height=20 width=20 src="/images/itemimages/flavorofmagic.gif" onClick=\'javascript:poop("desc_skill.php?whichskill=3017&self=true","skill", 350, 300)\'></td>');
 		intrinsics.append('<td class="info"');
 		if(get_property("relayAddsUpArrowLinks").to_boolean())
 			intrinsics.append(' colspan="2"');
-		intrinsics.append('><a class="chit_launcher" rel="chit_pickerflavour" href="#">Choose a Flavour</a></td><td class="infinity right"><a class="chit_launcher" rel="chit_pickerflavour" href="#">&infin;</a></td></tr>');
+		intrinsics.append('><a class="chit_launcher" rel="chit_pickerflavour" href="#">Choose a Flavour</a></td><td class="infizero right"><a class="chit_launcher" rel="chit_pickerflavour" href="#">00</a></td></tr>');
 		pickerFlavour();
+		total += 1;
+	}
+	// Add Lack of Iron Palm Intrinsic
+	if(have_effect($effect[Iron Palms]) == 0 && have_skill($skill[Iron Palm Technique]) && my_class() == $class[Seal Clubber]) {
+		intrinsics.append('<tr class="effect">');
+		if(vars["chit.effects.showicons"] == "true" && !isCompact)
+			intrinsics.append('<td class="icon"><img height=20 width=20 src="/images/itemimages/palmtree.gif" onClick=\'javascript:poop("desc_skill.php?whichskill=1025&self=true","skill", 350, 300)\'></td>');
+		intrinsics.append('<td class="info"');
+		if(get_property("relayAddsUpArrowLinks").to_boolean())
+			intrinsics.append(' colspan="2"');
+		intrinsics.append('>Lack of Iron Palms</td><td class="infizero right"><a href="');
+		intrinsics.append(sideCommand("cast Iron Palm Technique"));
+		intrinsics.append('" title="Cast Iron Palms">00</a></td></tr>');
 		total += 1;
 	}
 
@@ -896,7 +920,7 @@ void bakeElements() {
 	result.append(imagePath);
 	result.append('elements.png">Elements</th></tr></thead>');
 	result.append("<tr><td>");
-	result.addElementMap("elements2.gif");
+	result.addElementMap("elementchart1.gif");
 	result.append('</tr></table>');
 	
 	chitBricks["elements"] = result;
@@ -1176,7 +1200,7 @@ void pickerFamiliar(familiar myfam, item famitem, boolean isFed) {
 		}
 		
 		if(famitem != $item[none]) {
-			string mod = string_modifier(to_string(famitem), "Modifiers");
+			string mod = string_modifier(to_string(famitem), "Evaluated Modifiers");
 			// Effects for Scarecrow and Hatrack
 			matcher m = create_matcher('Familiar Effect: \\"(.*?), cap (.*?)\\"', mod);
 			if(find(m))
@@ -1549,10 +1573,10 @@ void pickerCompanion(string famname, string famtype) {
 }
 
 static { string [thrall] [int] pasta;
-	pasta[$thrall[Vampieroghi]][1] = "Attacks and heals you";
+	pasta[$thrall[Vampieroghi]][1] = "Attacks and heals";
 	pasta[$thrall[Vampieroghi]][5] = "Dispels bad effects";
 	pasta[$thrall[Vampieroghi]][10] = "+60 max HP";
-	pasta[$thrall[Vermincelli]][1] = "Attacks and restores MP";
+	pasta[$thrall[Vermincelli]][1] = "Attacks to restore MP";
 	pasta[$thrall[Vermincelli]][5] = "Attacks enemy";
 	pasta[$thrall[Vermincelli]][10] = "+30 max MP";
 	pasta[$thrall[Angel Hair Wisp]][1] = "Combat Initiative";
@@ -4751,6 +4775,7 @@ buffer modifyPage(buffer source) {
 	setvar("chit.effects.modicons", true);
 	setvar("chit.effects.layout","songs,buffs,intrinsics");
 	setvar("chit.effects.usermap",false);
+	setvar("chit.effects.describe",false);
 	setvar("chit.helpers.wormwood", "stats,spleen");
 	setvar("chit.helpers.dancecard", true);
 	setvar("chit.helpers.semirare", true);

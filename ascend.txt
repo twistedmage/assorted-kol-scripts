@@ -118,7 +118,7 @@ final drop chance=0.1759% + 0.2089% = 0.3848%
 item drop from gear = 174.98 + 500 = 674.98
 total chance = 1.05978%
 -----------------------------------------------
-AT + SC - anid
+AT + SC - <twistedmage>,anid
 AT + TT - twistedmage, asica, dinala
 AT + PM - 
 AT + S
@@ -131,14 +131,14 @@ DB + TT - twistedmage,
 DB + PM - 
 DB + S  - 
 
-S  + SC - <twistedmage>
-S  + TT - <twistedmage>
+S  + SC - twistedmage
+S  + TT - twistedmage
 S  + PM - 
 
-PM + SC - 
+PM + SC - <twistedmage>
 PM + TT - asica
 
-TT + SC - <twistedmage>
+TT + SC - twistedmage
 
 anid sc
 dinala pm
@@ -176,19 +176,6 @@ Accordion Thief = scholar
 3 Meat Tenderizer is Murder - musc% <>
 <does cli command "create" include summoning?>
 
-MS4wMzkzfHwxMzg1OTE2NDA5MTE2OzEzODU5MTY0MDkxMTY7MTM4NjIwNDgwMzM1OXwxMTExMTF8MzQ2NDAwNDUwMDMyMTEuMzQ0OzI3NTIwNDMyOTc5MjI5MC42OzU0MjI4OzI0Mjs4ODgyODE5ODgyOTA3Ny44NjsxMjE7LTE7LTE7MDswOzA7MDswOy0xOzA7MjQyOzA7MHwxNTAsMTUwLDQ1MjcyMjQ5OTEwLDA7MTUwLDE1MCwxOTkwNjUyMTYzODcsMDsxMDAsMTAwLDIzOTY0NDEyOCwwOzEwMCwxMDAsNTkyMzIyNTEwLDA7MTAwLDEwMCwyMTE1NDI5MDMzLDA7MTAwLDEwMCw0NDU0MzMxNTgyLDA7MTAwLDEwMCwxNjUyOTYyMDk1NiwwOzEwMCwxMDAsMzM3MTYxMzI1Mjc0LDA7NzksNzksMjI5MTMyMDQwOTAyOCwwOzU0LDU0LDc2MTY1Nzg3NzQxNzcsMDt8NDUwMzU5OTYyNzM3MDQ5NTs0NTAzMTg3MzEwNTEwMDc5OzIyNTI4OTkzMjUzMTMwMjM7Mzk0MDY1MjUxNzcxODUyNzsyMjUzNDgzNDM4ODEyMDk1OzEzNzQzODk1MzQ3M3w0NTAxOTQ4MjQ1OTAxMzExOzIyNTI2NDY0NTI3NDAwOTU7MTA2Mw%3D%3D%21END%21
-
-
-
-
-MS4wMzkzfHwxMzg1OTE2NDA5MTE2OzEzODU5MTY0MDkxMTY7MTM4NjIwNTgwMzgwNXwxMTExMTF8MzAwNjY4NzI3MzU0NS44NTI1OzI4MzI3OTYzNDgxODUyNC4zOzU1NDYxOzI0OTs4OTM3Mzc1ODI0NjQ1My44NDsxMjI7LTE7LTE7MDsyOzA7MDswOy0xOzA7MjQ5OzkyMjcyMzQ0MDMuOTk1MjE7Mjd8MTgxLDE4MSw0OTE5ODY2NDIxMiwwOzE1MCwxNTAsMjI1MDA4MzYyODgzLDA7MTAwLDEwMCwyNDc2NDc1OTUsMDsxMDAsMTAwLDYxNDczMjIxNywwOzEwMCwxMDAsMjE5NTQ2MzcwMCwwOzEwMCwxMDAsNDY2MjQyMTcxNSwwOzEwMCwxMDAsMTczMjk5Njc2MjMsMDsxMDAsMTAwLDM1MDQ5ODMwMjEyNywwOzgyLDgyLDIzNjIxMzQ4NDM1ODcsMDs1NCw1NCw3ODU0MjgxMzAxOTc4LDA7fDQ1MDM1OTk2MjczNzA0OTU7NDUwMzU5OTYyNzM3MDQ5NTsyNTMzMjc0NzkwMzk1OTAzOzM5NDA2NTI1MTc3MTg1Mjc7MjI1MzQ4MzQzODgxMjA5NTsxMzc0NDA1MjYzMzd8NDUwMTk0ODI0NTkwMTMxMTsyMjUyNjQ2NDUyNzQwMDk1OzExMjc%3D%21END%21
-
-
-
-MS4wMzkzfHwxMzg1OTE2NDA5MTE2OzEzODU5MTY0MDkxMTY7MTM4NjMyNDQ3ODM2MXwxMTExMTF8MTQzNTUyNjY2ODcyNzgyNi41OzEzNzY4ODgxMTQyNTg3NzAyOzc0OTgzOzQ1OTszMDEyODgwMTY4NDczMjc1LjU7NjMxOy0xOy0xOzA7MDsxMDs1MzgzMjswOy0xOzA7NDU5OzY4NjgwMjM5MjI5OTg3My41OzE1M3wyMDAsMjAwLDI2Njk5MjI2NDM5MTUsMDsxNzMsMTc0LDgzOTA2MjQzNjM3MjcsMDsxNTUsMTU1LDE1MjMzMzIxNDIsMDsxNDIsMTQyLDM1NzA2NzM3MjEsMDsxMzMsMTMzLDEyNTA5MDUwNDk4LDA7MTI0LDEyNCwzMDg1MDAzNDY2MiwwOzExNCwxMTQsMTE1MzM5MTM3NDg5LDA7MTEwLDExMCwxOTY1NzA5MzQ3MDQxLDA7MTAwLDEwMCwxNDkyMTY1NTIzMjM5MywwOzkwLDkwLDY4NTM1MTM0NDY2NzkzLDA7fDQ1MDM1OTk2MjczNzA0OTU7NDUwMzU5OTYyNzM3MDQ5NTs0NTAzNTk5NjI3MzcwNDk1OzQ1MDM1NzM3ODkwMTQ1Mjc7MjI1MzU4NjUxODUwNzUxOTsxNDQzMTcwODc3NDV8NDUwMzU5NzU0Njk5NTcxMTsyMjU0ODU3MjkxNDMxOTM1OzEyNTU%3D%21END%21
-
-
-MS4wMzkzfHwxMzg2MzI3MTM5OTc1OzEzODU5MTY0MDkxMTY7MTM4NjQyMTQ0MjA1MXwxMTExMTF8NjMwMDc5ODQ5MzA2NzkyMzszNTA2MzEzNzM1MTk2MzI3NjszODQwMTk7ODY3OzExMzM5MTIzNTAxMTYwMDE4Ozg2MTstMTstMTsxMzkzOTk0MDg1NDc0ODc1NjswOzEyOzM0MjQ4OzA7LTE7Mjs0MDA7ODM1NjIyMjcxNzYxNDY3LjU7NjU1fDE5NiwxOTYsNDMwOTI2NjE1Nzc0LDA7MTgxLDE4MSw1MTY3OTUzMzExMzI0LDA7MTU4LDE1OCw5MDQzNjExMTcsMDsxNDUsMTQ1LDIxNzI5NzIxNTQsMDsxMzcsMTM3LDcwMjUzMDg1MzcsMDsxMjgsMTI4LDE2OTQ1NTAxMzA1LDA7MTIwLDEyMCw1NDc0NDA4MDk2NSwwOzEyMiwxMjIsOTMxMDc4MTU1Mjc1LDA7MTA5LDEwOSw2ODEwNzUzNzExNTI3LDA7OTUsOTUsNTA0OTM0MTUzMzQwMjcsMDt8NDUwMzU5OTYyNzM3MDQ5NTs0NTAzNTk5NjI3MzcwNDk1OzQ1MDM1OTk2MjczNzA0OTU7NDUwMzU3Mzg0OTczMzYzMTsyODE0MzM3NDQ4NjczMjc5OzE3MTc5ODY5MTM1OXw0NTAzNTk5NTYwMjYxNjMxOzIyNTUwMjkwOTAxMjM3NzU7MjAzOQ%3D%3D%21END%21
 
 12.11
 12.6
@@ -214,12 +201,15 @@ cl
 ce
 <not for win8>
 
+maximize prismatic damage, moxie, equip crown of thrones, -melee, equip pantsgiving, equip hoverbelt
 
+MS4wMzkzfHwxMzg3MzE0NzkyNzEyOzEzODU5MTY0MDkxMTY7MTM4NzM4ODg1NDM3M3wxMTExMTF8MzQ1MTM5MzcxNTEyMTk2OTI7MjUxODY5NDk0NzEwNTM4MjQwMDszNzIyNTAwOzQwNzM7MTIyMjM0NjczMzAzNjk3MDgwMDszNzAzOy0xOy0xOzYyMDU2NjkyMTg4NzI2NDQwMDA7MTswOzA7MDstMTs4OzQwNjsxMDA2NDg2ODc3Mzk3MzcyNTA7MTM4fDI1MCwyNTAsODQ0OTUwNDY3MDEzMywwOzIzNywyMzcsMjc3NzkyMTE1OTIwMywwOzIyNSwyMjUsMTIyMjcwNjY3OSwwOzIxMiwyMTIsMzIxMzY3MDE0OSwwOzIwNCwyMDQsMTA5NjM4MjkyOTUsMDsxOTQsMTk0LDI3MDI3MDgwOTYxLDA7MTgyLDE4Miw5Njc4OTQwMTc0MywwOzE2NywxNjcsMTQ3MDU3MzE4NjExMCwwOzEzOCwxMzgsMTUzNDA2MTUzMzgzODksMDsxMjUsMTI1LDEzNDk1MDI5NzQzNzkzMSwwO3w0NTAzNTk5NjI3MzcwNDk1OzQ1MDM1OTk2MjczNzA0OTU7MjI2OTM5MTk5OTcyOTY2Mzs0NTAzNTczNzQ4NjQ0MzUxOzI4MTQ3NDk3NjcxMDY1NTk7MTcwMTU1MDQ4OTU5fDQ1MDM1OTk2MjczNzA0OTU7MjM5MjQ2ODU4MDQ2NjY4NzsyMDQ3%21END%21
 a25
 
 
 ----------Zombie homeowners association---------
 familiar magic dragonfish; maximize muscle, equip weedy skirt; uneffect jaba; uneffect scarysauce; ballpit; telescope high; use silver dreadsylvanian flask; use brass dreadsylvanian flask; use ferrigno; use philter; cast dark visions
+<need over 3k musc to do it in 30 rounds>
 -------------------------------------------------
 
 ----------The unkillable skeleton hard mode ---------
@@ -246,7 +236,7 @@ cast jala;
 cast jaba;
 cast scarysauce
 
-familiar mosquito; fold loathing legion helicopter; maximize familiar weight, -0.01 hp, equip parasitic headgnawer, equip ol scratchs stove door, equip spiky turtle shoulderpads, equip groovy prism necklace, equip mer-kin gutgirdle, equip loathing legion helicopter; cast jalape&ntilde;o saucesphere; cast jaba&ntilde;ero saucesphere; cast scarysauce; use potion of punctual companionship; cast jingle bells; cast empathy; cast leash; use cheap cigar butt; cast vent rage gland; use Stabonic scroll; use glowing syringe; cast frigidalmatian; cast boner battalion; use silver dreadsylvanian flask; use brass dreadsylvanian flask
+familiar mosquito; fold loathing legion helicopter; maximize familiar weight, -0.01 hp, equip parasitic headgnawer, equip ol scratchs stove door, equip spiky turtle shoulderpads, equip groovy prism necklace, equip mer-kin gutgirdle, equip loathing legion helicopter; cast jalape&ntilde;o saucesphere; cast scarysauce; use potion of punctual companionship; cast jingle bells; cast empathy; cast leash; use cheap cigar butt; cast vent rage gland; use Stabonic scroll; use glowing syringe; cast frigidalmatian; cast boner battalion; use silver dreadsylvanian flask; use brass dreadsylvanian flask
 
 ----great wolf hard mode------
 familiar disembodied hand; maximize 100 dr, 0.01 mainstat, equip moon amber necklace, equip rain-doh green lantern; cast frigidalmatian; use connery; use serum of; use hair spray; ballpit; telescope high; use Cold seal sweat; use silver dreadsylvanian flask; use brass dreadsylvanian flask;
@@ -293,37 +283,22 @@ svn checkout https://svn.code.sf.net/p/mafiarecovery/code/
 ash set_property("bcasc_unlockHiddenTavern","true");
 
 -----------------------------------------------------
+MS4wMzkzfHwxMzg2NjYzMjI4NjU5OzEzODU5MTY0MDkxMTY7MTM4NjY2NDg0NDMxMHwxMTExMTF8NzcwOTgzMjk3NC45ODI2NzY1OzIyNjQ1NzczNjcxOTE3Ljc5Mzs4ODk2MzsyMDM3OzE1NzQyNDc3MzMxNzgyLjY3OzE2NzM7LTE7LTE7ODE4OTM2MTY1MzQ1MDc4ODAwOzA7MDswOzY2OzIyMjU7NTs1OzA7MHwxNTEsMTUxLDY5ODE2OTUyNCwwOzEzNywxMzcsMjk1NTMxNDMzLDA7MTI1LDEyNSw1Mzc5NzI3LDA7MTEzLDExMywxMjk3NDU4NSwwOzEwNCwxMDQsMjMzNTMzMTksMDs5NCw5NCw1MTY1MzIyNSwwOzgzLDgzLDE0NzI2Mjk4NiwwOzczLDczLDI2MDU0MzI3MjQsMDs1NCw1NCwxNDE0Njk3Mjc0NCwwOzQzLDQzLDYyNjYwMDgwMjY3LDA7fDQ1MDM1OTk2MjczNzA0OTU7NDUwMzE4NzMxMDUxMDA3OTsyMjUxODA4NDAzNjE4ODE1OzM5NDA2NTI1MDA5MjA4MzE7MjQzOTI2NzA4MTE2OTgyMzsxNjMyMDkyODEwNjd8NDUwMzU5OTU2MDI2MTYzMTsyMjYwNTI3MTg1MTMzNTY3OzIwNDc%3D%21END%21
 
-Shooting Range{3} 30
--[Q of Diamonds] Inside the drawer in the control room.
-[5 of Spades] On foot locker inside the shooting area.
-[7 of DIamonds] Behind one of the targets of the shooting area.
-East Wing{7} 37
-[9 of Diamonds] Over the boxes of the 2nd storage room.
-[7 of Hearts] On the printer inside the offices near the workshop.
-[Q of Hearts] On the lobby desk outside medical bay.
-[7 of Clubs] On a footlocker inside the dormitories.
-[2 of DIamonds] On a clinic desk inside the medical bay.
-[9 of Spades] Inside drawers outside medical bay lobby.
-[6 of Hearts] On the desk of medical bay waiting area.
-Residential Area{5} 42
-[3 of Clubs] On a footlocker near the swimming pool.
-[8 of Clubs] In security room inside medical bay.
-[10 of Hearts] At refridgerator inside restaurant kitchen.
-[5 of Hearts] At mirror cabinet inside level 2 bathroom.
-[6 of Clubs] On level 2 bench.
+
+
 Oxygen Room{6} 48
-[9 of Hearts] On desk near campfire.
-[2 of Clubs] Under the stairs near checkpoint.
-[J of Clubs] Inside the drawers in control room.
-[5 of Diamonds] On the desk near cypher repair station.
-[8 of Spades] On the highboxes near control room.
+-[9 of Hearts] On desk near campfire.
+-[2 of Clubs] Under the stairs near checkpoint.
+-[J of Clubs] Inside the drawers in control room.
+-[5 of Diamonds] On the desk near cypher repair station.
+-[8 of Spades] On the highboxes near control room.
 [10 of Clubs] Inside the footlocker in locker room.
 Offices{4} 52
-[A of Spades] At the board inside conference room.
-[10 of Spades] On the security checkpoint near North Wing access.
-[4 of Clubs] Near the oven inside the kitchen.
-[K of Diamonds] In drawers inside Terry's office.
+-[A of Spades] At the board inside conference room.
+-[10 of Spades] On the security checkpoint near North Wing access.
+-[4 of Clubs] Near the oven inside the kitchen.
+-[K of Diamonds] In drawers inside Terry's office.
 Additional Info
 After collecting all 52 cards, another card, the Hermit's card, can be collected so the achievement "Family Photo" is completed.
 

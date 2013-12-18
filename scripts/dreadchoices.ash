@@ -7,6 +7,7 @@ string chef="twistedmage";
 string chest_opener="twistedmage";
 string grinder="anid";
 
+//ash import dreadchoices.ash; clean_choices();
 void clean_choices()
 {
 	int i=0;
