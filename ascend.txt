@@ -117,6 +117,159 @@ final drop chance=0.1759% + 0.2089% = 0.3848%
 
 item drop from gear = 174.98 + 500 = 674.98
 total chance = 1.05978%
+
+l2 pots = 20
+l3 booze and food = 40
+
+base 10
+pastamancer 10
+ml 0-20
+
+anid 10 (50)
+	2 dance food and drink
+	1 attack and defence food and drink
+	3 dance pot
+	2 attack and defence pots
+asica 10 (50)
+	2 dance food and drink
+	1 attack and defence food and drink
+	3 dance pot
+	2 attack and defence pots
+dinala 20 (60)
+	2 dance food and drink
+	1 attack and defence food and drink
+	3 dance pot
+	2 attack and defence pots
+twistedmage 40 (80)
+	2 dance food and drink
+	1 attack and defence food and drink
+	4 dance pot
+	2 attack and defence pots
+
+8 dance food (3 bots gives 9) 		anid*	dinala	asica
+8 dance drink (3 bots gives 9) 		dinala anid*	twistedmage
+4 attack food (2 bots gives 6)		<asica>	<twistedmage>
+4 attack drink (2 bots gives 6)		<asica>	<twistedmage>
+4 defence food (2 bots gives 6)		<asica>	_
+4 defence drink (2 bots gives 6)	<anid>	_
+13 dance pots (2 bots gives 18) 	<dinala> <dinala>
+8 attack pots (buy)					
+8 defence pots (buy)				
+24 batteries (8 bots give 24)		twistedmage*, twistedmage* asica* dinala, anid anid anid asica
+24 bots total, leaves 8
+
+4 hats								twistedmage* asica <>
+3 accessories						asica 		dinala	anid
+4 pants								dinala* 		dinala* <>
+1 toybots							twistedmage
+
+drones - all
+skill - all
+breakfast - all
+soda - all
+black box - 
+
+buy bearserker potion
+buy liquid overcoat
+
+for farming, wear warbear spiked helmet (22 fragments)
+			warbear officer greaves (22 fragments)
+			warbear plasma bowtie (22 fragmetns)
+			warbear fleece-lined scarf (21 fragments)
+			warbear nuclear bowtie (36 fragments)
+total helm fragments for 2 of each
+408
+total pants fragments for 2 of each
+408
+total accessory fragments for 1 of each
+204
+
+6 days left
+need 188 access (need 4.5 bots)
+need 390 trouser (need 9.4 bots)
+need 395 helm (need 9.4 bots)
+
+whosits a day 567+376+305+390=1638
+
+22 bots available
+
+
+
+still need to make
+second piece of all helms/pants
+
+
+
+-die casts
+	*tiny die-cast arc-welding Elfborg
+	*tiny die-cast Bashful the Reindeer (3)
+	*tiny die-cast blade a-spinning
+	*tiny die-cast CrimboTown Toy Factory (3)
+	*tiny die-cast death ray in a pear tree (2)
+	*tiny die-cast Doc the Reindeer (6)
+tiny die-cast Don Crimbo
+	*tiny die-cast Dopey the Reindeer (3)
+	*tiny die-cast factory worker elf
+tiny die-cast Father Crimbo
+	*tiny die-cast Father Crimborg
+	*tiny die-cast gift-wrapping elf (4)
+tiny die-cast golden ring
+tiny die-cast goose a-laying
+	*tiny die-cast Grumpy the Reindeer (6)
+	*tiny die-cast Happy the Reindeer (7)
+	*tiny die-cast killing bird (2)
+	*tiny die-cast middle-management elf (5)
+	*tiny die-cast pencil-pusher elf (5)
+tiny die-cast ribbon-cutting Elfborg
+	*tiny die-cast Rudolphus of Crimborg
+	*tiny die-cast Sleepy the Reindeer (5)
+	*tiny die-cast Sneezy the Reindeer
+	*tiny die-cast stocking-stuffer elf (5)
+	*tiny die-cast swarm a-swarming (2)
+	*tiny die-cast Swiss hen
+tiny die-cast turtle mech
+tiny die-cast Uncle Hobo
+	*tiny die-cast Unionize the Elves Sign (3)
+	*tiny die-cast Zeppo the Reindeer (4)
+
+
+----------------------------------------------
+***white team***
+-front
+Aveline Vallen	Epic		120	715	White	Disperse				Normal		Row		None
+Varric Tethras	Legendary	175	444	Red/White	Rhyming Triplet		Quick		Row		None
+
+
+-back
+Queen Anora	Epic			120	275	White	Rally					Normal		All		All allies gain power
+Fenris	Epic				105	328	Red/White	Spirit Flux			Normal		All		Stun (small chance)
+
+***red team***
+-front
+Varric Tethras	Legendary	175	444	Red/White	Rhyming Triplet		Quick		Row		None
+Fenris	Epic				105	328	Red/White	Spirit Flux			Normal		All		Stun (small chance)
+
+
+-back
+Flemeth	Legendary			234	502	Red	Apocalyptic Firestorm		Slow		All		None
+Yavana	Epic				170	266	Red	Death Cloud					Slow		All		Slow
+
+
+
+***combined team***
+-front
+Flemeth	Legendary			234	502	Red	Apocalyptic Firestorm		Slow		All		None
+Varric Tethras	Legendary	175	444	Red/White	Rhyming Triplet		Quick		Row		None
+
+-back
+Queen Anora	Epic			120	275	White	Rally					Normal		All		All allies gain power
+Yavana	Epic				170	266	Red	Death Cloud					Slow		All		Slow
+
+***large***
+Inferno Golem	Epic		311	1521	N/A	Ignite					Slow		Column	None
+Gate Guardian	Epic		303	880		N/A	Whirlwind				Slow		All		None
+
+
 -----------------------------------------------
 AT + SC - <twistedmage>,anid
 AT + TT - twistedmage, asica, dinala
@@ -171,9 +324,9 @@ Accordion Thief = scholar
 (created) 3 Shakespeare's Sister's Accordion - moxie%
 (created) half a purse - meat <summon for nuns? done>
 (created) 3 Frankly Mr. Shank - moxie% <>
-3 Saucepanic - <>
-3 Hand that Rocks the Ladle - myst%
-3 Meat Tenderizer is Murder - musc% <>
+(created) 3 Saucepanic - <>
+(created) 3 Hand that Rocks the Ladle - myst%
+(created) 3 Meat Tenderizer is Murder - musc% <>
 <does cli command "create" include summoning?>
 
 
@@ -332,9 +485,9 @@ zlib eatdrink_fav_groose_grease = true;
 zlib eatdrink_favUse = true;
 zlib eatdrink_valueOfPrimeStat = 2;
 zlib eatdrink_valueOfNonPrimeStat = 1;
-zlib eatdrink_valueOfAdventure = 1000;
-zlib eatdrink_budget = 40000;
-ash set_property("valueOfAdventure",1000);
+zlib eatdrink_valueOfAdventure = 2000;
+zlib eatdrink_budget = 60000;
+ash set_property("valueOfAdventure",2000);
 -------------------------uxl
 55 479 874 - garage
 sewer with flashlight

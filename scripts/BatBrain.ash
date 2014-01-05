@@ -694,6 +694,19 @@ advevent m_event(float att_mod, float stun_mod) {      // monster event -- attac
       case $monster[mer-kin raider]:                                                 // assuming 50% rate healing 250HP
       case $monster[mer-kin burglar]:
       case $monster[mer-kin healer]: res.dmg = to_spread(-min(125,monster_hp(m)+monster_level_adjustment()-monster_stat("hp")),max(0,1.0 - adj.stun)); break;
+      case $monster[warbear officer]:
+      case $monster[high-ranking warbear officer]:
+		 if (fvars contains "drone") switch (to_int(fvars["drone"])) {
+            case 1: case 7: res.pdmg[$element[none]] += 0.25*my_maxhp(); break;  // 7 is supercold
+            case 2: res.pdmg[$element[hot]] += 0.25*my_maxhp(); break;
+            case 3: res.pdmg[$element[cold]] += 0.25*my_maxhp(); break;
+            case 4: res.pdmg[$element[spooky]] += 0.25*my_maxhp(); break;
+            case 5: res.pdmg[$element[stench]] += 50; break;
+            case 6: res.pdmg[$element[sleaze]] += 0.25*my_maxhp(); break;
+            case 8: res.dmg = to_spread("-18"); break;
+            case 9: res.mp -= 50; break;
+			default: vprint("Unknown drone shown!",-3);
+		 } break;
    }
    if (my_stat("hp") - dmg_taken(res.pdmg) <= 0) res.meat -= beatenup;    // the monster took you out -- and I don't mean to dinner. ouch!
    adj.att -= att_mod;
@@ -989,6 +1002,7 @@ void build_items() {                                                // TODO: sph
          case 5563: if (to_int(get_property("_raindohCopiesMade")) + max(1,to_int(get_property("spookyPuttyCopiesMade"))) >= 6 || 
                         item_amount($item[rain-doh box full of monster]) > 0) continue; break;  // rain-doh black box
          case 6026: if ($monsters[oil baron, oil slick, oil cartel, oil tycoon] contains m) fields.special = "item bubblin' crude"; break;  // Duskwalker syringe
+         case 6708: if (monster_stat("att") < my_stat("att")) continue; break;                // crude voodoo doll
          case 819: case 820: case 821: case 822: case 823: case 824: case 825: case 826: case 827: // ! potions
             fields = get_bang(get_property("lastBangPotion"+it)); break;
          case 2174: case 2175: case 2176: case 2177:                                          // spheres
@@ -1083,6 +1097,7 @@ void build_skillz() {
            for i from 1419 to 1421 if (have_effect(to_effect(i)) > 0) { fields.special = "stun 1, hp "+m_hit_chance()*(3.5*(i - 1418)**2 - 6.5*(i - 1418) + 7); break; }
            for i from 1422 to 1424 if (have_effect(to_effect(i)) > 0) { fields.special = "stun "+max(1,m_hit_chance()*(i - 1419)); break; }
            d[$element[none]] = m_hit_chance()*0.1*my_stat("Muscle"); break;
+        case 3025: if (!have_equipped($item[hand that rocks the ladle])) break; d = to_spread(fields.dmg); foreach el in $elements[] d[el] += 11; break;  // utensil twist
         case 4014: if (!happened("skill 4014")) fields.special = "quick"; break;
         case 6030: if (!(factors["cadenza"] contains to_int(equipped_item($slot[weapon])))) return; combat_rec acc = factors["cadenza",to_int(equipped_item($slot[weapon]))];
            d = to_spread(acc.dmg); fields.pdmg = acc.pdmg; fields.special = acc.special; break;
@@ -1437,6 +1452,16 @@ void set_monster(monster elmo) {  // should be called once per BB instance; init
      // TODO: reanimated skeletons resist everything except pottery
       case $monster[your shadow]: foreach te,it,rd in factors                  // delete regular damage, add healing as damage
          factors[te,it].dmg = (rd.pdmg.length() > 1 && substring(rd.pdmg,0,1) == "-") ? substring(rd.pdmg,1) : "0"; break;
+      case $monster[warbear officer]:
+      case $monster[high-ranking warbear officer]:
+         switch (excise(page," the "," Warbear")) {
+            case "Hardened": foreach el in $elements[] mres[el] = 0.85; break;
+            case "Heavily-Armored": setmatt("damagecap","5"); break;
+            case "Poly-Phasic":  mres[$element[none]] = 0.85; break;
+//          default: vprint("Unsupported warbear attribute: "+excise(page," the "," Warbear"),3);
+         }
+         matcher drone = create_matcher("wbdrone(\\d+)\\.gif",page);      // store drone number in fvars, checked by m_event
+         if (drone.find()) { vprint("DRONE DETECTED: "+drone.group(1),4); fvars["wardrone"] = to_int(drone.group(1)); } break;
    }
    if (my_location() == $location[The Tower of Procedurally-Generated Skeletons]) {
       matcher skelatt = create_matcher("\\b([a-z]+?)\\b",excise(m,", the "," skeleton"));

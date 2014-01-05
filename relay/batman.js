@@ -83,6 +83,7 @@ jQuery(function($){
    if ($('#battab').length != 0) {
       if ($('table.actionbar').length == 0) $('body').css('margin-bottom','310px');
        else $('div.content').append('<p><img src="/images/otherimages/spacer.gif" width=1 height=310>');
+	   //css('bottom',$('#battab').position().top+40);
       $('#battab > div').hide();
       $('#battab div:first').fadeIn('fast');
       $('#battab ul li:first').addClass('active');

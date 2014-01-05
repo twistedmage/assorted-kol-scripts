@@ -645,7 +645,7 @@ boolean auto_mcd(monster mob) {                               // automcd for a s
    return auto_mcd(monster_attack(mob) + 7 - current_mcd());
 }
 boolean auto_mcd(location place) {                            // automcd for locations
-   if ($locations[tavern cellar, oil peak, the boss bat's lair, throne room, haert of the cyrpt, the slime tube] contains my_location())
+   if ($locations[the typical tavern cellar, oil peak, the boss bat's lair, throne room, haert of the cyrpt, the slime tube] contains my_location())
       return vprint("MCD: Sensitive location, not adjusting.","olive",4);
    if (count(get_monsters(place)) == 0) return vprint("MCD: "+place+" has no known combats.","olive",4);
    return auto_mcd(get_safemox(place));

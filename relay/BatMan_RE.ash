@@ -106,7 +106,7 @@ string quote() {
          bw[count(bw)] = "Dick: \"Gosh, Economics is sure a dull subject.\"<br>Bruce: \"Oh, you must be jesting, Dick. Economics dull? The glamour, the romance of commerce... Hmm. It's the very lifeblood of our country's society.\""; break;
       case $location[the hidden temple]: bw[count(bw)] = "\"It looks like we're getting closer to the heart of this criminal artichoke.\""; break;
       case $location[the temple portico]: bw[count(bw)] = "Robin: \"Batman, look! What skinny macaroni!\"<br>Batman: \"No, it's spaghetti, Robin. A variety of alimentary paste, larger then bernachelli but not as tubular as macaroni.\""; break;
-      case $location[tavern cellar]:
+      case $location[the typical tavern cellar]:
       case $location[a barroom brawl]: bw[count(bw)] = "Robin: \"Let's go!\"<br>Batman: \"Not you, Robin. They have strict licensing laws in this country. A boy of your age is not allowed in a drinking tavern.\""; break;
       case $location[The Valley of Rof L'm Fao]: bw[count(bw)] = "Robin: \"You can't get away from Batman that easy!\"<br>Batman: \"Easily.\"<br>Robin: \"Easily.\"<br>Batman: \"Good grammar is essential, Robin.\"<br>Robin: \"Thank you.\"<br>Batman: \"You're welcome.\"";
          bw[count(bw)] = "\"It's full of misspellings, and I'm full of misgivings.\""; break;
@@ -356,8 +356,10 @@ void batman_enhance() {
    actbox.append("\n   <div class='onemenu'><a href='http://zachbardon.com/mafiatools/bats.php' target='_new'>"+
       "<img src='../images/itemimages/2wingbat.gif' height=22 width=22 border=0></a></div>"+
       "<div class='popout'><a href='http://kolmafia.us/showthread.php?10042' title='Official thread' target='_new'>BatMan RE</a> "+
-      "is powered by <a href='http://kolmafia.us/showthread.php?6445' title='Official thread' target='_new'>BatBrain</a>.<p>"+
-      (verstuff == "" ? "<div id='batquote'>"+quote()+"</div>" : verstuff)+"</div></div>");
+      "is powered by <a href='http://kolmafia.us/showthread.php?6445' title='Official thread' target='_new'>BatBrain</a>.<p>");
+   if (to_boolean(vars["BatMan_RE_enabled"])) actbox.append("<form name=disablebatman action=fight.php method=post><input type=hidden name=enabletoggle value=off>"+
+      "<input class=button type=submit value='Disable BatMan RE'></form><p>");
+   actbox.append((verstuff == "" ? "<div id='batquote'>"+quote()+"</div>" : verstuff)+"</div></div>");
   // Add unknown_ml editor if any stats are unknown
    if (!havemanuel && (m.raw_attack == -1 || m.raw_defense == -1 || m.raw_hp == -1) && contains_text(page,"monname"))
       actbox.append("<div id='undermon'><form name='changeml' action=fight.php method=post>Unknown monster stats treated as "+

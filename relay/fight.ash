@@ -23,17 +23,11 @@ float turns_till_goals(boolean usespec) {
    }
    return totalgoalitems / max(has_goal(my_location(),usespec),0.0001);
 }
-/*boolean is_banished(monster m) {
+boolean been_banished(monster m) {
    if (m == $monster[none] || m.boss) return false;
-   if (m == to_monster(get_property("_nanorhinoBanishedMonster"))) return true;
-   switch (my_class()) {
-      case $class[avatar of boris]:
-      case $class[zombie master]: foreach i,s in split_string(get_property("banishingShoutMonsters"),"\\|") if (m == to_monster(s)) return true; break;
-      case $class[avatar of jarlsberg]: foreach i,s in split_string(get_property("_jiggleCheesedMonsters"),"\\|") if (m == to_monster(s)) return true; break;
-   }
-   if (get_counters(m+" banished",0,20) != "") return true;
+   if (is_banished(m) || get_counters(m+" banished",0,20) != "") return true;
    return false;
-}*/
+}
 boolean is_set_to(monster m, string attban) {
    string[int] ms = split_string(vars[(attban == "attract" ? "BatMan_attract" : "BatMan_banish")],", ");
    foreach i,foe in ms if (to_monster(foe) == m) return true;
@@ -174,7 +168,7 @@ void handle_post() {
          case $location[The Coral Corral]: if (get_property("lassoTraining") != "expertly") abox.append("<p><img src='/images/itemimages/lasso.gif' height=20 width=20 border=0> "+get_property("lassoTraining")); break;
          case $location[mer-kin colosseum]: if (have_item(next_w()) > 0 && !have_equipped(next_w()))
             abox.append("<p><b>Prepare</b> for next monster: <a href=# class='clilink'>equip "+next_w()+"</a>"); break;
-         case $location[anger man's level]: abox.append("<b>"+rnum(numeric_modifier("Hot Resistance"))+" Hot Resistance</b> (<span style='color:red'><b>"+
+         case $location[anger man's level]: abox.append("<p><b>"+rnum(numeric_modifier("Hot Resistance"))+" Hot Resistance</b> (<span style='color:red'><b>"+
 			   rnum(250 - (250*elemental_resistance($element[hot])/100.0))+"</b></span> to pass, 25 for pixel)<br>");
             abox.append("<b>All stats</b> 50+ pass, 500+ for pixel)"); 
             if (!have_equipped($item[regret hose]) && item_amount($item[regret hose]) > 0) abox.append("<p><a href=# class='clilink'>equip regret hose</a>"); break;
@@ -214,10 +208,10 @@ void handle_post() {
 		 sort sortm by -arq[value];
          foreach i,m in sortm {
 		    if (arq[m] <= 0) continue;
-			abox.append("<td align=center class='queuecell"+(m == goalmon && count(get_goals()) > 0 ? " goalmon" : "")+(is_banished(m) ? " dimmed" : "")+
+			abox.append("<td align=center class='queuecell"+(m == goalmon && count(get_goals()) > 0 ? " goalmon" : "")+(been_banished(m) ? " dimmed" : "")+
                "'><a href=# class='cliimglink' title='wiki "+(m == $monster[none] ? to_string(my_location()) : m)+
                "'><img src='/images/adventureimages/"+(m == $monster[none] ? "3doors.gif" : m.image == "" ? "question.gif" : m.image)+
-               "' title='"+(m == $monster[none] ? "Noncombat" : entity_encode(m)+(is_banished(m) ? " (banished)" : "")+
+               "' title='"+(m == $monster[none] ? "Noncombat" : entity_encode(m)+(been_banished(m) ? " (banished)" : "")+
                (has_goal(m) > 0 ? " (goals: "+rnum(has_goal(m))+")" : ""))+"' height=50 width=50></a>");
             if (m == $monster[none] || m.boss) abox.append("<p>"); 
 			else if (count(arq) > 1 && !($locations[mer-kin colosseum, the slime tube, oil peak, the daily dungeon] contains my_location()) && !($strings[Dreadsylvania, Volcano] contains my_location().zone)) {
@@ -282,6 +276,7 @@ void handle_post() {
 		  if (item_amount($item[cosmic calorie]) >= 60) abox.append("<tr><td><a href=# class='clilink' title='use celestial squid ink'>use 60</a></td><td style='font-size: 0.75em'>-5% Combats</td></tr>");
 		  abox.append("</table>");
 	   }
+       if (my_location().zone == "Psychoses" && svn_exists("psychoseamatic")) abox.append("<p><a href='relay_Psychose-a-Matic.ash'>Back to Psychose-a-Matic</a>");
       abox.write();
       exit;
      case "wicky":
@@ -302,9 +297,19 @@ void handle_post() {
       vars["unknown_ml"] = max(0,to_int(post["setml"]));
       updatevars();
    }
+   if (post contains "enabletoggle") {
+      vars["BatMan_RE_enabled"] = post["enabletoggle"] == "on";
+      updatevars();
+   }
 }
 
 void add_features() {
+   if (!to_boolean(vars["BatMan_RE_enabled"])) {
+      vprint("BatMan RE disabled for this character, skipping enhancements.",4);
+	  results.replace_string("Run Away\"></td></tr></form>","Run Away\"></form><p><form name=enablebatman action=fight.php method=post>"+
+        "<input type=hidden name=enabletoggle value=on><input class=button type=submit value='Enable BatMan RE'></td></tr></form>");
+      return;
+   }
   // add "loading" div
    results.replace_string("</body>", (contains_text(results,"<center><table><a name=\"end\">") && !contains_text(results, "window.fightover = true")) ? 
       "<div id='battab'><ul><li><a href='#bat-enhance'>Actions</a>"+
@@ -337,6 +342,7 @@ void add_features() {
    results.replace_string("<table><tr><td><img id='monpic","<table><tr id='nowfighting'><td><img id='monpic");
    results.replace_string("<td width=30></td><td>","<td width=30></td><td id='manuelcell'>");
 }
+setvar("BatMan_RE_enabled",true);       // this setting is used to enable/disable the script per character
 void main() {
    handle_post();
   // 100% run enforcement
