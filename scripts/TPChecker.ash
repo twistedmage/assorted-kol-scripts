@@ -34,6 +34,7 @@ boolean TP1 = true; 		// Set to true to check for Tiny Plastic Series One.
 boolean TP2 = true; 		// Set to true to check for Tiny Plastic Series Two.
 boolean TP3 = true; 		// Set to true to check for Tiny Plastic Series Three.
 boolean MP1 = true; 		// Set to true to check for Tiny Plastic Series Three.
+boolean DC1 = true; 		// Set to true to check for Tiny Plastic Series Three.
 boolean BuyFromMall = false; 	// Set to true if you want to be able to purchase from the mall
 boolean BuyRares = false; 	// Set to true if you want to include Rares in your purchases
 boolean MoveNeeded = true; //if tp not in display case, but is in stash, move to DC
@@ -199,6 +200,39 @@ micro_one [9] = $item[Microplushie: Dorkonide];
 micro_one [10] = $item[Microplushie: Fauxnerditide];
 micro_one [11] = $item[Microplushie: Hipsterine];
 
+
+item [int] diecast_one;
+diecast_one [1] = $item[tiny die-cast Bashful the Reindeer];
+diecast_one [2] = $item[tiny die-cast Doc the Reindeer];
+diecast_one [3] = $item[tiny die-cast Dopey the Reindeer];
+diecast_one [4] = $item[tiny die-cast Grumpy the Reindeer];
+diecast_one [5] = $item[tiny die-cast Happy the Reindeer];
+diecast_one [6] = $item[tiny die-cast Sleepy the Reindeer];
+diecast_one [7] = $item[tiny die-cast Sneezy the Reindeer];
+diecast_one [8] = $item[tiny die-cast Zeppo the Reindeer];
+diecast_one [9] = $item[tiny die-cast factory worker elf];
+diecast_one [10] = $item[tiny die-cast gift-wrapping elf];
+diecast_one [11] = $item[tiny die-cast middle-management elf];
+diecast_one [12] = $item[tiny die-cast pencil-pusher elf];
+diecast_one [13] = $item[tiny die-cast stocking-stuffer elf];
+diecast_one [14] = $item[tiny die-cast Unionize the Elves Sign];
+diecast_one [15] = $item[tiny die-cast CrimboTown Toy Factory];
+diecast_one [16] = $item[tiny die-cast death ray in a pear tree];
+diecast_one [17] = $item[tiny die-cast turtle mech];
+diecast_one [18] = $item[tiny die-cast Swiss hen];
+diecast_one [19] = $item[tiny die-cast killing bird];
+diecast_one [20] = $item[tiny die-cast golden ring];
+diecast_one [21] = $item[tiny die-cast goose a-laying];
+diecast_one [22] = $item[tiny die-cast swarm a-swarming];
+diecast_one [23] = $item[tiny die-cast blade a-spinning];
+diecast_one [24] = $item[tiny die-cast arc-welding Elfborg];
+diecast_one [25] = $item[tiny die-cast ribbon-cutting Elfborg];
+diecast_one [26] = $item[tiny die-cast Rudolphus of Crimborg];
+diecast_one [27] = $item[tiny die-cast Father Crimborg];
+diecast_one [28] = $item[tiny die-cast Don Crimbo];
+diecast_one [29] = $item[tiny die-cast Uncle Hobo];
+diecast_one [30] = $item[tiny die-cast Father Crimbo];
+
 record recMissingList {
 	int price;
 	item plastic; // to keep this plastic item with its associated price when we sort by price
@@ -215,12 +249,12 @@ int cost(item plastic) {
 
 //***********************************************************************************
 
-boolean have_display() {
-	if (!contains_text( visit_url("charsheet.php"), "Display Case"))
-		return false;
-	else
-		return true;
-}
+//boolean have_display() {
+//	if (!contains_text( visit_url("charsheet.php"), "Display Case"))
+//		return false;
+//	else
+//		return true;
+//}
 
 //***********************************************************************************
 
@@ -439,6 +473,7 @@ void main()
 	print("TP2 = " + TP2, "#33CCCC");
 	print("TP3 = " + TP3, "#33CCCC");
 	print("MP1 = " + MP1, "#33CCCC");
+	print("DC1 = " + MP1, "#33CCCC");
 	print("BuyFromMall = " + BuyFromMall, "#33CCCC");
 	print("BuyRares = " + BuyRares, "#33CCCC");
 	print("TPBudget = " + TPBudget, "#33CCCC");
@@ -462,6 +497,11 @@ void main()
 
 	if (MP1) {
 		check_series("Microplushie Series One", "MP1", "one", micro_one, trophy_page, "Fantastic Voyager",1);
+		print("");
+	}
+
+	if (DC1) {
+		check_series("Die-cast Series One", "DC1", "one", diecast_one, trophy_page, "Alia Iacta Est",1);
 		print("");
 	}
 	print("Tiny Plastic processing completed.","green");

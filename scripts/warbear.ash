@@ -300,6 +300,17 @@ void warbear_infantry()
 
 	cli_execute(m);
 	
+	if(have_familiar($familiar[warbear drone]))
+	{
+		use_familiar($familiar[warbear drone]);
+		equip($item[warbear drone codes]);
+	}
+	else
+	{
+		use_familiar($familiar[levitating potato]);
+		equip($item[sugar shield]);
+	}
+	
 	cli_execute("mood apathetic");
 	while(my_adventures()>0)
 	{

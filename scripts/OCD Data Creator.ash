@@ -4080,10 +4080,16 @@ save [$item[tiny die-cast Unionize the Elves Sign]] = 3;
 save [$item[tiny die-cast Zeppo the Reindeer]] = 3;
 save [$item[automatic catapult]] = 1;
 save [$item[pack of KWE trading card]] = 0;
+save [$item[warbear wardance potion]] = 0;
+save [$item[warbear liquid overcoat]] = 0;
+save [$item[warbear bearserker potion]] = 0;
+save [$item[velcro ore]] = 0;
+save [$item[Bright Water]] = 0;
+
+
 
 //stuff to sell later;
 save [$item[warbear badge]] = -1;
-save [$item[warbear bearserker potion]] = -1;
 save [$item[warbear battery]] = -1;
 save [$item[warbear warrior bread]] = -1;
 save     [$item[warbear helm fragment]] = -1;

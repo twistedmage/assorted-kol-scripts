@@ -207,28 +207,28 @@ second piece of all helms/pants
 	*tiny die-cast CrimboTown Toy Factory (3)
 	*tiny die-cast death ray in a pear tree (2)
 	*tiny die-cast Doc the Reindeer (6)
-tiny die-cast Don Crimbo
+	*tiny die-cast Don Crimbo
 	*tiny die-cast Dopey the Reindeer (3)
 	*tiny die-cast factory worker elf
 tiny die-cast Father Crimbo
 	*tiny die-cast Father Crimborg
 	*tiny die-cast gift-wrapping elf (4)
-tiny die-cast golden ring
-tiny die-cast goose a-laying
+	*tiny die-cast golden ring
+	*tiny die-cast goose a-laying
 	*tiny die-cast Grumpy the Reindeer (6)
 	*tiny die-cast Happy the Reindeer (7)
 	*tiny die-cast killing bird (2)
 	*tiny die-cast middle-management elf (5)
 	*tiny die-cast pencil-pusher elf (5)
-tiny die-cast ribbon-cutting Elfborg
+	*tiny die-cast ribbon-cutting Elfborg
 	*tiny die-cast Rudolphus of Crimborg
 	*tiny die-cast Sleepy the Reindeer (5)
 	*tiny die-cast Sneezy the Reindeer
 	*tiny die-cast stocking-stuffer elf (5)
 	*tiny die-cast swarm a-swarming (2)
 	*tiny die-cast Swiss hen
-tiny die-cast turtle mech
-tiny die-cast Uncle Hobo
+	*tiny die-cast turtle mech
+	*tiny die-cast Uncle Hobo
 	*tiny die-cast Unionize the Elves Sign (3)
 	*tiny die-cast Zeppo the Reindeer (4)
 
