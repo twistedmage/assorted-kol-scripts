@@ -47,7 +47,7 @@ void use_drink(string pot, string buff, int cost)
 
 void dump_pots()
 {
-	cli_execute("stash put * warbear wardance potion");
+	/*cli_execute("stash put * warbear wardance potion");
 	cli_execute("stash put * warbear bearserker potion");
 	cli_execute("stash put * warbear liquid overcoat");
 	
@@ -58,7 +58,7 @@ void dump_pots()
 	cli_execute("stash put * warbear feasting mead");
 	cli_execute("stash put * warbear bearserker mead");
 	cli_execute("stash put * warbear blizzard mead");
-	
+	*/
 	cli_execute("stash put * warbear battery");
 	
 	cli_execute("stash put * warbear helm fragment");

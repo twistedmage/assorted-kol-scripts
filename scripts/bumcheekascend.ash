@@ -4637,7 +4637,7 @@ void setMood(string combat) {
 		while(nf==0 && ns<2 && nu>0)
 		{
 			print("summoning some smithness","purple");
-			use_skill(1,$skill[summon smithness]);
+			use_skill(1,$skill[summon smithsness]);
 			ns=i_a("handful of smithereens");
 			nf=i_a("flaskfull of hollow");
 			nu=nu-1;
@@ -8024,7 +8024,7 @@ boolean bcascLairMariachis() {
 				Disco Banjo,
 				Shagadelic Disco Banjo,
 				Seeger's Unstoppable Banjo,
-				Crimbo ukelele,
+				Crimbo ukulele,
 				Massive sitar,
 				4-dimensional guitar,
 				plastic guitar,
@@ -9472,17 +9472,19 @@ boolean bcascPirateFledges() {
 			if(i_a("massive manual of marauder mockery")>1)
 				cli_execute("closet put massive manual of marauder mockery");
 			
+			string maxstr;
 			if(my_path() != "Avatar of Boris")
-				string maxstr="+outfit swashbuckling getup";
+			{
+				maxstr="+outfit swashbuckling getup";
 				//try to make a light and add it to maxstr
 				if(i_a("A Light that Never Goes Out")<1)
 					cli_execute("create a light that never goes out");
 				if(i_a("A Light that Never Goes Out")<1)
 					cli_execute("pull a light that never goes out");
 				if(i_a("A Light that Never Goes Out")>0)
-					maxstr=maxtr+", +equip A Light that Never Goes Out";
+					maxstr=maxstr+", +equip A Light that Never Goes Out";
 				buMax(maxstr);
-			else {
+			} else {
 				outfit("swashbuckling getup");
 				equip($item[Trusty]);
 			}

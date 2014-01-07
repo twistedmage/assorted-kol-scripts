@@ -4085,6 +4085,7 @@ save [$item[warbear liquid overcoat]] = 0;
 save [$item[warbear bearserker potion]] = 0;
 save [$item[velcro ore]] = 0;
 save [$item[Bright Water]] = 0;
+save [$item[rusty rivet]] = 0;
 
 
 
