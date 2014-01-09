@@ -1,3 +1,27 @@
+
+
+ml
+*big - kabha cerberus
+centaur - cerberus rahov
+*monster gang - kaha incu
+octo - rahov fure
+barb - furea nek
+
+fl
+*milk - drek jinin
+angel - drek haag
+farah - teer pazuz
+nazi - labas sidrag
+*twins - pazuzu sidr
+
+mfn2
+spider - people + camel
+mermaid - flower + duck
+*sucub - tadpole + rabbit
+kruger - tadpole + pot
+warrioress - rabbit + pot
+clown - rabbit +_ cameltoe
+
 http://xhamster.com/movies/2574795/busty_white_eruo_girl_vs_hot_tanned_eruo_girl.html
 
 http://www.gamebreaker.tv/culture/10-tantalizing-catwoman-cosplay-pics/#!
@@ -16,6 +40,17 @@ http://xhamster.com/movies/2574427/russian_threesome.html
 
 
 http://xhamster.com/movies/2576200/amber_the_slut.html
+
+
+
+http://www.dailymotion.com/video/x8uwqb_maria-swan-golden_sexy#.UPhv7Sc01uk
+http://www.dailymotion.com/video/xtqbu_maria-swan_sexy#.UPhzYic01uk
+http://www.dailymotion.com/video/x8v1o8_two-busty-lesbians_sexy#.UPhz9ic01uk
+http://www.dailymotion.com/video/x3azcf_maria-swan-1_sexy#.UPhziCc01uk
+
+
+http://xhamster.com/movies/1003463/wild_carrot_masturbation.html
+
 
 
 Wednesday 18th dec
@@ -53,15 +88,6 @@ gatwick 20:08 / 21:08 - plat 2
 guildford 20:57 / 21:50
 
 
-http://www.dailymotion.com/video/x8uwqb_maria-swan-golden_sexy#.UPhv7Sc01uk
-http://www.dailymotion.com/video/xtqbu_maria-swan_sexy#.UPhzYic01uk
-http://www.dailymotion.com/video/x8v1o8_two-busty-lesbians_sexy#.UPhz9ic01uk
-http://www.dailymotion.com/video/x3azcf_maria-swan-1_sexy#.UPhziCc01uk
-
-
-http://xhamster.com/movies/1003463/wild_carrot_masturbation.html
-
-
 
 
 Next ascension plan
@@ -80,28 +106,6 @@ Ascend with astral belt for all paths!
 maybe missing coi from 9:29 http://www.youtube.com/watch?feature=player_embedded&v=_wiaqcYpjYA
 
 
-
-ml
-*big - kabha cerberus
-centaur - cerberus rahov
-*monster gang - kaha incu
-octo - rahov fure
-barb - furea nek
-
-fl
-*milk - drek jinin
-angel - drek haag
-farah - teer pazuz
-nazi - labas sidrag
-*twins - pazuzu sidr
-
-mfn2
-spider - people + camel
-mermaid - flower + duck
-*sucub - tadpole + rabbit
-kruger - tadpole + pot
-warrioress - rabbit + pot
-clown - rabbit +_ cameltoe
 
 ----------------------
 
@@ -138,87 +142,10 @@ final drop chance=0.1759% + 0.2089% = 0.3848%
 item drop from gear = 174.98 + 500 = 674.98
 total chance = 1.05978%
 
-l2 pots = 20
-l3 booze and food = 40
-
-base 10
-pastamancer 10
-ml 0-20
-
-anid 10 (50)
-	2 dance food and drink
-	1 attack and defence food and drink
-	3 dance pot
-	2 attack and defence pots
-asica 10 (50)
-	2 dance food and drink
-	1 attack and defence food and drink
-	3 dance pot
-	2 attack and defence pots
-dinala 20 (60)
-	2 dance food and drink
-	1 attack and defence food and drink
-	3 dance pot
-	2 attack and defence pots
-twistedmage 40 (80)
-	2 dance food and drink
-	1 attack and defence food and drink
-	4 dance pot
-	2 attack and defence pots
-
-8 dance food (3 bots gives 9) 		anid*	dinala	asica
-8 dance drink (3 bots gives 9) 		dinala anid*	twistedmage
-4 attack food (2 bots gives 6)		<asica>	<twistedmage>
-4 attack drink (2 bots gives 6)		<asica>	<twistedmage>
-4 defence food (2 bots gives 6)		<asica>	_
-4 defence drink (2 bots gives 6)	<anid>	_
-13 dance pots (2 bots gives 18) 	<dinala> <dinala>
-8 attack pots (buy)					
-8 defence pots (buy)				
-24 batteries (8 bots give 24)		twistedmage*, twistedmage* asica* dinala, anid anid anid asica
-24 bots total, leaves 8
-
-4 hats								twistedmage* asica <>
-3 accessories						asica 		dinala	anid
-4 pants								dinala* 		dinala* <>
-1 toybots							twistedmage
-
-drones - all
-skill - all
-breakfast - all
-soda - all
-black box - 
-
-buy bearserker potion
-buy liquid overcoat
-
-for farming, wear warbear spiked helmet (22 fragments)
-			warbear officer greaves (22 fragments)
-			warbear plasma bowtie (22 fragmetns)
-			warbear fleece-lined scarf (21 fragments)
-			warbear nuclear bowtie (36 fragments)
-total helm fragments for 2 of each
-408
-total pants fragments for 2 of each
-408
-total accessory fragments for 1 of each
-204
-
-6 days left
-need 188 access (need 4.5 bots)
-need 390 trouser (need 9.4 bots)
-need 395 helm (need 9.4 bots)
-
-whosits a day 567+376+305+390=1638
-
-22 bots available
-
-
-
+----------------------------------------
 still need to make
-second piece of all helms/pants
-
-
+warbear dress greaves/bracers/helmet + tattoo for outfit
+warbear black box
 
 -die casts
 	*tiny die-cast arc-welding Elfborg
@@ -384,7 +311,7 @@ a25
 
 
 ----------Zombie homeowners association---------
-familiar magic dragonfish; maximize muscle, equip weedy skirt; uneffect jaba; uneffect scarysauce; ballpit; telescope high; use silver dreadsylvanian flask; use brass dreadsylvanian flask; use ferrigno; use philter; cast dark visions
+familiar magic dragonfish; maximize muscle, equip weedy skirt; uneffect jaba; uneffect scarysauce; uneffect jala; ballpit; telescope high; use silver dreadsylvanian flask; use brass dreadsylvanian flask; use ferrigno; use philter; cast dark visions
 <need over 3k musc to do it in 30 rounds>
 -------------------------------------------------
 
