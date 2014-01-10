@@ -220,7 +220,7 @@ Gate Guardian	Epic		303	880		N/A	Whirlwind				Slow		All		None
 -----------------------------------------------
 AT + SC - <twistedmage>,anid
 AT + TT - twistedmage, asica, dinala
-AT + PM - 
+AT + PM - <twistedmage>
 AT + S
 AT + DB - twistedmage, 
 
