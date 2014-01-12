@@ -40,7 +40,7 @@ void unlock_sly()
 			cli_execute("goal clear");
 			setFamiliar("items");
 			cli_execute("mood clear");
-			cli_execute("maximize items, -combat frequency");
+		//	cli_execute("maximize items, -combat frequency");
 			if (have_skill($skill[Smooth Movement])) cli_execute("trigger lose_effect, Smooth Movements, cast 1 smooth movement");
 			if (have_skill($skill[The Sonata of Sneakiness])) cli_execute("trigger lose_effect, The Sonata of Sneakiness, cast 1 sonata of sneakiness");
 			while(my_adventures()>0 && get_property("lastEncounter") != "Skull, Skull, Skull")
@@ -118,7 +118,7 @@ void unlock_wet()
 	{
 		setFamiliar("items");
 		cli_execute("mood clear");
-		cli_execute("maximize items, -combat frequency");
+		//cli_execute("maximize items, -combat frequency");
 		if (have_skill($skill[Smooth Movement])) cli_execute("trigger lose_effect, Smooth Movements, cast 1 smooth movement");
 		if (have_skill($skill[The Sonata of Sneakiness])) cli_execute("trigger lose_effect, The Sonata of Sneakiness, cast 1 sonata of sneakiness");
 		while(my_adventures()>0 && !get_property("_wet_checked_today").to_boolean())
