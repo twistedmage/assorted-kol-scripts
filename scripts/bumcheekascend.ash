@@ -1411,7 +1411,7 @@ boolean buMax(string maxme, int maxMainstat) {
 			}
 		}
 		if (contains_text(maxme, "+outfit") && contains_text(maxme, "+equip")) {
-			string [int] strs = split_string(maxme, "\\+");
+			string [int] strs = split_string(maxme, "[\\+\\,]");
 			foreach i in strs {
 				if (strs[i] != "") {
 					//print(strs[i], "green");
@@ -4440,7 +4440,7 @@ void setMood(string combat) {
 		//summon a pasta thrall
 		if(my_class()==$class[pastamancer])
 		{
-			if (contains_text(combat,"i") && have_skill($skill[Bind Spice Ghost])) //item drops, free spices, longer entangling noodles
+			if (contains_text(combat,"i") && have_skill($skill[Bind Spice Ghost]) && my_maxmp()>=250) //item drops, free spices, longer entangling noodles
 			{
 				if(my_thrall()!=$thrall[spice ghost])
 					use_skill($skill[Bind Spice Ghost]);
@@ -4483,7 +4483,7 @@ void setMood(string combat) {
 		}
 		else
 		{		
-			if (contains_text(combat,"i") && have_skill($skill[Bind Spice Ghost])) //item drops
+			if (contains_text(combat,"i") && have_skill($skill[Bind Spice Ghost]) && my_maxmp()>=250 && my_meat()>1000) //item drops
 				cli_execute("trigger lose_effect, Spice Haze, cast 1 Bind Spice Ghost");
 			else if (contains_text(combat,"m") && have_skill($skill[Bind Lasagmbie])) //meat
 				cli_execute("trigger lose_effect, Pasta Eyeball, cast 1 Bind Lasagmbie");
@@ -8453,8 +8453,8 @@ boolean bcascMacguffinHiddenCity() {
 	
 	if (item_amount($item[stone triangle]) == 2) {
 		//7 - Hospital: Fight surgeons to get doctor gear, then wear it and defeat spirit.
-		while (item_amount($item[dripping stone sphere]) == 0) {
-			while (item_amount($item[bloodied surgical dungarees]) == 0 && item_amount($item[surgical apron]) == 0 && item_amount($item[half-size scalpel]) == 0 && item_amount($item[head mirror]) == 0 && item_amount($item[surgical mask]) == 0) {
+		while (available_amount($item[dripping stone sphere]) == 0) {
+			while (available_amount($item[bloodied surgical dungarees]) == 0 && available_amount($item[surgical apron]) == 0 && available_amount($item[half-size scalpel]) == 0 && available_amount($item[head mirror]) == 0 && available_amount($item[surgical mask]) == 0) {
 				print("BCC: Adventuring one turn at a time to get surgeon's disguise.", "purple");
 				bumMiniAdv(1, $location[The Hidden Hospital], "");
 			}
@@ -9123,7 +9123,7 @@ boolean bcascManorLibrary() {
 			set_property("choiceAdventure81", "1"); //(Fall) Get the Gallery adventure.
 			bumAdv($location[The Haunted Library], "", "", "1 choiceadv", "Unlocking the Gallery Adventure thingymajig", "-");
 		}
-		while (contains_text(visit_url("place.php?whichplace=spookyraven1"), "place=gallery")) {
+		while (i_a("spookyraven gallery key")<1) {
 			bumAdv($location[The Haunted Conservatory], "", "", "1 Spookyraven Gallery Key", "Getting the Gallery Key", "-");
 		}
 	}
@@ -9477,8 +9477,12 @@ boolean bcascPirateFledges() {
 			{
 				maxstr="+outfit swashbuckling getup";
 				//try to make a light and add it to maxstr
-				if(i_a("A Light that Never Goes Out")<1)
+				if(i_a("A Light that Never Goes Out")<1 && have_skill($skill[summon smithsness]))
+				{
+					if(i_a("brituminous coal")==0)
+						use_skill(1,$skill[summon smithsness]);
 					cli_execute("create a light that never goes out");
+				}
 				if(i_a("A Light that Never Goes Out")<1)
 					cli_execute("pull a light that never goes out");
 				if(i_a("A Light that Never Goes Out")>0)
@@ -10693,8 +10697,12 @@ void bcs12() {
 				if (dispensary_available()) cli_execute("trigger lose_effect, Heavy Petting, use 1 Knob Goblin pet-buffing spray");
 				
 				//try to make a half purse
-				if(i_a("half a purse")<1)
+				if(i_a("half a purse")<1 && have_skill($skill[summon smithsness]))
+				{
+					if(i_a("brituminous coal")==0)
+						use_skill(1,$skill[summon smithsness]);
 					cli_execute("create half a purse");
+				}
 				if(i_a("half a purse")<1)
 					cli_execute("pull half a purse");
 				//Put on the outfit and adventure, printing debug information each time. 

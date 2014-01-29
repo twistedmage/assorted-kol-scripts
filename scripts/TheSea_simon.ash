@@ -102,7 +102,7 @@ void prepare_for(string type,location loc)
 	
 	//---------------------gear-----------------------
 	//input for maximizer
-	string max_str="maximize +sea";
+	string max_str="maximize +"+my_primestat()+" +sea";
 	
 	if(loc==$location[mer-kin library])
 		max_str+=", +outfit mer-kin scholar";
@@ -1121,9 +1121,12 @@ void scholar_path()
 
 void dad_path()
 {
+	use_familiar($familiar[magic dragonfish]);
 	outfit("clothing of loathing");
 //	cli_execute("maximize +sea, +equip Goggles of Loathing, +equip Stick-Knife of Loathing, +equip Scepter of Loathing, +equip Jeans of Loathing, +equip Belt of Loathing, +equip Treads of Loathing, +100 hp, +spell damage");
-	cli_execute("maximize +sea, +equip Goggles of Loathing, +equip Stick-Knife of Loathing, +equip Scepter of Loathing, +equip Jeans of Loathing, +equip Belt of Loathing, +equip Treads of Loathing, +100 hp, +spell damage");
+	string maxstr="maximize +sea, +equip Goggles of Loathing, +equip Stick-Knife of Loathing, +equip Scepter of Loathing, +equip Jeans of Loathing, +equip Belt of Loathing, +equip Treads of Loathing, +100 hp, +spell damage";
+	print(maxstr);
+	cli_execute(maxstr);
 	
 	//<no point in buffs>
 	clear_combat_macro();

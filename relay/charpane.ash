@@ -629,147 +629,136 @@ void pickerFlavour() {
 string parseMods(string ef) {
 
 	string evm = string_modifier(ef,"Evaluated Modifiers");
-	evm = to_lower_case(evm);
-	evm = replace_string(evm,"hp regen","HP regen");
-	evm = replace_string(evm,"mp regen","MP regen");
-	evm = replace_string(evm,"maximum hp","maximum HP");
-	evm = replace_string(evm,"maximum mp","maximum MP");
-	evm = replace_string(evm,"db combat","DB combat");
+	buffer enew;
 	
-	string sold = "";
-	string snew = "";
-	int aa, bb, cc, dd, ee;
-	string ab;
+	// Standardize capitalization
+	matcher uncap = create_matcher("\\b[a-z]", evm);
+	while(uncap.find())
+		uncap.append_replacement(enew, to_upper_case(uncap.group(0)));
+	uncap.append_tail(enew);
+	evm = enew;
 	
-	//Combine multiple similar modifiers into a single line
-	if (contains_text(evm,"HP regen max:")) {
-		aa = round(numeric_modifier(ef, "HP Regen Min"));
-		bb = round(numeric_modifier(ef, "HP Regen Max"));
-		if (aa == bb) {
-			ab = to_string(aa);
-		} else {
-			ab = aa+"-"+bb;
-		}
-		sold = "HP regen min: "+aa+", HP regen max: "+bb;
-		snew = "regen "+ab+" HP";
-		evm = replace_string(evm,sold,snew);
-	}
-	if (contains_text(evm,"MP regen max:")) {
-		aa = round(numeric_modifier(ef, "MP Regen Min"));
-		bb = round(numeric_modifier(ef, "MP Regen Max"));
-		if (aa == bb) {
-			ab = to_string(aa);
-		} else {
-			ab = aa+"-"+bb;
-		}
-		sold = "MP regen min: "+aa+", MP regen max: "+bb;
-		snew = "regen "+ab+" MP";
-		evm = replace_string(evm,sold,snew);
-	}
-	
-	if ( contains_text(evm,"cold damage:") && contains_text(evm,"hot damage:") && contains_text(evm,"spooky damage:") && contains_text(evm,"stench damage:") &&	contains_text(evm,"sleaze damage:") ) {
-		aa = round(numeric_modifier(ef, "Cold Damage"));
-		bb = round(numeric_modifier(ef, "Hot Damage"));
-		cc = round(numeric_modifier(ef, "Spooky Damage"));
-		dd = round(numeric_modifier(ef, "Stench Damage"));
-		ee = round(numeric_modifier(ef, "Sleaze Damage"));
-		if (aa==bb && aa==cc && aa==dd && aa==ee) {
-			ab = to_string(aa);
-			sold = "cold damage: +"+ab;
-			snew = "prismatic dmg: +"+ab;
-			evm = replace_string(evm,sold,snew);
-			evm = replace_string(evm,"hot damage: +"+ab,"");
-			evm = replace_string(evm,"spooky damage: +"+ab,"");
-			evm = replace_string(evm,"stench damage: +"+ab,"");
-			evm = replace_string(evm,"sleaze damage: +"+ab,"");
+	// Anything that applies the same modifier to all stats or all elements can be combined
+	record {
+		boolean [string] original;
+		string val;
+	} [string] modsort;
+	string [int,int] modparse = group_string(evm, "(?:,|^)\\s*([^,:]*?)(Muscle|Mysticality|Moxie|Hot|Cold|Spooky|Stench|Sleaze)([^:]*):\\s*([+-]?\\d+)");
+	string key;
+	foreach m in modparse {
+		if($strings[Muscle,Mysticality,Moxie] contains modparse[m][2])
+			key = modparse[m][1]+"Stats"+modparse[m][3];
+		else
+			key = modparse[m][1]+"Prismatic"+modparse[m][3];
+		if(!(modsort contains key) || modsort[key].val == modparse[m][4]) {
+			modsort[ key ].original[ modparse[m][0] ] = true;
+			modsort[ key ].val = modparse[m][4];
 		}
 	}
-	if ( contains_text(evm,"cold resistance:") && contains_text(evm,"hot resistance:") && contains_text(evm,"spooky resistance: ") && contains_text(evm,"stench resistance:") && contains_text(evm,"sleaze resistance:") ) {
-		aa = round(numeric_modifier(ef, "Cold Resistance"));
-		bb = round(numeric_modifier(ef, "Hot Resistance"));
-		cc = round(numeric_modifier(ef, "Spooky Resistance"));
-		dd = round(numeric_modifier(ef, "Stench Resistance"));
-		ee = round(numeric_modifier(ef, "Sleaze Resistance"));
-		if (aa==bb && aa==cc && aa==dd && aa==ee) {
-			ab = to_string(aa);
-			sold = "cold resistance: +"+ab;
-			snew = "elemental res: +"+ab;
-			evm = replace_string(evm,sold,snew);
-			evm = replace_string(evm,"hot resistance: +"+ab,"");
-			evm = replace_string(evm,"spooky resistance: +"+ab,"");
-			evm = replace_string(evm,"stench resistance: +"+ab,"");
-			evm = replace_string(evm,"sleaze resistance: +"+ab,"");
-		}
-	}	
-	if ( contains_text(evm,"muscle:") && contains_text(evm,"mysticality:") && contains_text(evm,"moxie:") ) {
-		aa = round(numeric_modifier(ef, "Muscle"));
-		bb = round(numeric_modifier(ef, "Mysticality"));
-		cc = round(numeric_modifier(ef, "Moxie"));
-		if (aa==bb && aa==cc) {
-			if (aa < 0) {
-				ab = to_string(aa);
-			} else {
-				ab = "+"+to_string(aa);
+	foreach m,s in modsort
+		if((m.contains_text("Stats") && count(s.original) == 3) || (m.contains_text("Prismatic") && count(s.original) == 5)) {
+			foreach o in s.original
+				evm = evm.replace_string(o, "");
+			buffer result;
+			if(length(evm) > 0) {
+				result.append(evm);
+				result.append(", ");
 			}
-			sold = "muscle: "+ab;
-			snew = "all stats: "+ab;
-			evm = replace_string(evm,sold,snew);
-			evm = replace_string(evm,"mysticality: "+ab,"");
-			evm = replace_string(evm,"moxie: "+ab,"");
+			result.append(m);
+			result.append(": ");
+			result.append(s.val);
+			evm = to_string(result);
 		}
-	}
-	if ( contains_text(evm,"muscle percent:") && contains_text(evm,"mysticality percent:") && contains_text(evm,"moxie percent:") ) {
-		aa = round(numeric_modifier(ef, "Muscle Percent"));
-		bb = round(numeric_modifier(ef, "Mysticality Percent"));
-		cc = round(numeric_modifier(ef, "Moxie Percent"));
-		if (aa==bb && aa==cc) {
-			if (aa < 0) {
-				ab = to_string(aa);
-			} else {
-				ab = "+"+to_string(aa);
+	
+	//Combine modifiers for  (weapon and spell) damage bonuses, (min and max) regen modifiers and maximum (HP and MP) mods
+	enew.set_length(0);
+	matcher parse = create_matcher("((?:Hot|Cold|Spooky|Stench|Sleaze|Prismatic) )Damage: ([+-]?\\d+), \\1Spell Damage: \\2"
+		+"|([HM]P Regen )Min: (\\d+), \\3Max: (\\d+)"
+		+"|Maximum HP( Percent)?:([^,]+), Maximum MP\\6:([^,]+)"
+		+"|(?:, *)?Familiar Weight: \\+5"
+		+"|Weapon Damage( Percent)?: ([+-]?\\d+), Spell Damage\\9?: \\10", evm);
+	while(parse.find()) {
+		parse.append_replacement(enew, "");
+		if(parse.group(1) != "") {
+			enew.append("All ");
+			enew.append(parse.group(1));
+			enew.append("Dmg: ");
+			enew.append(parse.group(2));
+		} else if(parse.group(3) != "") {
+			enew.append(parse.group(3));
+			enew.append(parse.group(4));
+			if(parse.group(4) != parse.group(5)) {
+				enew.append("-");
+				enew.append(parse.group(5));
 			}
-			sold = "muscle percent: "+ab;
-			snew = "all stats: "+ab+"%";
-			evm = replace_string(evm,sold,snew);
-			evm = replace_string(evm,"mysticality percent: "+ab,"");
-			evm = replace_string(evm,"moxie percent: "+ab,"");
+		} else if(parse.group(7) != "") {
+			enew.append("Max HP/MP");
+			enew.append(parse.group(7));
+			if(parse.group(7) != parse.group(8)) {
+				enew.append("/");
+				enew.append(parse.group(8));
+			}
+			if(parse.group(6) == " Percent") enew.append("%");
+		} else if(parse.group(10) != "") {
+			enew.append("All Dmg: ");
+			enew.append(parse.group(10));
+			if(parse.group(9) == " Percent") enew.append("%");
 		}
 	}
-
-	//change "percent: XX" to "XX%"
-	matcher mm = create_matcher("([A-Za-z]+) percent: (\\+|-)([0-9]+)",evm);
-	while (find(mm)) {
-		sold = group(mm);
-		snew = group(mm,1)+": "+group(mm,2)+group(mm,3)+"%";
-		evm = replace_string(evm,sold,snew);
+	parse.append_tail(enew);
+	evm = enew;
+	
+	// May be an extra comma left at start. :(
+	// Add missing + in front of modifier, for consistency. Then remove colon because it is in the way of legibility
+	// Change " Percent: +XX" and " Drop: +XX" to "+XX%"
+	// If HP and MP regen are the same, combine them
+	enew.set_length(0);
+	parse = create_matcher("^\\s*(,)\\s*"
+		+"|(\\s*Drop|\\s*Percent)?:\\s*(([+-])?\\d+)"
+		+"|(HP Regen ([0-9-]+), MP Regen \\6)", evm);
+	while(parse.find()) {
+		parse.append_replacement(enew, "");
+		if(parse.group(1) == ",") {			// group(1) would contain extra comma at beginning
+			// Delete this: append nothing
+		} else if(parse.group(3) != "") { 	// group(3) is the numeric modifier
+			if(parse.group(4) == "")		// group(4) would contain + or -
+				enew.append(" +");
+			else enew.append(" ");
+			enew.append(parse.group(3));	// This does not contain Drop, Percent or the colon.
+			if(parse.group(2) != "")		// group(2) is Drop or Percent
+				enew.append("%");
+		
+		} else if(parse.group(5) != "") {	// group(5) is the HP&MP combined Regen	
+			enew.append("All Regen ");
+			enew.append(parse.group(6));
+		}
 	}
-
+	parse.append_tail(enew);
+	evm = enew;
+	
 	//shorten various text
-	evm = replace_string(evm," drop","");
-	evm = replace_string(evm,"damage","dmg");
-	evm = replace_string(evm,"experience","exp");
-	evm = replace_string(evm,"initiative","init");
-	evm = replace_string(evm,"absorption","absorb");
-	evm = replace_string(evm,"monster level","ML");
-	evm = replace_string(evm,"moxie","mox");
-	evm = replace_string(evm,"muscle","mus");
-	evm = replace_string(evm,"mysticality","myst");
-	evm = replace_string(evm,"resistance","res");
-	evm = replace_string(evm,"familiar","fam");
-	evm = replace_string(evm,"maximum","max");
-	evm = replace_string(evm,"percent","%");
+	evm = replace_string(evm,"Damage Reduction","DR");
+	evm = replace_string(evm,"Damage Absorption","DA");
+	evm = replace_string(evm,"Weapon","Wpn");
+	evm = replace_string(evm,"Damage","Dmg");
+	evm = replace_string(evm,"Experience (Familiar)", "Fam xp");
+	evm = replace_string(evm,"Experience","Exp");
+	evm = replace_string(evm,"Initiative","Init");
+	evm = replace_string(evm,"Monster Level","ML");
+	evm = replace_string(evm,"Moxie","Mox");
+	evm = replace_string(evm,"Muscle","Mus");
+	evm = replace_string(evm,"Mysticality","Myst");
+	evm = replace_string(evm,"Resistance","Res");
+	evm = replace_string(evm,"Familiar","Fam");
+	evm = replace_string(evm,"Maximum","Max");
+	evm = replace_string(evm,"Smithsness","Smith");
 	//decorate elemental tags with pretty colors
-	evm = replace_string(evm,"hot","<span style=\"color:red\">hot</span>");
-	evm = replace_string(evm,"cold","<span style=\"color:blue\">cold</span>");
-	evm = replace_string(evm,"spooky","<span style=\"color:gray\">spooky</span>");
-	evm = replace_string(evm,"stench","<span style=\"color:green\">stench</span>");
-	evm = replace_string(evm,"sleaze","<span style=\"color:purple\">sleaze</span>");
-	evm = replace_string(evm,"prismatic","<span style=\"color:gray\">p</span><span style=\"color:red\">ri</span><span style=\"color:purple\">sm</span><span style=\"color:green\">at</span><span style=\"color:blue\">ic</span>");
-	evm = replace_string(evm,"elemental","<span style=\"color:gray\">e</span><span style=\"color:red\">le</span><span style=\"color:purple\">me</span><span style=\"color:green\">nt</span><span style=\"color:blue\">al</span>");
-
-	//clean up extra commas we might have from combining mods above
-	evm = replace_all(create_matcher(",(\\s*,)+", evm), ",");
-	evm = replace_all(create_matcher("(\\s*,\\s*$|^\\s*,\\s*)", evm), "");
+	evm = replace_string(evm,"Hot","<span class=modhot>Hot</span>");
+	evm = replace_string(evm,"Cold","<span class=modcold>Cold</span>");
+	evm = replace_string(evm,"Spooky","<span class=modspooky>Spooky</span>");
+	evm = replace_string(evm,"Stench","<span class=modstench>Stench</span>");
+	evm = replace_string(evm,"Sleaze","<span class=modsleaze>Sleaze</span>");
+	evm = replace_string(evm,"Prismatic","<span class=modspooky>P</span><span class=modhot>ri</span><span class=modsleaze>sm</span><span class=modstench>at</span><span class=modcold>ic</span>");
 
 	return evm;
 
@@ -793,14 +782,14 @@ buff parseBuff(string source) {
 	string columnIcon, columnTurns, columnArrow;
 	string spoiler, style;
 
-	matcher parse = create_matcher('(?:<td[^>]*>(.*?)</td>)?<td[^>]*>(<.*?itemimages/([^"]*).*?)</td><td[^>]*>[^>]*>(.*?) \\((?:(.*?), )?((?:<a[^>]*>)?(\\d+||&infin;)(?:</a>)?)\\)(?:(?:</font>)?&nbsp;(<a.*?</a>))?.*?</td>', source);
+	matcher parse = create_matcher('(?:<td[^>]*>(.*?)</td>)?<td[^>]*>(<.*?itemimages/([^"]*).*?)</td><td[^>]*>[^>]*>(.*?) +\\((?:(.*?), )?((?:<a[^>]*>)?(\\d+||&infin;)(?:</a>)?)\\)(?:(?:</font>)?&nbsp;(<a.*?</a>))?.*?</td>', source);
 	// The ? stuff at the end is because those arrows are a mafia option that might not be present
 	if(parse.find()) {
 		columnIcon = parse.group(2);	// This is full html for the icon
 		myBuff.effectImage = parse.group(3);
 		myBuff.effectName = parse.group(4);
 		spoiler = parse.group(5);		// This appears for "Form of...Bird!" and "On the Trail"
-		columnTurns = parse.group(6);
+		columnTurns = parse.group(6).replace_string('title="Use a remedy to remove', 'title="SGEEAs Left: '+ item_amount($item[soft green echo eyedrop antidote]) +'\nUse a remedy to remove');
 		if(parse.group(7) == "&infin;") {	// Is it intrinsic?
 			myBuff.effectTurns = -1;
 			myBuff.isIntrinsic = true;
@@ -891,9 +880,9 @@ buff parseBuff(string source) {
 	//ckb: Add modification details for buffs and effects
 	if(vars["chit.effects.describe"] == "true") {
 		if(length(string_modifier(myBuff.effectName,"Evaluated Modifiers"))>0) {
-			result.append('<br><small style="color:gray">');
+			result.append('<br><span class="efmods">');
 			result.append(parseMods(myBuff.effectName));
-			result.append('</small>');
+			result.append('</span>');
 		}
 	}
 	
@@ -993,7 +982,7 @@ void bakeEffects() {
 		total += 1;
 	}
 	
-	// Add Flavour of Nothing
+	// Add Flavour of Nothing for all classes
 	boolean have_flavour() {
 		for i from 167 to 171
 			if(have_effect(to_effect(i)) > 0) return true;
@@ -1010,19 +999,33 @@ void bakeEffects() {
 		pickerFlavour();
 		total += 1;
 	}
-	// Add Lack of Iron Palm Intrinsic
-	if(have_effect($effect[Iron Palms]) == 0 && have_skill($skill[Iron Palm Technique]) && my_class() == $class[Seal Clubber]) {
-		intrinsics.append('<tr class="effect">');
-		if(vars["chit.effects.showicons"] == "true" && !isCompact)
-			intrinsics.append('<td class="icon"><img height=20 width=20 src="/images/itemimages/palmtree.gif" onClick=\'javascript:poop("desc_skill.php?whichskill=1025&self=true","skill", 350, 300)\'></td>');
-		intrinsics.append('<td class="info"');
-		if(get_property("relayAddsUpArrowLinks").to_boolean())
-			intrinsics.append(' colspan="2"');
-		intrinsics.append('>Lack of Iron Palms</td><td class="infizero right"><a href="');
-		intrinsics.append(sideCommand("cast Iron Palm Technique"));
-		intrinsics.append('" title="Cast Iron Palms">00</a></td></tr>');
+	
+	// Some 0 mp Intrinsics should have reminders for their specific classe
+	void lack_effect(buffer result, skill sk, effect ef, string short_ef) {
+		if(have_skill(sk) && have_effect(ef) == 0 && my_class() == sk.class) {
+			result.append('<tr class="effect">');
+			if(vars["chit.effects.showicons"] == "true" && !isCompact) {
+				result.append('<td class="icon"><img height=20 width=20 src="/images/');
+				result.append(ef.image.substring(36));
+				result.append('" onClick=\'javascript:poop("desc_skill.php?whichskill=');
+				result.append(to_int(sk));
+				result.append('&self=true","skill", 350, 300)\'></td>');
+			}
+			result.append('<td class="info"');
+			if(get_property("relayAddsUpArrowLinks").to_boolean())
+				result.append(' colspan="2"');
+			result.append('>Lack of ');
+			result.append(short_ef);
+			result.append('</td><td class="infizero right"><a href="');
+			result.append(sideCommand("cast "+sk));
+			result.append('" title="Cast ');
+			result.append(to_string(sk));
+			result.append('">00</a></td></tr>');
+		}
 		total += 1;
 	}
+	intrinsics.lack_effect($skill[Iron Palm Technique], $effect[Iron Palms], "Iron Palms");
+	intrinsics.lack_effect($skill[Blood Sugar Sauce Magic], $effect[Blood Sugar Sauce Magic], "Blood Sugar");
 
 	if (length(intrinsics) > 0 ) {
 		intrinsics.insert(0, '<tbody class="intrinsics">');
@@ -1350,32 +1353,20 @@ void pickerFamiliar(familiar myfam, item famitem, boolean isFed) {
 		}
 		
 		if(famitem != $item[none]) {
-			string mod = string_modifier(to_string(famitem), "Evaluated Modifiers");
+			string mod = parseMods(to_string(famitem)); # string_modifier(to_string(famitem), "Evaluated Modifiers");
 			// Effects for Scarecrow and Hatrack
-			matcher m = create_matcher('Familiar Effect: \\"(.*?), cap (.*?)\\"', mod);
+			matcher m = create_matcher('Fam Effect: "(.*?), Cap ([^"]+)"', mod);
 			if(find(m))
-				return replace_string(m.group(1), "x", " x ");
-			// Compute modifier_eval()
-			m = create_matcher('(\\[([^]]+)\\])', mod);
-			while(find(m))
-				mod = mod.replace_string(m.group(1), eval(m.group(2)));
+				return replace_string(m.group(1), "x", "x ");
+			// farming implements from swarm of fire ants
+			m  = create_matcher('"(.*? Dmg, Meat)", Meat Bonus ', mod);
+			if(find(m))
+				mod = mod.replace_string(m.group(0), m.group(1)+" Bonus ");
 			// Remove boring stuff
-			m = create_matcher(',? *(Generic|Softcore Only|Familiar Weight: \\+5| *\\(familiar\\)|Equips On: "[^"]+"|Familiar Effect:|Underwater Familiar)', mod);
-			mod = m.replace_all("");
-			// Collapse Regen info.
-			m = create_matcher('((HP|MP) Regen Min: \\+(\\d+), \\2 Regen Max: \\+(\\d+))', mod);
-			while(find(m))
-				mod = mod.replace_string(m.group(1), m.group(2)+" Regen: "+ave(m.group(3), m.group(4)));
-			// Remove comma abandoned at the beginning
-			m = create_matcher('^ *, *', mod);
-			mod = m.replace_first("");
+			mod = mod.replace_string(' "Adventure Underwater"', ", Underwater");
+			mod = create_matcher(',? *(Generic|Softcore Only|Familiar Weight: \\+5| *\\(Fam\\)|Equips On: "[^"]+"|Fam Effect:|Underwater Fam|")', mod).replace_all("");
 			// Last touch ups
-			mod = mod.replace_string("Familiar Weight", "Weight");
-			mod = mod.replace_string("Experience", "Fam Exp");
-			mod = mod.replace_string("Monster Level", "ML");
-			mod = mod.replace_string("Meat Drop", "Meat");
-			mod = mod.replace_string("Item Drop", "Item");
-			mod = mod.replace_string('"adventure underwater"', "Underwater");
+			mod = mod.replace_string("Fam Weight", "Weight");
 			if(famitem == $item[Snow Suit] && equipped_item($slot[familiar]) != $item[Snow Suit])
 				mod += (length(mod) == 0? "(": " (") + get_property("_carrotNoseDrops")+"/3 carrots)";
 			if(length(mod) > 1)
@@ -1391,7 +1382,7 @@ void pickerFamiliar(familiar myfam, item famitem, boolean isFed) {
 		}
 		string mod = fam_equip(famitem);
 		if(mod == "") return action;
-		return action + "<br /><span style='color:#707070'>" + mod + "<span>";
+		return action + "<br /><span class='efmods'>" + mod + "<span>";
 	}
 
 	void addEquipment(item it, string cmd) {
@@ -1993,6 +1984,8 @@ void bakeFamiliar() {
 		} else info = "None";
 	} else if(myfam == $familiar[Reanimated Reanimator]) {
 		famname += ' (<a target=mainpane href="main.php?talktoreanimator=1">chat</a>)';
+	} else if(myfam == $familiar[Grim Brother] && source.contains_text("talk</a>)")) {
+		famname += ' (<a target=mainpane href="familiar.php?action=chatgrim&pwd='+my_hash()+'">talk</a>)';
 	}
 	
 	// Charges
@@ -2536,7 +2529,7 @@ void bakeModifiers() {
 
 	result.append('<tbody>');
 	result.append('<tr>');
-	result.append('<td class="label">Damage Absorp</td>');
+	result.append('<td class="label">Damage Absorb</td>');
 	result.append('<td class="info">' + to_int(damage_absorption_percent()) 
 	  + '%&nbsp;(' + formatInt(raw_damage_absorption()) + ')</td>');
 	result.append('</tr>');
@@ -3207,11 +3200,11 @@ string fancycurrency(string page) {
 }
 
 void pickOutfit() {
-	string boldit(string o) { return '<div style ="font-weight:600;color:darkred;">'+o+'</div>'; }
 	location loc = my_location();
 	if(loc == $location[none]) // Possibly beccause a fax was used
 		loc = lastLoc;
 	string local(string o) {
+		string boldit(string o) { return '<div style ="font-weight:700;color:darkred;">'+o+'</div>'; }
 		switch(o) {
 		case "Swashbuckling Getup":
 			if($locations[The Obligatory Pirate's Cove, Barrrney's Barrr, The F'c'le] contains loc)
@@ -3282,6 +3275,11 @@ void pickOutfit() {
 		else if(get_property("_hatBeforeKolhs") != "")
 			special.addGear("equip "+get_property("_hatBeforeKolhs")+"; set _hatBeforeKolhs = ", "Restore "+get_property("_hatBeforeKolhs"));
 	}
+	
+	// A Light that Never Goes Out & Half a Purse: Need to be swapped often
+	if(have_effect($effect[Merry Smithsness]) > 0)
+		foreach e in $items[A Light that Never Goes Out, Half a Purse]
+			special.addGear(e);
 		
 	// Certain quest items need to be equipped to enter locations
 	if(available_amount($item[digital key]) + creatable_amount($item[digital key]) < 1 && get_property("questL13Final") != "finished")
@@ -3302,8 +3300,10 @@ void pickOutfit() {
 		special.addGear("equip acc3 Talisman o\' Nam;equip acc1 Mega+Gem", "Talisman & Mega Gem");
 	if(get_property("questL11Worship") == "step3" && item_amount($item[antique machete]) > 0)
 		special.addGear("equip antique machete", "antique machete");
-	if(get_property("questL11Pyramid") == "started" && item_amount($item[UV-resistant compass]) > 0)
-		special.addGear("equip UV-resistant compass", "UV-resistant compass");
+	if($strings[started,step1,step2,step3,step4,step5,step6,step7,step8,step9] contains get_property("questL11Pyramid")) {
+		special.addGear($item[UV-resistant compass]);
+		special.addGear($item[ornate dowsing rod]);
+	}
 	
 	if(length(special) > 0) {
 		picker.append('<tr class="pickitem"><td style="color:white;background-color:blue;font-weight:bold;">Equip for Quest</td></tr>');
@@ -3342,7 +3342,7 @@ void bakeCharacter() {
 				myTitle = group(titleMatcher, 1);
 			}
 		} else {
-			titleMatcher = create_matcher("<br>(.*?)<", source);
+			titleMatcher = create_matcher("(?i)<br>(?:(?:level\\s*)?"+my_level()+"(?:.{2}?\\s*level)?\\s*)?([^<]*)", source); // Snip level out of custom title if it is at the beginning. Simple cases only.
 			if (find(titleMatcher)) {
 				myTitle = group(titleMatcher, 1);
 			}
@@ -3456,7 +3456,7 @@ void bakeCharacter() {
 	string councilStyle = "";
 	string councilText = "Visit the Council";
 	if(to_int(get_property("lastCouncilVisit")) < my_level() && get_property("kingLiberated") == "false") {
-		councilStyle = ' style="background-color:#F0F060"';
+		councilStyle = 'background-color:#F0F060';
 		councilText = "The Council wants to see you urgently";		
 	}
 
@@ -3479,7 +3479,7 @@ void bakeCharacter() {
 		result.append('<td rowspan="4" class="avatar"><a href="#" class="chit_launcher" rel="chit_pickeroutfit" title="Select Outfit"><img src="' + myAvatar + '"></a></td>');
 	pickOutfit();
 	result.append('<td class="label"><a target="mainpane" href="' + myGuild +'" title="Visit your guild">' + myTitle + '</a></td>');
-	result.append('<td class="level" rowspan="2"' + councilStyle + '><a target="mainpane" href="council.php" title="' + councilText + '">' + my_level() +	'</a></td>');
+	result.append('<td class="level" rowspan="2" style="width:30px;' + councilStyle + '"><a target="mainpane" href="council.php" title="' + councilText + '">' + my_level() + '</a></td>');
 	result.append('</tr>');
 
 	result.append('<tr>');
@@ -3768,7 +3768,16 @@ void bakeTracker() {
 	//Add Tracker for each available quest
 	//G for Guild. S for Sea. F for Familiar. I for Item. M for Miscellaneous 
 	
-	if (get_property("currentBountyItem")!="0") {
+	string bhit;
+	foreach b in $strings[Easy, Hard, Special] {
+		bhit = get_property("current"+ b +"BountyItem");
+		if(bhit != "") {
+			result.append("<tr><td>");
+			result.append('Your <a target="mainpane" href="bhh.php">Bounty</a> is: <br>');
+			result.append(bhit);
+		}
+	}
+/*	if (get_property("currentBountyItem")!="0") {
 		item bhit = to_item(get_property("currentBountyItem"));
 		result.append("<tr><td>");
 		result.append('Get your <a target="mainpane" href="bhh.php">Bounty</a> from the ');
@@ -3776,7 +3785,7 @@ void bakeTracker() {
 		result.append(to_string(to_item(get_property("currentBountyItem")))+" ("+to_string(item_amount(bhit))+"/"+bhit.bounty_count+")");
 		
 		result.append("</td></tr>");
-	}
+	} */
 	// L1: Open Manor
 	if(get_property("lastManorUnlock").to_int() != my_ascensions()) {
 		result.append("<tr><td>");
@@ -3968,14 +3977,14 @@ void bakeTracker() {
 	}
 	
 	//L10: SOCK, Giants Castle, questL10Garbage
-	if(started("questL10Garbage")) { 
+	if(started("questL10Garbage")) {
 		result.append("<tr><td>");
-		result.append('Climb the <a target="mainpane" href="place.php?whichplace=beanstalk">Beanstalk</a>');
-		if (item_amount($item[S.O.C.K.])==0) {
+		if(item_amount($item[S.O.C.K.])==0) {
+			result.append('Climb the <a target="mainpane" href="place.php?whichplace=beanstalk">Beanstalk</a>');
 			int numina = item_amount($item[Tissue Paper Immateria])+item_amount($item[Tin Foil Immateria])+item_amount($item[Gauze Immateria])+item_amount($item[Plastic Wrap Immateria]);
 			result.append('<br>Immateria found: '+item_report(numina == 4, to_string(numina)+'/4'));
 		} else {
-			result.append('<br>Conquer the <a target="mainpane" href="place.php?whichplace=giantcastle">Giant\'s Castle</a>');
+			result.append('Conquer the <a target="mainpane" href="place.php?whichplace=giantcastle">Giant\'s Castle</a>');
 		}
 		result.append("</td></tr>");
 	}
@@ -4333,7 +4342,7 @@ void bakeTracker() {
 			result.append(item_report($item[Richard's star key]));
 			result.append(", ");
 			//check for instruments
-			result.append(item_report($items[acoustic guitarrr, heavy metal thunderrr guitarrr, stone banjo, Disco Banjo, Shagadelic Disco Banjo, Seeger's Unstoppable Banjo, Crimbo ukelele, Massive sitar, 4-dimensional guitar, plastic guitar, half-sized guitar, out-of-tune biwa, Zim Merman's guitar, dueling banjo],"stringed instrument"));
+			result.append(item_report($items[acoustic guitarrr, heavy metal thunderrr guitarrr, stone banjo, Disco Banjo, Shagadelic Disco Banjo, Seeger's Unstoppable Banjo, Crimbo ukulele, Massive sitar, 4-dimensional guitar, plastic guitar, half-sized guitar, out-of-tune biwa, Zim Merman's guitar, dueling banjo],"stringed instrument"));
 			result.append(", ");
 			result.append(item_report($items[stolen accordion, calavera concertina, Rock and Roll Legend, Squeezebox of the Ages, The Trickster's Trikitixa],"accordion"));
 			result.append(", ");
@@ -4925,7 +4934,7 @@ buffer modifyPage(buffer source) {
 	setvar("chit.effects.modicons", true);
 	setvar("chit.effects.layout","songs,buffs,intrinsics");
 	setvar("chit.effects.usermap",false);
-	setvar("chit.effects.describe",false);
+	setvar("chit.effects.describe",true);
 	setvar("chit.helpers.wormwood", "stats,spleen");
 	setvar("chit.helpers.dancecard", true);
 	setvar("chit.helpers.semirare", true);

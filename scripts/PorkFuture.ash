@@ -107,11 +107,11 @@ void bottle_iku(int past_present_fuschia)
 void set_autoheal()
 {
 	// need to heal after Cyrus/Wumpus pwns us
-	if (get_property("hpAutoRecovery").to_int() < 0.2)
+	if (get_property("hpAutoRecovery").to_float() < 0.2)
 		set_property("hpAutoRecovery","0.2");
 	if (get_property("hpAutoRecoveryItems").to_string() == "")
 		set_property("hpAutoRecoveryItems","cannelloni cocoon;scroll of drastic healing;tongue of the walrus;lasagna bandages;doc galaktik's ailment ointment");
-	if (get_property("hpAutoRecoveryTarget").to_int() < 0.5)
+	if (get_property("hpAutoRecoveryTarget").to_float() < 0.5)
 		set_property("hpAutoRecoveryTarget","0.5");
 }
 

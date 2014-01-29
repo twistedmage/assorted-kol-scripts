@@ -629,6 +629,8 @@ void advise_food()
 			add_food(con_map,"- pat of butter ",3.5,0,1);
 		if(available_amount($item[whole turkey leg])>0)
 			add_food(con_map,"- whole turkey leg ",4.5,0,1);
+		if(my_fullness()==0)
+			add_food(con_map,"- spaghetti breakfast ",0.5 + 0.5 * my_level(),0,1);
 	
 	//	if(i_a("handful of smithereens")>0  || i_a("miserable pie")>0 || get_property("tomeSummons").to_int()<3)
 	//		add_food(con_map,"- miserable pie (smithereens) ",7,0,2);
@@ -925,7 +927,7 @@ boolean have_guitar()
 		return true;
 	if(available_amount($item[Seeger's Unstoppable Banjo])>0)
 		return true;
-	if(available_amount($item[Crimbo ukelele])>0)
+	if(available_amount($item[Crimbo ukulele])>0)
 		return true;
 	if(available_amount($item[Massive sitar])>0)
 		return true;

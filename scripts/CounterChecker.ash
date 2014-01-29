@@ -289,6 +289,7 @@ location expensive_semi() {
 }
 
 // semi-rare acquired, let's do it again
+setvar("auto_semirare", "true");  // Weird name because it comes from zarqon's BBB
 void eat_cookie() {
 	int count_counters() {
 		string counters = get_counters("Fortune Cookie", 0, 200);
@@ -297,21 +298,19 @@ void eat_cookie() {
 	}
 	
 	boolean toEat() {
-		if(vars contains "auto_semirare") {
-			matcher cooks = create_matcher("(timely|always|true|never|false) ?([1-3]?)", vars["auto_semirare"]);
-			if(cooks.find())
-				switch(cooks.group(1)) {
-				case "false":
-				case "never":
-				case "timely": return false;
-				case "always":
-				case "true":
-					if(count_counters() > 3) return false; // Too many means there's a problem. Don't burn off fullness
-					if(count_counters() < 1) return true;
-					if(cooks.group(2) != "")
-						return count_counters() > cooks.group(2).to_int();
-				}
-		}
+		matcher cooks = create_matcher("(timely|always|true|never|false) ?([1-3]?)", vars["auto_semirare"]);
+		if(cooks.find())
+			switch(cooks.group(1)) {
+			case "false":
+			case "never":
+			case "timely": return false;
+			case "always":
+			case "true":
+				if(count_counters() > 3) return false; // Too many means there's a problem. Don't burn off fullness
+				if(count_counters() < 1) return true;
+				if(cooks.group(2) != "")
+					return count_counters() > cooks.group(2).to_int();
+			}
 		return count_counters() < 1;
 	}
 	

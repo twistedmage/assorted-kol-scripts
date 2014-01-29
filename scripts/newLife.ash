@@ -622,25 +622,27 @@ void special(boolean bonus_actions) {
 				//pull whichever
 				if(storage_amount($item[Jarlsberg's pan (Cosmic portal mode)])>0)
 				{
-					pull_and_wear_if_good($item[Jarlsberg's pan (Cosmic portal mode)]);
+					pull_if_good($item[Jarlsberg's pan (Cosmic portal mode)]);
 				}
 				else
 				{
-					pull_and_wear_if_good($item[Jarlsberg's pan]);
+					pull_if_good($item[Jarlsberg's pan]);
 				}
 				//for now we will always use the portal version, might want to change it one day though
 				if(available_amount($item[Jarlsberg's pan])>0)
 				{
 					cli_execute("fold Jarlsberg's pan (Cosmic portal mode)");
 				}
-				equip($item[Jarlsberg's pan (Cosmic portal mode)]);
+				if(available_amount($item[Jarlsberg's pan (Cosmic portal mode)])>0)
+					equip($item[Jarlsberg's pan (Cosmic portal mode)]);
 			}
 			else //others want a shield
 			{
 				pull_and_wear_if_good($item[operation patriot shield]);
 			}
 			//pull_and_wear_if_good($item[greatest american pants]);
-			pull_and_wear_if_good($item[pantsgiving]);
+			if(available_amount($item[pantsgiving])==0)
+				pull_and_wear_if_good($item[pantsgiving]);
 			
 			pull_if_good($item[loathing legion universal screwdriver]);
 			boolean screw=item_amount($item[loathing legion universal screwdriver])>0;
@@ -702,6 +704,7 @@ void special(boolean bonus_actions) {
 				{
 					print("creating a saucepanic, better stats than  ice sickle","purple");
 					create(1,$item[saucepanic]);
+					equip(1,$item[saucepanic]);
 				}
 				else
 					pull_and_wear_if_good($item[ice sickle]);

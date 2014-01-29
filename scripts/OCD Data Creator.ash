@@ -4086,21 +4086,40 @@ save [$item[warbear bearserker potion]] = 0;
 save [$item[velcro ore]] = 0;
 save [$item[Bright Water]] = 0;
 save [$item[rusty rivet]] = 0;
+save [$item[warbear liquid lasers]] = 0;
+save [$item[Mer-kin stopwatch]] = 1;
+save [$item[soft green echo eyedrop antidote martini]] = 0;
+save [$item[generic mana potion]] = 0;
+save [$item[beery blood]] = 0;
+save [$item[robot reindeer protocol C.U.P.I.D.]] = 0;
+save [$item[cotton candy pillow]] = 0;
+save [$item[Woldo trading card]] = 0;
+save [$item[detective skull]] = 1;
+save [$item[gnoll-tooth necklace]] = 3;
+save [$item[warbear badge]] = 0;
+save [$item[warbear battery]] = 0;
+save [$item[warbear warrior bread]] = 0;
+save     [$item[warbear helm fragment]] = 0;
+save [$item[warbear trouser fragment]] = 0;
+save [$item[warbear accoutrements chunk]] = 0;
+save [$item[warbear feasting mead]] = 0;
+save [$item[warbear whosit]] = 0;
+save     [$item[blind-packed die-cast metal toy]] = 0;
+save [$item[dry cleaning receipt]] = 0;
+save [$item[power sock]] = 1;
+save [$item[toy accordion]] = 1;
+save [$item[FDKOL fire hose]] = 1;
+save [$item[tempura broccoli]] = 0;
+save [$item[cool mushroom]] = 0;
+save [$item[mannequin leg]] = 3;
+
+
 
 
 
 //stuff to sell later;
-save [$item[warbear badge]] = -1;
-save [$item[warbear battery]] = -1;
-save [$item[warbear warrior bread]] = -1;
-save     [$item[warbear helm fragment]] = -1;
-save [$item[warbear trouser fragment]] = -1;
-save [$item[warbear accoutrements chunk]] = -1;
-save [$item[warbear feasting mead]] = -1;
+save [$item[Discontent Winter Garden Catalog]] = -1;
 save [$item[funky junk key]] = -1;
-save [$item[warbear whosit]] = -1;
-save     [$item[blind-packed die-cast metal toy]] = -1;
-save [$item[dry cleaning receipt]] = -1; //use as mus class for power sock
 save [$item[Alice's Army Foil Dervish]] = -1;
 save [$item[pocket lint (white)]] = -1;
 save [$item[pocket lint (blue)]] = -1;

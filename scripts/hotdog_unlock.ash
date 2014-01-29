@@ -35,6 +35,7 @@ void unlock_sly()
 		if(get_property("cyrptNookEvilness").to_int() > 25)
 		{
 			//set choiceadv for deboner, set combat to runaway, then adv until choiceadventure
+			clear_combat_macro();
 			set_property("choiceAdventure155", "4");
 			set_property("battleAction","try to run away");
 			cli_execute("goal clear");

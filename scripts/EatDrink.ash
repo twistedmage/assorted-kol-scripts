@@ -1779,6 +1779,11 @@ con_rec extra_items(con_rec con)
     con.adv.min += 5;
     con.adv.max += 5;
   }
+  if ($items[goat cheese pizza, incredible pizza, mushroom pizza, plain pizza, sausage pizza, slice of pizza, white chocolate and tomato pizza] contains con.it && have_skill($skill[pizza lover]))
+  {
+    con.adv.min += con.it.fullness;
+    con.adv.max += con.it.fullness;
+  }
   if (tuxworthy(con.it))
   {
     con.adv.min += 1;

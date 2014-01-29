@@ -1,6 +1,6 @@
 /******************************************************************************
                                SmartStasis
-         First Things First + Restore + DB Combos + Intelligent Stasis
+            First Things First + Restore + Intelligent Stasis
 *******************************************************************************
 
    This script does way too many things to explain here.  Visit
@@ -143,17 +143,20 @@ void set_autoputtifaction() {
    if (m == $monster[lobsterfrogman] && get_property("sidequestLighthouseCompleted") == "none" &&
        item_amount($item[barrel of gunpowder]) < 4) should_putty = true;
    if (should_putty && should_olfact) return;
+/*
   // second, set puttifaction for bounty monsters
    item ihunt = to_item(to_int(get_property("currentBountyItem")));
    if (ihunt != $item[none]) {
       if (item_drops(m) contains ihunt && (
           !($locations[the "fun" house,the goatlet,lair of the ninja snowmen,cobb's knob laboratory] contains my_location()) ||
-          (create_matcher("(^|, )"+m+"($|, )",vars["BatMan_attract"]).find()))) {
-         if (ihunt.bounty_count <= to_int(vars["puttybountiesupto"]) && item_amount(ihunt) < ihunt.bounty_count-1) should_putty = true;
+          (list_contains(vars["BatMan_attract"],m)))) {
+         if (ihunt.bounty_count <= to_int(vars["BatMan_puttybountiesupto"]) && item_amount(ihunt) < ihunt.bounty_count-1) should_putty = true;
          should_olfact = true;
-      } else if (create_matcher("(^|, )"+m+"($|, )",vars["BatMan_attract"]).find() && ihunt.bounty != my_location())
+      } else if (list_contains(vars["BatMan_attract"],m) && ihunt.bounty != my_location())
          should_olfact = true;
-   } else if (create_matcher("(^|, )"+m+"($|, )",vars["BatMan_attract"]).find()) should_olfact = true;
+  } else
+  */
+   if (list_contains(vars["BatMan_attract"],m)) should_olfact = true;
   // next, handle effective goal-getting (this only olfacts if you set "goals" for autoOlfact)
    monster[int] sortm = get_monsters(my_location());
    sort sortm by -has_goal(value);
@@ -196,16 +199,18 @@ void build_custom() {
       encustom(to_event("skill 7117","stun 1, item "+get_spirit(),1));
   // flyers
    foreach flyer in $items[jam band flyers, rock band flyers] if (item_amount(flyer) > 0 && get_property("flyeredML").to_int() < 10050 &&
-      (to_boolean(vars["flyereverything"]) || m.base_attack.to_int() >= 10000 - get_property("flyeredML").to_int()) && !happened(flyer) &&
+      (to_boolean(vars["BatMan_flyereverything"]) || m.base_attack.to_int() >= 10000 - get_property("flyeredML").to_int()) && !happened(flyer) &&
       !($locations[the battlefield (hippy uniform), the battlefield (frat uniform)] contains my_location()))
      encustom(to_event("use "+to_int(flyer),to_spread(0),to_spread(to_string(m_dpr(0,0)*(1-m_hit_chance()))),"!! flyeredML +"+monster_attack(m),1));
   // putty
    set_autoputtifaction();
-   if (should_putty && encustom(custom_action("copy"))) {
+   if (should_putty) encustom(custom_action("copy"));
+/*
       if (to_item(to_int(get_property("currentBountyItem"))).bounty_count > 0)
          should_olfact = (to_item(to_int(get_property("currentBountyItem"))).bounty_count >= 5 -
             (to_int(get_property("spookyPuttyCopiesMade")) + to_int(get_property("_raindohCopiesMade"))));
    }
+*/
   // attraction
    if (should_olfact) encustom(custom_action("attract"));
   // insults
@@ -419,15 +424,9 @@ advevent to_combo(effect which) {
    }
    string seq(effect c) {
       switch (c) {
-         case $effect[disco nirvana]: return "disco dance of doom,disco dance ii: electric boogaloo";
-         case $effect[disco concentration]: return "disco eye-poke,disco dance of doom,disco dance ii: electric boogaloo";
          case $effect[none]: return ravepref(5);                // rave steal is $effect[none]
          case $effect[rave nirvana]: return ravepref(2);
          case $effect[rave concentration]: return ravepref(1);
-        // combat combos
-         case $effect[disco inferno]: return "disco eye-poke,disco dance ii: electric boogaloo";
-//         case $effect[disco blindness]: return "disco dance ii: electric boogaloo,disco eye-poke";
-//         case $effect[rave stats]: ravepref(6);
       } return "";
    }
    string[int] ord = split_string(seq(which),",");
@@ -441,7 +440,6 @@ advevent to_combo(effect which) {
    if (-res.mp > my_maxmp()) return new advevent;
    float bonus = 0.3;
    switch (which) {                                                  // add meat/items profit gained
-      case $effect[disco concentration]: bonus = 0.2;
       case $effect[none]:
       case $effect[rave concentration]: float dcprofit,prev,icount; boolean skipped;
          foreach num,rec in item_drops_array(m) {
@@ -463,10 +461,6 @@ advevent to_combo(effect which) {
          }
          res.meat += which == $effect[none] ? dcprofit/max(1,icount)+to_int($locations[outside the club, the haunted sorority house, lollipop forest] contains my_location())*9999999 : dcprofit; break;
       case $effect[rave nirvana]: bonus = 0.5;
-      case $effect[disco nirvana]: if (m == $monster[dirty thieving brigand] && vars["ocw_nunspeed"] == "false") break;
-         res.meat += bonus*to_float(meat_drop(m)); break;
-      case $effect[disco inferno]: res.att -= 5; break;
-//      case $effect[disco blindness]: res.stun = 3; break;
    }
    return res;
 }
@@ -475,17 +469,11 @@ void build_combos() {
    if (my_class() != $class[disco bandit]) return;
    void encombo(effect c) { advevent thec = to_combo(c); if (thec.id != "") combos[count(combos)] = thec; }
    vprint("Building disco combos...",9);
-   if (meat_drop(m) > 0) {
-      encombo($effect[disco nirvana]);
-      encombo($effect[rave nirvana]);
-   }
-   if (should_pp || my_location() == $location[outside the club])
-      encombo($effect[none]);
+   if (meat_drop(m) > 0) encombo($effect[rave nirvana]);
+   if (should_pp || my_location() == $location[outside the club]) encombo($effect[none]);
    if (count(item_drops(m)) > 1 && !(my_fam() == $familiar[he-boulder] && have_effect($effect[everything looks yellow]) == 0 &&
-       contains_text(vars["BatMan_yellow"],m.to_string()))) {            // no need for +items if you're going to yellow ray
-      encombo($effect[disco concentration]);
+       contains_text(vars["BatMan_yellow"],m.to_string())))             // no need for +items if you're going to yellow ray
       encombo($effect[rave concentration]);
-   }
    sort combos by -to_profit(value);
    vprint("Combos built! ("+count(combos)+" combos)",9);
 }

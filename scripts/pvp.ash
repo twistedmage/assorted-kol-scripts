@@ -109,8 +109,8 @@ void do_fights()
 		abort("buy cursed microwave");
 	if(swagger>10000 && available_amount($item[cursed pony keg])<1 && can_interact())
 		abort("buy cursed pony keg");
-//	if(swagger>1000 && available_amount($item[insulting hat])<1 && can_interact())
-//		abort("buy insulting hat");
+	if(swagger>1000 && available_amount($item[insulting hat])<1 && can_interact())
+		abort("buy insulting hat");
 //	if(swagger>2000 && available_amount($item[offensive moustache])<1 && can_interact())
 //		abort("buy offensive moustache");
 //	if(swagger>2000 && available_amount($item[hairshirt])<1 && can_interact())

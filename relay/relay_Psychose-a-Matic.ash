@@ -3,7 +3,7 @@
                   A helpful counselor for all your psychoses
 *******************************************************************************
 
-   Inquiries?  Insights?  Ingebretzens?  Visit
+   Inquiries?  Insights?  Ingebretsens?  Visit
    http://kolmafia.us/showthread.php?t=13293
    for documentation or to post a suggestion/bug report.
 
@@ -40,7 +40,8 @@ boolean fetchable(item j) {
 }
 boolean[item] rewards(item j) { switch (j) {
    case $item[jar of psychoses (The Suspicious-Looking Guy)]: return $items[white dragon fang, suspicious-looking fedora];
-   case $item[jar of psychoses (The Captain of the Gourd)]: return $items[goblin collarbone, sharp tin strip, wad of spider silk, truthsayer, fancy gourd potion];
+   case $item[jar of psychoses (The Captain of the Gourd)]: if (available_amount($item[truthsayer])+display_amount($item[truthsayer]) == 0)
+      return $items[goblin collarbone, sharp tin strip, wad of spider silk, truthsayer, fancy gourd potion]; else return $items[truthsayer, fancy gourd potion];
    case $item[jar of psychoses (The Crackpot Mystic)]: return $items[byte, anger blaster, doubt cannon, fear condenser, regret hose];
    case $item[jar of psychoses (The Old Man)]: return $items[bloodbath, ornamental sextant, foam commodore's hat, foam naval trousers, miniature deck cannon];
    case $item[jar of psychoses (The Pretentious Artist)]: return $items[ginsu&trade;];
@@ -89,14 +90,29 @@ page.append("<html><head>\n<title>Psychose-a-Matic</title>\n");
 page.append("<script src=\"jquery1.10.1.min.js\"></script>\n<script src=\"clilinks.js\"></script>\n");
 page.append("<link href='/images/styles.20120512.css' type='text/css' rel='stylesheet'/>\n");
 page.append("<style type=\"text/css\">img { vertical-align: middle } .dim { opacity: 0.4; filter: alpha(opacity=40); }</style></head>\n<body>");
-page.append("<div style='float:left'><h2>Psychose-a-Matic</h2> <small><i>"+randquote()+"</i></small><p>"+
-   "<a href=# class='cliimglink' title='wiki psychoanalytic jar'><img src='/images/itemimages/analjar_empty.gif' title='psychoanalytic jar'></a>: <b>"+item_amount($item[psychoanalytic jar])+"</b></div>");
+page.append("<div style='float:left'><h2>Psychose-a-Matic</h2> <small><i>"+randquote()+"</i></small><p><a href=# class='cliimglink' title='wiki psychoanalytic jar'>");
+page.append("<img src='/images/itemimages/analjar_empty.gif' title='psychoanalytic jar'></a>: <b>"+item_amount($item[psychoanalytic jar])+"</b></div>");
+string bonusinf(int gate) {
+   buffer bon;
+   bon.append("<td>"); 
+   void artistgoal(effect target, string goals) { bon.append("<p><a href=# class='clilink' title=\"conditions clear; conditions set "+goals+"\">Set goals for "+target+"</a>"); }
+   switch (gate) {  // special info specific to the jar you're doing
+      case 5: artistgoal($effect[my breakfast with andrea],"3 artist butterknife, 1 artist spatula, 1 artist whisk");
+         artistgoal($effect[the champion's breakfast],"3 artist torch, 1 artist whisk, 1 artist cutter");
+         artistgoal($effect[tiffany's breakfast],"2 artist spatula, 2 artist cutter, 1 artist whisk");
+         artistgoal($effect[breakfast clubbed],"1 artist butterknife, 1 artist spatula, 1 artist whisk, 1 artist cutter, 1 artist torch"); 
+		 break;
+      default: return "";
+   }
+   bon.append("</td>");
+   return bon;
+}
 // display current jar, if jar there be
 if (get_property("_psychoJarUsed") == "true") {
-   matcher gatenum = create_matcher("junggate_(\\d)",visit_url("campground.php"));
+   matcher gatenum = create_matcher("junggate_(\\d+)",visit_url("campground.php"));
    if (gatenum.find()) {
       matcher jarbit = create_matcher("<center><div(.+)</div>",visit_url("place.php?whichplace=junggate_"+gatenum.group(1)));
-	  if (jarbit.find()) page.append("<p align=center><table><tr><td>"+jarbit.group(0)+"</center></td></tr></table>");
+      if (jarbit.find()) page.append("<p align=center><table><tr>"+bonusinf(to_int(gatenum.group(1)))+"<td>"+jarbit.group(0)+"</center></td></tr></table>");
    }
 }
 // table of handiness
@@ -105,18 +121,23 @@ item jar;
 for i from 5898 upto 5905 {
    jar = to_item(i);
    if (jar == $item[none]) continue;
-   page.append("\n  <tr><td><a href=# class='cliimglink' title='wiki "+jar+"'><img src='/images/itemimages/"+jar.image+"' title='"+jar+"'></a> <b>"+
-      to_string(jar).replace_string("Jick","<a href=showplayer.php?who=1 title='view Jick with your own eyes, you Doubting Thomas you'>Jick</a>")+"</b>"+
-      (item_amount(jar) > 0 && get_property("_psychoJarUsed") == "false" ? " <a href=relay_Psychose-a-Matic.ash?used=yes class='clilink through' title='use 1 "+jar+"'>use</a>" : ""));
+   page.append("\n  <tr><td><a href=# class='cliimglink' title='wiki "+jar+"'><img src='/images/itemimages/"+jar.image+"' title='"+jar+"'></a> <b>");
+   page.append(to_string(jar).replace_string("Jick","<a href=showplayer.php?who=1 title='view Jick with your own eyes, you Doubting Thomas you'>Jick</a>")+"</b>");
+   if (item_amount(jar) > 0 && get_property("_psychoJarUsed") == "false") page.append(" <a href=relay_Psychose-a-Matic.ash?used=yes class='clilink through' title='use 1 "+jar+"'>use</a>");
    page.append("</td><td align=center><b>"+item_amount(jar)+"</b></td><td align=center>");
    page.append(fetchable(jar) ? "<form name='getjar"+i+"' action='relay_Psychose-a-Matic.ash'><input type=hidden name=getjar value="+i+"><input class=button type=submit value='Fill a jar'></form>" : 
       "<span style='color: "+(my_meat() >= mall_val(jar,3) ? "green" : "red")+"'>"+rnum(mall_val(jar,3))+"&mu;</span> "+(can_interact() ? "<a href=relay_Psychose-a-Matic.ash class='clilink through' title='buy 1 "+jar+"'>buy</a>" : "N/A"));
    page.append("</td><td>");
-   foreach i in rewards(jar) page.append("<a href=# class='cliimglink' title=\"wiki "+i+"\"><img src='/images/itemimages/"+i.image+"' title=\""+i+
-      (available_amount(i) + storage_amount(i) + display_amount(i) + closet_amount(i) == 0 ? "\" class=\"dim" : "")+"\"></a> ");
+   foreach i in rewards(jar) {
+      page.append("<a href=# class='cliimglink' title=\"wiki "+i+"\"><img src='/images/itemimages/"+i.image+"' title=\""+i);
+      if (available_amount(i) + storage_amount(i) + display_amount(i) + closet_amount(i) == 0) page.append("\" class=\"dim\"></a> ");
+	   else { page.append("\"></a> ");
+          if (i == $item[sword of procedural generation]) page.append(" <small>[<a onClick='window.open(\"desc_item.php?whichitem=268014939\",\"\",\"height=300,width=400\");'>my sword</a>]</small>");
+	   }
+   }
    page.append("</td></tr>");
 }
-page.append("</table>\n<p align=center><a href='sendmessage.php?toid=1406236' title='Find this useful? Send me a batbit!'><img src='images/adventureimages/stabbats.gif'"+
-   " border=0 height=60 width=60></a><br><small>Question? Ask <a href='http://kolmafia.us/showthread.php?t=13293' target='_blank'>here</a>.</small>");
+page.append("</table>\n<p align=center><a href='sendmessage.php?toid=1406236' title='Find this useful? Send me a batbit!'><img src='images/adventureimages/stabbats.gif'");
+page.append(" border=0 height=60 width=60></a><br><small>Question? Ask <a href='http://kolmafia.us/showthread.php?t=13293' target='_blank'>here</a>.</small>");
 page.write();
 check_version("Psychose-a-Matic","psychoseamatic",13293);

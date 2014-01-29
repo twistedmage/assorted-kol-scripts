@@ -194,6 +194,7 @@ void stock_hagnks()
 	buy_item($item[antique machete],1);
 	buy_item($item[spooky mushroom],1);
 	buy_item($item[killing jar],1);
+	buy_item($item[filthy knitted dread sack],1);
 	
 	//stuff for twistedmage
 	if(my_name()=="twistedmage")

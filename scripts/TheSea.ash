@@ -1245,7 +1245,7 @@ void OutfitQuest()
 					}
 					use(1, $item[mer-kin darkbook]);
 				}
-				if (get_property("dreadScroll4") == "0")
+				if (get_property("dreadScroll4") == "0" && get_property("merkinQuestPath") == "none")
 				{
 					obtain(1, $item[mer-kin knucklebone], $location[mer-kin library]);
 					use(1, $item[mer-kin knucklebone]);

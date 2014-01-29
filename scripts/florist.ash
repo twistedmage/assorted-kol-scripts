@@ -20,7 +20,7 @@ int zone_type(location loc)
 		return 0;
 	
 	//indoor
-	if($locations[The Haunted Library, The Haunted Conservatory, The Haunted Gallery, The Haunted Bedroom, Barrrney's Barrr, The Haunted Ballroom, The Castle in the Clouds in the Sky (Ground Floor), The Castle in the Clouds in the Sky (Top Floor), Belowdecks, McMillicancuddy's Barn, The Haunted Pantry, Infernal Rackets Backstage, The Laugh Floor, The Haunted Billiards Room, The Haunted Bathroom, The Hidden Apartment Building, The Hidden Office Building, The Hidden Bowling Alley, The hidden hospital] contains loc)
+	if($locations[Lair of the Ninja Snowmen, The Haunted Library, The Haunted Conservatory, The Haunted Gallery, The Haunted Bedroom, Barrrney's Barrr, The Haunted Ballroom, The Castle in the Clouds in the Sky (Ground Floor), The Castle in the Clouds in the Sky (Top Floor), Belowdecks, McMillicancuddy's Barn, The Haunted Pantry, Infernal Rackets Backstage, The Laugh Floor, The Haunted Billiards Room, The Haunted Bathroom, The Hidden Apartment Building, The Hidden Office Building, The Hidden Bowling Alley, The hidden hospital] contains loc)
 		return 1;
 	
 	//underground

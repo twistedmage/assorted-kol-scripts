@@ -342,7 +342,7 @@ void checkAccordion()
 void checkGuitar()
 {
 	foreach guitar in $items[acoustic guitarrr,heavy metal thunderrr guitarrr,stone banjo,disco banjo,
-					Shagadelic Disco Banjo,Seeger's Unstoppable Banjo,Crimbo ukelele,massive sitar,
+					Shagadelic Disco Banjo,Seeger's Unstoppable Banjo,Crimbo ukulele,massive sitar,
 					Zim Merman's guitar,4-dimensional guitar,half-sized guitar,out-of-tune biwa,plastic guitar]
 	{
 		if( available_amount( guitar ) > 0 )

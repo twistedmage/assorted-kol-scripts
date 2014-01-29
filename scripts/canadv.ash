@@ -314,6 +314,7 @@ boolean can_adv(location where, boolean prep) {
    case $location[The Beanbat Chamber]: if (prep && !qprop("questL04Bat","step2")) use_upto(2 - to_int(qprop("questL04Bat","step1")), $item[sonar-in-a-biscuit],true); 
       return qprop("questL04Bat","step2") || item_amount($item[sonar-in-a-biscuit]) > 1 - to_int(qprop("questL04Bat","step1"));
    case $location[The Boss Bat's Lair]: if (prep && !qprop("questL04Bat","step3")) use_upto(3 - (to_int(qprop("questL04Bat","step1")) + to_int(qprop("questL04Bat","step2"))), $item[sonar-in-a-biscuit],true); 
+      if (get_property("questL04Bat") == "finished") return false;
       return get_property("questL04Bat") == "step3" || item_amount($item[sonar-in-a-biscuit]) > 2 - (to_int(qprop("questL04Bat","step1")) + to_int(qprop("questL04Bat","step2")));
   // beach
    case $location[The Arid, Extra-Dry Desert]: return itemcheck($item[your father's macguffin diary]);
@@ -497,6 +498,7 @@ boolean can_adv(location where, boolean prep) {
    case $location[The Typical Tavern Cellar]: return levelcheck(3) && qprop("questL03Rat","started");
    case $location[The Black Forest]: return levelcheck(11) && qprop("questL11MacGuffin","started");
    case $location[The Hidden Temple]: return get_property("lastTempleUnlock").to_int() == my_ascensions();
+   case $location[The Old Landfill]: return perm_urlcheck("woods.php","oldlandfill.gif");
    case $location[The Road to White Citadel]: return (!white_citadel_available() && qprop("questG02Whitecastle","step1"));
    case $location[Whitey's Grove]: return (levelcheck(7) && primecheck(34) && (qprop("questL11Palindome","step3") || (checkguild() && qprop("questG02Whitecastle","started"))) && perm_urlcheck("woods.php","grove.gif"));
   // unique locations
@@ -516,6 +518,9 @@ boolean can_adv(location where, boolean prep) {
    case $location[Heartbreaker's Hotel]:
    case $location[Lollipop Forest]:
    case $location[The Cannon Museum]:
+   case $location[WarBear Fortress (First Level)]:
+   case $location[WarBear Fortress (Second Level)]:
+   case $location[WarBear Fortress (Third Level)]:
    case $location[Spectral Salad Factory]: return vprint(where+" is no longer adventurable.",-9);
    default: vprint("Unknown location: "+where,"olive",-2);
             return vprint("Please report this missing location here: http://kolmafia.us/showthread.php?t=2027","black",-2);
