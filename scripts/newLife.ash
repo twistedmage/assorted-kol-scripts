@@ -748,10 +748,9 @@ void special(boolean bonus_actions) {
 					equip($slot[acc1],$item[loathing legion necktie]);
 			}
 		}
-	}
-	if(available_amount($item[wrecked generator])<1 && my_path() != "KOLHS")
-		pull_if_good($item[wrecked generator]);
-	pull_if_good($item[jar of psychoses (The Crackpot Mystic)]);
+		if(available_amount($item[wrecked generator])<1 && my_path() != "KOLHS")
+			pull_if_good($item[wrecked generator]);
+		pull_if_good($item[jar of psychoses (The Crackpot Mystic)]);
 				
 		//14 pulls
 //			pull_if_good($item[v for vivala mask]);
@@ -765,6 +764,9 @@ void special(boolean bonus_actions) {
 //could also pull miniborg destroy o bot for combat
 //		if(get_property("tomeSummons").to_int() > 0 && my_path()!="Way of the Surprising Fist")
 //			use_skill(3 - get_property("tomeSummons").to_int(), $skill[Summon Stickers]);
+
+	}
+	
 	set_property("_photocopyUsed","false"); //in case the game crashes during ascension and it isn't reset
 	cli_execute("mood default");
 	if(in_hardcore())
