@@ -216,7 +216,7 @@ PM + TT - asica
 TT + SC - twistedmage
 
 anid  - s,,<tt>
-dinala - sc,<at>
+dinala - at
 asica  - db,<pm>
 twisted = s
 <to get last undying skeleton item, I need to be myst class to make pies>

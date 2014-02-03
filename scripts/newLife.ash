@@ -763,7 +763,6 @@ void special(boolean bonus_actions) {
 //				print("Couldn't find stinky cheese item","red");
 		//16 pull 
 //could also pull miniborg destroy o bot for combat
-	}
 //		if(get_property("tomeSummons").to_int() > 0 && my_path()!="Way of the Surprising Fist")
 //			use_skill(3 - get_property("tomeSummons").to_int(), $skill[Summon Stickers]);
 	set_property("_photocopyUsed","false"); //in case the game crashes during ascension and it isn't reset

@@ -4119,7 +4119,7 @@ save [$item[comb jelly]] = 0;
 save     [$item[jagged tooth]] = 0;
 save [$item[obnoxious riddle]] = 0;
 save [$item[barskin loincloth]] = 2;
-clli_execute("use * fruit bowl");
+cli_execute("use * fruit bowl");
 
 
 
