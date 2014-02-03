@@ -4112,12 +4112,24 @@ save [$item[FDKOL fire hose]] = 1;
 save [$item[tempura broccoli]] = 0;
 save [$item[cool mushroom]] = 0;
 save [$item[mannequin leg]] = 3;
+save [$item[snow berries]] = 0;
+save     [$item[ice harvest]] = 0;
+save [$item[Buddy     Bjorn]] = 1;
+save [$item[comb jelly]] = 0;
+save     [$item[jagged tooth]] = 0;
+save [$item[obnoxious riddle]] = 0;
+save [$item[barskin loincloth]] = 2;
+clli_execute("use * fruit bowl");
 
 
 
 
 
-//stuff to sell later;
+
+
+
+//stuff to sell later;s
+save [$item[Alice's Army Foil Martyr]] = -1;
 save [$item[Discontent Winter Garden Catalog]] = -1;
 save [$item[funky junk key]] = -1;
 save [$item[Alice's Army Foil Dervish]] = -1;

@@ -195,6 +195,7 @@
 		13-11-28:WHen using Drunkula's Wineglass anything but attack is futile
 		13-11-29:Remove code for saucesplashing as that is no longer a thing
 				 Entangling Noodles are only useful for Pastamancers, adapt stunning logic for the new class specific stun skills		
+		14-02-01:Ban windchimes and PADL phones against Trendy Bugbear Chefs
 ***********************************************************************************************************************/
 import <SmartStasis.ash>;
 
@@ -284,7 +285,7 @@ void quit(string input) {
 }
 
 //Set unknown_ml for a couple of semi-spaded monsters not yet in Mafia
-void set_unknown_ml(monster foe, string pg) {
+void pre_brain(monster foe, string pg) {
 	havemanuel = contains_text(pg,"var monsterstats");
 	if(to_int(vars["unknown_ml"]) != 0) {
 		vprint("WHAM: Checking to see if WHAM sould adjust the unknown_ml for " + foe + ".", "purple", 8);
@@ -298,6 +299,10 @@ void set_unknown_ml(monster foe, string pg) {
 	if(my_path() == "KOLHS")
 		foreach i in $ints[6653,6656,6370,6374,6379,6382,6384,6385,6387]
 			blacklist["use "+i] = 0;
+	if(foe == $monster[Trendy Bugbear Chef]) {
+		blacklist["use "+2065] = 0;
+		blacklist["use "+2354] = 0;
+	}
 }
 
 //Set information for the procedurally generated skeletons
@@ -306,7 +311,6 @@ void set_skeleton_info() {
 		vprint("WHAM: Vicious skeletons deal bonus damage. Currently not handled.", "green", 5);
 		//Vicious ones deal bonus damage (500 at 1100 monster attack, compared to a deadly doing ~90 damage at 1600 monster attack). 
 	}
-	build_options();
 }
 
 //Set information for the procedurally generated skeletons
@@ -1459,7 +1463,7 @@ void main(int initround, monster foe, string pg) {
 
 	//Set unknown_ml for specific monsters Mafia doesn't handle and that have semi-spaded unknown_ml
 	//Doing this before act() makes sure that batbrain uses our new unknown_ml-value
-	set_unknown_ml(foe, pg);
+	pre_brain(foe, pg);
 	
 	//Set up the initial variables and skills
 	vprint("WHAM: Setting up variables via BatBrain", "purple", 8);

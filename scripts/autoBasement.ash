@@ -50,6 +50,9 @@ Version History:
 2013-06-28: Fix order of operations error for the drinking check
 2013-08-09: Don't ignore the value of items in inventory
 2013-08-31: Fix some fuzzy matching
+2014-02-01: Modify the usage of phials slightly and give an informative message when the script tries to do an elemental test without an elemental form.
+			Don't do a lot of refresh calls as Mafia should now hopefully not do strange stuff when swapping loads of outfits any longer (as of r13518)
+			Only do outfit caching once per day to avoid having to redo that process just because the script stopped or was aborted
 */
 
 import <zlib.ash>;
@@ -144,7 +147,7 @@ int max_potion_price = vars["autoBasement_max_potion_price"].to_int();
 boolean use_percentage_potions = vars["autoBasement_use_percentage_potions"].to_boolean();
 boolean use_absolute_potions = vars["autoBasement_use_absolute_potions"].to_boolean();
 
-boolean outfits_cached = false;
+boolean outfits_cached = get_property("_autoBasementOutfitCached").to_boolean();
 
 string maximize_familiar;
 if(!have_familiar($familiar[Disembodied Hand]) || !use_Disembodied_Hand)
@@ -308,8 +311,8 @@ boolean maximize_wrap(string max_string, int goal, int current) {
 			if(contains_text(max_string, "Disembodied Hand") && my_familiar() == $familiar[none])
 				use_familiar($familiar[disembodied hand]);
 
-			if(contains_text(perform[i], "familiar"))
-				cli_execute("refresh inv; refresh equip");
+//			if(contains_text(perform[i], "familiar"))
+//				cli_execute("refresh inv; refresh equip");
 			
 			cli_execute(perform[i]);
 			if(sum[i] + current >  goal)
@@ -338,7 +341,7 @@ void cache_outfits()
 		switch_hand("Mysticality");
 		if(outfit("Mysticality")) {} //Make sure we don't abort if we cannot equip the outfit
 	}
-	cli_execute("refresh equip");
+//	cli_execute("refresh equip");
 	maximize("Mysticality" + maximize_familiar, false);
 	cli_execute("outfit save Mysticality");
 	familiarCache["Mysticality"].f = my_familiar();
@@ -350,7 +353,7 @@ void cache_outfits()
 		switch_hand("Muscle");
 		if(outfit("Muscle")) {} //Make sure we don't abort if we cannot equip the outfit
 	}
-	cli_execute("refresh equip");
+//	cli_execute("refresh equip");
 	maximize("Muscle" + maximize_familiar, false);
 	cli_execute("outfit save Muscle");
 	familiarCache["Muscle"].f = my_familiar();
@@ -362,7 +365,7 @@ void cache_outfits()
 		switch_hand("Moxie");
 		if(outfit("Moxie")) {} //Make sure we don't abort if we cannot equip the outfit
 	}
-	cli_execute("refresh equip");
+//	cli_execute("refresh equip");
 	maximize("Moxie" + maximize_familiar, false);
 	cli_execute("outfit save Moxie");
 	familiarCache["Moxie"].f = my_familiar();
@@ -374,7 +377,7 @@ void cache_outfits()
 		switch_hand("Gauntlet");
 		if(outfit("Gauntlet")) {} //Make sure we don't abort if we cannot equip the outfit
 	}
-	cli_execute("refresh equip");
+//	cli_execute("refresh equip");
 	maximize("HP" + maximize_familiar, false);
 	cli_execute("outfit save Gauntlet");
 	familiarCache["Gauntlet"].f = my_familiar();
@@ -386,7 +389,7 @@ void cache_outfits()
 		switch_hand("MPDrain");
 		if(outfit("MPDrain")) {} //Make sure we don't abort if we cannot equip the outfit
 	}
-	cli_execute("refresh equip");
+//	cli_execute("refresh equip");
 	string command = "MP" + maximize_familiar;
 	foreach it in $items[]
 	{
@@ -406,7 +409,7 @@ void cache_outfits()
 		switch_hand("MP Regen");
 		if(outfit("MP Regen")) {} //Make sure we don't abort if we cannot equip the outfit
 	}
-	cli_execute("refresh equip");
+//	cli_execute("refresh equip");
 	maximize(".5 MP Regen min, .5 MP Regen max" + maximize_familiar, false);
 	cli_execute("outfit save MP Regen");
 	familiarCache["MP Regen"].f = my_familiar();
@@ -433,7 +436,7 @@ void cache_outfits()
 		switch_hand("Damage");
 		if(outfit("Damage")) {} //Make sure we don't abort if we cannot equip the outfit
 	}
-	cli_execute("refresh equip");
+//	cli_execute("refresh equip");
 	maximize(command, false);
 	cli_execute("outfit save Damage");
 	familiarCache["Damage"].f = $familiar[none];
@@ -444,13 +447,14 @@ void cache_outfits()
 		switch_hand("Elemental Resistance");
 		if(outfit("Elemental Resistance")) {} //Make sure we don't abort if we cannot equip the outfit
 	}
-	cli_execute("refresh equip");
+//	cli_execute("refresh equip");
 	maximize("all res" + maximize_familiar, false);
 	cli_execute("outfit save Elemental Resistance");
 	familiarCache["Elemental Resistance"].f = my_familiar();
 	familiarCache["Elemental Resistance"].i = familiar_equipped_equipment(my_familiar());	
 
 	outfits_cached = true;
+	set_property("_autoBasementOutfitCached", true);
 
 	vprint("Outfits caching complete!", "green", 1);
 }
@@ -680,7 +684,7 @@ boolean elemental_test(int level, element elem1, element elem2)
 			cli_execute(perform[i]);
 			vprint(6, "purple", 7);
 			break;
-		} else if(i == j-1) {
+		} else if(i == j-1 && mall_price(elementForm[elem1].i) < to_int(get_property("autoBuyPriceLimit"))) {
 			vprint("Chugging a " + elementForm[elem1].i + " and moving on from there.", 5);
 			cli_execute("use 1 " + elementForm[elem1].i);
 		}
@@ -689,36 +693,40 @@ boolean elemental_test(int level, element elem1, element elem2)
 	vprint(7, "purple", 7);
 	cli_execute("whatif quiet");
 	j = 0;
-	if (elemental_damage(level, elem1) + elemental_damage(level, elem2) > my_maxhp() && have_effect(elementForm[elem1].e) > 0) {
-		foreach i, rec in maximize(to_string(elem2) + " resistance, 0.01 hp" + element_familiar, max_potion_price, 1, true, true) {
-			if(!ok(rec.item, rec.command, rec.effect))
-				continue;
-			if(contains_text(rec.command, "phial"))
-				continue;
-			if(rec.score > 0) {
-				if(j == 0) {
-					perform[j] = rec.command;
-					perform_whatif[j] = (!(contains_text(rec.command, "equip") || contains_text(rec.command, "familiar")) ? "up " + to_string(rec.effect) : rec.command);
-				} else {
-					perform[j] = perform[j-1] + "; " + rec.command;
-					perform_whatif[j] = perform_whatif[j-1] + "; " + (!(contains_text(rec.command, "equip") || contains_text(rec.command, "familiar")) ? "up " + to_string(rec.effect) : rec.command);
+	if(have_effect(elementForm[elem1].e) > 0) {
+		if (elemental_damage(level, elem1) + elemental_damage(level, elem2) > my_maxhp() && have_effect(elementForm[elem1].e) > 0) {
+			foreach i, rec in maximize(to_string(elem2) + " resistance, 0.01 hp" + element_familiar, max_potion_price, 1, true, true) {
+				if(!ok(rec.item, rec.command, rec.effect))
+					continue;
+				if(contains_text(rec.command, "phial"))
+					continue;
+				if(rec.score > 0) {
+					if(j == 0) {
+						perform[j] = rec.command;
+						perform_whatif[j] = (!(contains_text(rec.command, "equip") || contains_text(rec.command, "familiar")) ? "up " + to_string(rec.effect) : rec.command);
+					} else {
+						perform[j] = perform[j-1] + "; " + rec.command;
+						perform_whatif[j] = perform_whatif[j-1] + "; " + (!(contains_text(rec.command, "equip") || contains_text(rec.command, "familiar")) ? "up " + to_string(rec.effect) : rec.command);
+					}
+					j += 1;
 				}
-				j += 1;
-			}
-		}	
-		vprint(8, "purple", 7);
-		for i from 0 to j-1 {
-			cli_execute("whatif " + perform_whatif[i] + "; quiet");
-			if(elemental_damage(level, elem1) + elemental_damage(level, elem2) < my_maxhp()) {
-				cli_execute(perform[i]);
-				break;
-			} else if(i == j-1) {
-				vprint("Executing the maximizer commands and moving on to HP maximization.", 5);
-				cli_execute(perform[i]);
+			}	
+			vprint(8, "purple", 7);
+			for i from 0 to j-1 {
+				cli_execute("whatif " + perform_whatif[i] + "; quiet");
+				if(elemental_damage(level, elem1) + elemental_damage(level, elem2) < my_maxhp()) {
+					cli_execute(perform[i]);
+					break;
+				} else if(i == j-1) {
+					vprint("Executing the maximizer commands and moving on to HP maximization.", 5);
+					cli_execute(perform[i]);
+				}
+				cli_execute("whatif quiet");
 			}
 			cli_execute("whatif quiet");
 		}
-		cli_execute("whatif quiet");
+	} else {
+		vprint("The script was unable to acquire the necessary elemental form. You may need to acquire some phials yourself or raise your autoBuyPriceLimit. Attempting to pass test by HP buffing", 3);
 	}
 	vprint(9, "purple", 7);
 	damage = elemental_damage(level, elem1) + elemental_damage(level, elem2);
@@ -853,8 +861,8 @@ void basement(int num_turns)
 			cli_execute("stickers wrestler, wrestler, wrestler");
 			
 		cache_outfits();
-		//cli_execute("refresh inv"); //Attempt to avoid Mafia getting out of sync by refreshing the inventory between levels
-		//cli_execute("refresh equip");
+//		cli_execute("refresh inv"); //Attempt to avoid Mafia getting out of sync by refreshing the inventory between levels
+//		cli_execute("refresh equip");
 
 		if (base_stat != my_basestat(my_primestat()))
 		{
@@ -977,7 +985,7 @@ void basement(int num_turns)
 				equip_cached_outfit("Gauntlet");
 			}
 			
-			cli_execute("refresh inv; refresh equip");
+//			cli_execute("refresh inv; refresh equip");
 			int damage = ceil( hp * (1 - damage_absorption_percent()/100));
 			
 			float[int] sum;

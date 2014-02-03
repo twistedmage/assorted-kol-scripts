@@ -589,147 +589,170 @@ void special(boolean bonus_actions) {
 		if(my_name()=="twistedmage")
 		{
 			//hat
-			if(!good($item[crown of thrones]) || !good("el vibrato Megadrone"))
-			{
-				if(storage_amount($item[Boris's Helm (askew)])>0)
-					pull_and_wear_if_good($item[Boris's Helm (askew)]);
-				else
-				{
-					pull_if_good($item[Boris's Helm]);
-					if(available_amount($item[boris's helm])>0)
-					{
-						cli_execute("fold boris's helm (askew)");
-						equip($item[boris's helm (askew)]);
-					}
-				}
-			}
+			if(storage_amount($item[Boris's Helm (askew)])>0)
+				pull_and_wear_if_good($item[Boris's Helm (askew)]);
 			else
 			{
-				pull_and_wear_if_good($item[crown of thrones]);
-				if(available_amount($item[crown of thrones])>0)
-					if(good("el vibrato Megadrone"))
-					{
-						cli_execute("enthrone El Vibrato Megadrone");
-	//					else if(good("Li'l Xenomorph"))
-	//					cli_execute("enthrone Li'l Xenomorph");
-					}
-					else
-						abort("Don't know what familiar to enthrone for this path");
-			}
-			//myst classes want a pan offhand
-			if(my_primestat()==$stat[mysticality] && my_path()!="Bees Hate You" && my_path()!="BIG!")
-			{
-				//pull whichever
-				if(storage_amount($item[Jarlsberg's pan (Cosmic portal mode)])>0)
+				pull_if_good($item[Boris's Helm]);
+				if(available_amount($item[boris's helm])>0)
 				{
-					pull_if_good($item[Jarlsberg's pan (Cosmic portal mode)]);
-				}
-				else
-				{
-					pull_if_good($item[Jarlsberg's pan]);
-				}
-				//for now we will always use the portal version, might want to change it one day though
-				if(available_amount($item[Jarlsberg's pan])>0)
-				{
-					cli_execute("fold Jarlsberg's pan (Cosmic portal mode)");
-				}
-				if(available_amount($item[Jarlsberg's pan (Cosmic portal mode)])>0)
-					equip($item[Jarlsberg's pan (Cosmic portal mode)]);
-			}
-			else //others want a shield
-			{
-				pull_and_wear_if_good($item[operation patriot shield]);
-			}
-			//pull_and_wear_if_good($item[greatest american pants]);
-			if(available_amount($item[pantsgiving])==0)
-				pull_and_wear_if_good($item[pantsgiving]);
-			
-			pull_if_good($item[loathing legion universal screwdriver]);
-			boolean screw=item_amount($item[loathing legion universal screwdriver])>0;
-			if(my_path()!="Avatar of Boris" && my_path()!="Avatar of Jarlsberg")
-			{
-				pull_if_good($item[moveable feast]);
-				pull_and_wear_if_good($item[snow suit]);
-			}
-			if(have_skill($skill[torso awaregness]))
-				if(available_amount($item[astral shirt]) < 1)
-					pull_and_wear_if_good($item[cane-mail shirt]);
-			pull_and_wear_if_good($item[Camp Scout backpack]);
-			if(available_amount($item[Camp Scout backpack])<1)
-				pull_and_wear_if_good($item[Cloak of Dire Shadows]);
-			//now pull useful stuff
-			if(pull_if_good($item[can of rain-doh]))
-				if(available_amount($item[rain-doh blue balls])==0)
-					use(1,$item[can of rain-doh]);
-			if(available_amount($item[box of bear arms])>0)
-				use(1,$item[box of bear arms]);
-	//			pull_if_good($item[jewel-eyed wizard hat]);
-			//pull tps drink
-	//			pull_if_good($item[grogtini]);
-			//handle zombie head + maid if we have gnoll
-			if( knoll_available() && pull_if_good($item[Ninja pirate zombie robot head]))
-			{
-				if(screw)
-				{
-					knife_untinker($item[ninja pirate zombie robot head]);
-					knife_untinker($item[pirate zombie robot head]);
-					knife_untinker($item[pirate zombie head]);
-					knife_untinker($item[clockwork pirate skull]);
-					knife_untinker($item[enchanted eyepatch]);
-					if(my_path()!="Way of the Surprising Fist") //can't afford other meat maid pieces in wotsf
-					{
-						cli_execute("make clockwork maid");
-						cli_execute("use clockwork maid");
-					}
-				}
-			}
-			
-			if(my_path()=="BIG!")
-			{
-				 if(my_primestat()==$stat[moxie])
-					pull_and_wear_if_good($item[bottle-rocket crossbow]);
-				else
-					pull_and_wear_if_good($item[haiku katana]);
-					
-				pull_and_wear_if_good($item[v for vivala mask],$slot[acc2]);
-				pull_and_wear_if_good($item[mr. accessory jr.],$slot[acc1]);
-				if(available_amount($item[astral mask])>0)
-					equip($slot[acc3],$item[astral mask]);
-				else
-					pull_and_wear_if_good($item[mr. accessory jr.],$slot[acc3]);
-			}
-			else //not big
-			{
-				if(my_class()==$class[sauceror])
-				{
-					print("creating a saucepanic, better stats than  ice sickle","purple");
-					create(1,$item[saucepanic]);
-					equip(1,$item[saucepanic]);
-				}
-				else
-					pull_and_wear_if_good($item[ice sickle]);
-				pull_and_wear_if_good($item[juju mojo mask],$slot[acc2]);
-				//if we have no astral belt, wear fangs. Else pull fangs as superclover but dont wear 
-				if(available_amount($item[astral belt])<1)
-					pull_and_wear_if_good($item[plastic vampire fangs],$slot[acc3]);
-				else
-				{
-					pull_if_good($item[plastic vampire fangs]);
-					equip($slot[acc3],$item[astral belt]);
-				}
-				if(screw)
-				{
-					cli_execute("fold loathing legion necktie");
-					if(good($item[loathing legion necktie]))
-						equip($slot[acc1],$item[loathing legion necktie]);
+					cli_execute("fold boris's helm (askew)");
+					equip($item[boris's helm (askew)]);
 				}
 			}
 		}
-		if(available_amount($item[wrecked generator])<1 && my_path() != "KOLHS")
-			pull_if_good($item[wrecked generator]);
-		pull_if_good($item[jar of psychoses (The Crackpot Mystic)]);
+		else
+		{
+			pull_and_wear_if_good($item[crown of thrones]);
+			if(available_amount($item[crown of thrones])>0)
+				if(good("el vibrato Megadrone"))
+				{
+					cli_execute("enthrone El Vibrato Megadrone");
+//					else if(good("Li'l Xenomorph"))
+//					cli_execute("enthrone Li'l Xenomorph");
+				}
+				else
+					abort("Don't know what familiar to enthrone for this path");
+		}
+		//myst classes want a pan offhand
+		if(my_primestat()==$stat[mysticality] && my_path()!="Bees Hate You" && my_path()!="BIG!")
+		{
+			//pull whichever
+			if(storage_amount($item[Jarlsberg's pan (Cosmic portal mode)])>0)
+			{
+				pull_if_good($item[Jarlsberg's pan (Cosmic portal mode)]);
+			}
+			else
+			{
+				pull_if_good($item[Jarlsberg's pan]);
+			}
+			//for now we will always use the portal version, might want to change it one day though
+			if(available_amount($item[Jarlsberg's pan])>0)
+			{
+				cli_execute("fold Jarlsberg's pan (Cosmic portal mode)");
+			}
+			if(available_amount($item[Jarlsberg's pan (Cosmic portal mode)])>0)
+				equip($item[Jarlsberg's pan (Cosmic portal mode)]);
+		}
+		else //others want a shield
+		{
+			pull_and_wear_if_good($item[operation patriot shield]);
+		}
+		//pull_and_wear_if_good($item[greatest american pants]);
+		if(available_amount($item[pantsgiving])==0)
+			pull_and_wear_if_good($item[pantsgiving]);
 		
+		pull_if_good($item[loathing legion universal screwdriver]);
+		boolean screw=item_amount($item[loathing legion universal screwdriver])>0;
+		if(my_path()!="Avatar of Boris" && my_path()!="Avatar of Jarlsberg")
+		{
+			pull_if_good($item[moveable feast]);
+			pull_and_wear_if_good($item[snow suit]);
+		}
+		if(have_skill($skill[torso awaregness]))
+			if(available_amount($item[astral shirt]) < 1)
+				pull_and_wear_if_good($item[cane-mail shirt]);
 		
+		//back
+		pull_and_wear_if_good($item[buddy bjorn]);
+		if(available_amount($item[buddy bjorn])>0)
+		{
+			if(good("el vibrato Megadrone"))
+			{
+				//cli_execute("enthrone El Vibrato Megadrone");
+				
+				visit_url("familiar.php?showback=1");
+				visit_url("familiar.php?&action=backpack&famid=81&pwd");
+				
+				
+//				else if(good("Li'l Xenomorph"))
+//				cli_execute("enthrone Li'l Xenomorph");
+			}
+			else
+				abort("Don't know what familiar to enthrone for this path");
+		}
+		else
+		{
+			pull_and_wear_if_good($item[Camp Scout backpack]);
+			if(available_amount($item[Camp Scout backpack])<1)
+				pull_and_wear_if_good($item[Cloak of Dire Shadows]);
+		}
+		//now pull useful stuff
+		if(pull_if_good($item[can of rain-doh]))
+			if(available_amount($item[rain-doh blue balls])==0)
+				use(1,$item[can of rain-doh]);
+		if(available_amount($item[box of bear arms])>0)
+			use(1,$item[box of bear arms]);
+//			pull_if_good($item[jewel-eyed wizard hat]);
+		//pull tps drink
+//			pull_if_good($item[grogtini]);
+		//handle zombie head + maid if we have gnoll
+		if( knoll_available() && pull_if_good($item[Ninja pirate zombie robot head]))
+		{
+			if(screw)
+			{
+				knife_untinker($item[ninja pirate zombie robot head]);
+				knife_untinker($item[pirate zombie robot head]);
+				knife_untinker($item[pirate zombie head]);
+				knife_untinker($item[clockwork pirate skull]);
+				knife_untinker($item[enchanted eyepatch]);
+				if(my_path()!="Way of the Surprising Fist") //can't afford other meat maid pieces in wotsf
+				{
+					cli_execute("make clockwork maid");
+					cli_execute("use clockwork maid");
+				}
+			}
+		}
+		if(my_path()=="BIG!")
+		{
+			 if(my_primestat()==$stat[moxie])
+				pull_and_wear_if_good($item[bottle-rocket crossbow]);
+			else
+				pull_and_wear_if_good($item[haiku katana]);
+				
+			pull_and_wear_if_good($item[v for vivala mask],$slot[acc2]);
+			pull_and_wear_if_good($item[mr. accessory jr.],$slot[acc1]);
+			if(available_amount($item[astral mask])>0)
+				equip($slot[acc3],$item[astral mask]);
+			else
+				pull_and_wear_if_good($item[mr. accessory jr.],$slot[acc3]);
+		}
+		else //not big
+		{
+			if(my_class()==$class[sauceror])
+			{
+				print("creating a saucepanic, better stats than  ice sickle","purple");
+				
+				if(available_amount($item[saucepanic])<1 && have_skill($skill[summon smithsness]))
+					if(available_amount($item[brituminous coal])==0)
+						use_skill(1,$skill[summon smithsness]);
+						
+				create(1,$item[saucepanic]);
+				equip($item[saucepanic]);
+			}
+			else
+				pull_and_wear_if_good($item[ice sickle]);
+			pull_and_wear_if_good($item[juju mojo mask],$slot[acc2]);
+			//if we have no astral belt, wear fangs. Else pull fangs as superclover but dont wear 
+			if(available_amount($item[astral belt])<1)
+				pull_and_wear_if_good($item[plastic vampire fangs],$slot[acc3]);
+			else
+			{
+				pull_if_good($item[plastic vampire fangs]);
+				equip($slot[acc3],$item[astral belt]);
+			}
+			if(screw)
+			{
+				cli_execute("fold loathing legion necktie");
+				if(good($item[loathing legion necktie]))
+					equip($slot[acc1],$item[loathing legion necktie]);
+			}
+		}
+	}
+	if(available_amount($item[wrecked generator])<1 && my_path() != "KOLHS")
+		pull_if_good($item[wrecked generator]);
+	pull_if_good($item[jar of psychoses (The Crackpot Mystic)]);
+				
 		//14 pulls
 //			pull_if_good($item[v for vivala mask]);
 //			if(storage_amount($item[stinky cheese eye])>0)

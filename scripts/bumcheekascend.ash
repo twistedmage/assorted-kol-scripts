@@ -4306,6 +4306,16 @@ void setMood(string combat) {
 				if (have_skill($skill[Smooth Movement])) cli_execute("trigger lose_effect, Smooth Movements, cast 1 smooth movement");
 				if (have_skill($skill[The Sonata of Sneakiness])) cli_execute("trigger lose_effect, The Sonata of Sneakiness, cast 1 sonata of sneakiness");
 				cli_execute("trigger gain_effect, Carlweather's Cantata of Confrontation, uneffect Carlweather's Cantata of Confrontation");
+				//if we dont need any more snow boards, use them for -combat
+				if(i_a("snow berries")>0 && my_level()>8)
+				{
+					if(have_effect($effect[snow shoes])==0)
+					{
+						create(1,$item[snow cleats]);
+						use(1,$item[snow cleats]);
+					}
+				}
+				cli_execute("trigger gain_effect, Carlweather's Cantata of Confrontation, uneffect Carlweather's Cantata of Confrontation");
 			}
 		}
 		if (contains_text(combat,"i")) {
@@ -4483,9 +4493,9 @@ void setMood(string combat) {
 		}
 		else
 		{		
-			if (contains_text(combat,"i") && have_skill($skill[Bind Spice Ghost]) && my_maxmp()>=250 && my_meat()>1000) //item drops
+/*			if (contains_text(combat,"i") && have_skill($skill[Bind Spice Ghost]) && my_maxmp()>=250 && my_meat()>1000) //item drops
 				cli_execute("trigger lose_effect, Spice Haze, cast 1 Bind Spice Ghost");
-			else if (contains_text(combat,"m") && have_skill($skill[Bind Lasagmbie])) //meat
+			else */if (contains_text(combat,"m") && have_skill($skill[Bind Lasagmbie])) //meat
 				cli_execute("trigger lose_effect, Pasta Eyeball, cast 1 Bind Lasagmbie");
 			else if (contains_text(combat,"n") && have_skill($skill[Bind Angel Hair Wisp])) //initiative
 				cli_execute("trigger lose_effect, whispering strands, cast 1 Bind Angel Hair Wisp");
@@ -5594,6 +5604,12 @@ boolean bcascBats1() {
 			}
 		}
 		
+		//snow shovel
+		if(i_a("snow berries")>3 && i_a("ice harvest")>0)
+		{
+			create(1,$item[snow shovel]);
+			use(1,$item[snow shovel]);
+		}
 		
 		buMax("+10 stench res");
 		if (my_path() != "Bees Hate You") {
@@ -6230,6 +6246,12 @@ boolean bcascChasm() {
 			chasm = visit_url("place.php?whichplace=orc_chasm");
 		//Disassemble the bridge and use all parts we have
 		chasm = visit_url("place.php?whichplace=orc_chasm&action=bridge"+(to_int(get_property("chasmBridgeProgress"))));
+		//make + use snow boards
+		while(i_a("snow berries")>1)
+		{
+			create(1,$item[snow boards]);
+			use(1,$item[snow boards]);
+		}
 		
 		//Prepare for adventuring
 		if(!in_hardcore())
@@ -9487,6 +9509,13 @@ boolean bcascPirateFledges() {
 					cli_execute("pull a light that never goes out");
 				if(i_a("A Light that Never Goes Out")>0)
 					maxstr=maxstr+", +equip A Light that Never Goes Out";
+				
+				if(i_a("ice harvest")>2)
+				{
+					create(1,$item[ice bucket]);
+					maxstr=maxstr+", +equip ice bucket";
+				}		
+					
 				buMax(maxstr);
 			} else {
 				outfit("swashbuckling getup");

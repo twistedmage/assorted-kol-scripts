@@ -611,8 +611,7 @@ void advise_food()
 		if(available_amount($item[root beer])>0)
 			add_food(con_map,"- root beer ",4,0,1);
 			
-		if(my_fullness() == 0 && (available_amount($item[spaghetti breakfast])>0 || (have_skill($skill[spaghetti breakfast]) && !get_property("_spaghettiBreakfast").to_boolean())))
-			add_food(con_map,"- *** spaghetti breakfast (prefer to drink at higher levels, but must be first food of the day)",6,0,1);
+		
 			
 			
 		if(available_amount($item[can of sardines])>0)
@@ -629,8 +628,14 @@ void advise_food()
 			add_food(con_map,"- pat of butter ",3.5,0,1);
 		if(available_amount($item[whole turkey leg])>0)
 			add_food(con_map,"- whole turkey leg ",4.5,0,1);
-		if(my_fullness()==0)
-			add_food(con_map,"- spaghetti breakfast ",0.5 + 0.5 * my_level(),0,1);
+		if(my_fullness() == 0 && (available_amount($item[spaghetti breakfast])>0 || (have_skill($skill[spaghetti breakfast]) && !get_property("_spaghettiBreakfast").to_boolean())))
+			add_food(con_map,"- *** spaghetti breakfast (prefer to eat at higher levels, but must be first food of the day)",0.5 + 0.5 * my_level(),0,1);
+		
+		
+		if(available_amount($item[Snow berries]) + available_amount($item[ice harvest])>0)
+			add_food(con_map,"- Snow berries/Ice harvest ",2.5,0,1);
+		if(available_amount($item[Snow berries])>2)
+			add_food(con_map,"- Snow crab ",6,0,1);
 	
 	//	if(i_a("handful of smithereens")>0  || i_a("miserable pie")>0 || get_property("tomeSummons").to_int()<3)
 	//		add_food(con_map,"- miserable pie (smithereens) ",7,0,2);
@@ -782,7 +787,10 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 		if(available_amount($item[cold one])>0 || (have_skill($skill[grab a cold one]) && !get_property("_coldOne").to_boolean()))
 			add_drink(con_map,"- cold one (prefer to drink at higher levels)",6,0,1);
 		if(i_a("handful of smithereens")>0  || i_a("Paint A Vulgar Pitcher")>0 || get_property("tomeSummons").to_int()<3)
-			add_food(con_map,"- Paint A Vulgar Pitcher (smithereens) ",12,0,2);
+			add_drink(con_map,"- Paint A Vulgar Pitcher (smithereens) ",12,0,2);
+			
+		if(available_amount($item[Snow berries])>0 && available_amount($item[ice harvest])>2)
+			add_food(con_map,"- Ice Island Long Tea ",6,0,1);
 	}
 	//sort map
 	sort con_map by -value.efficiency;

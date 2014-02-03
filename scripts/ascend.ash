@@ -43,6 +43,10 @@ void stock_hotdog(string html, string ingredient, int req_ing, int desired_dogs)
 				//junkyard dog
 				dog=-99;
 				break;
+			case "tattered scrap of paper":
+				//optimal dog
+				dog=;
+				break;
 			default:
 				abort("Unrecognised dog on ascend line 30, using ingredient "+ingredient);
 		}
@@ -70,6 +74,7 @@ void stock_hotdogs()
 	stock_hotdog(hotdog_str,"tattered scap of paper",25,5);
 	stock_hotdog(hotdog_str,"guaze hammock",10,5);
 	stock_hotdog(hotdog_str,"issue of GameInformPowerDailyPro magazine",3,5);
+	stock_hotdog(hotdog_str,"tattered scrap of paper",25,5);
 }
 
 void buy_item(item it, int num)

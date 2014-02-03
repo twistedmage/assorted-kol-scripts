@@ -158,7 +158,7 @@ void unlock_hotdogs()
 	unlock_sly();
 //	unlock_chilly();
 	unlock_wet();
-	unlock_optimal();
+//	unlock_optimal();
 	unlock_owe();
 	unlock_devil();
 //	unlock_ghost();
