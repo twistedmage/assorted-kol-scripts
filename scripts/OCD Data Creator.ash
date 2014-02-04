@@ -4120,6 +4120,7 @@ save     [$item[jagged tooth]] = 0;
 save [$item[obnoxious riddle]] = 0;
 save [$item[barskin loincloth]] = 2;
 cli_execute("use * fruit bowl");
+save [$item[king cookie]] = 0;
 
 
 

@@ -1073,7 +1073,7 @@ void build_skillz() {
       fvars["mpcost"] = mp_cost(to_skill(sk));
       if (have_skill($skill[intrinsic spiciness])) {
          fvars["spelldmg"] = numeric_modifier("Spell Damage");  // reset since it may have previously been decremented
-         if (to_skill(sk).class != $class[sauceror]) fvars["spelldmg"] -= min(my_level(),10.0);
+         if (to_skill(sk).class == $class[sauceror]) fvars["spelldmg"] += min(my_level(),10.0);
       }
       rate = 0;
       d = to_spread(0);
@@ -1136,8 +1136,9 @@ void build_skillz() {
         case 11006: if (!have_equipped($item[trusty])) return; break;    // throw trusty needs a trusty
         case 11010: if (have_effect($effect[foe-splattered]) > 0) return; break;   // bifurcating blow
         case 12012: if (!happened("skill 12000")) break;         // plague claws could grant MP after bite
+           d = to_spread(happened("skill 12012") ? my_level()*3 : my_level()*2);
         case 12000: if ($phyla[bug,constellation,elemental,construct,plant,slime] contains m.phylum) break;
-           fields.special = "!! zombify"; break;                 // set flag for +MP since all regular MP is ignored
+           if (!happened("skill "+sk)) fields.special = "!! zombify"; break;    // set flag for +MP since all regular MP is ignored
         default: if (contains_text(fields.special,"regular")) {
               if (have_effect($effect[QWOPped up]) > 0 || (current_hit_stat() == $stat[moxie] && !($ints[1022,1023,1032,12010] contains sk))) return;
               switch (sk) {    // dmg formulas too complicated for data file
