@@ -8427,6 +8427,7 @@ boolean bcascMacguffinHiddenCity() {
 		//5 - Apartment: Get cursed three times. If we hit the NC without 3, get cursed, else fight spirit.
 		while (item_amount($item[moss-covered stone sphere]) == 0) {
 			set_property("choiceAdventure780", "1");
+			setMood("-");
 			if(my_thrall()==$thrall[Vampieroghi])
 				use_skill(1,$skill[dismiss pasta thrall]);
 //				abort("We can't get thrice cursed with a Vampieroghi thrall... (fixme line 8369)");
