@@ -8431,7 +8431,8 @@ boolean bcascMacguffinHiddenCity() {
 			if(my_thrall()==$thrall[Vampieroghi])
 				use_skill(1,$skill[dismiss pasta thrall]);
 //				abort("We can't get thrice cursed with a Vampieroghi thrall... (fixme line 8369)");
-			bumAdv($location[The Hidden Apartment Building], "", "", "1 choiceadv", "Getting the moss-covered stone sphere.", "-");
+			print("Getting the moss-covered stone sphere.","purple");
+			bumMiniAdv(1,$location[The Hidden Apartment Building]);
 		}
 		while (item_amount($item[moss-covered stone sphere]) == 1) {
 			bumMiniAdv(1, $location[An Overgrown Shrine (Northwest)], "");
