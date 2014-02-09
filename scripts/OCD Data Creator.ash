@@ -4121,6 +4121,7 @@ save [$item[obnoxious riddle]] = 0;
 save [$item[barskin loincloth]] = 2;
 cli_execute("use * fruit bowl");
 save [$item[king cookie]] = 0;
+save [$item[insulting hat]] = 2;
 
 
 

@@ -1156,8 +1156,11 @@ void OutfitQuest()
 					}
 					COLOSSEUM_ROUND = get_property("lastColosseumRoundWon").to_int();
 				}
-				if (item_amount($item[crayon shavings]) < 4) buy(4 - item_amount($item[crayon shavings]), $item[crayon shavings]);
-				print("Time for the boss fight! Make sure you remove any sources of elemental damage first.");
+				if (COLOSSEUM_ROUND == 15)
+				{
+					if (item_amount($item[crayon shavings]) < 4) buy(4 - item_amount($item[crayon shavings]), $item[crayon shavings]);
+					print("Time for the boss fight! Make sure you remove any sources of elemental damage first.");
+				}
 				break;
 			case 2:
 				if (is_wearing_outfit("mer-kin scholar's vestment") || is_wearing_outfit("crappy mer-kin disguise")) ;

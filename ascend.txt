@@ -215,9 +215,9 @@ PM + TT - asica
 
 TT + SC - twistedmage
 
-anid  - s,,<tt>
-dinala - at
-asica  - db,<pm>
+anid  - s
+dinala - at,<tt>
+asica  - pm
 twisted = s
 <to get last undying skeleton item, I need to be myst class to make pies>
 
@@ -230,15 +230,6 @@ Disco Bandit =     scholar
 Accordion Thief = scholar
 <dad MANUEL IS FINISHED>
 
-
-------landfill--------
-junk band * 3 - wire + glue
-junk trunks	* 2			- wire
-junk-mail shirt		* 1	 - glue
-arm buzzer		* 1 - wire + glue + battery
-boilgun * 1 (all done)
-swordzall * 3 (2 done) - wire + glue + battery
-battery on it's own
 
 ----------Zombie homeowners association---------
 familiar magic dragonfish; maximize muscle, equip weedy skirt; uneffect jaba; uneffect scarysauce; uneffect jala; ballpit; telescope high; use silver dreadsylvanian flask; use brass dreadsylvanian flask; use ferrigno; use philter; cast dark visions

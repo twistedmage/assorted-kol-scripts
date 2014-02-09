@@ -8428,7 +8428,8 @@ boolean bcascMacguffinHiddenCity() {
 		while (item_amount($item[moss-covered stone sphere]) == 0) {
 			set_property("choiceAdventure780", "1");
 			if(my_thrall()==$thrall[Vampieroghi])
-				abort("We can't get thrice cursed with a Vampieroghi thrall... (fixme line 8369)");
+				use_skill(1,$skill[dismiss pasta thrall]);
+//				abort("We can't get thrice cursed with a Vampieroghi thrall... (fixme line 8369)");
 			bumAdv($location[The Hidden Apartment Building], "", "", "1 choiceadv", "Getting the moss-covered stone sphere.", "-");
 		}
 		while (item_amount($item[moss-covered stone sphere]) == 1) {
