@@ -91,6 +91,152 @@ DFh8TGNKiFtW6JkCm11Y3Uv4YPWYCipEkr
 dogevault
 DGi7kVeHdac3iVR7S5TmMox3vVk7ntSRZk
 
+--------------loqo-------------------------
+missing pictures
+22
+28
+30
+34
+Name: Illustration 35 - "Blackeagle and the Bandit"Illustration 35 Crop 90(2).png
+Region: Arena of Champions
+Requirements: Defeat Class Champion of Class E
+
+41
+43
+48
+51
+52
+53
+65
+Name: Illustration 66 - "Roaring Beast"Illustration 66 Crop 90(2).png
+Region: Battle Peninsula
+Requirements: Master Hen'Tai Battle (Ship Required)
+
+68
+69
+70
+
+
+73
+80
+81
+82
+84
+85
+86
+87
+88
+89
+91-123
+Name: Illustration 92 - "Backfiring Plot"Illustration 92 Crop 90(2).png
+Region: Island northeast of Tel Ravida
+Requirements: Envelope on the floor inside the Monastery
+
+Name: Illustration 94 - The Slug Empress
+Region: Rockgard Village
+Requirements: Master Hen'Tai battle
+Artist: TheTentacleMonster (-no site given-)
+Character(s): Osira
+
+Name: Illustration 95 - "Playing with a Goddess"Illustration 95 Crop 90.png
+Region: Arena of Champions
+Requirements: Defeat Class Champion of Class D
+Artist: Ker
+Character(s): Farah, Opala
+
+Name: Illustration 96 - "Battle of the Boobs"Illustration 96 Crop 90(2).png
+Region: Tel Ravida (Middle Area, topleft house, second floor)
+Requirements: Master Hen'Tai battle
+Artist: Jose Malvado
+Character(s): Farah, Latex
+
+Name: Illustration 101 - "???"
+Region: Tower of despair
+Requirements: Defeat Knight Champion (fourth boss)
+Artist: ???
+Character(s): ???
+
+Name: Illustration 107 - "???"
+Region: Tower of despair
+Requirements: Defeat third boss
+Artist: ???
+Character(s): ???
+
+
+
+trading cards
+7
+8
+9
+
+Name: Trading Card 13 - "???"
+Region: Dreadclaw pass (On a pillar when you go west)
+
+Trading Card 19 - On a table at the Arena of Champions
+
+Name: Trading Card 20 - "Large Crowd Pleaser"
+Region: Palace of Thebes (Underground Caves)
+
+23
+24
+
+Trading Card 25 - Rockgard village, on a pillar behind the slave outpost.
+Trading Card 26 - ???
+Trading Card 27 - ???
+Trading Card 28 - Obtained from man standing across from the tavern in Thebes
+Trading Card 29 - ???
+Trading Card 30 - Obtained from fighting Mischief in cave to the right of Gabe's House in Neverless Canyons (right road on north side of Greystone Ruins)
+Trading Card 31 - ???
+Trading Card 32 - ???
+Trading Card 33 - Obtained from farmer in front of Gordo Farm
+Trading Card 34 - ???
+Trading Card 35 - ???
+Trading Card 36 - ???
+Trading Card 37 - ???
+Trading Card 38 - Obtained from fighting Sodwolf in Neverless Canyons entrance (coming from Rockgard Village)
+Trading Card 39 - Search the furniture in the house on the right of the costume color changing store, in Grand Aideen
+Trading Card 40 - Obtained from fighting perverted impregnator, in the impregnator lair. On the west side, where you met Latex.
+Trading Card 41 - Obtained from Blackeagle Bandits, at the Blackeagle Fortress. Bandit group on the stairs, inside the fortress, just after teleporting there.
+Trading Card 42 - Tower of moon, on a pillar in the carvern.
+Trading Card 43 - ???
+Trading Card 44 - ???
+Trading Card 45 - Obtained from Goblins, Temple of Sun, in the Castle. Room after you turn right at 2nd fork.
+Trading Card 46 - Obtained from Sand Giant, Dunes of Shaabera, plate of SW, grand space near Forest of Echoes.
+Trading Card 47 - Obtained in the cathedral on the island northeast of Tel Ravida.
+Trading Card 48 - Grand Aideen, House with the horny dog. Only accessible at night
+Trading Card 49 - ???
+Trading Card 50 - ???
+Trading Card 51 - ???
+Trading Card 52 - ???
+Trading Card 53 - Old House, Down stairs, to the right, then up a set of stairs, in the wardrobe.
+Trading Card 54 - ???
+Trading Card 55 - ???
+Trading Card 56 - ???
+Trading Card 57 - Temple of Sacrifice, Northern Cave, in between Titanium and Gold deposits.
+Trading Card 58 - ???
+Trading Card 59 - ???
+Trading Card 60 - ???
+Trading Card 61 - ???
+Trading Card 62 - Namaria shores, carvern in the upper path leading to a dead end.
+Trading Card 63 - ???
+Trading Card 64 - ???
+Trading Card 65 - ???
+Trading Card 66 - Blackeagle fortress, on a pillar in the tunnel.
+Trading Card 67 - ???
+Trading Card 68 - ???
+Trading Card 69 - ???
+Trading Card 70 - Rockgard village, near the gard sleeping in the slave outpost.
+
+Name: Trading Card 71 - "Sebastilion's Treat"
+Region: Palace of Thebes (Dungeon)
+Requirements: Lockpick. Card is in the small cell next to the sleeping prisoner.
+Artist: Sparrow (Hentai-foundry.com/profile-Sparrow.php)
+Character(s): Gabrielle, Opala, Sebastilion
+
+Trading Card 72 - Blackeagle fortress, in the west area of the castle.
+
+73-101
+
 ---------- urban x life------------
 - Pennywild, the neighbor:
 do the Bread Delivey job on monday, on this day, you should get the delivery quest for her, the first time, check the left side of the tv, the second, the right side, and choose ti watch the Bunny Wild program, 
@@ -195,12 +341,12 @@ tiny die-cast Father Crimbo
 -----------------------------------------------
 AT + SC - twistedmage,anid
 AT + TT - twistedmage, asica, dinala
-AT + PM - twistedmage
-AT + S
+AT + PM - twistedmage, <anid>
+AT + S  - <twistedmage>, <asica>
 AT + DB - twistedmage, 
 
 
-DB + SC - <twistedmage>
+DB + SC - twistedmage
 DB + TT - twistedmage, 
 
 DB + PM - twistedmage
@@ -215,8 +361,8 @@ PM + TT - asica
 
 TT + SC - twistedmage
 
-anid  - s
-dinala - at,<tt>
+anid  - s,<tt>
+dinala - at
 asica  - pm
 twisted = s
 <to get last undying skeleton item, I need to be myst class to make pies>
@@ -230,7 +376,19 @@ Disco Bandit =     scholar
 Accordion Thief = scholar
 <dad MANUEL IS FINISHED>
 
-
+------------mask stuff
+hare
+- get hare pin for fastest hare racer per day
+- 1*skull gearshift knob
+- 3*Sketcherz
+- 3*"honey" dipper
+- 2*fire hose
+- 2*plain paper hat
+witch
+- witchs bra for dily best witch
+- 3*candy stick
+- 3*licorice whip
+- 3*gummi sword
 ----------Zombie homeowners association---------
 familiar magic dragonfish; maximize muscle, equip weedy skirt; uneffect jaba; uneffect scarysauce; uneffect jala; ballpit; telescope high; use silver dreadsylvanian flask; use brass dreadsylvanian flask; use ferrigno; use philter; cast dark visions
 <need over 3k musc to do it in 30 rounds>

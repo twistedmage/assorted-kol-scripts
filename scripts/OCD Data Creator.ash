@@ -4122,10 +4122,16 @@ save [$item[barskin loincloth]] = 2;
 cli_execute("use * fruit bowl");
 save [$item[king cookie]] = 0;
 save [$item[insulting hat]] = 2;
-
-
-
-
+save [$item[accord ion]] = 3;
+save [$item[grimstone mask]] = 0;
+save [$item[junk band]] = 3;
+save [$item[junk trunks]] = 2;
+save [$item[junk-mail     shirt]] = 1;
+save [$item[arm buzzer]] = 1;
+save [$item[ghost accordion]] = 1;
+save [$item[folder (wizard)]] = 0;
+save [$item[foam noodle]] = 0;
+save [$item[rhesus monkey]] = 1;
 
 
 

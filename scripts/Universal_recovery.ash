@@ -122,8 +122,9 @@ int disco = to_int(have_skill($skill[Disco Nap]))
 	+ 2* to_int(have_skill($skill[Adventurer of Leisure]))
 	+ to_int(have_skill($skill[Executive Narcolepsy]))
 	+ 10*to_int(have_skill($skill[Food Coma]))
-	+ 5*to_int(have_skill($skill[Dog Tired]))
-	+ 3* to_int(have_familiar($familiar[Unconscious Collective]));
+	+ 5*to_int(have_skill($skill[Dog Tired]));
+	// For the 6 basic clases, possessing an Unconscious Collective gives 3 rests.
+if(my_class().to_int() < 7 && have_familiar($familiar[Unconscious Collective])) disco += 3;
 int rest_hp = numeric_modifier("Base Resting HP") * (numeric_modifier("Resting HP Percent")+100) / 100 + numeric_modifier("Bonus Resting HP");
 int rest_mp = numeric_modifier("Base Resting MP") * (numeric_modifier("Resting MP Percent")+100) / 100 + numeric_modifier("Bonus Resting MP");
 	// If the character has properties set to not auto-purhase from mall, then always stay in hardcore mode.
@@ -324,6 +325,7 @@ boolean populate_skills(int target) {
 	if(have_skill($skill[Laugh It Off])) skills[$skill[Laugh It Off]].ave =1.5;
 	if(have_skill($skill[Bite Minion])) skills[$skill[Bite Minion]].ave =max(my_maxhp()/10, 10);
 	if(have_skill($skill[Devour Minions])) skills[$skill[Devour Minions]].ave =max(my_maxhp()/2, 20);
+	if(have_skill($skill[Shake It Off])) skills[$skill[Shake It Off]].ave = 999999999;
 	foreach key in skills
 		skills[key].mp = max(mpcost(key) + mana_mod, 1);
 	return true;
@@ -333,10 +335,10 @@ boolean mp_heal(int target);
 // This will cast a skill. The advantage of this over use_skill is to control equipping of -MP Cost items and it sets _meatperhp
 boolean cast(int q, skill it) {
 	if(it == $skill[none]) return false;
-	if(it == $skill[Cannelloni Cocoon]) {
+	if(it == $skill[Cannelloni Cocoon] || it == $skill[Shake It Off]) {
 		if(my_hp() >= my_maxhp()) return true;
 		set_property("_meatperhp", to_string(max(skills[it].mp * get_property("_meatpermp").to_float() / (my_maxhp() - my_hp()), 0.001)));
-	}else if(!beset($effect[Beaten Up]))
+	} else if(!beset($effect[Beaten Up]))
 		set_property("_meatperhp", to_string(skills[it].mp * get_property("_meatpermp").to_float() / skills[it].ave));
 	if(q * skills[it].mp > my_maxmp())
 		q = floor(my_maxmp() / skills[it].mp);
@@ -784,7 +786,7 @@ void meatper() {
 	skill best_skill = find_cheapest_skill(my_maxhp()*1.25);
 	if(best_skill == $skill[none])
 		skill_mph = 987654321.0;
-	else if(best_skill == $skill[Cannelloni Cocoon])
+	else if(best_skill == $skill[Cannelloni Cocoon] || best_skill == $skill[Shake It Off])
 		skill_mph = skills[best_skill].mp * get_property("_meatpermp").to_float() / (my_maxhp() * .75);
 	else skill_mph = skills[best_skill].mp * get_property("_meatpermp").to_float() / skills[best_skill].ave;
 	if(mallcore) {
@@ -1258,7 +1260,7 @@ boolean inv_hp_restore(int target, item [int] options) {
 boolean cheapest_beatup() {
 	int [string] price;
 	item test;
-	foreach doodad in $strings[tiny house, forest tears, Soft green echo eyedrop antidote] {
+	foreach doodad in $strings[Space Tours Tripple, tiny house, forest tears, Soft green echo eyedrop antidote] {
 		test = doodad.to_item();
 		if(historical_age(test) > 2) price[doodad] = mall_price(test); 	// Ensure price is good
 		else price[doodad] = historical_price(test);
@@ -1304,6 +1306,11 @@ boolean cure_beatenup(int target){
 	
 	populate_skills(1);
 	
+	// Sneaky Pete has only one trick, but it does EVERYTHING. Check again for the strange case of high HP beaten up later.
+	if(have_skill($skill[Shake It Off]) && my_hp() < my_maxhp() / 5 && my_maxmp() >= skills[$skill[Shake It Off]].mp
+		  && (my_mp() >= skills[$skill[Shake It Off]].mp || mp_heal(skills[$skill[Shake It Off]].mp)))
+			return cast(1, $skill[Shake It Off]);
+	
 	// Zombie Master recovery
 	if(have_skill($skill[Devour Minions]))
 		return cast(1, $skill[Bite Minion]);
@@ -1324,6 +1331,8 @@ boolean cure_beatenup(int target){
 		switch {
 		case item_amount($item[personal massager]) >0:
 			use(1, $item[personal massager]); break;	// If beaten up outside of battle, it didn't auto-use!
+		case item_amount($item[Space Tours Tripple]) > 0:
+			use(1, $item[Space Tours Tripple]);
 		case item_amount($item[forest tears]) >0 && test_waste($item[forest tears]):
 			use(1, $item[forest tears]); break;
 		case item_amount($item[tiny house]) >0 && test_waste($item[tiny house]):
@@ -1333,6 +1342,8 @@ boolean cure_beatenup(int target){
 		switch {
 		case item_amount($item[personal massager]) >0:
 			use(1, $item[personal massager]); break;	// If beaten up outside of battle, it didn't auto-use!
+		case item_amount($item[Space Tours Tripple]) > 0:
+			use(1, $item[Space Tours Tripple]);
 		case item_amount($item[tiny house]) >0 && test_waste($item[tiny house]):
 			use(1, $item[tiny house]); break;
 		case item_amount($item[forest tears]) >0:
@@ -1341,6 +1352,12 @@ boolean cure_beatenup(int target){
 			use(1, $item[tiny house]); break;
 		}
 	}
+	
+	// Sneaky Pete has only one trick, but it does EVERYTHING! If HP is high and character is beaten up, it failed earlier
+	if(have_skill($skill[Shake It Off]) && my_maxmp() >= skills[$skill[Shake It Off]].mp
+		  && (my_mp() >= skills[$skill[Shake It Off]].mp || mp_heal(skills[$skill[Shake It Off]].mp)))
+			return cast(1, $skill[Shake It Off]);
+	
 	if(beset($effect[Beaten Up]) && have_skill($skill[Tongue of the Walrus]) && my_maxmp() >= skills[$skill[Tongue of the Walrus]].mp
 		  && (my_mp() >= skills[$skill[Tongue of the Walrus]].mp || mp_heal(skills[$skill[Tongue of the Walrus]].mp)))
 			cast(1, $skill[Tongue of the Walrus]);
@@ -1475,7 +1492,7 @@ boolean hp_heal(int target){
 	
 	// Let's not use the nuns if Caneloni Cocoon would be used later.
 	boolean use_nuns() {
-		if(have_skill($skill[Cannelloni Cocoon]) && get_property("nunsVisits").to_int() * 1000 + my_hp() < my_maxhp())
+		if((have_skill($skill[Cannelloni Cocoon]) || have_skill($skill[Shake It Off])) && get_property("nunsVisits").to_int() * 1000 + my_hp() < my_maxhp())
 			return false;
 		return true;
 	}

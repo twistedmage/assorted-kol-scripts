@@ -231,7 +231,7 @@ advevent to_event(string id, spread dmg, spread pdmg, string special, int howman
       case "custom": res.custom = (bittles.group(2) == "" ? "x" : bittles.group(2)); break;
       case "endscombat": res.endscombat = true; break;
       case "quick": res.rounds = 0; break;
-	  case "!!": res.note = bittles.group(2); break;
+      case "!!": res.note = bittles.group(2); break;
       case "noitems": noitems = 1.0; break;
       case "noskills": noskills = 1.0; break;
    }
@@ -307,7 +307,7 @@ float dmg_dealt(spread action) {
    foreach el,amt in action newdeal[el] = amt < 0 ? amt : max(to_int(amt > 0),amt - mres[el]*amt);  // first, apply monster resistances
    float softcapped(float orig) {
       if (damagecap < 1 || orig <= damagecap) return orig;
-	  return damagecap + floor((orig - damagecap)**capexp);
+      return damagecap + floor((orig - damagecap)**capexp);
    }
    foreach el,amt in newdeal res += softcapped(amt);
    return min(res,monster_stat("hp"));
@@ -434,6 +434,11 @@ float monstervalue() {
         // normal, no pp
          case "n": res += item_val(rec.drop,max(rec.rate,0.01));
       }
+   }
+   switch (braindrop(m)) {    // include brain drops for Zombie Slayer
+      case $item[none]: case $item[hunter brain]: break;      // mafia accounts for hunter brain drops already
+      case $item[boss brain]: res += item_val(braindrop(m),1.0); break;
+      default: res += item_val(braindrop(m),have_skill($skill[skullcracker]) ? 0.6 : 0.3);
    }
    return res + stat_value(m_stats());
 }
@@ -651,8 +656,8 @@ spread m_regular() {               // damage dealt by monster attack
       case $monster[the landscaper]: return to_spread(my_maxhp()*0.49);
       case $monster[vanya's creature]: return to_spread(my_maxhp()*0.125);
       case $monster[pufferfish]: return to_spread(2 + 2**round);
-	  case $monster[the unkillable skeleton (hard mode)]: return to_spread(my_maxhp()*0.09);
-	  case $monster[great wolf of the air (hard mode)]: if (round % 2 == 1) return to_spread(my_maxhp() + 50 - max(0,numeric_modifier("Damage Reduction"))); break;
+      case $monster[the unkillable skeleton (hard mode)]: return to_spread(my_maxhp()*0.09);
+      case $monster[great wolf of the air (hard mode)]: if (round % 2 == 1) return to_spread(my_maxhp() + 50 - max(0,numeric_modifier("Damage Reduction"))); break;
    }
    spread res;
    res[m.attack_element] = max(1.0,max(0,max(0,monster_stat("att")) - my_defstat(true)) + 0.225*max(0,monster_stat("att")) - max(0,numeric_modifier("Damage Reduction"))) *
@@ -696,7 +701,7 @@ advevent m_event(float att_mod, float stun_mod) {      // monster event -- attac
       case $monster[mer-kin healer]: res.dmg = to_spread(-min(125,monster_hp(m)+monster_level_adjustment()-monster_stat("hp")),max(0,1.0 - adj.stun)); break;
       case $monster[warbear officer]:
       case $monster[high-ranking warbear officer]:
-		 if (fvars contains "drone") switch (to_int(fvars["drone"])) {
+         if (fvars contains "drone") switch (to_int(fvars["drone"])) {
             case 1: case 7: res.pdmg[$element[none]] += 0.25*my_maxhp(); break;  // 7 is supercold
             case 2: res.pdmg[$element[hot]] += 0.25*my_maxhp(); break;
             case 3: res.pdmg[$element[cold]] += 0.25*my_maxhp(); break;
@@ -705,8 +710,8 @@ advevent m_event(float att_mod, float stun_mod) {      // monster event -- attac
             case 6: res.pdmg[$element[sleaze]] += 0.25*my_maxhp(); break;
             case 8: res.dmg = to_spread("-18"); break;
             case 9: res.mp -= 50; break;
-			default: vprint("Unknown drone shown!",-3);
-		 } break;
+            default: vprint("Unknown drone shown!",-3);
+         } break;
    }
    if (my_stat("hp") - dmg_taken(res.pdmg) <= 0) res.meat -= beatenup;    // the monster took you out -- and I don't mean to dinner. ouch!
    adj.att -= att_mod;
@@ -964,7 +969,7 @@ void build_items() {                                                // TODO: sph
    added.clear();
    foreach it,fields in factors["item"] {
       if (is_goal(to_item(it)) || item_amount(to_item(it)) <= blacklist["use "+it] || !be_good(to_item(it))) continue;
-	  if (blacklist contains ("use "+it) && blacklist["use "+it] < 1) continue;
+      if (blacklist contains ("use "+it) && blacklist["use "+it] < 1) continue;
       if (happened("use "+it) && (contains_text(fields.special,"once") || 
           (!to_item(it).reusable && happenings["use "+it].queued >= max(0,item_amount(to_item(it)) - blacklist["use "+it])) ||
            m == $monster[Yog-Urt, Elder Goddess of Hatred])) continue;
@@ -1012,7 +1017,12 @@ void build_items() {                                                // TODO: sph
       d = to_spread(fields.dmg);
       if (isseal) {
          foreach el,amt in d if (d[el] > 0) d[el] = min(1.0,amt);
-      } else if (have_equipped($item[v for vivala mask])) d = factor(d,1.5);
+      } else {
+         float dammult = 1.0;
+         if (have_equipped($item[v for vivala mask])) dammult += 0.5;
+         if (have_skill($skill[deft hands])) dammult += 0.25;
+         if (dammult > 1) d = factor(d,dammult);
+      }
       if (m == $monster[mother hellseal] && count(d) > 0) continue;
       advevent temp = to_event("use "+it,d,to_spread(fields.pdmg),fields.special,1);
       switch (my_fam()) {       // arbitrarily assume 30% blocking for these
@@ -1067,7 +1077,7 @@ void build_skillz() {
          case $monster[x bottles of beer on a golem]: if (is_spell(to_skill(sk))) return; break; // this dude blocks spells
          case $monster[zombie homeowners' association (hard mode)]:
          case $monster[zombie homeowners' association]: if (!contains_text(fields.special,"aoe ")) return; break; // only aoe skills work
-	  }
+      }
       if (my_location() == $location[The Tower of Procedurally-Generated Skeletons] && contains_text(m,"shiny") && is_spell(to_skill(sk))) return;
       fvars["elembonus"] = spell_elem_bonus(excise(fields.dmg," ",""));
       fvars["mpcost"] = mp_cost(to_skill(sk));
@@ -1100,7 +1110,7 @@ void build_skillz() {
         case 3025: if (!have_equipped($item[hand that rocks the ladle])) break; d = to_spread(fields.dmg); foreach el in $elements[] d[el] += 11; break;  // utensil twist
         case 4014: if (!happened("skill 4014")) fields.special = "quick"; break;
         case 6030: if (!(factors["cadenza"] contains to_int(equipped_item($slot[weapon])))) return; combat_rec acc = factors["cadenza",to_int(equipped_item($slot[weapon]))];
-           d = to_spread(acc.dmg); fields.pdmg = acc.pdmg; fields.special = acc.special; break;
+           d = to_spread(acc.dmg); fields.pdmg = acc.pdmg; fields.special = list_add(acc.special,"once"); break;
         case 7061: fvars["wpnpower"] = get_power(equipped_item($slot[weapon])); break;      // spring raindrop attack
         case 7074: if (my_maxhp() - my_stat("hp") <= 2*burrowgrub_amt() || my_maxmp() - my_stat("mp") <= burrowgrub_amt()) return; break;  // skip burrowgrub unless none is wasted
         case 7081: fvars["botcharges"] = get_property("bagOTricksCharges").to_int(); break;
@@ -1115,19 +1125,19 @@ void build_skillz() {
                else { d = to_spread((6*monster_stat("hp"))+" hot,cold,spooky,sleaze,stench,none"); fields.special = "custom, once, endscombat"; }
            } break;
         case 7112: rate = ((have_effect($effect[taste the inferno])-1)/50.0)*item_val($item[nuclear blastball]); break;  // nuclear breath costs a blastball, but should be used
-        case 7116: if (m.phylum == $phylum[dude]) fields.special += ", stun 1"; break;
+        case 7116: if (m.phylum == $phylum[dude]) fields.special += ", stun"; break;
         case 7137: effect nano; int turns; foreach e in $effects[nanobrawny, nanobrainy, nanoballsy] if (have_effect(e) > turns) { nano = e; turns = have_effect(e); }
            switch (nano) {    // unleash nanites
-		      case $effect[nanobrawny]: if (m.boss || turns < 40) {
+              case $effect[nanobrawny]: if (m.boss || turns < 40) {
                  d = to_spread(turns*10); fields.pdmg = to_string(-turns*5); fields.special = "custom, once";
-			  } else fields.special = "custom banish, endscombat"; break;
-		      case $effect[nanobrainy]: if (m.boss || turns < 40) {
+              } else fields.special = "custom banish, endscombat"; break;
+              case $effect[nanobrainy]: if (m.boss || turns < 40) {
                  d = to_spread(turns*10); fields.special = "custom, once, mp "+to_string(-turns*5);
-			  } else fields.special = "custom, once, !! replaces monster with gray goo!"; break;
-		      case $effect[nanoballsy]: if (m.boss || turns < 40 || have_effect($effect[everything looks yellow]) > 0) {
+              } else fields.special = "custom, once, !! replaces monster with gray goo!"; break;
+              case $effect[nanoballsy]: if (m.boss || turns < 40 || have_effect($effect[everything looks yellow]) > 0) {
                  fields.pdmg = to_string(-turns); fields.special = "custom, once, att -"+(turns/2)+", def -"+(turns/2)+", mp "+turns+", !! amounts unknown";
-			  } else fields.special = "custom yellow, once, endscombat"; break;
-			  default: return;
+              } else fields.special = "custom yellow, once, endscombat"; break;
+              default: return;
            }
         case 7142: case 7143: case 7144: case 7145: if (item_amount($item[pixel power cell]) == 0) return; 
            rate = item_val($item[pixel power cell]); break;  // anger/fear/regret/doubt weapons cost pixel cells
@@ -1228,13 +1238,13 @@ void build_options() {
    if (item_type(equipped_item($slot[weapon])) == "chefstaff" && contains_text(page,"chefstaffform") &&
        !happened("jiggle") && factors["chef"] contains to_int(equipped_item($slot[weapon])) && !(blacklist contains "jiggle")) {
       int stf = to_int(equipped_item($slot[weapon]));
-	  void chkstf(string prop) { if (to_int(get_property(prop)) > 4) stf -= 6000; }
+      void chkstf(string prop) { if (to_int(get_property(prop)) > 4) stf -= 6000; }
       switch (stf) {
          case 6259: chkstf("_jiggleLife"); break;
          case 6261: chkstf("_jiggleCheese"); break;
          case 6263: chkstf("_jiggleSteak"); break;
          case 6265: chkstf("_jiggleCream"); break;
-	  }
+      }
       if (isseal) factors["chef",stf].dmg = "1";
       addopt(to_event("jiggle",factors["chef",stf],1),0,0);
    }
@@ -1413,6 +1423,10 @@ void set_monster(monster elmo) {  // should be called once per BB instance; init
    if (have_equipped($item[mer-kin hookspear])) fvars["monstermeat"] = to_float(my_path() == "Way of the Surprising Fist" ? max(meat_drop(m),12) : meat_drop(m));
    if (my_location().zone == "Dreadsylvania") { fvars["woodskisses"] = $location[dreadsylvanian woods].kisses; 
       fvars["villagekisses"] = $location[dreadsylvanian village].kisses; fvars["castlekisses"] = $location[dreadsylvanian castle].kisses; }
+   if (have_skill($skill[disco face stab]) || have_skill($skill[knife in the dark]) || have_skill($skill[disco shank])) {
+      fvars["bestknife"] = 0;
+      foreach i in get_inventory() if (item_type(i) == "knife" && can_equip(i) && get_power(i) > fvars["bestknife"]) fvars["bestknife"] = get_power(i);
+   }
   // set default monster attributes
    nostun = false; nomultistun = false; nomiss = false; nohit = false; isseal = false;
    howmanyfoes = 1; maxround = 30; damagecap = 0; capexp = 0; noitems = 0; noskills = 0;
@@ -1464,30 +1478,44 @@ void set_monster(monster elmo) {  // should be called once per BB instance; init
          matcher drone = create_matcher("wbdrone(\\d+)\\.gif",page);      // store drone number in fvars, checked by m_event
          if (drone.find()) { vprint("DRONE DETECTED: "+drone.group(1),4); fvars["wardrone"] = to_int(drone.group(1)); } break;
    }
-   if (my_location() == $location[The Tower of Procedurally-Generated Skeletons]) {
-      matcher skelatt = create_matcher("\\b([a-z]+?)\\b",excise(m,", the "," skeleton"));
-      while (skelatt.find()) switch (skelatt.group(1)) {
-         case "accurate": setmatt("nomiss",""); break;
-         case "blazing": base.pdmg[$element[hot]] += my_maxhp()*0.2; break;
-         case "charred": mres = get_resistance($element[hot]); break;
-         case "dancing": setmatt("noitems",""); break;
-         case "disorienting": setmatt("noskills","0.7"); break;
-         case "foul": mres = get_resistance($element[stench]); break;
-         case "frigid": base.pdmg[$element[cold]] += my_maxhp()*0.2; break;
-         case "frozen": mres = get_resistance($element[cold]); break;
-         case "ghostly": mres[$element[none]] = 1; break;
-         case "greasy": mres = get_resistance($element[sleaze]); break;
-         case "lascivious": base.pdmg[$element[sleaze]] += my_maxhp()*0.2; break;
-         case "scary": mres = get_resistance($element[spooky]); break;
-         case "shimmering": foreach el in $elements[] mres[el] = 1; break;
-         case "terrifying": base.pdmg[$element[spooky]] += my_maxhp()*0.2; break;
-		 case "thorny": setmatt("retal","50"); break;   // arbitrarily chosen value; unspaded!
-         case "unstoppable": setmatt("nostun",""); break;
-         case "unwashed": base.pdmg[$element[stench]] += my_maxhp()*0.2; break;
-         case "deadly": case "giant": case "nimble": case "thick": case "smelling":
-		 case "shifty": case "shiny": break;  // 'shiny' handled in build_skillz, 'shifty' in hitchance
-         default: vprint("Unsupported skeletal attribute: "+skelatt.group(1),"gray",3);                 // TODO: vicious deals bonus damage
-	  }
+   switch (my_location()) {
+     case $location[The Tower of Procedurally-Generated Skeletons]:
+       matcher skelatt = create_matcher("\\b([a-z]+?)\\b",excise(m,", the "," skeleton"));
+       while (skelatt.find()) switch (skelatt.group(1)) {
+          case "accurate": setmatt("nomiss",""); break;
+          case "blazing": base.pdmg[$element[hot]] += my_maxhp()*0.2; break;
+          case "charred": mres = get_resistance($element[hot]); break;
+          case "dancing": setmatt("noitems",""); break;
+          case "disorienting": setmatt("noskills","0.7"); break;
+          case "foul": mres = get_resistance($element[stench]); break;
+          case "frigid": base.pdmg[$element[cold]] += my_maxhp()*0.2; break;
+          case "frozen": mres = get_resistance($element[cold]); break;
+          case "ghostly": mres[$element[none]] = 1; break;
+          case "greasy": mres = get_resistance($element[sleaze]); break;
+          case "lascivious": base.pdmg[$element[sleaze]] += my_maxhp()*0.2; break;
+          case "scary": mres = get_resistance($element[spooky]); break;
+          case "shimmering": foreach el in $elements[] mres[el] = 1; break;
+          case "terrifying": base.pdmg[$element[spooky]] += my_maxhp()*0.2; break;
+          case "thorny": setmatt("retal","50"); break;   // arbitrarily chosen value; unspaded!
+          case "unstoppable": setmatt("nostun",""); break;
+          case "unwashed": base.pdmg[$element[stench]] += my_maxhp()*0.2; break;
+          case "deadly": case "giant": case "nimble": case "thick": case "smelling":
+          case "shifty": case "shiny": break;  // 'shiny' handled in build_skillz, 'shifty' in hitchance
+          default: vprint("Unsupported skeletal attribute: "+skelatt.group(1),"gray",3);                 // TODO: vicious deals bonus damage
+       } break;
+     case $location[Video Game Level 3]: 
+       switch (get_property("gameProBossSpecialPower")) {
+          case "Cold immunity": mres[$element[cold]] = 1; break;
+          case "Cold aura": base.pdmg[$element[cold]] += 7; break;
+          case "Hot immunity": mres[$element[hot]] = 1; break;
+          case "Hot aura": base.pdmg[$element[hot]] += 7; break;
+          case "Blocks combat items": setmatt("noitems",""); break;
+          case "Reduced physical damage": mres[$element[none]] = 0.5; break;
+          case "Stun resistance": setmatt("nostun",""); break;
+          case "Elemental Resistance": foreach el in $elements[] mres[el] = 0.3; break;
+          case "Passive damage": onhit.pdmg[$element[none]] += 10;   // how much damage do the spikes do?
+          default: vprint("Unsupported boss attribute: " + get_property("gameProBossSpecialPower"),"gray",3); // Ignores armor, Reduced damage from spells
+      } break;
    }
    parse_factors();
   // initialize effects/gear
@@ -1552,7 +1580,7 @@ string act(string action) {
       if (contains_text(action,"grab something") || contains_text(action,"You manage to wrest") ||
          (my_class() == $class[disco bandit] && contains_text(action,"knocked loose some treasure."))) {
          vprint("You snatched a "+doodad+" ("+rnum(item_val(doodad))+entity_decode("&mu;")+")!","green",5);
-		 mvalcache = monstervalue();
+         mvalcache = monstervalue();
          should_pp = vprint("Revised monster value: "+rnum(mvalcache),"green",-4);
          set_happened("stolen");
       } else vprint("Look! You found "+n+" "+doodad+" ("+rnum(n*item_val(doodad))+entity_decode("&mu;")+")!","green",5);
@@ -1720,11 +1748,11 @@ string batround() {
       case $monster[mer-kin netdragger]: case $monster[Johnringo, the Netdragger]: if (have_equipped($item[mer-kin switchblade]))
          res.append("while (match \"starts to fold his net up\" && hasskill 7091) || (match \"draws it back like a baseball bat\" && "+
          "hasskill 7092) || (match \"attaches some sharp metal barbs\" && hasskill 7093); if match \"starts to fold his net up\" && hasskill "+
-		 "7091; skill 7091; endif; if match \"draws it back like a baseball bat\" && hasskill 7092; skill 7092; endif; if match \"attaches "+
+         "7091; skill 7091; endif; if match \"draws it back like a baseball bat\" && hasskill 7092; skill 7092; endif; if match \"attaches "+
          "some sharp metal barbs\" && hasskill 7093; skill 7093; endif; endwhile; "); break;  // sling, roller, runner
       case $monster[Falls-From-Sky (Hard Mode)]:
       case $monster[Falls-From-Sky]: res.append("if match \"begins to spin in a circle\"; skill 7161; endif; "+
-	     "if match \"begins to paw at the ground\"; skill 7160; endif; if match \"shuffles toward you\"; skill 7159; endif; "); break;
+         "if match \"begins to paw at the ground\"; skill 7160; endif; if match \"shuffles toward you\"; skill 7159; endif; "); break;
    }
    switch (my_fam()) {
       case $familiar[he-boulder]: if (have_effect($effect[everything looks yellow]) > 0 || !contains_text(to_lower_case(vars["BatMan_yellow"]),to_lower_case(m.to_string()))) break;

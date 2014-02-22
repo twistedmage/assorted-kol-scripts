@@ -504,12 +504,13 @@ string helperSemiRare() {
 	string [location] rewards;
 		rewards[$location[The Sleazy Back Alley]] = "wine.gif|Distilled fotified wine (3)|0";
 		rewards[$location[The Haunted Pantry]] = "pie.gif|Tasty tart (3)|0";
-		rewards[$location[The Limerick Dungeon]] = "eyedrops.gif|cyclops eyedrops|21";
+		rewards[$location[The Limerick Dungeon]] = "eyedrops.gif|cyclops eyedrops|0";
 		rewards[$location[The Valley of Rof L'm Fao]] = "scroll2.gif|Fight Bad ASCII Art|68";
-		rewards[$location[The Castle in the Clouds in the Sky (Top Floor)]] = "inhaler.gif|Mick's IcyVapoHotness Inhaler|95";
+		rewards[$location[The Castle in the Clouds in the Sky (Top Floor)]] = "inhaler.gif|Mick's IcyVapoHotness Inhaler|85";
 		rewards[$location[The Outskirts of Cobb's Knob]] = "lunchbox.gif|Knob Goblin lunchbox|0";
+		rewards[$location[The Copperhead Club]] = "rocks_f.gif|Flamin' Whatshisname (3)|104";
 	if(can_interact()) {
-		rewards[$location[An Octopus's Garden]] = "bigpearl.gif|Fight a moister oyster|200";
+		rewards[$location[An Octopus's Garden]] = "bigpearl.gif|Fight a moister oyster|148";
 	} else {
 		if(available_amount($item[stone wool]) < 1)
 			rewards[$location[The Hidden Temple]] = "stonewool.gif|Fight Baa'baa'bu'ran|5";
@@ -518,7 +519,7 @@ string helperSemiRare() {
 		if(!have_outfit("Mining Gear") && my_path() != "Way of the Surprising Fist")
 			rewards[$location[Itznotyerzitz Mine]] = "mattock.gif|Fight Dwarf Foreman|53";
 	}
-		
+	
 	int semirareCounter = to_int(get_property("semirareCounter"));
 	location semirareLocation = semirareCounter == 0? $location[none]: get_property("semirareLocation").to_location();
 	string message = semirareCounter == 0? "No semirare so far during this ascension"
@@ -628,14 +629,28 @@ void pickerFlavour() {
 //ckb: function for effect descriptions to make them short and pretty, called by chit.effects.describe
 string parseMods(string ef) {
 
+	if(ef == "Knob Goblin Perfume") return "";
+
 	string evm = string_modifier(ef,"Evaluated Modifiers");
-	buffer enew;
+	buffer enew;  // This is used for rebuilding evm with append_replacement()
 	
 	// Standardize capitalization
 	matcher uncap = create_matcher("\\b[a-z]", evm);
 	while(uncap.find())
 		uncap.append_replacement(enew, to_upper_case(uncap.group(0)));
 	uncap.append_tail(enew);
+	evm = enew;
+	
+	// Move parenthesis to the beginning of the modifier
+	enew.set_length(0);
+	matcher paren = create_matcher("(,|^)(.*?)\\((.+?)\\)", evm);
+	while(paren.find()) {
+		paren.append_replacement(enew, paren.group(1));
+		enew.append(paren.group(3));
+		enew.append(" ");
+		enew.append(paren.group(2));
+	}
+	paren.append_tail(enew);
 	evm = enew;
 	
 	// Anything that applies the same modifier to all stats or all elements can be combined
@@ -675,7 +690,6 @@ string parseMods(string ef) {
 	matcher parse = create_matcher("((?:Hot|Cold|Spooky|Stench|Sleaze|Prismatic) )Damage: ([+-]?\\d+), \\1Spell Damage: \\2"
 		+"|([HM]P Regen )Min: (\\d+), \\3Max: (\\d+)"
 		+"|Maximum HP( Percent)?:([^,]+), Maximum MP\\6:([^,]+)"
-		+"|(?:, *)?Familiar Weight: \\+5"
 		+"|Weapon Damage( Percent)?: ([+-]?\\d+), Spell Damage\\9?: \\10", evm);
 	while(parse.find()) {
 		parse.append_replacement(enew, "");
@@ -714,23 +728,24 @@ string parseMods(string ef) {
 	// If HP and MP regen are the same, combine them
 	enew.set_length(0);
 	parse = create_matcher("^\\s*(,)\\s*"
-		+"|(\\s*Drop|\\s*Percent)?:\\s*(([+-])?\\d+)"
+		+"|(\\s*Drop|\\s*Percent([^:]*))?(?<!Limit):\\s*(([+-])?\\d+)"
 		+"|(HP Regen ([0-9-]+), MP Regen \\6)", evm);
 	while(parse.find()) {
 		parse.append_replacement(enew, "");
-		if(parse.group(1) == ",") {			// group(1) would contain extra comma at beginning
+		if(parse.group(1) == ",") {			// group would contain extra comma at beginning
 			// Delete this: append nothing
-		} else if(parse.group(3) != "") { 	// group(3) is the numeric modifier
-			if(parse.group(4) == "")		// group(4) would contain + or -
+		} else if(parse.group(4) != "") { 	// group is the numeric modifier
+			enew.append(parse.group(3));	// group is possible words after "Percent"
+			if(parse.group(5) == "")		// group would contain + or -
 				enew.append(" +");
 			else enew.append(" ");
-			enew.append(parse.group(3));	// This does not contain Drop, Percent or the colon.
-			if(parse.group(2) != "")		// group(2) is Drop or Percent
+			enew.append(parse.group(4));	// This does not contain Drop, Percent or the colon.
+			if(parse.group(2) != "")		// group is Drop or Percent
 				enew.append("%");
 		
-		} else if(parse.group(5) != "") {	// group(5) is the HP&MP combined Regen	
+		} else if(parse.group(6) != "") {	// group is the HP&MP combined Regen	
 			enew.append("All Regen ");
-			enew.append(parse.group(6));
+			enew.append(parse.group(7));
 		}
 	}
 	parse.append_tail(enew);
@@ -741,15 +756,15 @@ string parseMods(string ef) {
 	evm = replace_string(evm,"Damage Absorption","DA");
 	evm = replace_string(evm,"Weapon","Wpn");
 	evm = replace_string(evm,"Damage","Dmg");
-	evm = replace_string(evm,"Experience (Familiar)", "Fam xp");
-	evm = replace_string(evm,"Experience","Exp");
 	evm = replace_string(evm,"Initiative","Init");
 	evm = replace_string(evm,"Monster Level","ML");
 	evm = replace_string(evm,"Moxie","Mox");
 	evm = replace_string(evm,"Muscle","Mus");
 	evm = replace_string(evm,"Mysticality","Myst");
 	evm = replace_string(evm,"Resistance","Res");
+	evm = replace_string(evm,"Familiar Experience","Fam xp");
 	evm = replace_string(evm,"Familiar","Fam");
+	evm = replace_string(evm,"Experience","Exp");
 	evm = replace_string(evm,"Maximum","Max");
 	evm = replace_string(evm,"Smithsness","Smith");
 	//decorate elemental tags with pretty colors
@@ -1364,7 +1379,7 @@ void pickerFamiliar(familiar myfam, item famitem, boolean isFed) {
 				mod = mod.replace_string(m.group(0), m.group(1)+" Bonus ");
 			// Remove boring stuff
 			mod = mod.replace_string(' "Adventure Underwater"', ", Underwater");
-			mod = create_matcher(',? *(Generic|Softcore Only|Familiar Weight: \\+5| *\\(Fam\\)|Equips On: "[^"]+"|Fam Effect:|Underwater Fam|")', mod).replace_all("");
+			mod = create_matcher(',? *(Generic|Softcore Only|Fam Weight \\+5| *\\(Fam\\)|Equips On: "[^"]+"|Fam Effect:|Underwater Fam|")', mod).replace_all("");
 			// Last touch ups
 			mod = mod.replace_string("Fam Weight", "Weight");
 			if(famitem == $item[Snow Suit] && equipped_item($slot[familiar]) != $item[Snow Suit])
@@ -1832,7 +1847,156 @@ void pickerThrall() {
 	chitPickers["thrall"] = picker;
 }
 
+void FamBoris() {
+	string famimage, equiptype, equipimage, clancyLink, famweight;
+	string source = chitSource["familiar"];
+	matcher level = create_matcher("Level <b>(.*?)</b> Minstrel", source);
+	if(find(level)) famweight = level.group(1).to_int();
+	matcher image = create_matcher("(otherimages/.*?) width=60", source);
+	if(find(image)) famimage = image.group(1);
+
+	// Does Clancy want attention?
+	matcher att = create_matcher("Minstrel</font><br><a target=mainpane href=(.*?)>", source);
+	if(find(att)) clancyLink = att.group(1);
+	
+	// What is Clancy equipped with?
+	if(famimage.contains_text("_1"))
+		equiptype = "Clancy's sackbut";
+	else if(famimage.contains_text("_2"))
+		equiptype = "Clancy's crumhorn";
+	else if(famimage.contains_text("_3"))
+		equiptype = "Clancy's lute";
+	equipimage = equiptype.to_item().image;
+	
+	string info = '<br><span style="color:#606060;font-weight:normal">Level ' + famweight + ' Minstrel';
+	switch(equiptype) {
+	case "Clancy's sackbut": info += "<br><br>Restore HP/MP</span>"; break;
+	case "Clancy's crumhorn": info += "<br><br>Increase Exp</span>"; break;
+	case "Clancy's lute": info += "<br><br>Phat Loot!</span>"; break;
+	}
+	
+	
+	//Finally start some output
+	buffer result;
+	result.append('<table id="chit_familiar" class="chit_brick nospace">');
+	
+	result.append('</tr><tr>');
+	result.append('<td class="clancy" title="Your Faithful Minstrel">');
+	#result.append('<img src="/images/' + famimage + '" width=50 height=100 border=0>');
+	if(clancyLink != "")
+		result.append('<a target=mainpane href="'+clancyLink+'" class="familiarpick">');
+	result.append('<img src="/images/' + famimage + '">');
+	if(clancyLink != "")
+		result.append('</a>');
+	result.append('</td>');
+	result.append('<td class="info">Clancy');
+	result.append(info);
+	result.append('</td>');
+	result.append('<td class="icon" title="');
+	result.append(equiptype);
+	result.append('">');
+	result.append('<a class="chit_launcher" rel="chit_pickerfam" href="#">');
+	result.append('<img src="/images/itemimages/' );
+	result.append(equipimage);
+	result.append('">');
+	result.append('</a></td>');
+	result.append('</tr>');
+	
+	result.append('</table>');
+	chitBricks["familiar"] = result;
+
+	//Add Equipment Picker
+	pickerFamiliar($familiar[none], familiar_equipped_equipment(my_familiar()), false);
+}
+
+# <font size=2><b>Companion:</b><br><img src=http://images.kingdomofloathing.com/adventureimages/jarlcomp3.gif width=100 height=100><br><b>Ella</b><br>the Hippotatomous</font><br><font color=blue size=2><b>+3 Stats per Combat</b></font>
+# <font size=2><b>Companion:</b><br>(none)
+void FamJarlsberg() {
+	string famimage, famname, famtype, actortype, equiptype;
+	matcher companion = create_matcher('images/(.*?\\.gif).*?<b>([^<]*)</b><br>([^<]*).*?<br>(.*?font>)', chitSource["familiar"]);
+	if(find(companion)) {
+		famimage = companion.group(1);
+		famname = companion.group(2);
+		famtype = companion.group(3);
+		actortype = famname+', '+famtype;
+		equiptype = companion.group(4);
+	} else {
+		famimage = "blank.gif";
+		famname = "";
+		famtype = "";
+		actortype = "(No Companion)";
+		equiptype = "<font color=blue size=2><b>Click to Summon a Companion</b></font>";
+	}
+	buffer result;
+	result.append('<table id="chit_familiar" class="chit_brick nospace">');
+	result.append('<tr><th colspan="2" title="Companion">');
+	result.append(actortype);
+	result.append('</th></tr>');
+	
+	result.append('<tr><td class="companion" title="Playing with this food">');
+	result.append('<a class="chit_launcher" rel="chit_pickerfam" href="#">');
+	result.append('<img src="images/adventureimages/' );
+	result.append(famimage);
+	result.append('"></a></td>');
+	result.append('<td class="info"><a class="chit_launcher" rel="chit_pickerfam" href="#">');
+	result.append(equiptype);
+	result.append('</a></td>');
+	result.append('</tr></table>');
+	
+	chitBricks["familiar"] = result;
+
+	//Add Companion Picker
+	pickerCompanion(famname, famtype);
+}
+
+# <a target=mainpane href=main.php?action=motorcycle><img src=/images/adventureimages/bigbike.gif width=100 height=100 border=0 alt="Hermes the Motorcycle" title="Hermes the Motorcycle"></a><br> <b>Hermes</b>
+void FamPete() {
+	string peteMotorbike(string part) {
+		string pref = get_property("peteMotorbike"+part.replace_string(" ", ""));
+		if(pref == "") return "(factory standard)";
+		return pref;
+	}
+	string famlink, famimage, famname;
+	matcher motorcycle = create_matcher('(<[^>]+>).*?adventureimages/([^ ]+).*?<b>(.+?)</b>', chitSource["familiar"]);
+	if(find(motorcycle)) {
+		famlink = motorcycle.group(1);
+		famimage = motorcycle.group(2);
+		famname = motorcycle.group(3);
+	} else {
+		famlink = "main.php";
+		famimage = "blank.gif";
+		famname = "No Motorcycle?";
+	}
+	buffer result;
+	result.append('<table id="chit_familiar" class="chit_brick nospace">');
+	result.append('<tr><th colspan="2" title="Motorcycle">');
+	result.append(famname);
+	result.append('</th></tr>');
+	result.append('<tr><td class="motorcycle" title="');
+	foreach pref in $strings[Tires, Gas Tank, Headlight, Cowling, Muffler, Seat] {
+		result.append(pref);
+		result.append(': ');
+		result.append(peteMotorbike(pref));
+		if(pref != "Seat") result.append('\n');
+	}
+	result.append('" style="overflow:hidden;">');
+	result.append(famlink);
+	result.append('<img src="images/adventureimages/');
+	result.append(famimage);
+	result.append('"></a></td>');
+	result.append('</tr></table>');
+	
+	chitBricks["familiar"] = result;
+}
+		
 void bakeFamiliar() {
+
+	// Special Challenge Path Familiar-ish things
+	switch(my_path()) {
+	case "Avatar of Boris": FamBoris(); break;
+	case "Avatar of Jarlsberg": FamJarlsberg(); break;
+	case "Avatar of Sneaky Pete": FamPete(); return;
+	}
 
 	string source = chitSource["familiar"];
 
@@ -2019,99 +2183,6 @@ void bakeFamiliar() {
 		}
 	}
 	
-	// Special Challenge Path Familiar-ish things?
-	if(my_path() == "Avatar of Boris") {
-		famtype = "Clancy";
-		protect = true;
-		matcher level = create_matcher("Level <b>(.*?)</b> Minstrel", source);
-		if(find(level)) famweight = level.group(1).to_int();
-		matcher image = create_matcher("(otherimages/.*?) width=60", source);
-		if(find(image)) famimage = image.group(1);
-
-		// Does Clancy want attention?
-		string clancyLink;
-		matcher att = create_matcher("Minstrel</font><br><a target=mainpane href=(.*?)>", source);
-		if(find(att)) clancyLink = att.group(1);
-		
-		// What is Clancy equipped with?
-		if(famimage.contains_text("_1"))
-			equiptype = "Clancy's sackbut";
-		else if(famimage.contains_text("_2"))
-			equiptype = "Clancy's crumhorn";
-		else if(famimage.contains_text("_3"))
-			equiptype = "Clancy's lute";
-		equipimage = equiptype.to_item().image;
-		
-		info = '<br><span style="color:#606060;font-weight:normal">Level ' + famweight + ' Minstrel';
-		switch(equiptype) {
-		case "Clancy's sackbut": info += "<br><br>Restore HP/MP</span>"; break;
-		case "Clancy's crumhorn": info += "<br><br>Increase Exp</span>"; break;
-		case "Clancy's lute": info += "<br><br>Phat Loot!</span>"; break;
-		}
-		
-		
-		//Finally start some output
-		buffer result;
-		result.append('<table id="chit_familiar" class="chit_brick nospace">');
-		
-		result.append('</tr><tr>');
-		result.append('<td class="clancy" title="Your Faithful Minstrel">');
-		#result.append('<img src="/images/' + famimage + '" width=50 height=100 border=0>');
-		if(clancyLink != "")
-			result.append('<a target=mainpane href="'+clancyLink+'" class="familiarpick">');
-		result.append('<img src="/images/' + famimage + '">');
-		if(clancyLink != "")
-			result.append('</a>');
-		result.append('</td>');
-		result.append('<td class="info" style="' + famstyle + '">' + famtype + info + '</td>');
-		result.append('<td class="icon" title="' + equiptype + '">');
-		result.append('<a class="chit_launcher" rel="chit_pickerfam" href="#">');
-		result.append('<img src="/images/itemimages/' + equipimage + '">');
-		result.append('</a></td>');
-		result.append('</tr>');
-		
-		result.append('</table>');
-		chitBricks["familiar"] = result;
-
-		//Add Equipment Picker
-		pickerFamiliar(myfam, famitem, isFed);
-
-		return;
-	} else if(my_path() == "Avatar of Jarlsberg") {
-		# <font size=2><b>Companion:</b><br><img src=http://images.kingdomofloathing.com/adventureimages/jarlcomp3.gif width=100 height=100><br><b>Ella</b><br>the Hippotatomous</font><br><font color=blue size=2><b>+3 Stats per Combat</b></font>
-		# <font size=2><b>Companion:</b><br>(none)
-		matcher companion = create_matcher('images/(.*?\\.gif).*?<b>([^<]*)</b><br>([^<]*).*?<br>(.*?font>)', source);
-		if(find(companion)) {
-			famimage = companion.group(1);
-			famname = companion.group(2);
-			famtype = companion.group(3);
-			actortype = famname+', '+famtype;
-			equiptype = companion.group(4);
-		} else {
-			famimage = "blank.gif";
-			famname = "";
-			famtype = "";
-			actortype = "(No Companion)";
-			equiptype = "<font color=blue size=2><b>Click to Summon a Companion</b></font>";
-		}
-		buffer result;
-		result.append('<table id="chit_familiar" class="chit_brick nospace">');
-		result.append('<tr><th colspan="2" title="Companion">'+actortype+'</th></tr>');
-		
-		result.append('<tr><td class="companion" title="Playing with this food">');
-		result.append('<a class="chit_launcher" rel="chit_pickerfam" href="#">');
-		result.append('<img src="images/adventureimages/' + famimage + '"></a></td>');
-		result.append('<td class="info" style="' + famstyle + '"><a class="chit_launcher" rel="chit_pickerfam" href="#">' + equiptype + '</a></td>');
-		result.append('</tr></table>');
-		
-		chitBricks["familiar"] = result;
-
-		//Add Companion Picker
-		pickerCompanion(famname, famtype);
-
-		return;
-	}
-
 	//Add final touches to additional info
 	if (info != "") {
 		info = '<br><span style="color:#606060;font-weight:normal">(' + info + ')</span>';
@@ -2666,10 +2737,35 @@ void addSauce(buffer result) {
 	result.append('</td>');
 	if(to_boolean(vars["chit.stats.showbars"])) {
 		result.append('<td class="progress">');
-		result.append('<div class="progressbox" title="' + my_soulsauce() + ' / 100"><div class="progressbar" style="width:' + my_soulsauce() + '%"></div></div></td>');
+		result.append('<div class="progressbox" title="');
+		result.append(my_soulsauce());
+		result.append(' / 100"><div class="progressbar" style="width:');
+		result.append(my_soulsauce());
+		result.append('%"></div></div></td>');
 		result.append('</td>');
 	}
 	result.append('</tr>');
+}
+
+void addAud(buffer result) {
+	matcher parseAud = create_matcher("Aud:</td><td align=left>(.+?)</td>", chitSource["stats"]);
+	if(parseAud.find()) {
+		result.append('<tr>');
+		result.append('<td class="label">Aud</td><td class="info">');
+		result.append(parseAud.group(1));
+		result.append('</td>');
+		int audience = abs(my_audience());
+		if(to_boolean(vars["chit.stats.showbars"])) {
+			result.append('<td class="progress">');
+			result.append('<div class="progressbox" title="');
+			result.append(audience);
+			result.append(' / 30"><div class="progressbar" style="width:');
+			result.append(to_string(audience * 3.33));
+			result.append('%"></div></div></td>');
+			result.append('</td>');
+		}
+		result.append('</tr>');
+	}
 }
 
 void addOrgan(buffer result, string organ, boolean showBars, int current, int limit, boolean eff) {
@@ -3114,8 +3210,10 @@ void bakeStats() {
 		}
 		if(my_fury() > 0 && section.contains_text("muscle"))
 			result.addFury();
-		if(my_soulsauce() > 0 && section.contains_text("myst"))
+		else if(my_soulsauce() > 0 && section.contains_text("myst"))
 			result.addSauce();
+		else if(my_path() == "Avatar of Sneaky Pete" && section.contains_text("moxie"))
+			result.addAud();
 		result.append("</tbody>");
 	}
 
@@ -3203,11 +3301,11 @@ void pickOutfit() {
 	location loc = my_location();
 	if(loc == $location[none]) // Possibly beccause a fax was used
 		loc = lastLoc;
-	string local(string o) {
+	string localize(string o) {
 		string boldit(string o) { return '<div style ="font-weight:700;color:darkred;">'+o+'</div>'; }
 		switch(o) {
 		case "Swashbuckling Getup":
-			if($locations[The Obligatory Pirate's Cove, Barrrney's Barrr, The F'c'le] contains loc)
+			if($locations[The Obligatory Pirate's Cove, Barrrney's Barrr, The F'c'le] contains loc || last_monster() == $monster[booty crab])
 				return boldit(o);
 			break;
 		case "Mining Gear":
@@ -3239,7 +3337,7 @@ void pickOutfit() {
 			if(is_wearing_outfit(o) && o != "Birthday Suit")
 				picker.append('<tr class="pickitem current"><td class="info">' + o + '</td>');
 			else
-				picker.append('<tr class="pickitem"><td class="info"><a class="change" href="'+ sideCommand("outfit "+o) + '">' + local(o) + '</a></td>');
+				picker.append('<tr class="pickitem"><td class="info"><a class="change" href="'+ sideCommand("outfit "+o) + '">' + localize(o) + '</a></td>');
 		}
 		
 	picker.append('<tr class="pickitem"><td style="color:white;background-color:blue;font-weight:bold;">Custom Outfits</td></tr>');
@@ -3278,8 +3376,10 @@ void pickOutfit() {
 	
 	// A Light that Never Goes Out & Half a Purse: Need to be swapped often
 	if(have_effect($effect[Merry Smithsness]) > 0)
-		foreach e in $items[A Light that Never Goes Out, Half a Purse]
-			special.addGear(e);
+		special.addGear($items[A Light that Never Goes Out, Half a Purse]);
+
+	if(get_property("dailyDungeonDone") == "false")
+		special.addGear($item[ring of Detect Boring Doors]);
 		
 	// Certain quest items need to be equipped to enter locations
 	if(available_amount($item[digital key]) + creatable_amount($item[digital key]) < 1 && get_property("questL13Final") != "finished")
@@ -3347,7 +3447,8 @@ void bakeCharacter() {
 				myTitle = group(titleMatcher, 1);
 			}
 		}
-		if(myTitle == "Avatar of Jarlsberg" || myTitle == "Avatar of St. Sneaky Pete")  // Too long!
+	} else {
+		if(myTitle == "Avatar of Jarlsberg" || myTitle == "Avatar of Sneaky Pete" || myTitle == "Unknown")  // Too long!
 			myTitle = "Avatar";
 	}
 
@@ -3397,6 +3498,8 @@ void bakeCharacter() {
 		myGuild = "campground.php?action=grave";
 	else if(my_path() == "Avatar of Jarlsberg")
 		myGuild = "da.php?place=gate2";
+	else if(my_path() == "Avatar of Sneaky Pete")
+		myGuild = "da.php?place=gate3";
 
 	// LifeStyle suitable for charpane
 	string myLifeStyle() {
@@ -3436,7 +3539,7 @@ void bakeCharacter() {
 		case "Avatar of Jarlsberg": return "Jarlsberg";
 		case "KOLHS": return "<a target='mainpane' style='font-weight:normal;' href='place.php?whichplace=KOLHS'>KOLHS</a>";
 		case "Class Act II: A Class For Pigs": return "Class Act <span style='font-family:Times New Roman,times,serif'>II</span>"; // Shorten. Also II looks a LOT better in serif
-		case "Avatar of St. Sneaky Pete": return "Sneaky Pete";
+		case "Avatar of Sneaky Pete": return "Sneaky Pete";
 		}
 		return my_path();
 	}
@@ -3483,13 +3586,13 @@ void bakeCharacter() {
 	result.append('</tr>');
 
 	result.append('<tr>');
-	result.append('<td class="info">' + myLifeStyle() + '</td>');
+	result.append('<td class="info">' + myPath() + '</td>');
 	result.append('</tr>');
 	
 	// 30x30:	hp.gif		meat.gif		hourglass.gif		swords.gif
 	// 20x20:	slimhp.gif	slimmeat.gif	slimhourglass.gif	slimpvp.gif
 	result.append('<tr>');
-	result.append('<td class="info">' + myPath() + '</td>');
+	result.append('<td class="info">' + myLifeStyle() + '</td>');
 	if(hippy_stone_broken() && index_of(chitSource["health"], "peevpee.php") > 0) {
 		matcher fites = create_matcher("PvP Fights Remaining.+?black>(\\d+)</span>", chitSource["health"]);
 		if(fites.find())
@@ -4507,11 +4610,12 @@ boolean parsePage(buffer original) {
 	matcher parse;
 
 	// Familiar: Could be before or after effects block
-	parse = create_matcher("(<p><span class=small><b>Familiar:.+?>none</a>\\)</span>"+  // familiar (none)
-		"|<table width\\=90%.+?Familiar:.+?</table></center>"+  // regular familiar
-		"|<b>Clancy</b>.*?</font></center>"+  // Clancy (Avatar of Boris)
-		"|<font size=2><b>Companion:</b>.*?(?:</b></font>|none\\)))"  // (Avatar of Jarlsberg)
-			, source);
+	parse = create_matcher("(<p><span class=small><b>Familiar:.+?>none</a>\\)</span>"  // familiar (none)
+		+ "|<table width\\=90%.+?Familiar:.+?</table></center>"  // regular familiar
+		+ "|<b>Clancy</b>.*?</font></center>"  // Clancy (Avatar of Boris)
+		+ "|<font size=2><b>Companion:</b>.*?(?:</b></font>|none\\))"  // (Avatar of Jarlsberg)
+		+ "|<a target=mainpane href=main.php\\?action=motorcycle>.*?</b>"  // (Avatar of Sneaky Pete)
+		+ ")", source);
 	if(find(parse)) {
 		chitSource["familiar"] = parse.group(1);
 		source = parse.replace_first("");

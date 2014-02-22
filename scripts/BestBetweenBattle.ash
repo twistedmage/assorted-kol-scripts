@@ -42,6 +42,17 @@ boolean cookiecheck() {
    return true;
 }
 
+void use_goalcontaining_items() {
+   if (my_path() == "Way of the Surprising Fist") cli_execute("use * teachings of the fist");
+    else if (!can_interact()) cli_execute("sell * meat stack; sell * dense meat stack");
+   cli_execute("use * evil eye");
+   while (item_amount($item[gnollish toolbox]) > 0 && be_good($item[gnollish toolbox]) && (is_goal($item[bitchin' meatcar]) || is_goal($item[meat engine])))
+      use(1,$item[gnollish toolbox]);
+   if (count(useforitems) == 0 && !load_current_map("use_for_items", useforitems)) return;
+   foreach cont,res,chance in useforitems
+      while (item_amount(cont) > 0 && be_good(cont) && is_goal(res) && chance > 0) use(1,cont);
+}
+
 // CHOICEADVS!!
 void set_choiceadvs() {       // this is where the arduous magic happens.
    if (!to_boolean(vars["bbb_adjust_choiceadvs"])) return;
@@ -139,7 +150,7 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
         // Raver
          if (item_amount($item[drum 'n' bass 'n' drum 'n' bass record]) == 0 && !have_equipped($item[mohawk wig]) && 
             get_property("questL10Garbage") != "finished") friendlyset(676,"3","Get a quest (drum+bass)*2 record.");
-          else if (has_goal($monster[raver giant]) > 0) friendlyset(676,"3","Fight Raver Giants for goals.");
+          else if (has_goal($monster[raver giant]) > 0) friendlyset(676,"1","Fight Raver Giants for goals.");
           else if (get_property("choiceAdventure676") == "2") vprint("Respecting user's decision to set Raver choice to restore HP/MP.",5);
           else friendlyset(676,"4","Nothing in Raver; proceed to Punk Rock.");
         // Punk
@@ -215,6 +226,7 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
       case $location[the defiled nook]:
          if (be_good($item[rusty bonesaw]) && item_amount($item[rusty bonesaw]) < to_int(vars["bbb_miniboss_items"]))
             friendlyset(155,"3","Get "+vars["bbb_miniboss_items"]+" rusty bonesaws.");
+          else if (get_property("choiceAdventure155") != "3") return;
           else if (is_goal($stat[moxie])) friendlyset(155,"1","Get moxie stats.");
           else friendlyset(155,"4","Skip rusty bonesaw/non-primestat choiceadv.");
          return;
@@ -260,8 +272,8 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
             friendlyset(80,"99","Unlock second floor.");
           else if (get_property("choiceAdventure80") != "3") friendlyset(80,"4","Skip Rise of Spookyraven.");
          if (get_property("lastGalleryUnlock").to_int() != my_ascensions() &&    // Fall
-             (my_primestat() == $stat[muscle] || to_item(get_property("currentBountyItem")) == $item[non-euclidean hoof] ||
-              my_level() > 13 || to_int(get_property("fistSkillsKnown")) > 0) || my_path() == "Bugbear Invasion") {
+             (my_primestat() == $stat[muscle] || get_property("currentHardBountyItem") == "non-Euclidean hoof" ||
+              (my_level() > 13 && my_path() != "BIG!") || to_int(get_property("fistSkillsKnown")) > 0) || my_path() == "Bugbear Invasion") {
             friendlyset(81,"1","Read stuff about pet alligators or something.");
             set_property("choiceAdventure87","2");
          } else {
@@ -284,8 +296,8 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
          return;
       case $location[the hidden bowling alley]:
          if (item_amount($item[bowling ball]) > 0 && get_property("hiddenBowlingAlleyProgress").to_int() < 7) friendlyset(788,"1","Bowl!");
-         if (item_amount($item[bowl of scorpions]) == 0 && item_amount($item[bowling ball]) + get_property("hiddenBowlingAlleyProgress").to_int() < 5 &&
-            my_meat() > 1000 && my_path() != "Way of the Surprising Fist") retrieve_item(1,$item[bowl of scorpions]);
+         if (item_amount($item[bowl of scorpions]) == 0 && item_amount($item[bowling ball]) + get_property("hiddenBowlingAlleyProgress").to_int() < 5 && my_meat() > 1000 &&
+            get_property("hiddenTavernUnlock").to_int() == my_ascensions() && my_path() != "Way of the Surprising Fist") retrieve_item(1,$item[bowl of scorpions]);
          return;
       case $location[the hidden office building]:
          if (item_amount($item[boring binder clip]) > 0 && get_property("hiddenOfficeProgress") == "5") use(1,$item[boring binder clip]);
@@ -295,26 +307,30 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
           else friendlyset(786,"6","Skip Working Holiday.");
          return;
       case $location[the hidden park]:
-         if (have_item($item[antique machete]) == 0 || includes_goal($items[bowling ball,half-size scalpel,head mirror,surgical mask,surgical apron,bloodied surgical dungarees]))
+         if (get_property("relocatePygmyJanitor").to_int() < my_ascensions()) friendlyset(789,"2","Knock over the dumpster (move pygmy janitors here).");
+		  else if (have_item($item[antique machete]) == 0 || item_amount($item[bowling ball]) + get_property("hiddenBowlingAlleyProgress").to_int() < 5 ||
+		     min(1,have_item($item[half-size scalpel])) + min(1,have_item($item[head mirror])) + min(1,have_item($item[surgical mask])) + 
+			 min(1,have_item($item[surgical apron])) + min(1,have_item($item[bloodied surgical dungarees])) < 5 ||
+             includes_goal($items[bowling ball,half-size scalpel,head mirror,surgical mask,surgical apron,bloodied surgical dungarees]))
             friendlyset(789,"1","Dumpster dive!");
-          else if (get_property("relocatePygmyJanitor").to_int() < my_ascensions()) friendlyset(789,"2","Knock over the dumpster (move pygmy janitors here).");
           else friendlyset(789,"6","Skip the dumpster.");
          return;
       case $location[the hidden temple]: 
-        // such great heights
          if ((goal_exists("choiceadv") || is_goal($item[the nostril of the serpent])) && 
           item_amount($item[stone wool]) > 0 && have_effect($effect[stone-faced]) == 0) use(1,$item[stone wool]);
+        // such great heights
          if (item_amount($item[the nostril of the serpent]) == 0 && get_property("lastTempleButtonsUnlock").to_int() < my_ascensions())
             friendlyset(579,"2","Get the Nostril of the Serpent.");
           else if (get_property("lastTempleAdventures").to_int() < my_ascensions()) friendlyset(579,"3","Gain a trio of adventures!");
           else if (is_goal($stat[mysticality])) friendlyset(579,"1","Already got Nostril and adventures, get goal myst stats.");
-        // heart (pikachulotlcoatlopteryx)
+        // unconfusing buttons
          if (!($strings[step3, finished] contains get_property("questL11Worship"))) {
-            friendlyset(580,"1","Unlock the Hidden City.");
+//            friendlyset(580,"1","Unlock the Hidden City.");
             friendlyset(584,"4","Unlock the Hidden City.");
          } else {
-            friendlyset(580,"2","Hidden City unlocked, leave Pikachutlotl and go back to the Heart.");
-			friendlyset(584,"0","Choice of post-quest Heart not yet supported.");
+//            friendlyset(580,"2","Hidden City unlocked, leave Pikachutlotl and go back to the Heart.");
+			if (is_goal($item[ancient calendar fragment])) friendlyset(584,"2","Hidden City unlocked, get goal ancient calendar fragment.");
+			 else if (is_goal($stat[muscle])) friendlyset(584,"1","Hidden City unlocked, get muscle stats.");
          }
         // fitting in (stone wool choice)
          if (get_property("choiceAdventure579") == "2") friendlyset(582,"1","Go to the heights for the Nostril.");
@@ -405,6 +421,10 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
          }
          return;
       case $location[The Shore, Inc. Travel Agency]:
+         foreach i in $items[] if (sells_item($coinmaster[The Shore\, Inc. Gift Shop],i) && has_goal(i) > 0 &&
+             item_amount($item[Shore Inc. Ship Trip Scrip]) >= sell_price($coinmaster[The Shore\, Inc. Gift Shop],i))
+            buy($coinmaster[The Shore\, Inc. Gift Shop],1,i);
+         use_goalcontaining_items();
          if (is_goal($stat[muscle])) friendlyset(793,"1","Take muscly vacations.");
           else if (is_goal($stat[mysticality])) friendlyset(793,"2","Take mystical vacations.");
           else friendlyset(793,"3","Take moxious vacations.");
@@ -456,7 +476,7 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
          if (!have_skill($skill[pulverize]) || item_amount($item[tenderizing hammer]) == 0) return;
          foreach its in $items[goatskin umbrella, wool hat] if (item_amount(its) == 1 && !is_goal(its)) cli_execute("pulverize 1 "+its);
          return;
-      case $location[tavern cellar]:
+      case $location[the typical tavern cellar]:
          if (numeric_modifier("Stench Damage") < 20) friendlyset(514, 1, "Less than +20 Stench Damage");
           else friendlyset(514,"2","Stink out the rats.");
          if (numeric_modifier("Spooky Damage") < 20) friendlyset(515, 1, "Less than +20 Spooky Damage");
@@ -500,17 +520,6 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
          return;
 */
    }
-}
-
-void use_goalcontaining_items() {
-   if (my_path() == "Way of the Surprising Fist") cli_execute("use * teachings of the fist");
-    else if (!can_interact()) cli_execute("sell * meat stack; sell * dense meat stack");
-   cli_execute("use * evil eye");
-   while (item_amount($item[gnollish toolbox]) > 0 && be_good($item[gnollish toolbox]) && (is_goal($item[bitchin' meatcar]) || is_goal($item[meat engine])))
-      use(1,$item[gnollish toolbox]);
-   if (count(useforitems) == 0 && !load_current_map("use_for_items", useforitems)) return;
-   foreach cont,res,chance in useforitems
-      while (item_amount(cont) > 0 && be_good(cont) && is_goal(res) && chance > 0) use(1,cont);
 }
 
 boolean fight_items() {
@@ -661,7 +670,9 @@ boolean taming_check() {
    vprint("Preparing to tame a "+tort.turtle+"...",2);
    switch (tort.tier) {
       case 3: if (!ensure_turtlefam(true)) return vprint("You need a turtle familiar to hunt a "+tort.turtle+" here.",-4);
-      case 2: cli_execute("checkpoint");
+      case 2: if (my_location() == $location[the arid, extra-dry desert] && 
+         (have_equipped($item[uv-resistant compass]) || have_equipped($item[ornate dowsing rod]))) return false;
+         cli_execute("checkpoint");
          if (!have_equipped($item[turtling rod]) && !have_equipped($item[flail of the seven aspects]) &&
         !equip($item[flail of the seven aspects]) && !equip($item[turtling rod]))
         return vprint("You need to be able to equip a turtling rod to hunt a "+tort.turtle+" here.",-4);
@@ -682,6 +693,8 @@ familiar dropfam() {
          case $familiar[gelatinous cubeling]: return (available_amount($item[eleven-foot pole]) == 0 || 
             available_amount($item[ring of detect boring doors]) == 0 || available_amount($item[pick-o-matic lockpicks]) == 0);
          case $familiar[green pixie]: if (have_effect($effect[absinthe-minded]) > 0) return false; return clim("_absintheDrops",5);
+         case $familiar[grim brother]: return clim("_grimFairyTaleDrops",5);
+         case $familiar[grimstone golem]: return clim("_grimstoneMaskDrops",1);
          case $familiar[happy medium]: return clim("_mediumSiphons",20);
          case $familiar[knob goblin organ grinder]: return clim("_pieDrops",5);
          case $familiar[li'l xenomorph]: return clim("_transponderDrops",5);
@@ -694,9 +707,9 @@ familiar dropfam() {
       } return false;
    }
    for i from 1 upto 10
-    foreach f in $familiars[green pixie, li'l xenomorph, baby sandworm, astral badger, llama lama, mini-hipster, bloovian groose, 
-       rogue program, pair of stomping boots, blavious kloop, unconscious collective, angry jung man, happy medium, 
-       knob goblin organ grinder, artistic goth kid, gelatinous cubeling]
+    foreach f in $familiars[green pixie, li'l xenomorph, baby sandworm, grim brother, grimstone golem, astral badger, llama lama, mini-hipster, 
+       bloovian groose, rogue program, blavious kloop, unconscious collective, angry jung man, happy medium, 
+       knob goblin organ grinder, artistic goth kid, pair of stomping boots, gelatinous cubeling]
       if (have_familiar(f) && has_more_drop(f,i)) return f;
    return my_familiar();
 }
@@ -724,6 +737,7 @@ setvar("bbb_turtlegear",false);   // toggle automatically creating gear from tam
 setvar("bbb_famitems",false);     // toggle automatically farming familiar-dropped items
 check_version("Best Between Battle","bestbetweenbattle",1240);
 
+/*
 void hacienda_tracking() {
    if (get_property("lastHaciendaReset").to_int() < my_ascensions() || get_property("haciendaLayout").length() < 19) {
       set_property("haciendaLayout","0000000000000000000");
@@ -769,6 +783,7 @@ void hacienda_tracking() {
          }
       }
 }
+*/
 
 void bbb() {
   // reactions to previous encounters; expect this to get fleshed out with more ascensions
@@ -785,7 +800,7 @@ void bbb() {
       } break;
       case "Keep On Turnin' the Wheel in the Sky": visit_url("council.php"); break;
    }
-   if (my_location() == $location[the island barracks]) hacienda_tracking();
+//   if (my_location() == $location[the island barracks]) hacienda_tracking();
    if (have_equipped($item[bag o' tricks]) && (run_combat().contains_text("a single fat bumblebee") || run_combat().contains_text("You open the bag and ")))
       set_property("bagOTricksCharges","0");
   // exchange tokens for tickets if they'll probably be needed

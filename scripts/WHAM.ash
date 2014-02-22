@@ -196,6 +196,8 @@
 		13-11-29:Remove code for saucesplashing as that is no longer a thing
 				 Entangling Noodles are only useful for Pastamancers, adapt stunning logic for the new class specific stun skills		
 		14-02-01:Ban windchimes and PADL phones against Trendy Bugbear Chefs
+		14-02-18:Remove special support for video game bosses and use BatBrain for that
+				 Attempt to use DIsco Dances somewhat intelligently to gain Disco Momentum until BatBrain/SS has a better idea
 ***********************************************************************************************************************/
 import <SmartStasis.ash>;
 
@@ -316,50 +318,13 @@ void set_skeleton_info() {
 //Set information for the procedurally generated skeletons
 void set_gameinformboss_info() {
 	switch(get_property("gameProBossSpecialPower")) {
-		case "Cold immunity":
-			vprint("WHAM: This boss is immune to cold damage.", "green", 5);		
-			mres[$element[cold]] = 1;
-			break;
-		case "Cold aura":
-			vprint("WHAM: This boss has a cold aura that does 5-10 damage per turn.", "green", 5);		
-			//res0.pdmg[$element[cold]] += 7;
-			break;
-		case "Hot immunity":
-			vprint("WHAM: This boss is immune to hot damage.", "green", 5);		
-			mres[$element[hot]] = 1;
-			break;
-		case "Hot aura":
-			vprint("WHAM: This boss has a hot aura that does 5-10 damage per turn.", "green", 5);		
-			//res.pdmg[$element[hot]] += 7;		
-			break;		
 		case "Ignores armor":
-			vprint("WHAM: This boss is ignores some of your armor.", "green", 5);	
+			vprint("WHAM: This boss is ignores some of your armor. This is currently not handled, attempting anyway.", "green", 5);	
 			break;		
-		case "Blocks combat items":
-			vprint("WHAM: This boss is blocks items.", "green", 5);
-			noitems = 100;
-			break;		
-		case "Reduced physical damage":
-			vprint("WHAM: This boss is resistant to physical damage.", "green", 5);		
-			mres[$element[none]] = 0.5;		
-			break;
 		case "Reduced damage from spells":
-			vprint("WHAM: This boss is takes 30% less damage from spells.", "green", 5);	
-			break;
-		case "Stun resistance":
-			vprint("WHAM: This boss is cannot be stunned.", "green", 5);
-			nostun = true;
-			break;
-		case "Elemental Reistance":
-			vprint("WHAM: This boss is resistant to elemental damage.", "green", 5);
-			foreach el in $elements[]
-				mres[el] = 0.3;		
-			break;
-		case "Passive damage":
-			vprint("WHAM: This boss deals physical damage when attacked with melee weapons.", "green", 5);	
+			vprint("WHAM: This boss is takes 30% less damage from spells. This is currently not handled, attempting anyway.", "green", 5);	
 			break;
 	}
-	build_options();
 }
     
 //Calculate number of bees if needed
@@ -1113,6 +1078,18 @@ void build_custom_WHAM() {
 		vprint("WHAM: Throwing some pocket crumbs at yoru opponent", "purple", 5);
 		encustom(get_action($skill[Pocket Crumbs]));		
 	}
+	
+	//Disco Dances for Dicso Bandits
+	if(my_class() == $class[Disco Bandit]) {
+		if(have_skill($skill[Disco State of Mind]) && have_skill($skill[Disco Greed]) && have_skill($skill[Flashy Dancer]) && !nostun) {
+			if(has_option(get_action($skill[Disco Dance of Doom])))
+				encustom(get_action($skill[Disco Dance of Doom]));
+			if(has_option(get_action($skill[Disco Dance II: Electric Boogaloo])))
+				encustom(get_action($skill[Disco Dance II: Electric Boogaloo]));
+			if(has_option(get_action($skill[Disco Dance 3: Back in the Habit])))
+				encustom(get_action($skill[Disco Dance 3: Back in the Habit]));			
+		}
+	}	
 		
 	switch (to_string(m)) {
 		//Boss actions

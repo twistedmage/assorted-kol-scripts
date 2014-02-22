@@ -103,7 +103,7 @@ string join(string[int] pieces, string glue) {
 }
 // returns true if a glue-delimited list contains needle (case-insensitive)
 boolean list_contains(string list, string needle, string glue) {
-   return create_matcher("(^|"+glue+")"+to_lower_case(needle)+"($|"+glue+")",to_lower_case(list)).find();
+   return create_matcher("(^|"+glue+")\\Q"+to_lower_case(needle)+"\\E($|"+glue+")",to_lower_case(list)).find();
 }
 boolean list_contains(string list, string needle) { return list_contains(list, needle, ", "); }
 // adds a unique entry to a glue-delimited list (and so won't add if already exists), returns modified list
@@ -413,6 +413,17 @@ int have_item(string tolookup) {
    return item_amount(to_item(tolookup)) + equipped_amount(to_item(tolookup));
 }
 
+// returns the brain dropped by a given monster
+item braindrop(monster patient) {
+   if (my_path() != "Zombie Slayer" || $phyla[bug,constellation,elemental,construct,plant,slime] contains patient.phylum) return $item[none];
+   if (index_of(patient.image,"hunter") == 0) return $item[hunter brain];
+   if ($monsters[Boss Bat, Baron von Ratsworth, Knob Goblin King, giant skeelton, huge ghuol, conjoined zmombie, gargantulihc, Bonerdagon, 
+      Groar, Dr. Awkward, Lord Spookyraven, Protector Spectre, The Big Wisniewski, Guy Made Of Bees] contains patient) return $item[boss brain];
+   if (monster_attack(patient) + monster_level_adjustment() >= 100) return $item[good brain];
+   if (monster_attack(patient) + monster_level_adjustment() > 50) return $item[decent brain];
+   return $item[crappy brain];
+}
+
 // returns true if the given stat is a goal (from setting "level X" or "<stat> X" as a condition), or primestat needed for run
 boolean is_goal(stat gstat) {
    foreach i,g in get_goals() if (create_matcher("\\d+ "+to_lower_case(gstat),g).find()) return true;
@@ -494,6 +505,11 @@ float has_goal(monster m, boolean usespec) {                      // chance of g
                           numeric_modifier("Item Drop"))+100)/100.0,0,100)/100.0; continue;
          case "0": res += .001; continue;
       }
+   }
+   if (is_goal(braindrop(m))) switch (braindrop(m)) {       // include brains for Zombie Slayers
+      case $item[hunter brain]: break; case $item[boss brain]: res += 1; break;
+      default: res += minmax((have_skill($skill[skullcracker]) ? 0.6 : 0.3)*((usespec ? numeric_modifier("_spec","Item Drop") :
+         numeric_modifier("Item Drop"))+100)/100.0,0,100)/100.0;
    }
    return res;
 }
