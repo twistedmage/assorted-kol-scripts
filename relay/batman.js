@@ -32,7 +32,8 @@ function bjilgt(doug) {
 
   // functions for (re)loading various sections of the page: Adventure Again box, Blacklist tab, and Wiki tab, respectively
    function refresh_again() {
-	   $('#again').load('fight.ash', {dashi: 'annae'});
+      $('#again').load('fight.ash', {dashi: 'annae'});
+      $('#srhelper').load('fight.ash', {dashi: 'sera'});           // also reload semirare helper here
    }
    function refresh_blacklist(data) {
       if (!data) data = {black: 'get'};
@@ -43,7 +44,7 @@ function bjilgt(doug) {
    }
    cliComplete = function(data) {                                  // extend cliComplete to refresh the Again box when done
       oldComplete.apply(this, arguments);
-	  refresh_again();
+      refresh_again();
    };
 
 jQuery(function($){
@@ -83,16 +84,16 @@ jQuery(function($){
    if ($('#battab').length != 0) {
       if ($('table.actionbar').length == 0) $('body').css('margin-bottom','310px');
        else $('div.content').append('<p><img src="/images/otherimages/spacer.gif" width=1 height=310>');
-	   //css('bottom',$('#battab').position().top+40);
+      //css('bottom',$('#battab').position().top+40);
       $('#battab > div').hide();
       $('#battab div:first').fadeIn('fast');
       $('#battab ul li:first').addClass('active');
       $('#battab ul li a').click(function(){
-	     if ($(this).parent().hasClass('active')) return false;   // ignore clicks if already active
+         if ($(this).parent().hasClass('active')) return false;   // ignore clicks if already active
          $('#battab ul li.active').removeClass('active');         // remove active from active
          $(this).parent().addClass('active');
-		 if ($(this).hasClass('wickytrigger')) load_wicky();
-		 if ($(this).hasClass('blacktrigger')) refresh_blacklist();
+         if ($(this).hasClass('wickytrigger')) load_wicky();
+         if ($(this).hasClass('blacktrigger')) refresh_blacklist();
          var selectedTab = $(this).attr('href');
          $('#battab > div').stop(true,true).fadeOut('fast');
          $(selectedTab).delay(200).fadeIn('fast');
@@ -117,7 +118,7 @@ jQuery(function($){
           'oLanguage': {
              'sInfo': '_TOTAL_ possible actions',
              'sSearch': '<img src="/images/itemimages/magnify.gif" title="Filter (press 9 to give focus)" height=16 width=16> ',
-			 'sZeroRecords': 'No matching actions found'
+             'sZeroRecords': 'No matching actions found'
           },
           'bSortClasses': false,                                    // don't bother applying classes to sorted columns
           'aoColumnDefs': [
@@ -144,10 +145,10 @@ jQuery(function($){
       bt.fnSortListener( document.getElementById('attacksort'), 9 );  // use hidden indices for sorting from external links
       bt.fnSortListener( document.getElementById('stasissort'), 10 );
       bt.fnSortListener( document.getElementById('stunsort'), 11 );
-	  
+
      // move a few things
       $('#undermon').insertAfter($('#monname'));
-	  $('body').append($('#actbox'));
+      $('body').append($('#actbox'));
 
     // blacklist functions
       $(document).on('click','.addblack', function() {
@@ -165,19 +166,19 @@ jQuery(function($){
       });
       $(document).on('submit','#blackform', function() {
          refresh_blacklist($('#blackform').serialize());
-		 return false;
+         return false;
       });
       $(document).on('click','.refreshblack', function(event) {        // enable links to reload blacklist
         return refresh_blacklist();  
       });
-	  
+
      // enhance Manuel
       if ($('#manuelbox').length != 0) { 
          if ($('#manuelcell').length == 0) {                      // add empty manuel cell for players without Manuel
             $('#nowfighting').append('<td width=30></td><td id="manuelcell"></td>');
          }
-	     $('#manuelcell').html($('#manuelbox'));
-	  }
+         $('#manuelcell').html($('#manuelbox'));
+      }
    });
 
   // register hotkeys if no CAB
@@ -189,7 +190,7 @@ jQuery(function($){
       if ($('input,textarea').is(":focus")) return true;          // otherwise, give all keystrokes to inputs when focused
 //      alert(e.keyCode);
       switch(e.keyCode) {
-         case 96: if ($('#actbox form:first').length == 0) {      // ` key submits first menu (for blasting through)
+         case 96: if ($('#actbox form:first').length == 0 || $('#actbox form:first').attr('name') == 'disablebatman') {  // ` key submits first menu (for blasting through)
             $('#actbox img:first').click();
            } else $('#actbox form:first').submit();
            break;
@@ -198,7 +199,7 @@ jQuery(function($){
          case 51:
          case 52:
          case 53: $('.onemenu:eq('+(e.keyCode-48)+') form:first').submit(); break;  // 1-5 keys submit 2nd-6th menus
-		 case 57: if ($('#battable_filter').is(":visible")) $('#battable_filter label input:text').focus(); return false; // 9 key gives focus to filter
+         case 57: if ($('#battable_filter').is(":visible")) $('#battable_filter label input:text').focus(); return false; // 9 key gives focus to filter
          case 48: return cliPopup('');                            // 0 key opens CLI box
       }
    });

@@ -198,6 +198,7 @@
 		14-02-01:Ban windchimes and PADL phones against Trendy Bugbear Chefs
 		14-02-18:Remove special support for video game bosses and use BatBrain for that
 				 Attempt to use DIsco Dances somewhat intelligently to gain Disco Momentum until BatBrain/SS has a better idea
+		14-03-11:Take a photo of Racecar Bob or Bob Racecar if we need one.
 ***********************************************************************************************************************/
 import <SmartStasis.ash>;
 
@@ -1089,7 +1090,12 @@ void build_custom_WHAM() {
 			if(has_option(get_action($skill[Disco Dance 3: Back in the Habit])))
 				encustom(get_action($skill[Disco Dance 3: Back in the Habit]));			
 		}
-	}	
+	}
+	
+	//Photograph Bob Racecar or Racecar Bob
+	if((m == $monster[racecar bob] || m == $monster[bob racecar]) && item_amount($item[disposable instant camera]) > 0
+		&& item_amount($item[photograph of a dog]) == 0 && get_property("questL11Palindome") != "finished")
+			encustom(get_action($item[disposable instant camera]));
 		
 	switch (to_string(m)) {
 		//Boss actions

@@ -117,6 +117,7 @@ void unlock_wet()
 	//manor 2 open
 	if(can_adv($location[the haunted bedroom]))
 	{
+		print("Going for a wet dog","green");
 		setFamiliar("items");
 		cli_execute("mood clear");
 		//cli_execute("maximize items, -combat frequency");
@@ -157,13 +158,14 @@ void unlock_hotdogs()
 //	unlock_savage();
 	unlock_sly();
 //	unlock_chilly();
-	unlock_wet();
 //	unlock_optimal();
-	unlock_owe();
-	unlock_devil();
+//	unlock_devil();
 //	unlock_ghost();
 //	unlock_junkyard();
 	unlock_sleeping();
+	unlock_owe();
+	unlock_wet();
+	abort("Try to get everything again, to wear as gear");
 }
 
 void main()

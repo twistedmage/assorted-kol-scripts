@@ -1,436 +1,5 @@
-/*
-	bumcheekascend.ash
-	A script to ascend a character from start to finish.
-	
-	0.1 - Spun initial release. Gets up to about level 10, haphazardly. 
-	0.2 - Added checking for the trapper after the goat cheese.
-	    - Fixed bug where it wouldn't get the teleportitis choiceadv immediately after the plus sign. 
-		- Added majority of pirate quest.
-	0.3 - Implemented Zarqon's excellent scripts for the Level 11 and 12 quests.
-		- Fixed bug where it would continue to adventure in the Billiards Room even after you got the key.
-		- Fixed bug where it'd get the sonar-in-a-biscuits even if you had them. 
-	0.4 - Fixed bug whereby it wouldn't account for Game Grid tokens if you had them, when switching familiars. 
-		- Going to start to use a lot more clovers since the change. Levelling post-10 will be done with clovers, as will getting 2 sonars. 
-		- Various other small bugs. 
-		- Moved all of Zarqon's Level 11 script to this, extensively modified. 
-		- Moved some of Zarqon's Level 12 script to this, but unfinished. 
-		- Level 13 now completely automated, though a litle buggy. 
-		- He-Boulder use now basically supported.
-	0.5 - Making both innaboxen post-bonerdagon. 
-		- Automating beer pong.
-		- Moved the hidden city to being inside the script rather than being called from outside it. 
-		- Changed to the full version of bumAdv() moving the goals, etc. to the function rather than calling them individually. 2032 lines before I started this. 
-		- Do the Daily Dungeon and zap legend items as appropriate.
-	0.6 - Moved (some of) the level 12 script to here, rather than making people run Wossname.ash
-		- Moved the billiards room to the part at Level 7.
-		- Open the guild store at level 9.
-		- Fixed bug whereby it would continue to try to adventure to get insults when you had no adventures. 
-		- Fixed bug whereby it would try to get the swashbuckling outfit even if you had the fledges and had sold an outfit piece.
-		- Made the script automatically fight the Defiled area bosses.
-		- Use noncombat in the > Sign and DoD.
-		- Sort problem where it would attempt to level in the Temple immediately even if you couldn't.
-		- Added aborts to the spooky sapling and tavern areas as mafia support for those is currently in the pipeline. 
-		- Throw a visit to trapper.php when we use the black paint at Level 11, just in case we haven't got cold resistance yet. 
-		- Make DB Epic Weapon if applicable. 
-		- Only adventure in the DoD to get the wand if you have > 6000 meat.
-	0.7 - Fix issue where it wouldn't stop adventuring in the HitS.
-		- Fix issue with not turning in the arena adventure. 
-		- Fix bug where it wouldn't do the Wartime Sonofa Beach quest at all. 
-		- Add support for 100% familiars.
-		- Added support for pumpkin bombs where we don't have a he-boulder or are on a 100% run. 
-		- Changed a lot of IFs to WHILEs to account for sugar items breaking. 
-		- Actually adventure at the shore instead of breaking. 
-		- Fixed issue where the script would break if you didn't get Minniesota Indoodlywhatatis from the Billiards Room in 5 advs.
-		- Every time we change the MCD, we must check if we can using the canMCD() function which I've added. 
-		- Added support for a cloverless option. 
-		- Used Rinn's scripts to add support for Beer Pong
-		- Use spleen items automatically (aguas, coffee pixie sticks) including turning tokens into tickets using the skeeball machine.
-		- Some more testing on completing the war as a Hippy, which has now been tested. 
-		- Don't adventure in the Knoll if you have no adventures. 
-		- Fix problem where it wouldn't equip stench resistance to adventure in Guano junction.
-		- Sort out the spooky sapling thing, finally!
-		- There's now an items mood, which will be expanded on shortly. 
-	0.8 - Accommodated change to Mr. Alarm
-		- Made sure that there weren't any maximize commands without -melee added
-		- Check for meat when shoreing.
-		- Other misc. issues. 
-		- Update the Boss Bat quest to account for Nov 2010 Changes. 
-		- Added support for phat/leash when you need item drops. 
-		- Added default options, so that this is ACTUALLY zero setup again. 
-	0.9 - Fix problem with moods +-combat moods that cancel each other out. 
-		- Set wheel choiceadventures in the Castle
-		- Fix bug whereby it'd adventure in the goatlet even once you gave the cheese back. 
-		- Change "f" to "familiar". 
-		- Make it not crash on DB chars when making boxen. 
-		- Made making a bartender an opt-in preference. 
-		- Do GMoB instead of Cyrus. Figuring out the Cyrus logic is too hard. 
-	0.10- Open ballroom by going through bedroom.
-		- Check for the He-Boulder BEFORE making the pumpkin bomb. Not after. That would be a stupid idea. 
-		- Force MCD=0 in Junkyard. Maximize DR/DA as well. Force MCD=4,7 in Boss Bat, Throne Room.
-		- Fix bug where it'd continue to get the steel items. 
-		- Made a slight change to the way the script checks for clovers. 
-		- Set the library choice adventures. 
-		- Also set moods if we have >100MP or >7000 meat.
-		- Start moving things into separate functions per quests.
-		- Set moods when trying to level.
-	0.11- Fixed bug with trapzor quest where it wouldn't get the goat cheese at all. 
-		- Only adventure in the Upper Chamber if you DON'T have the wheel. And use tomb ratchets if one drops. 
-		- Don't mark the guild tests as being done if they haven't been done.
-		- Don't worry about safe moxie in the starting areas.
-		- Adventure in the haunted pantry during levelMe when still level 1.
-		- Visit Toot and use the letter. 
-		- Check for if you're cloverless and hence can't get an EW. 
-		- Use Spleen items on change of familiar. 
-		- Beaten up check in Hidden City added.
-		- Don't try to make Epic weapons if you don't have meat or the tenderizing hammer. 
-		- Add tavern code. Thanks, picklish!
-	0.12- Added option to fight the NS. 
-		- Don't get innaboxen if you're cloverless.
-		- Add -melee -ML to the default maximize command.
-		- Fix bug with levelling not working with buffed moxie. 
-		- Add mining command.
-		- Use an item drop familiar in the gremlins (to solve problems with snatch and DB attacks).
-	0.13- If you don't have an accordion, get one. 
-		- Don't abort if you don't have a big rock for the Epic Weapon(s)
-		- Don't think you can shop in the KGE store if you don't have the lab key. Because you can't. 
-		- Use a spanglerack if possible. 
-		- Move the Level 11 quest into sub-functions. 
-		- Make sure to set familiars when levelling. Also don't use your last clover on levelling. 
-		- Don't make a meatcar if you have a pumpkin carriage or desert bus pass.
-		- Do the Bedroom. Yay!
-	0.14- Fix bug with using clovers to level in cloverless runs. 
-		- Don't cast Mojo if you want NCs or items. This solves problems with setting 4 songs. 
-		- Create a new mood called "bumcheekascend" to use.
-		- Fixed bug whereby it would mark the bats1 as done when it wasn't. 
-		- Let's not equip the pool cue, eh? Also, moved the Billiards Room to earlier. 
-		- Only set skills in your mood if you can use them.
-		- Add some fixes by picklish for burning teleportitis. 
-		- Fix The Hole in the Sky for about the zillionth time. 
-		- Add a check for a one-handed item during the 8-bit. 
-		- Improved logic for Level 13, which will now correctly get a DoD potion as well as a couple other items. 
-	0.15- Add red ray use. Fix potion of blessing for Level 13. Thanks, picklish!
-		- Add telescope checking. 
-		- Fix bug where it wouldn't do the DD.
-		- Change maximize commands for mus/mys compatibility. 
-		- Add basic support for muscle classes.
-	0.16- Various fixes for muscle ascensions. 
-		- Fix some telescope stuff, expand on options there. 
-		- Added some "base" entries to the maximizer, which are always on. Melee and shield for Mus, ranged for Mox.
-		- It's probably best if muscle classes DON'T attack the gremlins.
-		- Hit the questlog to see if you've completed the Hidden City for (pah!) SOFTcore players...
-		- Added new Azazel quest.
-	0.17- Fixed bug where muscle classes basically wouldn't fight the Bonerdagon
-		- Use the hipster for the temple.
-		- No need to hit the guild for the meatcar quest anymore. 
-		- Continued muscle fixes. 
-		- Don't abort at Yossarian if you have the outfit on already.
-		- Don't abort at the 8bit for muscle classes.
-		- Start the steel quest properly now. 
-	0.18- Only make an RNR Legend if you have relevant skills. Thanks, St. Doodle!
-		- Don't switch to the hipster if you're on a 100% run. 
-		- Fix "try" now being a reserved word. 
-		- Dont cast Mojo if you can't. 
-	0.19- Change for Cobb's Knob changes. 
-		- Don't go to the chasm if you already have the scroll. Important now with faxbot.
-		- Remove the eyedrops from use.
-		- Option to NOT get your stuff from Hagnks
-		- Only get the 1-handed weapon if you're moxie. And get a disco ball.
-		- Get the AT epic weapon last. 
-		- Major tavern fix from picklish. 
-		- Revamped Level 5 quest. 
-		- Open Gallery as Muscle class.
-	0.20- Some better Sven logic.
-		- Fixed detection of Cyrpt, KnobKing, Steel Item and Innaboxen stages if they were done out-of-script. Thanks, Winterbay!
-		- Improved Tavern handling from picklish. 
-		- Stuff. Various actually quite large fixes that I forgot to mention. 
-		- Ability to set default familiar. Check your relay scripts.
-	0.21- Get mariachi instruments. Thanks, picklish!
-		- Add option to NOT level in the temple.
-		- Get meelgra pills, more tavern fixes. Another picklish addition. 
-		- Fix bug with Sven and failing to get the Unicorn. 
-		- Fix bug with getting a box if you can't access the the \"fun\" house. Thanks, gruddlefitt!
-		- Don't use the scope if you've passed the mariachis.
-		- Added default options for those who can't work out the relay script. This is finally zero-setup again!
-		- Don't remove goals when getting a firecracker for pumpkin bomb. 
-	0.22- Allow 2-handed weapons or DFSS when you don't have a shield. 
-		- Use your CCS actions and be more robust to wandering monsters thanks to picklish.
-		- Dont fight the Boss Bat if there's rubble there. 
-		- Don't open the prok sack if you don't want to autosell the gems. 
-		- Myst ascension. Oh yes.
-	0.23- Myst fixes ranging from minor to major. Added various sauce spells.
-		- Set choiceadvs on levelMe()
-		- Set a while rather than an if for the level 9 quest.
-		- Should zap legend keys if you have MORE than one of them. Also move zapKeys() into the global space. 
-		- Have myst consult script fire in all appropriate locations. 
-		- Don't equip hippy outfit in Hidden City as myst. 
-		- Don't use the hipster in the temple if you're on a 100% run. 
-		- New Cyrpt added. 
-	0.24- Change MCD to only go up to 10.
-		- Use evilometer at cyrpt to stop bug whereby it won't know how evil things are. 
-		- Don't infinitely adventure at Chasm for Myst characters.
-		- Warn if you don't have a recoveryScript or counterScript.
-		- Fix changes to the moon signs due to 2011 Valhalla update. 
-	0.25- Add an option to disable the MCD.
-		- Fix bug where the script would adventure in the black forest to get the map if you had it. 
-		- Don't bother with your classes EW if you have the astral items that kick ass. 
-		- Massive fixes for Bees Hate You (virtually all of them from Winterbay). Thanks, Winterbay!
-		- Closet clovers instead of using them in BHY. 
-		- Use Massive Manual of Moodly Whatsis in BHY. 
-		- No YOROIDS or pumpkin bomb either. 
-		- Check for familiars with 'b' in their name. And don't use them in BHY. 
-		- Little things like the chest of the Bonerdagon, Innaboxen, tomb ratchets, black forest and a couple other places. 
-		- Major change for the meatcar. 
-		- Get the dispensiry password. If you're OK with bees. 
-		- When trying for the GMoB, set the choice adventure to primestat. 
-		- Fix bug where it would advnture in the pantry when it would be massively inappropriate to do so. 
-		- Fix bug where it wouldn't adventure in the filthworms if you already had the Heart of the Queen.
-		- Olfact stuff as a myst class if it's set in your CCS.
-		- Estimate monster HP where necessary as a myst class.
-	0.26- Massive changes to get the script to run better in softcore and casual. 
-	0.27- Init boost in the relevant Cyrpt zone. 
-		- Fix issue where bumRunCombat WOULD adventure in the n00b cave. 
-		- Fix issue with the Dooks quest which would break if you didn't have a chaos butterfly. 
-		- Equip scratch 'n' sniff for nuns. 
-		- Fixed handling of the sorceress quest when you have the SCUBA gear. Or, more likely, broke it horrifically for hardcore. 
-	0.28- Don't use consultMyst for softcore.
-		- Fix he-bo for myst classes and BHY.
-		- Use antique hand mirror aganist GMOB. Not Cyrus.
-		- Calculate Weapon of the Pastalord damage correctly. Also abort properly if necessary. 
-		- Work out if you're already unlocked the beach manually. 
-	0.29- Don't unlock the temple if you don't want to level in it. Until level 11, of course.
-		- Fax support added. 
-		- Major extra support for BHY, mostly from Winterbay, who is awesome. 
-		- Extra support for casual. 
-		- Use the Cobb's Knob Harem outfit instead of the KGE one if you're moxie to kill the Knob Goblin King.
-		- Add options to override Myst and Casual handing and just fight using your CCS.
-		- Add options to skip getting the steel item.
-	0.30- New guild challenge.
-		- Fix bug with adventuring in the chasm forever. 
-		- Fix nuns if you have the scratch and sniff sword.
-		- Do the beach if you have five barrels of gunpowder, even if you don't have the setting on. Optimal!
-		- Use wallet-style items (coin purses, pension check, etc.)
-		- Call buMax and setFamiliar before faxing.
-	0.31- Improved optimisation for the nuns. 
-		- Register aliases for operation. 
-		- Prepare food in a ridiculously stupid and unintelligent way.
-		- Actually abort bumMiniAdv() if you abort the script. 
-	0.32- Use astral shell in the daily dungeon. 
-		- Use guild meat. 
-		- Use obtuse angel against LFM.
-		- Tidy up willMood() function. 
-		- Cast astral shell in the DD.
-		- Fix pulling items from hagnks.
-		- Disable autosell in Fist, as well as KGE faxing, KGE fighting, mining support and buMax issues.
-	0.33- Fix maximizer in fist runs. 
-		- Change choices for bedroom in fist runs. 
-		- A couple of aborts and meat checks for fist runs. 
-	0.34- Don't sell gems in fist runs. Also change some mood working. 
-		- We can fight the protector spirit if we're in Fistcore or not moxie.
-		- Fix a problem with the nuns aborting due to bumMiniAdv() not returning true.
-		- Fix a bug with telescopes in Bad Moon. 
-		- Stop too much levelling in fistcore.
-	0.35- Fix a bug with outfits and fistcore. 
-		- Don't use radio if you can't afford it. 
-		- Fix bug with telescope backfarming.
-		- Save you from drunk self.
-		- Don't fax LFM after the war.
-		- Don't use DOD potions if you're > 16 drunk.
-		- Don't fax a monster if you have no adventures. 
-	0.36- Fix bug where it wouldn't update the airship as done. 
-		- Don't get stuck if you can't get into the bedroom. 
-		- Don't REQUIRE the softcore warning in the relay script. But still give the warning every time. 
-		- Use unbearable light if necessary.
-		- Add support for Trendy via Winterbay's patch for familiars. 
-		- Remove poisoned when levelling because it buggers with the amount of buffed stat you need. 
-		- Put in an option to not consume spleen. 
-		- Make the function for telescope stuff more verbose (from morgad).
-		- Add option to not use clovers to level.
-		- Fix bug where it wouldn't stop adventuring in the DD.
-		- Use boots spleen items too, but don't get them.
-		- Change to credit RINN correctly. 
-		- Major revision of moods, optimisation of bats, cyrpt, and various bugfixes thanks to Winterbay. 
-	0.37- Improve the telescope information even more. 
-		- Speed up the war stage a bit (hopefully this won't screw it up) and print some helpful debugging information for when fighting the war. 
-		- Fix clover levelling for BHY.
-		- Make sure we have appropriate gear before levelling.
-		- Consider the Spanglypants as well as the Spanglyrack for item drops.
-		- Make sure we don't crash due to not having a non-trendy spleen familiar.
-		- Fix bug where it wouldn't fax anything due to an incorrectly read property.
-		- Make sure we have the right choice adventure set when myst-levelling.
-		- Set familiar before guild quest.
-	0.38- Use Knob Goblin Perfume if we can and are using the Cobb's Knob Harem outfit to kill the Knob King.
-		- Make sure we have all 5 bus passes before moving on to the Comedy club to potentially minimize some levelling.
-		- Use an item-drop familiar for the Dark Neck of the Woods
-		- Don't auto-adventure if all goals have already been met
-		- Fix clover levelling going to the wrong place
-		- Don't use spleen items in casual.
-		- Don't pickpocket if there are no items to drop in casual. 
-		- Fix bug where it wouldn't make the meatcar due to a new crimbo item. 
-		- "outfit" not "+outfit"
-		- Don't set a default mood in casual runs. 
-		- Fix creation of wind-up meatcar instead of bitchin' meatcar
-		- Correctly deal with the pirates in casual runs. 
-		- Actively make an unbearable light. 
-	0.39- Don't re-get the tower items if you already used them in the tower. 
-		- Add option to completely disable all moods. 
-		- Add Groose Support
-		- Add option to fight the Protector Spectre as Moxie. We'll always fight as Muscle/Myst
-		- Fix bug where it would stop at Wartime Sonofa Beach and report a false positive if a SR counter came up. 
-		- Don't try to pull stuff if there are none available (because take_storage returns true which leads to infinite loops)
-		- Fix some code for detection of gate items
-		- Fix bug where it would adventure forever in the Ballroom if there was a rogue condition somewhere. 
-		- Don't make a 2nd unbearble light if we have one already.
-		- Don't YR Cobb's Knob Harem Madams
-		- Don't check the tower more than once, and abort if there are known items that we can't get
-		- Make sure to create a myst epic weapon if we have told the script to create innaboxen
-		- Shrug Just the Best Anapests since it screws with automatic detection of things
-		- Ask the user before creating a Knob Cake if requireBoxServants is set to true
-		- Make sure to always use the full outfit name in case people have similarly named custom outfits
-	0.40- Don't adventure in the Noob Cave after fighting the Lobsterfrogman as a Myst-class (or in a casual run)
-		- Don't maximize into a shield everytime anHero() is called, instead check if we have a shield with a new function
-		- Fix for Mafia changing the Hidden City to two different zones
-		- Make the aliases use the filename of the current file rather than anything else
-		- Fix fix for knob cake
-		- Only maximize what's necessary for the area, using MP regen and +exp gear if possible. 
-		- Make it easier to fight the NS as myst. 
-	0.41- Don't use the groose in BHY runs.
-		- Add option to ignore safe moxie in hardcore.
-		- Make sure that 100% runs are respected for the NS. 
-		- Refactor path handling for familiars
-		- Complete the guild before getting the items in the three starter areas for the scope. 
-		- Remove the "-tie" from maximizer calls.
-		- Don't fail getting stench resist for myst classes.
-		- Check for advs before doing the DD.
-		- Fix the fix for fighting Knob Goblin Harem Girls.
-	0.42- Add "resolution: be wealthier" as a meat-boost for the nuns
-		- Fixes for Avatar of Boris (Should be fairly workable now, even upto including instrument swapping). You do need to learn your own skills.
-		- Less confusing message for people on 100%-runs without pumpkins and clipart
-		- Don't set nuns to completion just because we run out of turns. Check the Mafia preference for it.
-		- Ignore 100% setting for Boris runs. 
-		- Fix bug where it'd get the first item for the gates again once you were through them. 
-	0.43- Add handsomeness potion as an item to get automatically, also rejigger the chewing-gum-getting code
-		- Use minstrel_instrument() rather than checking for Clancy's image, also use use() to use the instrument instead of visit_url()
-		- Properly abort leveling if we fulfill the required goal with a clover.
-		- Fix bug caused when mafia removed the to_float(boolean) function. 
-	0.44- Go back to to_float(boolean) and not to_int(to_float(boolean)) as it works again also don't try to use the sackbut if Clancy's already using it
-	0.45- Fix all warnings for "sloppy" code and add return values to all functions needing it
-		- Use noncombat in the friars zones. 
-		- Basic moods for Boris runs
-		- Adventure at your primestat's location only. 
-		- Correct misspelled pandamonium.php and fix fullness-check for Boris runs in friarssteel()
-		- Don't get the hippy outfit in softcore. Or, for that matter, telescope items. 
-		- Abort at the beach to putty. (Softcore only)
-		- Add a couple of non-class specific options at the Gremlins
-		- Zap Boris' key last to avoid problems with the Gates in Avatar of Boris
-	0.46- Remove temple levelling code, abort if we don't want to level in the temple
-		- Fix some Boris related errors in the Steel-quest
-		- Try to do the entryway in a lucky way if we have at least one clover
-		- Take that back and only do it if we've got an option set. 
-		- Use non-combats when trying for 70 myst for the frat outfit
-		- Indicate that we are loading a map, in case it halts and the user has no idea what's going on
-		- Don't get the Wand of Nagmar if we're in Boris. 		
-		- Fix bug with Safe Moxie in the temple.
-		- Add a new way to level up after the temple went out of fashion.
-	0.47- Add Therazes fix for opening the hidden city
-		- Don't try to level in the temple in the new level code
-		- Use Boris's Helm if you have it. 
-		- Fix council code so it runs a *maximum* of once per level, per ascension.
-		- Add option to stop script after paying attention to Clancy in AoB
-		- Don't zap your last Boris key in AoB
-		- Add options for manual and automatic (non-optimal) skill training in BorisCore.
-		- Ignore maidens in the gallery
-		- Fix bug with casting MM even if you didn't have it as a Myst-class
-		- Make sure to set an item mood if we are gunning for Yellow Ray usage, in case we can't.
-		- Add option to buy a Crumhorn in AoB, after building the dinghy, if we have at least 3000 meat
-		- Fix for the change to buying sweet rims from the mall. 
-		- Change orchard handling code slightly. 
-	0.48- Simplyfy goal-detection by usage of Mafia's built-in functions
-		- Start adapting for the Bugbear Invasion (mainly keys)
-		- Even more addition of Bugbear features (hunt bugbears, buy a key-o-tron, halt at the mothership)
-	0.49- Adapt for the mothership, all areas are currently handled apart from the scaling galley
-		- Fix aborting when trying to use the hatter more than once, add resolution: be happier
-		- Make sure the hidden city unlock works with stone wool as well
-		- Change bumAdv to abort at 0 turns instead of returning false
-		- Refactor the way levelMe, bumAdv and buMax operate together
-		- Use free runaway familiars when unlocking the Ballroom
-		- Use parrot for Softcore Bats
-	0.50- Use Bat Hole Entryway instead of Entryway since that gives multiple matches
-	0.51- Re-maximize if we've entered the levelMe-function in bumAdv to avoid losing what we were actually maximizing for in the first place
-		- Don't try to equip the elite guard uniform if we can't do it yet.
-		- Fix bug with recognition of "Combat" in bugbear invasion.
-		- Don't go hunting bugbear chefs if we haven't actually finished the war...
-		- Add setting bcasc_AllowML to allow +ML if the user wants to, in conjunction with bcasc_ignoreSafeMoxInHardcore this will also always run with mcd = 10
-		- Don't switch to a free run-away familiar if we are on a 100% run with something
-		- Avoid infinite loops in the spooky forest
-		- Some fixes for the re-jiggering of the mountain quest
-		- Set the O Cap'm, My Cap'm choice adventure to 2 if it is 0 to not abort automation
-		- More fixes for the level 8 quest. Should now be compatible with reality.
-		- Don't move on to third level of the bugbear ship if it's not available. Abort and let the user check what's wrong.
-		- Start moving away from internal quest tracking properties towards Mafia's internal ones instead
-	0.52- Some more swapping to Mafia properties instead of internal ones
-		- Code efficency at some points
-		- Small adaptations for zombie-runs
-		- Fix bug where the function getting tower items would fail due to lack of elemental resistance
-		- Make sure we have cold resistance before going to the peak after hunting ninjas
- 	0.53- Add options to not change equipments or moods. 
- 		- Add abort for if you have a hunter brain and can eat it, but not if we have all skills already
- 		- Add support for -combat zombie skill as well as fixing the detection of if we need a frigid ninja star
-		- Don't try to create a dinghy if we have a skeletal skiff
-		- Only pick pumpkins if we have pumpkins to pick
-		- Allow people to not open the temple until level 11 by setting bcasc_openTempleLater to true
-		- Fix bug for not reentering the pirate cove correctly
-		- Attempt better handling of trapper quest
-		- Fix bug with forcing a wepon in Fist-runs
-		- Don't count things in the closet if the user has autoSatisfyWithCloset set to false
-		- Plant the bean by clicking the ground rather than have Mafia do it for us
-		- Fix bug with outfit in the The Icy Peak
-		- Migrate cold_res to get_res and adapt it for all elements
-		- Make sure we have casting items for sauceror and turtle tamer skills
-		- Adapt the script for the new level 9 quest
-		- Maximize for elemental damage when going up against physically resistant monsters, rathe rthan equipping a specific outfit.
-		- Better handling of the moods for orchard and nunnery
-	0.54- Add a source of stench resistance for the Twin Peak
-		- Clear goals when starting the script to avoid conflicts
-		- Fix VisitURLs for the Mystic
-		- Don't screw up 100%-runs
-		- Only abort for too low meat when strictly needed
-		- Adapt get_res for the new maximize functionality as well as using that for the Twin Peak
-		- Fix maximizer string for zombies during the nuns
-		- Add option to get an Epic Legendary Weapon (bcasc_getLEW) (thanks Ioeth)
-		- Add adventuring for all tower items (thanks Ioeth)
-		- Add auto-adventuring for most of the Clancy adventures
-		- Fix bugs in the new LEW and tower item getting code
-	0.55- Add code to allow Softcore to be run with the maximizer and other normally hardcore related ways of doing things (controlled by bcasc_RunSCasHC)
-		- Fix wand zapping failing due to warm gloves
-		- Update spleen familiar picking code for the new spleen familiar
-		- Pre-generalise some code for the upcoming Avatar of Jarlsberg (or not, it seems Jarlsberg decided to be different...)
-		- Don't try to add four songs unless we can
-		- Don't level in the Barrr if we cannot access it
-		- Fix clover use in the entryway if in BHY
-		- Comment out the castle-quest and fix references to the old Giant Castle in other functions
-		- Update the wording for the level 9 quest abort messages in Twin Peak to make it clearer what is expected of the user
-		- Add in mood checking for Jarlsberg.
-		- Add a consult script for Jarlsberg.
-		- Also need init for myst classes (by which I mean Jarlsberg)
-		- Fix Steel-check for Jarlsberg
-		- Update the quest matcher for the Roflmao-quest
-		- Fix bug whereby the script would adventure in the hippy camp to get the outfit past level 12. 
-		- Fix bug where the Jarlsberg Mood wouldn't fire
-		- Add code for the new level 10 quest
-	0.56- Add familiar swapping for Jarlsberg if bcasc_SwapFood = true (make sure to eat and drink before adventuring if true)
-		- Add workarounds for pixelfarming and fat loot tokens until Mafia gets fixed
-		- SOme more mood things for Jarlsberg
-		- Fix a bunch of small bugs
-		- Fix the star chart in the same manner as for other new KoL-store layouts
-		- Make sure the pirate book is thrown wether you win initiative or not
-		- Swap map-checking to kolmafia.co.uk which is the new domain for the data-files
-		- Minor changes for Jarlsberg and BIG! as well as the airship.		
-		- Make sure we don't destroy +ML for the oilpeak as Jarlsberg or Boris		
-        - Some minor changes to quest handling
-		- Try to not make keys we do not need (digital and star keys) when we have a universal key
-	  
-		last compared version 383
-*/
+//		last compared version 522
+
 script "bumcheekascend.ash";
 
 import "florist.ash";
@@ -448,8 +17,9 @@ boolean bcasc_bartender = get_property("bcasc_bartender").to_boolean(), bcasc_be
 		bcasc_fightNS = get_property("bcasc_fightNS").to_boolean(), bcasc_MineUnaccOnly = get_property("bcasc_MineUnaccOnly").to_boolean(), 
 		bcasc_AllowML = get_property("bcasc_AllowML").to_boolean(), bcasc_ignoreSafeMoxInHardcore = get_property("bcasc_ignoreSafeMoxInHardcore").to_boolean(),
 		bcasc_getLEW = get_property("bcasc_getLEW").to_boolean(), bcasc_RunSCasHC = get_property("bcasc_RunSCasHC").to_boolean(),
-		bcasc_unlockHiddenTavern = get_property("bcasc_unlockHiddenTavern").to_boolean(), bcasc_castEmpathy = get_property("bcasc_castEmpathy").to_boolean();
-
+		bcasc_unlockHiddenTavern = get_property("bcasc_unlockHiddenTavern").to_boolean(), bcasc_castEmpathy = get_property("bcasc_castEmpathy").to_boolean(),
+		bcasc_cellarWineBomb = get_property("bcasc_cellarWineBomb").to_boolean();
+ 
 /***************************************
 * DO NOT EDIT ANYTHING BELOW THIS LINE *
 ***************************************/
@@ -682,6 +252,8 @@ boolean have_path_familiar(familiar fam) {
 	else if(my_path() == "Bees Hate You")
 		return have_familiar(fam) && !contains_text(to_lower_case(to_string(fam)), "b");
 	else if(my_path() == "Avatar of Boris" || my_path() == "Avatar of Jarlsberg")
+		return false;
+	else if(my_path() == "Avatar of Sneaky Pete")
 		return false;
 	else
 		return have_familiar(fam);
@@ -1399,6 +971,10 @@ boolean buMax(string maxme, int maxMainstat) {
 		if (i_a("Boris's Helm") > 0) maxme += " +equip Boris's Helm";
 		else if (i_a("Boris's Helm (askew)") > 0) maxme += " +equip Boris's Helm (askew)";
 	}
+	if(my_path() == "Avatar of Sneaky Pete" && !contains_text(maxme, "outfit")) {
+		if (i_a("Sneaky Pete's leather jacket") > 0) maxme += " +equip Sneaky Pete's leather jacket";
+		else if (i_a("Sneaky Pete's leather jacket (collar popped)") >0) maxme += " +equip Sneaky Pete's leather jacket (collar popped)";
+	}
 
 	if (!in_hardcore() && !bcasc_RunSCasHC) {
 		if (cli_execute("outfit bumcheekascend")) {}
@@ -1449,8 +1025,8 @@ boolean buMax(string maxme, int maxMainstat) {
 		return true;
 	}
 
-	//We should sell these to avoid hassle when muscle classes.
-	foreach i in $items[antique helmet, antique shield, antique greaves, antique spear] {
+	//We should sell these to avoid hassle with muscle classes.
+	foreach i in $items[antique helmet, antique shield, antique greaves, antique spear, drowsy sword] {
 		autosell(item_amount(i), i);
 	}
 
@@ -1479,9 +1055,9 @@ boolean buMax(string maxme, int maxMainstat) {
 	if (contains_text(maxme, "nuns")) {
 		cli_execute("maximize mainstat " + ((bcasc_AllowML) ? "" : "-10 ml") + " +outfit "+bcasc_warOutfit);
 		switch (my_primestat()) {
-			case $stat[Muscle] : 		cli_execute("maximize "+max_bees+" beeosity" + (my_path() == "Zombie Slayer" ? "" : ", 0.5 mp regen max") + ", mainstat " + ((bcasc_AllowML) ? "" : "-10 ml") + (my_path() == "Way of the Surprising Fist" ? " " : " +melee ")+((anHero()) ? "+shield" : "")+" +outfit "+bcasc_warOutfit); break;
-			case $stat[Mysticality] : 	cli_execute("maximize "+max_bees+" beeosity, 0.5 mp regen max, mainstat +init " + ((bcasc_AllowML) ? "" : "-10 ml") + " +outfit "+bcasc_warOutfit); break;
-			case $stat[Moxie] :             cli_execute("maximize "+max_bees+" beeosity, 0.5 mp regen max, mainstat " + ((bcasc_AllowML) ? "" : "-10 ml") + (my_path() == "Way of the Surprising Fist" ? " " : " -melee +outfit ")+bcasc_warOutfit); break;
+			case $stat[Muscle] : 		cli_execute("maximize "+max_bees+" beeosity, mainstat "+maxMainstat+" max, "+(my_path() == "Way of the Surprising Fist" ? " " : " +melee ")+((anHero() && !contains_text(maxme, "UV-re")) ? "+shield" : "") + ((bcasc_AllowML) ? "" : " -10 ml") + " +muscle experience " + (my_path() == "Zombie Slayer" ? "" : "+0.5 mp regen min +0.5 mp regen max, .5 hp, ")+maxme); break;
+			case $stat[Mysticality] : 	cli_execute("maximize "+max_bees+" beeosity, mainstat "+maxMainstat+" max, "+" +10spell damage +mysticality experience +init +5 mp regen min +5 mp regen max, .5 hp, " + ((bcasc_AllowML) ? "" : "-10 ml, ")+maxme); break;
+			case $stat[Moxie] : 		cli_execute("maximize "+max_bees+" beeosity, mainstat "+maxMainstat+" max, "+(my_path() == "Way of the Surprising Fist" ? " " : " -melee ") + ((bcasc_AllowML) ? "" : "-10 ml") + " +moxie experience +0.5 mp regen min +0.5 mp regen max, .5 hp, "+maxme); break;
 		}
 		string sns = prepSNS();
 		if (sns != "") {
@@ -1570,16 +1146,16 @@ string bumRunCombat(string consult) {
 	}
 	
 	if (consult != "") {
-		print("BCC: This isn't actually adventuring at the noob cave. Don't worry! (Consult Script = "+consult+")", "purple");
-		adv1($location[The Noob Cave], -1, consult);
+		print("BCC: This isn't actually adventuring at noob cave. Don't worry! (Consult Script = "+consult+")", "purple");
+		adv1($location[noob cave], -1, consult);
 	}
 	else if (my_primestat() == $stat[Mysticality] && in_hardcore()) {
-		print("BCC: This isn't actually adventuring at the noob cave. Don't worry! (Myst)", "purple");
-		adv1($location[The Noob Cave], -1, "consultMyst");
+		print("BCC: This isn't actually adventuring at noob cave. Don't worry! (Myst)", "purple");
+		adv1($location[noob cave], -1, "consultMyst");
 	}
 	else if (can_interact()) {
-		print("BCC: This isn't actually adventuring at the noob cave. Don't worry. (Can_Interact() == True)", "purple");
-		adv1($location[The Noob Cave], -1, "consultCasual");
+		print("BCC: This isn't actually adventuring at noob cave. Don't worry. (Can_Interact() == True)", "purple");
+		adv1($location[noob cave], -1, "consultCasual");
 	}
 	print("BCC: Run_Combat() being used normally.", "purple");
 	return to_string(run_combat());
@@ -1632,7 +1208,7 @@ print("a","lime");
 	if (get_property("bcasc_lastHermitCloverGet") != today_to_string()) {
 		print("BCC: Getting Clovers", "purple");
 		if (my_path() != "Zombie Slayer")
-			while (buys_item($coinmaster[Hermit],$item[Ten-leaf clover]) && my_meat() > 50) {}
+			if (cli_execute("hermit * clover")) {}
 		else
 			if (buys_item($coinmaster[Hermit],$item[Ten-leaf clover])) {}
 		set_property("bcasc_lastHermitCloverGet", today_to_string());
@@ -2298,9 +1874,6 @@ string consultMyst(int round, string opp, string text) {
 	}
 	//Checks if the monster is weak against whatever Sauce element would be appropriate. The actual string is ignored.
 	int isWeak(string ignored) {
-		if (have_skill($skill[Saucegeyser])) {
-			if ($elements[spooky, stench, sleaze, cold] contains monster_element()) return 2;
-		}
 		return isWeak($element[none]);
 	}
 	
@@ -2746,6 +2319,9 @@ string consultHeBo(int round, string opp, string text) {
 		} else if (item_amount($item[pumpkin bomb]) > 0) {
 			print("BCC: We are trying to use the HeBoulder, but you don't have one (or perhaps are on a 100% run), so I'm using a pumpkin bomb.", "purple");
 			return "item pumpkin bomb";
+		} else if (my_path() == "Avatar of Sneaky Pete" && have_skill($skill[flash headlight]) && get_property("peteMotorbikeHeadlight") == "Ultrabright Yellow Bulb") {
+			print("BCC: We are trying to use the HeBoulder, but you are in an AoSP run, so I'm using Flash Headlight.", "purple");
+			return "skill flash headlight";
 		} else {
 			print("BCC: We are trying to use the HeBoulder, but you don't have one (or perhaps are on a 100% run without pumpkins or clipart), so I'm attacking.", "purple");
 			return ((my_primestat() == $stat[Mysticality] && in_hardcore()) ? consultMyst(round, opp, text) : get_ccs_action(round)); 
@@ -2888,6 +2464,8 @@ void defaultMood(boolean castMojo) {
 	}
 	if(i_a("CSA discount card")>0)
 		use(1,$item[CSA discount card]);
+	if(i_a("Handful of tips")>0)
+		use(1,$item[Handful of tips]);
 	
 	//if we have skeletons planted and already made a skeletal skiff
 	if(i_a("skeleton")>0 && i_a("skeletal skiff")>0)
@@ -2978,7 +2556,7 @@ void defaultMood(boolean castMojo) {
 	
 	//have to be a bit conservative in wosf
 	if(my_path() == "Way of the Surprising Fist") {
-		if (my_level() < 7 && castMojo && have_skill($skill[The Magical Mojomuscular Melody])) cli_execute("trigger lose_effect, The Magical Mojomuscular Melody, cast 1 The Magical Mojomuscular Melody");
+		if (my_level() < 7 && castMojo && have_skill($skill[The Magical Mojomuscular Melody]) && my_path() != "BIG!") cli_execute("trigger lose_effect, The Magical Mojomuscular Melody, cast 1 The Magical Mojomuscular Melody");
 		if (have_skill($skill[Miyagi Massage])) cli_execute("trigger lose_effect, Retrograde Relaxation, cast 1 Miyagi Massage");
 		if (have_skill($skill[Salamander Kata])) cli_execute("trigger lose_effect, Salamanderenity, cast 1 Salamander Kata");
 		if (have_skill($skill[worldpunch])) cli_execute("trigger lose_effect, Earthen Fist, cast 1 Worldpunch");
@@ -3012,11 +2590,11 @@ if(can_interact())
 		switch (my_primestat()) {
 			case $stat[Muscle] :
 				if (my_level() > 5 && my_path() != "Bees Hate You" && my_path() != "BIG!") { cli_execute("trigger lose_effect, Tiger!, use 5 Ben-Gal Balm"); }
-				if (my_level() < 7 && castMojo && have_skill($skill[The Magical Mojomuscular Melody])) cli_execute("trigger lose_effect, The Magical Mojomuscular Melody, cast 1 The Magical Mojomuscular Melody");
+				if (my_level() < 7 && castMojo && have_skill($skill[The Magical Mojomuscular Melody]) && my_path() != "BIG!") cli_execute("trigger lose_effect, The Magical Mojomuscular Melody, cast 1 The Magical Mojomuscular Melody");
 				if (anHero()) {
 		//			if (have_skill($skill[The Power Ballad of the Arrowsmith])) cli_execute("trigger lose_effect, Power Ballad of the Arrowsmith, cast 1 The Power Ballad of the Arrowsmith");
 				} else {
-					if (castMojo && have_skill($skill[The Moxious Madrigal])) cli_execute("trigger lose_effect, The Moxious Madrigal, cast 1 The Moxious Madrigal");
+					if (castMojo && have_skill($skill[The Moxious Madrigal]) && my_path() != "BIG!") cli_execute("trigger lose_effect, The Moxious Madrigal, cast 1 The Moxious Madrigal");
 				}
 				if (have_skill($skill[Patience of the Tortoise]) && my_path() != "BIG!") cli_execute("trigger lose_effect, Patience of the Tortoise, cast 1 Patience of the Tortoise");
 				if (have_skill($skill[Seal Clubbing Frenzy]) && my_path() != "BIG!") cli_execute("trigger lose_effect, Seal Clubbing Frenzy, cast 1 Seal Clubbing Frenzy");
@@ -3034,7 +2612,7 @@ if(can_interact())
 				} else {
 					if (my_level() > 5 && my_meat() > 2000) { cli_execute("trigger lose_effect, Butt-Rock Hair, use 5 hair spray"); }
 					if (my_level() > 5 && my_meat() > 2000) { cli_execute("trigger lose_effect, Glittering Eyelashes, use 5 glittery mascara"); }
-					if ((my_level() < 7 && castMojo && have_skill($skill[The Moxious Madrigal]))) cli_execute("trigger lose_effect, The Moxious Madrigal, cast 1 The Moxious Madrigal");
+					if ((my_level() < 7 && castMojo && have_skill($skill[The Moxious Madrigal])) && my_path() != "BIG!") cli_execute("trigger lose_effect, The Moxious Madrigal, cast 1 The Moxious Madrigal");
 					if (my_level() < 7  && have_skill($skill[Springy Fusilli])) cli_execute("trigger lose_effect, Springy Fusilli, cast 1 Springy Fusilli");
 					if (have_skill($skill[Manicotti Meditation]) && my_level() < 5) cli_execute("trigger lose_effect, Pasta Oneness, cast 1 Manicotti Meditation");
 					if (have_skill($skill[Sauce Contemplation]) && my_level() < 5) cli_execute("trigger lose_effect, Saucemastery, cast 1 Sauce Contemplation");
@@ -3053,7 +2631,7 @@ if(can_interact())
 			
 			case $stat[Moxie] :
 				if (castMojo && have_skill($skill[The Moxious Madrigal])) cli_execute("trigger lose_effect, The Moxious Madrigal, cast 1 The Moxious Madrigal");
-				if (my_level() < 7 && castMojo && have_skill($skill[The Magical Mojomuscular Melody])) cli_execute("trigger lose_effect, The Magical Mojomuscular Melody, cast 1 The Magical Mojomuscular Melody");
+				if (my_level() < 7 && castMojo && have_skill($skill[The Magical Mojomuscular Melody]) && my_path() != "BIG!") cli_execute("trigger lose_effect, The Magical Mojomuscular Melody, cast 1 The Magical Mojomuscular Melody");
 				if (my_level() > 5) { cli_execute("trigger lose_effect, Butt-Rock Hair, use 5 hair spray"); }
 				if (have_skill($skill[snarl of the timberwolf]))
 					cli_execute("trigger lose_effect, snarl of the timberwolf, cast 1 snarl of the timberwolf");
@@ -3622,18 +3200,19 @@ boolean can_adv(location where) {
 	case $location[Cobb's Knob Menagerie\, Level 1]: return (primecheck(35) && itemcheck($item[Cobb's Knob Menagerie key]));
 	case $location[Cobb's Knob Menagerie\, Level 2]: return (primecheck(40) && itemcheck($item[Cobb's Knob Menagerie key]));
 	case $location[Cobb's Knob Menagerie\, Level 3]: return (primecheck(45) && itemcheck($item[Cobb's Knob Menagerie key]));
-	case $location[Hippy Camp]: return (itemcheck($item[dingy dinghy]) && get_property("warProgress") != "started" && get_property("sideDefeated") != "hippies" && get_property("sideDefeated") != "both" && primecheck(30));
-	case $location[Frat House]: return (itemcheck($item[dingy dinghy]) && get_property("warProgress") != "started" && get_property("sideDefeated") != "fratboys" && get_property("sideDefeated") != "both" && primecheck(30));
+	case $location[Hippy Camp]: return (get_property("lastIslandUnlock").to_int() == my_ascensions() && get_property("warProgress") != "started" && get_property("sideDefeated") != "hippies" && get_property("sideDefeated") != "both" && primecheck(30));
+	case $location[Frat House]: return (get_property("lastIslandUnlock").to_int() == my_ascensions() && get_property("warProgress") != "started" && get_property("sideDefeated") != "fratboys" && get_property("sideDefeated") != "both" && primecheck(30));
+
 	case $location[The Obligatory Pirate's Cove]: return (itemcheck($item[dingy dinghy]) && !is_wearing_outfit("swashbuckling getup") && !have_equipped($item[pirate fledges]) && get_property("warProgress") != "started" && primecheck(45));
 	case $location[The Castle in the Clouds in the Sky (Basement)]: return (primecheck(95) && item_amount($item[S.O.C.K.]) > 0);
 	case $location[The Castle in the Clouds in the Sky (Ground Floor)]: return (primecheck(95) && item_amount($item[S.O.C.K.]) > 0);
 	case $location[The Castle in the Clouds in the Sky (Top Floor)]: return (primecheck(95) && item_amount($item[S.O.C.K.]) > 0);
 	case $location[The Hole in the Sky]: return (primecheck(100) && itemcheck($item[steam-powered model rocketship]));
 	case $location[The Haunted Library]: return (primecheck(40) && itemcheck($item[Spookyraven library key]));
-	case $location[The Haunted Gallery]: return (itemcheck($item[Spookyraven gallery key]));
-	case $location[The Haunted Ballroom]: return (itemcheck($item[Spookyraven ballroom key]));
-	case $location[The Palindome]: return (primecheck(65) && equipcheck($item[Talisman o' Nam]));
-	case $location[Tower Ruins]: return (primecheck(11) && itemcheck($item[Fernswarthy's letter]));
+	case $location[The Haunted Gallery]: return (get_property("questM21Dance") != "unstarted");
+	case $location[The Haunted Ballroom]: return (get_property("questM21Dance") == "finished");
+	case $location[Inside the Palindome]: return (primecheck(65) && equipcheck($item[Talisman o' Nam]));
+	case $location[Tower Ruins]: return (primecheck(18) && itemcheck($item[Fernswarthy's letter]));
 	case $location[The Oasis]: return (itemcheck($item[your father's macguffin diary]) && perm_urlcheck("place.php?whichplace=desertbeach","oasis.gif"));
 	case $location[The Upper Chamber]:
 	case $location[The Middle Chamber]: return (itemcheck($item[staff of ed]));
@@ -3662,10 +3241,10 @@ boolean can_adv(location where) {
 	case $location[The Haunted Kitchen]: return (primecheck(5) && (itemcheck($item[Spookyraven library key]) || perm_urlcheck("place.php?whichplace=town_right","manor.gif")));
 	case $location[The Haunted Conservatory]: return (primecheck(6) && perm_urlcheck("place.php?whichplace=town_right","manor.gif"));
 	case $location[The Haunted Billiards Room]: return (primecheck(10) && perm_urlcheck("place.php?whichplace=town_right","manor.gif"));
-	case $location[The Haunted Bathroom]: return (primecheck(68) && to_int(get_property("lastSecondFloorUnlock")) == my_ascensions());
-	case $location[The Haunted Bedroom]: return (primecheck(85) && to_int(get_property("lastSecondFloorUnlock")) == my_ascensions());
+	case $location[The Haunted Bathroom]: return (primecheck(68) && get_property("questM21Dance") != "unstarted");
+	case $location[The Haunted Bedroom]: return (primecheck(85) && get_property("questM21Dance") != "unstarted");
 	case $location[The Icy Peak]: return (levelcheck(8) && primecheck(53) && perm_urlcheck("questlog.php?which=2","L337 Tr4pz0r") && numeric_modifier("Cold Resistance") > 0);
-	//case $location[Barrrney's Barrr]: return (itemcheck($item[dingy dinghy]) && (equipcheck($item[pirate fledges]) || outfitcheck("swashbuckling getup")));
+	//case $location[Barrrney's Barrr]: return (get_property("lastIslandUnlock").to_int() == my_ascensions() && (equipcheck($item[pirate fledges]) || outfitcheck("swashbuckling getup"))); - problematic
 	case $location[The F'c'le]: return (pirate_check("cove3_3x1b.gif"));
 	case $location[The Poop Deck]: return (pirate_check("cove3_3x3b.gif"));
 	case $location[Belowdecks]: return (pirate_check("cove3_5x2b.gif"));
@@ -3685,7 +3264,7 @@ boolean innerSetFamiliar(string famtype) {
 	}
 
 	//The very first thing is to check 100% familiars
-	if(bcasc_100familiar != "" && my_path() != "Avatar of Boris"  && my_path() != "Avatar of Jarlsberg") {
+	if(bcasc_100familiar != "" && my_path() != "Avatar of Boris" && my_path() != "Avatar of Jarlsberg" && my_path() != "Avatar of Sneaky Pete") {
 		print("BCC: Your familiar is set to a 100% "+bcasc_100familiar, "purple");
 		cli_execute("familiar "+bcasc_100familiar);
 		return true;
@@ -3749,8 +3328,19 @@ boolean innerSetFamiliar(string famtype) {
 		use_familiar($familiar[none]);
 		return true;
 	}
+
+	if (famtype == "blackforest" && i_a("reassembled blackbird") == 0 && i_a("reconstituted crow") == 0) {
+		if (have_path_familiar($familiar[Reassembled Blackbird])) {
+			use_familiar($familiar[Reassembled Blackbird]);
+			return true;
+		} else if (have_path_familiar($familiar[Reconstituted Crow])) {
+			use_familiar($familiar[Reconstituted Crow]);
+			return true;
+		}
+	}
+
 	//Then a quick check for if we have Everything Looks Yellow
-	if ((have_effect($effect[Everything Looks Yellow]) > 0 || (my_path() == "Bees Hate You") || my_path() == "Avatar of Boris" || my_path() == "Avatar of Jarlsberg") && famtype == "hebo") { famtype = "items"; }
+	if ((have_effect($effect[Everything Looks Yellow]) > 0 || (my_path() == "Bees Hate You") || my_path() == "Avatar of Boris" || my_path() == "Avatar of Jarlsberg" && my_path() != "Avatar of Sneaky Pete") && famtype == "hebo") { famtype = "items"; }
 		
 	//THEN a quick check for a spanglerack
 	if (i_a("spangly sombrero") > 0 && have_path_familiar($familiar[Mad Hatrack]) &&
@@ -4191,7 +3781,7 @@ monster whatShouldIFax() {
 	if (get_property("bcasc_lastFax") == today_to_string() || get_property("_photocopyUsed") != "false") return $monster[none];
 	if (get_property("bcasc_doNotFax") == true) return $monster[none];
 	if (can_interact() && !bcasc_RunSCasHC) return $monster[none];
-	if (my_path() == "Avatar of Boris" || my_path() == "Avatar of Jarlsberg") return $monster[none];
+	if (my_path() == "Avatar of Boris" || my_path() == "Avatar of Jarlsberg" || my_path() == "Avatar of Sneaky Pete") return $monster[none];
 	if (item_amount($item[Clan VIP Lounge key]) == 0) return $monster[none];
 	if (!contains_text(visit_url("clan_viplounge.php"), "faxmachine.gif")) return $monster[none];
 	
@@ -4290,21 +3880,21 @@ void setMood(string combat) {
 	cli_execute("mood clear");
 	defaultMood(combat == "");
 	//SIMON CHANGED
-	if (my_path() != "Avatar of Boris" && my_path() != "Zombie Slayer" && my_path() !="Avatar of Jarlsberg") {
+	if (my_path() != "Avatar of Boris" && my_path() != "Zombie Slayer" && my_path() !="Avatar of Jarlsberg" && my_path() != "Avatar of Sneaky Pete") {
 		print("setting normal paths mood","lime");
 		if (contains_text(combat,"+")) {
 			if (willMood()) {
 				print("BCC: Need moar combat! WAAARGH!", "purple");
-				if (have_skill($skill[Musk of the Moose])) cli_execute("trigger lose_effect, Musk of the Moose, cast 1 Musk of the Moose");
-				if (have_skill($skill[Carlweather's Cantata of Confrontation])) cli_execute("trigger lose_effect, Carlweather's Cantata of Confrontation, cast 1 Carlweather's Cantata of Confrontation");
+				if (have_skill($skill[Musk of the Moose]) && my_maxmp() > mp_cost($skill[Musk of the Moose]) * 2) cli_execute("trigger lose_effect, Musk of the Moose, cast 1 Musk of the Moose");
+				if (have_skill($skill[Carlweather's Cantata of Confrontation]) && my_maxmp() > mp_cost($skill[Carlweather's Cantata of Confrontation]) * 2) cli_execute("trigger lose_effect, Carlweather's Cantata of Confrontation, cast 1 Carlweather's Cantata of Confrontation");
 				cli_execute("trigger gain_effect, The Sonata of Sneakiness, uneffect sonata of sneakiness");
 			}
 		} 
 		if (contains_text(combat,"-")) {
 			if (willMood()) {
 				print("BCC: Need less combat, brave Sir Robin!", "purple");
-				if (have_skill($skill[Smooth Movement])) cli_execute("trigger lose_effect, Smooth Movements, cast 1 smooth movement");
-				if (have_skill($skill[The Sonata of Sneakiness])) cli_execute("trigger lose_effect, The Sonata of Sneakiness, cast 1 sonata of sneakiness");
+				if (have_skill($skill[Smooth Movement]) && my_maxmp() > mp_cost($skill[Smooth Movement]) * 2) cli_execute("trigger lose_effect, Smooth Movements, cast 1 smooth movement");
+				if (have_skill($skill[The Sonata of Sneakiness]) && my_maxmp() > mp_cost($skill[The Sonata of Sneakiness]) * 2) cli_execute("trigger lose_effect, The Sonata of Sneakiness, cast 1 sonata of sneakiness");
 				cli_execute("trigger gain_effect, Carlweather's Cantata of Confrontation, uneffect Carlweather's Cantata of Confrontation");
 				//if we dont need any more snow boards, use them for -combat
 				if(i_a("snow berries")>0 && my_level()>8)
@@ -4321,19 +3911,20 @@ void setMood(string combat) {
 		if (contains_text(combat,"i")) {
 			if (willMood()) {
 				print("BCC: Need items!", "purple");
-				if (have_skill($skill[Fat Leon's Phat Loot Lyric])) cli_execute("trigger lose_effect, Fat Leon's Phat Loot Lyric, cast 1 Fat Leon's Phat Loot Lyric");
-				if (have_skill($skill[Singer's Faithful Ocelot]))
-					cli_execute("trigger lose_effect, Singer's Faithful Ocelot, cast 1 Singer's Faithful Ocelot");
+				if (have_skill($skill[Fat Leon's Phat Loot Lyric]) && my_maxmp() > mp_cost($skill[Fat Leon's Phat Loot Lyric]) * 2) cli_execute("trigger lose_effect, Fat Leon's Phat Loot Lyric, cast 1 Fat Leon's Phat Loot Lyric");
+				if (have_skill($skill[The Ballad of Richie Thingfinder]) && my_maxmp() > mp_cost($skill[The Ballad of Richie Thingfinder]) * 2) cli_execute("trigger lose_effect, The Ballad of Richie Thingfinder, cast 1 The Ballad of Richie Thingfinder");
+				if (have_skill($skill[Leash of Linguini]) && my_maxmp() > mp_cost($skill[Leash of Linguini]) * 2) cli_execute("trigger lose_effect, Leash of Linguini, cast 1 Leash of Linguini");
+				if (bcasc_castEmpathy && have_skill($skill[Empathy of the Newt]) && my_maxmp() > mp_cost($skill[Empathy of the Newt]) * 2 && have_castitems($class[turtle tamer], true)) cli_execute("trigger lose_effect, Empathy, cast 1 Empathy of the Newt");
+				if (have_skill($skill[Singer's Faithful Ocelot]) && my_maxmp() > mp_cost($skill[Singer's Faithful Ocelot]) * 2) cli_execute("trigger lose_effect, Singer's Faithful Ocelot, cast 1 Singer's Faithful Ocelot");
 			}
 		}
 		if (contains_text(combat,"n")) {
 			if (willMood()) {
 				print("BCC: Need initiative!", "purple");
-				if (have_skill($skill[Springy Fusilli])) cli_execute("trigger lose_effect, Springy Fusilli, cast 1 Springy Fusilli");
+				if (have_skill($skill[Springy Fusilli]) && my_maxmp() > mp_cost($skill[Springy Fusilli]) * 2) cli_execute("trigger lose_effect, Springy Fusilli, cast 1 Springy Fusilli");
+				if (have_skill($skill[Cletus's Canticle of Celerity]) && my_maxmp() > mp_cost($skill[Cletus's Canticle of Celerity]) * 2) cli_execute("trigger lose_effect, Cletus's Canticle of Celerity, cast 1 Cletus's Canticle of Celerity");
+				if (have_skill($skill[Walberg's Dim Bulb]) && my_maxmp() > mp_cost($skill[Walberg's Dim Bulb]) * 2) cli_execute("trigger lose_effect, Walberg's Dim Bulb, cast 1 Walberg's Dim Bulb");
 				//its so rare that we need initiative, lets just go all out
-				if (have_skill($skill[cletus's canticle of celerity])) cli_execute("trigger lose_effect, cletus's canticle of celerity, cast 1 cletus's canticle of celerity");
-				if (have_skill($skill[Walberg's Dim Bulb]))
-					cli_execute("trigger lose_effect, Walberg's Dim Bulb, cast 1 Walberg's Dim Bulb");	
 				if(item_amount($item[Okee-Dokee soda])>0) cli_execute("trigger lose_effect, , use 1 Okee-Dokee soda");
 				if(item_amount($item[yellow candy heart])>0) cli_execute("trigger lose_effect, Heart of Yellow, use 1 yellow candy heart");
 				if(item_amount($item[upsy daisy])>0) cli_execute("trigger lose_effect, Ass Over Teakettle, use 1 upsy daisy");
@@ -4345,12 +3936,13 @@ void setMood(string combat) {
 		if (contains_text(combat,"m")) {
 			print("BCC: Need meat (this will always trigger)!", "purple");
 			if (have_skill($skill[The Polka of Plenty])) cli_execute("trigger lose_effect, Polka of Plenty, cast 1 Polka of Plenty");
+			if (have_skill($skill[The Ballad of Richie Thingfinder]) && my_maxmp() > mp_cost($skill[The Ballad of Richie Thingfinder]) * 2) cli_execute("trigger lose_effect, The Ballad of Richie Thingfinder, cast 1 The Ballad of Richie Thingfinder");
 		}
 		if (contains_text(combat,"l") && my_path()!="BIG!") {
 			if (willMood()) {
 				print("BCC: Need bigger monsters!", "purple");
-				if (have_skill($skill[Ur-Kel's Aria of Annoyance])) cli_execute("trigger lose_effect, Ur-Kel's Aria of Annoyance, cast 1 Ur-Kel's Aria of Annoyance");
-				if (have_skill($skill[Drescher's Annoying Noise])) cli_execute("trigger lose_effect, Drescher's Annoying Noise, cast 1 Drescher's Annoying Noise");
+				if (have_skill($skill[Ur-Kel's Aria of Annoyance]) && my_maxmp() > mp_cost($skill[Ur-Kel's Aria of Annoyance]) * 2) cli_execute("trigger lose_effect, Ur-Kel's Aria of Annoyance, cast 1 Ur-Kel's Aria of Annoyance");
+				if (have_skill($skill[Drescher's Annoying Noise]) && my_maxmp() > mp_cost($skill[Drescher's Annoying Noise]) * 2) cli_execute("trigger lose_effect, Drescher's Annoying Noise, cast 1 Drescher's Annoying Noise");
 				if (have_skill($skill[Pride of the Puffin])) cli_execute("trigger lose_effect, Pride of the Puffin, cast 1 Pride of the Puffin");
 			}
 		} 
@@ -4609,6 +4201,34 @@ void setMood(string combat) {
 			//ML
 			if (have_skill($skill[Gristlesphere])) cli_execute("trigger lose_effect, Gristlesphere, cast 1 Gristlesphere");
 		}
+	} else if (my_path() == "Avatar of Sneaky Pete") {
+		if (contains_text(combat, "-")) {
+			print("BCC: Need less combat, let's rev our engine!", "purple");
+			if (have_skill($skill[rev engine]) && get_property("peteMotorbikeMuffler") == "Extra-Quiet Muffler") cli_execute("trigger lose_effect, Muffled, cast 1 Rev Engine");
+			print("BCC: Need less combat, Let's get Broody!", "purple");
+			if (have_skill($skill[Brood])) cli_execute("trigger lose_effect, Brooding, cast 1 Brood");
+			if (i_a($item[pile of ashes]) > 0) cli_execute("trigger unconditional, ,ashq if(item_amount($item[pile of ashes]) > 0 && have_effect($effect[ashen]) == 0) {use(1, $item[pile of ashes]);}");
+		}
+		if (contains_text(combat, "+")) {
+			print("BCC: Need more combat, let's rev our engine", "purple");
+			if (have_skill($skill[rev engine]) && get_property("peteMotorbikeMuffler") == "Extra-Loud Muffler") cli_execute("trigger lose_effect, Unmuffled, cast 1 Rev Engine");
+		}
+		if (contains_text(combat, "i")) {
+			print("BCC: Need more items!", "purple");
+			if (have_skill($skill[Check Hair]) && my_maxmp() > mp_cost($skill[Check Hair]) * 2) cli_execute("trigger lose_effect, Of course it looks great, cast 1 Check Hair");
+		}
+		if (contains_text(combat, "m")) {
+			print("BCC: Need more meat. Spending a turn to change intrinsic (currently not implemented).", "purple");
+			//if (have_skill($skill[Check Mirror]) && my_audience() >= 20) use_skill(1, $skill[Check Mirror]);
+		}
+		if (contains_text(combat, "n")) {
+			print("BCC: Need more initative!", "purple");
+			if (have_skill($skill[Live Fast])) cli_execute("trigger lose_effect, Living Fast, cast 1 Live Fast");
+		}
+		if (contains_text(combat, "l")) {
+			print("BCC: Need tougher monsters. These are too weak!", "purple");
+			if (have_skill($skill[Biker Swagger])) cli_execute("trigger lose_effect, Biker Swagger, cast 1 Biker Swagger");
+		}
 	}
 	//buffs for all paths
 	if (contains_text(combat,"i")) {
@@ -4629,7 +4249,7 @@ void setMood(string combat) {
 		if (i_a("lavender candy hear") > 0) cli_execute("trigger unconditional, ,ashq if(item_amount($item[lavender candy heart]) > 0 && have_effect($effect[Heart of Lavender]) <= 1) {use(1, $item[lavender candy heart]);}");
 		if (i_a("resolution: be happier") > 0) cli_execute("trigger unconditional, ,ashq if(item_amount($item[resolution: be happier]) > 0 && have_effect($effect[Joyful Resolve]) <= 1) {use(1, $item[resolution: be happier]);}");
 		if (i_a("blue snowcone") > 0) cli_execute("trigger unconditional, ,ashq if(item_amount($item[blue snowcone]) > 0 && have_effect($effect[blue tongue]) <= 1 && have_effect($effect[red tongue]) == 0) {use(1, $item[blue snowcone]);}");
-		if (have_skill($skill[Empathy of the Newt])) cli_execute("trigger lose_effect, Empathy, cast 1 Empathy");
+		if (have_skill($skill[Empathy of the Newt]) && my_maxmp() > mp_cost($skill[Empathy of the Newt]) * 2 && have_castitems($class[turtle tamer], true)) cli_execute("trigger lose_effect, Empathy, cast 1 Empathy of the Newt");
 		if (i_a("green candy hear") > 0) cli_execute("trigger unconditional, ,ashq if(item_amount($item[green candy heart]) > 0 && have_effect($effect[Heart of Green]) <= 1) {use(1, $item[green candy heart]);}");
 		get_kolhs_buff("items");
 	}
@@ -4680,13 +4300,19 @@ location level_location(int value) {
 	location best = $location[The Haunted pantry];
 	int one;
 	int two = safeMox(best);
+	location preferred;
+	switch(my_primestat()) {
+		case $stat[Muscle]: preferred = $location[The Haunted Gallery];
+		case $stat[Mysticality]: preferred = $location[The Haunted Bathroom];
+		case $stat[Moxie]: preferred = $location[The Haunted Ballroom];
+	}
 	//my_buffedstat(my_primestat())
-	if (value < 120) {
+	if (value < 120 || !can_adv(preferred)) {
 	foreach loc in $locations[The Sleazy Back Alley, The Haunted Pantry, The Outskirts of Cobb's Knob, The Spooky Forest, A Barroom Brawl, 8-Bit Realm, 
 			The Bat Hole Entrance, Guano Junction, The Batrat and Ratbat Burrow, The Beanbat Chamber, Cobb's Knob Kitchens, Cobb's Knob Barracks, Cobb's Knob Treasury, 
 			Cobb's Knob Harem, The Enormous Greater-Than Sign, The Dungeons of Doom, Itznotyerzitz Mine, The Black Forest, The Knob Shaft, Cobb's Knob Laboratory, Cobb's Knob Menagerie\, Level 1, 
 			Cobb's Knob Menagerie\, Level 2, Cobb's Knob Menagerie\, Level 3, Hippy Camp, Frat House, The Obligatory Pirate's Cove, The Castle in the Clouds in the Sky (Basement), The Hole in the Sky, The Haunted Library, The Haunted Gallery, 
-			The Haunted Ballroom, The Palindome, Tower Ruins, The Oasis, The Upper Chamber, The Middle Chamber, Thugnderdome, 
+			The Haunted Ballroom, Inside the Palindome, Tower Ruins, The Oasis, The Upper Chamber, The Middle Chamber, Thugnderdome, 
 			Outskirts of Camp Logging Camp, Camp Logging Camp, Post-Quest Bugbear Pens, The Bugbear Pen, The Degrassi Knoll Garage, The \"Fun\" House, 
 			Pre-Cyrpt Cemetary, Post-Cyrpt Cemetary, The Goatlet, Lair of the Ninja Snowmen, The eXtreme Slope, Whitey's Grove, The Laugh Floor, 
 			Infernal Rackets Backstage, Pandamonium Slums, The Valley of Rof L'm Fao, The Penultimate Fantasy Airship, The Road to White Citadel, The Haunted Kitchen, The Haunted Conservatory, 
@@ -4696,18 +4322,14 @@ location level_location(int value) {
 			if (can_adv(loc)) {
 				one = safeMox(loc);
 				print("can adv there. It's safemox is "+one+" compared to current best "+two+" and limit "+value,"blue");
-				if (one < value && one > two) {
+				if (one == 0 || (one < value && one > two)) {
 					best = loc;
 					two = safeMox(best);
 				}
 			}
 		}
 	} else {
-		switch(my_primestat()) {
-			case $stat[Muscle]: return $location[The Haunted Gallery];
-			case $stat[Mysticality]: return $location[The Haunted Bathroom];
-			case $stat[Moxie]: return $location[The Haunted Ballroom];
-		}
+		return preferred;
 	}
 	return best;
 }
@@ -4835,7 +4457,7 @@ boolean levelMe(int sMox, boolean needBaseStat) {
 							}
 							print("BCC: We have "+item_amount($item[disassembled clover])+" clovers and are using one to level.", "purple");
 							use(1, $item[disassembled clover]);
-							visit_url("adventure.php?snarfblat=106&confirm=on");
+							visit_url("adventure.php?snarfblat=394&confirm=on");
 						}
 					} else {
 						//Bees hate broken clovers so use the closet instead
@@ -4851,7 +4473,7 @@ boolean levelMe(int sMox, boolean needBaseStat) {
 							}
 							print("BCC: We have "+closet_amount($item[ten-leaf clover])+" clovers and are using one to level.", "purple");
 							take_closet(1, $item[ten-leaf clover]);
-							visit_url("adventure.php?snarfblat=106&confirm=on");
+							visit_url("adventure.php?snarfblat=394&confirm=on");
 						}
 					}	
 				}
@@ -4907,7 +4529,7 @@ boolean levelMe(int sMox, boolean needBaseStat) {
 							}
 							print("BCC: We have "+item_amount($item[disassembled clover])+" clovers and are using one to level.", "purple");
 							use(1, $item[disassembled clover]);
-							visit_url("adventure.php?snarfblat=107&confirm=on");
+							visit_url("adventure.php?snarfblat=392&confirm=on");
 						}
 					}
 					else {
@@ -4924,7 +4546,7 @@ boolean levelMe(int sMox, boolean needBaseStat) {
 							}
 							print("BCC: We have "+closet_amount($item[ten-leaf clover])+" clovers and are using one to level.", "purple");
 							take_closet(1, $item[ten-leaf clover]);
-							visit_url("adventure.php?snarfblat=107&confirm=on");
+							visit_url("adventure.php?snarfblat=392&confirm=on");
 						}
 					}						
 				}
@@ -4998,7 +4620,7 @@ boolean levelMe(int sMox, boolean needBaseStat) {
 								}
 								print("BCC: We have "+item_amount($item[disassembled clover])+" clovers and are using one to level.", "purple");
 								use(1, $item[disassembled clover]);
-								visit_url("adventure.php?snarfblat=109&confirm=on");
+								visit_url("adventure.php?snarfblat=395&confirm=on");
 							}
 						}
 						else
@@ -5015,7 +4637,7 @@ boolean levelMe(int sMox, boolean needBaseStat) {
 								}
 								print("BCC: We have "+closet_amount($item[ten-leaf clover])+" clovers and are using one to level.", "purple");
 								take_closet(1, $item[ten-leaf clover]);
-								visit_url("adventure.php?snarfblat=109&confirm=on");
+								visit_url("adventure.php?snarfblat=395&confirm=on");
 							}
 						}
 					}
@@ -5194,7 +4816,7 @@ void use_putty()
 	set_combat_macro();
 }
 
-boolean bumAdv(location loc, string maxme, string famtype, string goals, string printme, string combat, string consultScript) {
+boolean bumAdv(location loc, string maxme, string famtype, string goals, string printme, string combat, string consultScript, int maxAdvs) {
 	//Prepare food if appropriate. 
 	omNomNom();
 	
@@ -5375,6 +4997,12 @@ boolean bumAdv(location loc, string maxme, string famtype, string goals, string 
 	if (canMCD() && loc == $location[Throne Room]) { cli_execute("mcd "+k); }
 	if (canMCD() && loc == $location[Haert of the Cyrpt]) { cli_execute("mcd "+d); }
 	
+	int adventureThis = my_adventures();
+	//If we set some given quantity of adventures, set this. 
+	if (maxAdvs > 0) {
+		adventureThis = maxAdvs;
+	}
+	
 	//SIMON CHANGED TO SINGLE ADV LOOPING WITH PUTTIES
 	boolean goals_done=false;
 	boolean used_adv=true;
@@ -5410,6 +5038,7 @@ boolean bumAdv(location loc, string maxme, string famtype, string goals, string 
 		return true;
 	return false; // Make the compiler happy...
 }
+boolean bumAdv(location loc, string maxme, string famtype, string goals, string printme, string combat, string consultScript) { return bumAdv(loc, maxme, famtype, goals, printme, combat, consultScript, 0); }
 boolean bumAdv(location loc, string maxme, string famtype, string goals, string printme, string combat) { return bumAdv(loc, maxme, famtype, goals, printme, combat, ""); }
 boolean bumAdv(location loc, string maxme, string famtype, string goals, string printme) { return bumAdv(loc, maxme, famtype, goals, printme, ""); }
 boolean bumAdv(location loc, string maxme, string famtype, string goals) { return bumAdv(loc, maxme, famtype, goals, ""); }
@@ -5503,7 +5132,7 @@ boolean bcasc8Bit() {
 		cli_execute("hottub");
 	if(have_effect($effect[consumed by fear])>0)
 		cli_execute("uneffect consumed by fear");
-	checkStage("8bit", true);
+	if (i_a("digital key") > 0) checkStage("8bit", true);
 	return true;
 }
 
@@ -5523,7 +5152,8 @@ boolean bcascAirship() {
 
 	
 	string airshipGoals = "1 metallic A, 1 S.O.C.K.";
-	if (!in_hardcore() || my_path() == "Bees Hate You" || my_path() == "Avatar of Boris" || my_path() == "Bugbear Invasion" || my_path()=="Zombie Slayer") airshipGoals = "1 S.O.C.K.";
+	if (!in_hardcore() || my_path() == "Bees Hate You" || my_path() == "Avatar of Boris" || my_path() == "Avatar of Jarlsberg" || my_path() == "Avatar of Sneaky Pete" || my_path() == "Bugbear Invasion" || my_path() == "Zombie Slayer") airshipGoals = "1 S.O.C.K.";
+ 	
 	if(my_path()=="Bugbear Invasion" && to_int(get_property("biodataEngineering"))<9)
 		airshipGoals=", +"+(9 - to_int(get_property("biodataEngineering"))) + " BURT";
 	
@@ -8588,7 +8218,7 @@ boolean bcascMacguffinPalindome() {
 				retrieve_item(1, $item[ketchup hound]);
 			}
 			if (my_meat() < (500 * (2 - i_a("photograph of God") - i_a("hard rock candy")))) abort("You're going to need more meat for this.");
-			bumAdv($location[The Palindome], "+equip talisman o' nam", "hebo", "1 I Love Me Vol I", "Getting the 'I Love Me' from the Palindome", "-i", "consultHeBo");
+			bumAdv($location[inside the palindome], "+equip talisman o' nam", "hebo", "1 I Love Me Vol I", "Getting the 'I Love Me' from the Palindome", "-i", "consultHeBo");
 		}
 		
 		//if we didn't get a ketchup hound / stunt nuts, farm or pull them now
@@ -8602,9 +8232,9 @@ boolean bcascMacguffinPalindome() {
 				cli_execute("pull stunt nuts");
 		}
 		while(i_a("ketchup hound")<1)
-			bumAdv($location[The Palindome], "+equip talisman o' nam", "hebo", "1 ketchup hound", "Getting a ketchup hound", "+i", "consultHeBo");
+			bumAdv($location[inside the palindome], "+equip talisman o' nam", "hebo", "1 ketchup hound", "Getting a ketchup hound", "+i", "consultHeBo");
 		while(i_a("stunt nuts")<1 && i_a("wet stunt nut stew")<1)
-			bumAdv($location[The Palindome], "+equip talisman o' nam", "hebo", "1 stunt nuts", "Getting stunt nuts", "+i", "consultHeBo");
+			bumAdv($location[inside the palindome], "+equip talisman o' nam", "hebo", "1 stunt nuts", "Getting stunt nuts", "+i", "consultHeBo");
 		if(i_a("wet stew")>0 && i_a("stunt nuts")>0)
 			create(1, $item[wet stunt nut stew]);
 		
@@ -8629,7 +8259,7 @@ boolean bcascMacguffinPalindome() {
 				if(!in_hardcore() && i_a("stunt nuts")<1)
 					cli_execute("pull stunt nuts");
 				while (i_a("stunt nuts") == 0)
-					bumAdv($location[The Palindome], "", "items", "1 stunt nuts", "Getting the stunt nuts from the Palindome, which you should probably already have");
+					bumAdv($location[inside the palindome], "", "items", "1 stunt nuts", "Getting the stunt nuts from the Palindome, which you should probably already have");
 				create(1, $item[wet stunt nut stew]);
 			}
 			if (item_amount($item[wet stunt nut stew]) == 0) abort("Unable to cook up some tasty wet stunt nut stew.");
@@ -8656,7 +8286,7 @@ boolean bcascMacguffinPalindome() {
 			equip($slot[acc2], $item[Mega Gem]);
 		}
 		setFamiliar("meatboss");
-		bumMiniAdv(1, $location[The Palindome]);
+		bumMiniAdv(1, $location[inside the palindome]);
 		if (item_amount($item[Staff of Fats]) == 0) abort("Looks like Dr. Awkward opened a can of whoop-ass on you. Try fighting him manually.");
 	}
 	
@@ -8824,8 +8454,9 @@ boolean bcascMacguffinSpooky() {
 						retrieve_item(1, to_item(i));
 				}
 			} else {
-				while (item_amount(wines[1]) == 0 || item_amount(wines[2]) == 0 || item_amount(wines[3]) == 0)
-					bumAdv($location[The Haunted Wine Cellar (Automatic)], "", "items", "1 "+wines[1]+", 1 "+wines[2]+", 1 "+wines[3], "Getting the three wines ("+wines[1]+", "+wines[2]+", "+wines[3]+")");
+				abort("Wine cellar is no more");
+//				while (item_amount(wines[1]) == 0 || item_amount(wines[2]) == 0 || item_amount(wines[3]) == 0)
+//					bumAdv($location[The Haunted Wine Cellar (Automatic)], "", "items", "1 "+wines[1]+", 1 "+wines[2]+", 1 "+wines[3], "Getting the three wines ("+wines[1]+", "+wines[2]+", "+wines[3]+")");
 			}
 			
 			if (my_ascensions() < 2)

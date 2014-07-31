@@ -76,6 +76,7 @@ string normalized(string mixvar, string type) {
       case "class": return to_string(to_class(mixvar));
       case "coinmaster": return to_string(to_coinmaster(mixvar));
       case "phylum": return to_string(to_phylum(mixvar));
+      case "bounty": return to_string(to_bounty(mixvar));
       case "list of string":
       case "string": return mixvar;
    }
@@ -315,6 +316,7 @@ void setvar(string varname,item dfault)    {  setvar(varname,to_string(dfault),"
 void setvar(string varname,location dfault){  setvar(varname,to_string(dfault),"location");  }
 void setvar(string varname,monster dfault) {  setvar(varname,to_string(dfault),"monster");  }
 void setvar(string varname,phylum dfault)  {  setvar(varname,to_string(dfault),"phylum");  }
+void setvar(string varname,bounty dfault)  {  setvar(varname,to_string(dfault),"bounty");  }
 void setvar(string varname,skill dfault)   {  setvar(varname,to_string(dfault),"skill");  }
 void setvar(string varname,stat dfault)    {  setvar(varname,to_string(dfault),"stat");  }
 
@@ -419,6 +421,7 @@ item braindrop(monster patient) {
    if (index_of(patient.image,"hunter") == 0) return $item[hunter brain];
    if ($monsters[Boss Bat, Baron von Ratsworth, Knob Goblin King, giant skeelton, huge ghuol, conjoined zmombie, gargantulihc, Bonerdagon, 
       Groar, Dr. Awkward, Lord Spookyraven, Protector Spectre, The Big Wisniewski, Guy Made Of Bees] contains patient) return $item[boss brain];
+   if (to_string(patient).contains_text("Ed the Undying")) return $item[none];
    if (monster_attack(patient) + monster_level_adjustment() >= 100) return $item[good brain];
    if (monster_attack(patient) + monster_level_adjustment() > 50) return $item[decent brain];
    return $item[crappy brain];

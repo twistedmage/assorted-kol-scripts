@@ -279,7 +279,7 @@ boolean [item] favorites; //will be populated in main()
 boolean tuxworthy(item it)
 {
   return (tuxable contains it) && (have_item($item[tuxedo shirt]) > 0) &&
-    have_skill($skill[Torso Awaregness]) && can_equip($item[tuxedo shirt]);
+    can_equip($item[tuxedo shirt]);
 }
 
 void summarize(string add)
@@ -324,7 +324,7 @@ record range
 record con_rec
 {
   item it; //the consumable in question
-  string type; //"food", "drink", or "spleen" ("overdrink" is invalid here)
+  string type; //"food", "booze", or "spleen" ("overdrink" is invalid here)
   range consumptionGain; //fullness, inebriety, whatever
   int level; //min level required
   range adv; //adv gain
@@ -816,6 +816,11 @@ int effective_price(item it, boolean inventoried)
     else if (daily_special() == it)
     {
       price = abs(autosell_price(it)) * 3;
+      if (price == 0)
+      {
+         if (it.inebriety > 0) price = to_int(excise(visit_url("cafe.php?cafeid=2"), daily_special().to_string()+" (","Meat"));
+         else price = to_int(excise(visit_url("cafe.php?cafeid=1"), daily_special().to_string()+" (","Meat"));
+      }
       vprint("DAILY ITEM:"+it+" = "+price,8);
     }
     else if (!is_tradeable(it))
@@ -1904,7 +1909,7 @@ void update_from_mafia(string type)
         totalcost = it.fullness;
         gainadv = totalcost > 0 ? (averange(set_range(it.adventures)) / totalcost) : 0;
         break;
-      case "drink":
+      case "booze":
         if ((special_values(it, 1) == 1 && get_quality(it) < MINIMUM_QUALITY) || unknown_bottle(it)) continue;
         if (it.fullness > 0 || it.spleen > 0) continue;
         if (my_class() == $class[Avatar of Jarlsberg] && (it.to_int() < 6176 || it.to_int() > 6236)) continue;
@@ -1993,7 +1998,7 @@ float value(con_rec con, boolean overdrink, boolean breakfast, boolean speculati
     milk = wants_milk ? milk_do_body_good(averange(con.consumptionGain), true) : false;
     ode = false;
   }
-  else if (con.type == "drink")
+  else if (con.type == "booze")
   {
     lunch = false;
     milk = false;
@@ -2261,7 +2266,7 @@ boolean consumeone(con_rec con, string type, int iteration, int step)
       if (wants_lunch && !get_lunch(averange(con.consumptionGain)))
         lunch_do_body_good(foodadventures, false);
     }                
-    else if ((!get_ode(averange(con.consumptionGain))) && (type == "drink") && wants_ode)
+    else if ((!get_ode(averange(con.consumptionGain))) && (type == "booze") && wants_ode)
     {
       //See if you should be getting ode
       int odeadventures = 0;
@@ -2285,7 +2290,7 @@ boolean consumeone(con_rec con, string type, int iteration, int step)
            eat(1, con.it);
         }
       }
-      if (type == "drink")
+      if (type == "booze")
       {
         // drinky stuff now 
         if (tuxworthy(con.it))
@@ -2316,7 +2321,7 @@ boolean consumeone(con_rec con, string type, int iteration, int step)
         else simadventures += food_adjust(averange(con.adv), averange(con.consumptionGain));
         simfullness += con.consumptionGain.min;
       }
-      if (type == "drink")
+      if (type == "booze")
       {
         simadventures += drink_adjust(averange(con.adv), averange(con.consumptionGain));
         siminebriety += con.consumptionGain.min;
@@ -2353,7 +2358,7 @@ int doneness(string type)
 {
   if (type == "food")
     return get_fullness();
-  if (type == "drink")
+  if (type == "booze")
     return get_inebriety();
   if (type == "spleen")
     return get_spleen();
@@ -2369,7 +2374,7 @@ int predoneness(string type, boolean speculative)
     foreach i in specposition { queued += specposition[i].consumptionGain.min; }
   else
     foreach i in position { queued += position[i].consumptionGain.min; }
-  if (type == "food" || type == "drink" ||type == "spleen")
+  if (type == "food" || type == "booze" ||type == "spleen")
     return queued + doneness(type);
   abort("Predoneness: Invalid type "+type);
   return 0;
@@ -2502,7 +2507,7 @@ int eatdrink(int foodMax, int drinkMax, int spleenMax, boolean overdrink)
     }
     else if (iteration == 2)
     {
-      type = "drink";
+      type = "booze";
       conmax = drinkMax;
       can_do = can_drink();
     }
@@ -2514,7 +2519,7 @@ int eatdrink(int foodMax, int drinkMax, int spleenMax, boolean overdrink)
     }
     else if (iteration == 4)
     {
-      type = "drink";
+      type = "booze";
       conmax = 999999;
       can_do = overdrink && can_drink();
     }

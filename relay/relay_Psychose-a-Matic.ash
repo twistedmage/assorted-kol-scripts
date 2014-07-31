@@ -27,8 +27,8 @@ foreach k,v in post switch (k) {
          case $item[jar of psychoses (Jick)]: visit_url("showplayer.php?who=1&action=jung&whichperson=jick"); break;
       }
 }
-if (get_property("_jickJarAvailable") == "unknown") visit_url("showplayer.php?who=1");
 boolean havejar = item_amount($item[psychoanalytic jar]) > 0;
+if (havejar && get_property("_jickJarAvailable") == "unknown") visit_url("showplayer.php?who=1");
 boolean fetchable(item j) {
    if (!havejar) return false;
    switch (j) {
@@ -90,19 +90,29 @@ page.append("<html><head>\n<title>Psychose-a-Matic</title>\n");
 page.append("<script src=\"jquery1.10.1.min.js\"></script>\n<script src=\"clilinks.js\"></script>\n");
 page.append("<link href='/images/styles.20120512.css' type='text/css' rel='stylesheet'/>\n");
 page.append("<style type=\"text/css\">img { vertical-align: middle } .dim { opacity: 0.4; filter: alpha(opacity=40); }</style></head>\n<body>");
-page.append("<div style='float:left'><h2>Psychose-a-Matic</h2> <small><i>"+randquote()+"</i></small><p><a href=# class='cliimglink' title='wiki psychoanalytic jar'>");
-page.append("<img src='/images/itemimages/analjar_empty.gif' title='psychoanalytic jar'></a>: <b>"+item_amount($item[psychoanalytic jar])+"</b></div>");
+page.append("<h2>Psychose-a-Matic</h2> <small><i>"+randquote()+"</i></small>");
 string bonusinf(int gate) {
    buffer bon;
-   bon.append("<td>"); 
+   bon.append("<td><a href=# class='cliimglink' title='wiki psychoanalytic jar'>");
+   bon.append("<img src='/images/itemimages/analjar_empty.gif' title='psychoanalytic jar'></a>: <b>"+item_amount($item[psychoanalytic jar])+"</b><p>");
    void artistgoal(effect target, string goals) { bon.append("<p><a href=# class='clilink' title=\"conditions clear; conditions set "+goals+"\">Set goals for "+target+"</a>"); }
+   void flick(int num, string spoil) { 
+      bon.append("<br><span"+(get_property("flickeringPixel"+num) == "true" ? " class='dim'" : "")+"><a href=# class='cliimglink' title='wiki flickering pixel'>");
+      bon.append("<img src='/images/itemimages/flickerpixel.gif'></a>"+spoil+"</span>");
+   }
    switch (gate) {  // special info specific to the jar you're doing
+      case 3: bon.append("You have <b>"+available_amount($item[flickering pixel])+"</b> flickering pixels.");
+         if (available_amount($item[byte])+display_amount($item[byte])+storage_amount($item[byte]) > 0) break;
+         bon.append("<p><small><b>Anger</b>"); flick(1,"25 hot resistance"); flick(2,"500 buffed Mus/Mys/Mox");
+         bon.append("<br><b>Fear</b>"); flick(3,"300 buffed Moxie"); flick(4,"25 spooky resistance");
+         bon.append("<br><b>Doubt</b>"); flick(5,"+300 weapon damage"); flick(6,"1000 HP");
+         bon.append("<br><b>Regret</b>"); flick(7,"1000 MP"); flick(8,"60 prismatic damage"); bon.append("</small>");
+         break;
       case 5: artistgoal($effect[my breakfast with andrea],"3 artist butterknife, 1 artist spatula, 1 artist whisk");
          artistgoal($effect[the champion's breakfast],"3 artist torch, 1 artist whisk, 1 artist cutter");
          artistgoal($effect[tiffany's breakfast],"2 artist spatula, 2 artist cutter, 1 artist whisk");
          artistgoal($effect[breakfast clubbed],"1 artist butterknife, 1 artist spatula, 1 artist whisk, 1 artist cutter, 1 artist torch"); 
 		 break;
-      default: return "";
    }
    bon.append("</td>");
    return bon;
@@ -112,7 +122,7 @@ if (get_property("_psychoJarUsed") == "true") {
    matcher gatenum = create_matcher("junggate_(\\d+)",visit_url("campground.php"));
    if (gatenum.find()) {
       matcher jarbit = create_matcher("<center><div(.+)</div>",visit_url("place.php?whichplace=junggate_"+gatenum.group(1)));
-      if (jarbit.find()) page.append("<p align=center><table><tr>"+bonusinf(to_int(gatenum.group(1)))+"<td>"+jarbit.group(0)+"</center></td></tr></table>");
+      if (jarbit.find()) page.append("<p align=center style='clear: both'><table><tr>"+bonusinf(to_int(gatenum.group(1)))+"<td>"+jarbit.group(0)+"</center></td></tr></table>");
    }
 }
 // table of handiness

@@ -145,26 +145,30 @@ void set_autoputtifaction() {
    if (should_putty && should_olfact) return;
 /*
   // second, set puttifaction for bounty monsters
-   item ihunt = to_item(to_int(get_property("currentBountyItem")));
-   if (ihunt != $item[none]) {
-      if (item_drops(m) contains ihunt && (
-          !($locations[the "fun" house,the goatlet,lair of the ninja snowmen,cobb's knob laboratory] contains my_location()) ||
+   boolean[location] blocs;
+   foreach s in $strings[currentEasyBountyItem, currentHardBountyItem, currentSpecialBountyItem] {
+      bounty thisb = to_bounty(get_property(s));
+      if (thisb.number == 0) continue;
+      if (m == thisb.monster && (!($locations[the "fun" house, the goatlet, lair of the ninja snowmen, cobb's knob laboratory] contains my_location()) ||
           (list_contains(vars["BatMan_attract"],m)))) {
-         if (ihunt.bounty_count <= to_int(vars["BatMan_puttybountiesupto"]) && item_amount(ihunt) < ihunt.bounty_count-1) should_putty = true;
+         if (thisb.number <= to_int(vars["BatMan_puttybountiesupto"]) && item_amount(ihunt) < ihunt.bounty_count-1) should_putty = true;
          should_olfact = true;
       } else if (list_contains(vars["BatMan_attract"],m) && ihunt.bounty != my_location())
          should_olfact = true;
   } else
   */
-   if (list_contains(vars["BatMan_attract"],m)) should_olfact = true;
+  
   // next, handle effective goal-getting (this only olfacts if you set "goals" for autoOlfact)
    monster[int] sortm = get_monsters(my_location());
+   boolean belongs;
    sort sortm by -has_goal(value);
    int sources;
    foreach i,mon in sortm {
+      if (mon == m) belongs = true;
       if (has_goal(mon) == 0) break;
       sources += 1;
    }
+   if (list_contains(vars["BatMan_attract"],m) && (belongs || my_location() == $location[none])) should_olfact = true;
    if (sources == 0) return;
    print(sources+"/"+count(get_monsters(my_location()))+" monsters drop goals here.");
    if (sortm[0] == m) {
@@ -185,8 +189,10 @@ void build_custom() {
    void encustom(item which) { encustom(which, false); }
    void encustom(skill which) { advevent toque = get_action(which); encustom(toque); }
   // stealing! add directly to queue[] rather than custom actions
-   if (should_pp && (intheclear() || has_goal(m) > 0) && contains_text(page,"value=\"steal"))   //"
-      enqueue(to_event("pickpocket","once",1));
+   if (should_pp && (intheclear() || has_goal(m) > 0)) {
+      if (contains_text(page,"value=\"steal")) enqueue(to_event("pickpocket","once",1));
+       else if (my_path() == "Zombie Slayer") encustom($skill[smash & graaagh]);
+   }
   // safe salve
    if (have_skill($skill[saucy salve]) && !happened($skill[saucy salve]) && (my_stat("hp") < m_dpr(0,0) ||
        min(round(to_float(get_property("hpAutoRecoveryTarget"))*to_float(my_maxhp())) - my_stat("hp"),12)*meatperhp > mp_cost($skill[saucy salve])*meatpermp))
@@ -394,6 +400,8 @@ void build_custom() {
       return new advevent;
    }
    encustom(unknown_rave());
+   if (to_boolean(vars["BatMan_onlycustomitems"])) foreach i,v in opts 
+      if (index_of(v.id,"use ") == 0 && v.custom == "") remove opts[i];
    vprint("Custom actions built! ("+count(custom)+" actions)",9);
 }
 
@@ -526,7 +534,7 @@ string stasis_repeat() {       // the string of repeat conditions for stasising
       " && !mpbelow "+my_stat("mp")+                                                        // mp
       (my_stat("mp") < min(expskill(),my_maxmp()) ? " && mpbelow "+min(expskill(),my_maxmp()) : "")+
       " && !pastround "+max(1,floor(maxround - 3 - kill_rounds(smack)))+                    // time to kill
-      ((have_equipped($item[crown of thrones])) ? " && !match \"acquire an item\"" : "")+   // CoT
+      ((have_equipped($item[crown of thrones]) || have_equipped($item[buddy bjorn])) ? " && !match \"acquire an item\"" : "")+   // CoT/BB
       ((my_fam() == $familiar[hobo monkey]) ? " && !match \"hands you some Meat\"" : "")+   // famspent
       ((my_fam() == $familiar[gluttonous green ghost]) ? " && match ggg.gif" : "")+
       ((my_fam() == $familiar[slimeling]) ? " && match slimeling.gif" : "");
@@ -560,6 +568,7 @@ string stasis() {
 setvar("BatMan_flyereverything",true);
 setvar("BatMan_puttybountiesupto",19);
 setvar("BatMan_pretentioustarget",$effect[my breakfast with andrea]);
+setvar("BatMan_onlycustomitems",false);
 setvar("BatMan_attract","blooper, dairy goat, shaky clown, zombie waltzers, goth giant, dirty old lihc, hellion, violent fungus","list of monster");
 setvar("BatMan_banish","senile lihc, slick lihc, A.M.C. gremlin","list of monster");
 setvar("BatMan_yellow","knob goblin harem girl, 7-foot dwarf foreman","list of monster");

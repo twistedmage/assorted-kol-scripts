@@ -182,7 +182,7 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
             friendlyset(658,1,"Enter Debasement");
          } else friendlyset(657,2,"Skip Debasement (insufficient GP)");
          return;
-      case $location[convention hall lobby]: 
+      case $location[convention hall lobby]:
          for i from 3891 to 3896 {
             if (get_property("lastSlimeVial"+i) != "") continue;
             if (item_amount(to_item(i)) == 0 && creatable_amount(to_item(i)) > 0) create(1,to_item(i));
@@ -308,9 +308,9 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
          return;
       case $location[the hidden park]:
          if (get_property("relocatePygmyJanitor").to_int() < my_ascensions()) friendlyset(789,"2","Knock over the dumpster (move pygmy janitors here).");
-		  else if (have_item($item[antique machete]) == 0 || item_amount($item[bowling ball]) + get_property("hiddenBowlingAlleyProgress").to_int() < 5 ||
-		     min(1,have_item($item[half-size scalpel])) + min(1,have_item($item[head mirror])) + min(1,have_item($item[surgical mask])) + 
-			 min(1,have_item($item[surgical apron])) + min(1,have_item($item[bloodied surgical dungarees])) < 5 ||
+          else if (have_item($item[antique machete]) == 0 || item_amount($item[bowling ball]) + get_property("hiddenBowlingAlleyProgress").to_int() < 5 ||
+             min(1,have_item($item[half-size scalpel])) + min(1,have_item($item[head mirror])) + min(1,have_item($item[surgical mask])) + 
+             min(1,have_item($item[surgical apron])) + min(1,have_item($item[bloodied surgical dungarees])) < 5 ||
              includes_goal($items[bowling ball,half-size scalpel,head mirror,surgical mask,surgical apron,bloodied surgical dungarees]))
             friendlyset(789,"1","Dumpster dive!");
           else friendlyset(789,"6","Skip the dumpster.");
@@ -329,8 +329,8 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
             friendlyset(584,"4","Unlock the Hidden City.");
          } else {
 //            friendlyset(580,"2","Hidden City unlocked, leave Pikachutlotl and go back to the Heart.");
-			if (is_goal($item[ancient calendar fragment])) friendlyset(584,"2","Hidden City unlocked, get goal ancient calendar fragment.");
-			 else if (is_goal($stat[muscle])) friendlyset(584,"1","Hidden City unlocked, get muscle stats.");
+            if (is_goal($item[ancient calendar fragment])) friendlyset(584,"2","Hidden City unlocked, get goal ancient calendar fragment.");
+             else if (is_goal($stat[muscle])) friendlyset(584,"1","Hidden City unlocked, get muscle stats.");
          }
         // fitting in (stone wool choice)
          if (get_property("choiceAdventure579") == "2") friendlyset(582,"1","Go to the heights for the Nostril.");
@@ -348,12 +348,12 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
         // to add: tent?
          return;
       case $location[the island barracks]: friendlyset(409,"1","Continue (only one choice here anyway)");
-		 if (get_property("questG04Nemesis") != "finished" && hacienda_target("k","Get key deduced or indicated by clue.")) return;
-		 if (hacienda_target("0","Explore unknown choice.")) return;
-		 if (hacienda_target("r","Collect unvisited reward.")) return;
-		 if (hacienda_target("f",get_property("questG04Nemesis") == "finished" ? "Get remaining once-only loot from previous fight locations." : "All locations known; fight!")) return;
-		 if (get_property("questG04Nemesis") == "finished" && hacienda_target("F","Get remaining once-only loot from previous fight locations.")) return;
-		 hacienda_target("W","Hacienda cleared; head to Puttin' on the Wax.");
+         if (get_property("questG04Nemesis") != "finished" && hacienda_target("k","Get key deduced or indicated by clue.")) return;
+         if (hacienda_target("0","Explore unknown choice.")) return;
+         if (hacienda_target("r","Collect unvisited reward.")) return;
+         if (hacienda_target("f",get_property("questG04Nemesis") == "finished" ? "Get remaining once-only loot from previous fight locations." : "All locations known; fight!")) return;
+         if (get_property("questG04Nemesis") == "finished" && hacienda_target("F","Get remaining once-only loot from previous fight locations.")) return;
+         hacienda_target("W","Hacienda cleared; head to Puttin' on the Wax.");
          return;
       case $location[kegger in the woods]:
          if (is_goal($item[orquette's phone number]) || item_amount($item[orquette's phone number]) < 20)
@@ -391,7 +391,7 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
             friendlyset(113,"3","Try for a Kiss the Knob apron.");
           else friendlyset(113,"2","Fight BBQ goblins.");
          return;
-      case $location[the palindome]:
+      case $location[inside the palindome]:
          if (is_goal($item[Ye Olde Navy Fleece]) && available_amount($item[Ye Olde Navy Fleece]) == 0)
             friendlyset(180,"1","Get Fleeced.");
           else if (available_amount($item[Ye Olde Navy Fleece]) > 0)
@@ -467,7 +467,7 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
            }
         }
         return;
-      case $location[the spooky gravy barrow]:
+      case $location[the spooky gravy burrow]:
          if (have_equipped($item[spooky glove]) && item_amount($item[inexplicably glowing rock]) > 0 && my_adventures() > 2)
             friendlyset(5,"1","Fight Felonia.");
           else friendlyset(5,"2","Skip Felonia.");
@@ -503,7 +503,7 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
             friendlyset(610,"1","");
             friendlyset(617,"1","");
         } else friendlyset(606,"0","What to do here?");
-		return;		
+        return;
       case $location[whitey's grove]:
          if (is_goal($item[piece of wedding cake]) || is_goal($item[white rice]))
             friendlyset(73,"3","Get goal cake/rice.");
@@ -534,6 +534,7 @@ boolean fight_items() {
            mall_price(to_item(get_property("dolphinItem"))) > 2*(min(mall_price($item[sand dollar]),mall_price($item[dolphin whistle])) + get_property("valueOfAdventure").to_int()))) {
          vprint("Whistling for a "+get_property("dolphinItem")+"...","blue",2);
          restore_hp(0);     // recover here since recovery is not triggered normally
+         if (item_amount($item[dolphin whistle]) > 0) cli_execute("refresh inv");  // sometimes they don't disappear from inventory and you have ghosts
          if (retrieve_item(1,$item[dolphin whistle])) use(1,$item[dolphin whistle]);
       }
    }
@@ -542,10 +543,10 @@ boolean fight_items() {
       if (item_amount(i) == 0 || (i == $item[shaking 4-d camera] && get_property("_cameraUsed") == "true")) return true;
       if (get_property(mprop+"Monster") == "") vprint("You have a "+i+", but mafia doesn't know what it is.",-2);
       if (has_goal(to_monster(get_property(mprop+"Monster"))) == 0 && (to_item(to_int(get_property("currentBountyItem"))) == $item[none] || 
-	   !(item_drops(to_monster(get_property(mprop+"Monster"))) contains to_item(to_int(get_property("currentBountyItem")))))) return true;
+       !(item_drops(to_monster(get_property(mprop+"Monster"))) contains to_item(to_int(get_property("currentBountyItem")))))) return true;
       restore_hp(0);     // recover here since recovery is not triggered normally
       restore_mp(0);
-	  use(1,i);
+      use(1,i);
       return fight_items();
    }
    // if (!to_boolean(get_property("_cameraUsed")))
@@ -578,7 +579,7 @@ boolean use_fam(familiar f) {
 boolean ensure_turtlefam(boolean really) {
    if ($familiars[grinning turtle, syncopated turtle] contains my_familiar()) return true;
    if (!($familiars[none,grinning turtle,syncopated turtle] contains to_familiar(vars["is_100_run"])) || 
-      my_location() == $location[The Spooky Gravy Barrow]) return false;
+      my_location() == $location[The Spooky Gravy Burrow]) return false;
    familiar[int] tfams;
    tfams[to_int(can_interact())] = $familiar[grinning turtle];
    tfams[to_int(!can_interact())] = $familiar[syncopated turtle];
@@ -700,7 +701,7 @@ familiar dropfam() {
          case $familiar[li'l xenomorph]: return clim("_transponderDrops",5);
          case $familiar[llama lama]: return clim("_gongDrops",5);
          case $familiar[artistic goth kid]: if (!hippy_stone_broken() && have_familiar($familiar[mini-hipster])) return false;
-		 case $familiar[mini-hipster]: if (!contains_text(to_url(my_location()),"adventure.php")) return false; return clim("_hipsterAdv",7);
+         case $familiar[mini-hipster]: if (!contains_text(to_url(my_location()),"adventure.php")) return false; return clim("_hipsterAdv",7);
          case $familiar[pair of stomping boots]: foreach i,m in get_monsters(my_location()) if (!($phyla[dude,none] contains m.phylum)) return clim("_pasteDrops",7); return false;
          case $familiar[rogue program]: return clim("_tokenDrops",5);
          case $familiar[unconscious collective]: return clim("_dreamJarDrops",5);
@@ -715,7 +716,7 @@ familiar dropfam() {
 }
 
 boolean fam_check() {
-   if ($classes[avatar of boris, avatar of jarlsberg] contains my_class() || my_location() == $location[The Spooky Gravy Barrow]) return true;
+   if ($classes[avatar of boris, avatar of jarlsberg] contains my_class() || my_location() == $location[The Spooky Gravy Burrow]) return true;
   // first, enforce 100% runs
    if (to_familiar(vars["is_100_run"]) != $familiar[none]) {
       if (my_familiar() != to_familiar(vars["is_100_run"])) return use_fam(to_familiar(vars["is_100_run"]));
@@ -728,13 +729,13 @@ boolean fam_check() {
 
 // NOTE: after running this script, changing these variables here in the script will have no
 // effect.  You should instead edit the values by typing "zlib vars" in the CLI.
-setvar("auto_semirare","timely"); // auto-eat fortune cookies: always, timely, never (maxcounters)
-setvar("bbb_miniboss_items",1);   // vs.-miniboss items to get in the defiled cyrpt areas before getting stats
+setvar("auto_semirare","timely");     // auto-eat fortune cookies: always, timely, never (maxcounters)
+setvar("bbb_miniboss_items",1);       // vs.-miniboss items to get in the defiled cyrpt areas before getting stats
 setvar("bbb_adjust_choiceadvs",true); // enable/disable choiceadv adjustment
-setvar("bbb_turtles",1);          // number of each turtle to auto-tame; 0 disables taming
-setvar("bbb_dolphin_goodies",true); // toggle automatically fighting dolphins for valuable non-goal items
-setvar("bbb_turtlegear",false);   // toggle automatically creating gear from tamed turtles (makes 1 of each)
-setvar("bbb_famitems",false);     // toggle automatically farming familiar-dropped items
+setvar("bbb_turtles",1);              // number of each turtle to auto-tame; 0 disables taming
+setvar("bbb_dolphin_goodies",true);   // toggle automatically fighting dolphins for valuable non-goal items
+setvar("bbb_turtlegear",false);       // toggle automatically creating gear from tamed turtles (makes 1 of each)
+setvar("bbb_famitems",false);         // toggle automatically farming familiar-dropped items
 check_version("Best Between Battle","bestbetweenbattle",1240);
 
 /*

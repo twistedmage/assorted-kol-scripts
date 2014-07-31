@@ -1,46 +1,3 @@
-/*
-	bumcheekcity's snapshot.ash v2.7
-
-	This script takes a snapshot of your character, level, stats, everything, and prints it in wikicode.
-	Mad props to Terrabull and Zarqon for being cool. 
-
-	Changelog:
-	0.1 - Initial Implementation. Only Hobopolis done yet. 
-	0.2 - Completed the Familiars check, including the 90/100% check.
-	0.3 - Added Slime Tube, Tattoos. <Added Stocking Mimic as Familiar>
-	0.4 - Added Skill check.
-	0.5 - Fixed various tattoos, fixed tome skills, sped up script.
-	0.6 - Trophies added. Hobo Code added. Various small fixes.
-	0.7 - Fixed misspelt Hobo Codes. Added option for no description on trophies, war medals. Fixed tattoos, display case bug. <Added Crimbo 2009 tattoo, familiar>
-	0.8 - Changed script massively. Few various fixes and tweaks on top of that.
-	0.9 - Changed script massively again. Now it's on my server. 
-	1.0 - Minor fixes. Released script.
-	1.1 - If a password is set, then require the password to update your snapshot. Make tattoos use the "/" and ".gif" part of the gifname to make sure it
-		matches the whole string. Add Slime skill strength checking. Fix familiar 90/100% run checking for those with a space in their username. Check for telescope strength.
-		Ascension reward checking. 
-	1.2 - Discoveries. Mr. Items. 
-	1.3 - Bugfixing. Add multi-use discoveries. 
-	1.4 - Bugfixing. Fixed the store/DC blue text. 
-	2.0 - No longer need your password to update. "Misc. Rare Items" check. Frostys arm now counts in chefstaff form. Maps moved to my server. 
-	2.1 - Added Consumption Records.
-	2.2 - Added checking of the Arcade Games, Uncle Hobo Stuff, Demon Names and Mr. Store Garden things. 
-	2.3 - Add pen pal support. 
-		- Improve checking of the familiars% runs to use the kol server and only count runs to the king.
-		- Add karma tracking.
-		- Abort if trendy.
-	2.4 - Abort if AoB and Bugbear Invasion.
-		- Fixed telescope error when in Bugbear Invasion Path (RNG-HeHateMe)
-		- Fix for Bugbear Invasion. 
-	2.5 - Check the second page of KoLDB for those people who ascend too much and have 100% runs on earlier pages. 
-		- Match discoveries with upper and lower case.
-		- Search for and warn about banned paths. 
-		- Support for Monster Hunting using the Manuel.
-		- Support for Zombie/Boris/etc. Points
-	2.6 - Fix bug where 100% runs wouldn't show up.
-	2.7 - Remove the one-click crafting and inventory images debug information. This is not needed.
-		- Change to fix to look at kolmafia.co.uk only.
-*/
-
 script "snapshot.ash";
 notify bumcheekcity;
 
@@ -94,26 +51,9 @@ int i_a(string name) {
 	return a + d + s;
 }
 
-boolean load_current_map(string fname, ItemImage[int] map) 
-{
-	string domain = "http://kolmafia.co.uk/";
-	string curr = visit_url(domain + "index.php?name=" + fname);
+
+boolean load_current_map(string fname, ItemImage[int] map) {
 	file_to_map(fname+".txt", map);
-	
-	//If the map is empty or the file doesn't need updating
-	if ((count(map) == 0) || (curr != "" && get_property(fname+".txt") != curr)) 
-	{
-		print("Updating "+fname+".txt from '"+get_property(fname+".txt")+"' to '"+curr+"'...");
-		
-		if (!file_to_map(domain + fname + ".txt", map) || count(map) == 0) 
-		{
-			return false;
-		}
-		
-		map_to_file(map, fname+".txt");
-		set_property(fname+".txt", curr);
-		print("..."+fname+".txt updated.");
-	}
 	
 	return true;
 }
@@ -715,24 +655,6 @@ void main() {
 	} else {
 		debug("You have no store.");
 	}
-	
-	/* This should no longer be needed.
-	//Now check the options set. 
-	if (index_of(visit_url("account.php"), "<input type=checkbox name=invimages value=1 checked> Hide Inventory Images") > 0)
-	{
-		debug("Inventory Images are Hidden.");
-	} else {
-		debug("Inventory Images are not Hidden.");
-	}
-
-	//Now check the options set. 
-	if (index_of(visit_url("account.php"), "<input type=checkbox name=oneclickcraft value=1> Turn On One-Click Crafting") > 0)
-	{
-		debug("One-Click Crafting is turned off.");
-	} else {
-		debug("One-Click Crafting is turned on.");
-	}
-	*/
 
 	//Check the slime skills.
 	string slime_brain = visit_url ("desc_skill.php?whichskill=47&self=true");

@@ -46,7 +46,7 @@ if (count(post) > 0 && post contains "id" && post contains "value") {
    if (!(post contains "pwd") || post["pwd"] != my_hash()) { vprint("Mismatched pwd hash.  Maybe you've logged out since first loading this script.  Rerun the relay script.",-1); write("Error: mismatched hash."); exit; }
    if (post contains "docaction" && vars contains excise(post["id"],"---","")) {   // documentation data was changed for existing setting
       switch (excise(post["id"],"","---")) {
-         case "type": if (!($strings[string,int,float,boolean,class,coinmaster,effect,element,familiar,item,location,monster,phylum,skill,slot,stat]
+         case "type": if (!($strings[string,int,float,boolean,bounty,class,coinmaster,effect,element,familiar,item,location,monster,phylum,skill,slot,stat]
                          contains post["value"])) { write(vardoc[excise(post["id"],"---","")].type); exit; }
                       vardoc[excise(post["id"],"---","")].type = post["value"]; break;
          case "usage": vardoc[excise(post["id"],"---","")].usage = post["value"]; break;
@@ -70,6 +70,7 @@ if (count(post) > 0 && post contains "id" && post contains "value") {
       string[string] bmap;
       if (post["value"] != "type") bmap["none"] = "none";
       switch (post["value"]) {
+         case "bounty": foreach b in $bounties[] bmap[cup(b)] = cup(b); break;
          case "class": foreach c in $classes[] bmap[cup(c)] = cup(c); break;
          case "coinmaster": foreach c in $coinmasters[] bmap[cup(c)] = cup(c); break;
          case "effect": foreach e in $effects[] bmap[cup(e)] = cup(e); break;
@@ -82,7 +83,7 @@ if (count(post) > 0 && post contains "id" && post contains "value") {
          case "skill": foreach s in $skills[] bmap[cup(s)] = cup(s); break;
          case "slot": foreach s in $slots[] bmap[cup(s)] = cup(s); break;
          case "stat": foreach s in $stats[] bmap[cup(s)] = cup(s); break;
-         case "type": foreach tt in $strings[int,float,boolean,class,coinmaster,effect,element,familiar,item,location,monster,phylum,skill,slot,stat,string] bmap[tt] = tt;
+         case "type": foreach tt in $strings[int,float,boolean,bounty,class,coinmaster,effect,element,familiar,item,location,monster,phylum,skill,slot,stat,string] bmap[tt] = tt;
       }
       build.append(to_json(bmap));
       vprint("...finished.",6);
@@ -111,7 +112,7 @@ if (count(post) > 0 && post contains "id" && post contains "value") {
  build.append("  $('.editable_bool').editable('relay_WOSSMAN.ash', {\n");
  build.append("    indicator : '<img src=\"indicator.gif\">', tooltip : \"Click to edit...\", onblur : \"submit\", data : \"{'true':'true','false':'false'}\", type : \"select\", style : \"display: inline\", submitdata : {pwd: \""+my_hash()+"\"}\n");
  build.append("  });\n");
- foreach s in $strings[class,coinmaster,effect,element,familiar,item,location,monster,phylum,skill,stat,type] {
+ foreach s in $strings[bounty,class,coinmaster,effect,element,familiar,item,location,monster,phylum,skill,stat,type] {
     build.append("  $('.editable_"+s+"').editable('relay_WOSSMAN.ash', {\n");
     build.append("    indicator : '<img src=\"indicator.gif\">', tooltip : \"Click to edit...\", onblur : \"submit\", loadurl : 'relay_WOSSMAN.ash?pwd="+my_hash()+"&id=constants&value="+s+"', type : \"select\", style : \"display: inline\"\n");
     build.append("   , submitdata : {docaction: \"yes\", pwd: \""+my_hash()+"\"}");

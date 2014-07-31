@@ -19,13 +19,7 @@
 //  - Dance Card: Will adventure in Ballroom, if you're not already there and use another dance card.
 //  - CLI: You can delay execution of a CLI command. To defer it for <num> turns, type this in the CLI:
 //         counters add <num> cli <command>
-//  - Get Steel Organ: Will adventure in the Friar's Gate and then try to use the organ, if possible.
-//  - Dude Ranch Vacation, Tropical Island Vacation, Ski Resort Vacation:
-//         Will abort automatic adventuring and alert you that the vacation is ready to produce a tower item,
-//         but it will not adventure there automatically so you can purposefully schedule those 3 turns.
-
-// Steel Organ counters and Vacation counters are automatically set by my recovery script:
-// http://kolmafia.us/showthread.php?t=1780
+//  - Lights Out: Will get the "Lights Out" noncombats to encounter Stephen and Elizabeth.
 
 script "CounterChecker.ash";
 notify Bale;
@@ -44,6 +38,8 @@ setvar("BaleCC_useDanceCards", TRUE);
 setvar("BaleCC_ImprovePoolSkills", FALSE);
 setvar("BaleCC_SellSemirare", FALSE);
 setvar("BaleCC_SemirareWindowContinue", FALSE);
+setvar("BaleCC_LightsOutFightAutomated", FALSE);
+setvar("BaleCC_LightsOutPreferred", "Stephen Spookyraven");
 
 record queue_entry {
 	location loc;	// Where to find the semi-rare
@@ -93,10 +89,14 @@ item [location] semi_rare;
 	semi_rare[$location[A-Boo Peak]] = $item[death blossom];
 	semi_rare[$location[Twin Peak]] = $item[miniature boiler];
 	semi_rare[$location[Oil Peak]] = $item[unnatural gas];
+	semi_rare[$location[The Copperhead Club]] = $item[Flamin' Whatshisname];
+	semi_rare[$location[The Red Zeppelin]] = $item[red foxglove];
+	semi_rare[$location[The Haunted Boiler Room]] = $item[Bram's choker];
 int[item] rare_quant;
 	rare_quant[$item[distilled fortified wine]] = 3;
 	rare_quant[$item[tasty tart]] = 3;
 	rare_quant[$item[scented massage oil]] = 3;
+	rare_quant[$item[Flamin' Whatshisname]] = 3;
 
 // I only want to check these once, so I'm making it global
 boolean can_hobo = visit_url("town_clan.php").contains_text("clanbasement.gif")    // Does the clan have a basement?
@@ -158,8 +158,8 @@ boolean canadv(location loc) {
 		return "clan_hobopolis.php?place="+zone()+"&pwd";
 	}
 	
-	boolean island() {
-		return available_amount($item[dingy dinghy]) > 0 || available_amount($item[skeletal skiff])  > 0;
+	boolean unlocked(string pref) {
+		return get_property(pref).to_int() == my_ascensions();
 	}
 
 	switch(loc) {
@@ -169,19 +169,33 @@ boolean canadv(location loc) {
 		return true;
 	case $location[The Limerick Dungeon]:
 		return my_buffedstat(my_primestat()) > 20;
-	case $location[The Haunted Billiards Room]:
-		if(my_buffedstat(my_primestat()) < 10) return false;
 	case $location[The Haunted Kitchen]:
-		return my_buffedstat(my_primestat()) >=5 && get_property("lastManorUnlock").to_int() == my_ascensions();
+	case $location[The Haunted Conservatory]:
+		return available_amount($item[telegram from Lady Spookyraven]) == 0 & (my_ascensions() > 0 || my_level() >= 4);
+	case $location[The Haunted Billiards Room]:
+		return item_amount($item[Spookyraven billiards room key]) > 0;
 	case $location[The Haunted Library]:
 		return available_amount($item[Spookyraven library key]) > 0;
+	case $location[The Haunted Bathroom]:
+	case $location[The Haunted Bedroom]:
+	case $location[The Haunted Gallery]:
+		return get_property("questM21Dance") != "unstarted";
+	case $location[The Haunted Ballroom]:
+		return $strings[step3, finished] contains get_property("questM21Dance");
+	case $location[The Haunted Laboratory]:
+	case $location[The Haunted Nursery]:
+	case $location[The Haunted Storage Room]:
+		return get_property("questM21Dance") == "finished";
+	case $location[The Haunted Boiler Room]:
+	case $location[The Haunted Laundry Room]:
+	case $location[The Haunted Wine Cellar]:
+		return get_property("questL11Manor") == "finished";
 	case $location[Cobb's Knob Laboratory]:
 		return available_amount($item[Cobb's Knob lab key]) > 0;
 	case $location[Cobb's Knob Menagerie\, Level 2]:
 		return available_amount($item[Cobb's Knob Menagerie key]) > 0;
 	case $location[Cobb's Knob Harem]:
-		return get_property("questL05Goblin") == "finished" 
-		  || (get_property("questL05Goblin") == "started" && item_amount($item[Cobb's Knob map]) < 1);
+		return get_property("questL05Goblin") == "finished" || get_property("questL05Goblin") == "step1";
 	case $location[The Goatlet]:
 		if(get_property("questL08Trapper") == "step2") return true;
 	case $location[Lair of the Ninja Snowmen]:
@@ -199,8 +213,9 @@ boolean canadv(location loc) {
 	case $location[The Batrat and Ratbat Burrow]:
 		return get_property("questL04Bat") != "unstarted" && get_property("questL04Bat") != "started";
 	case $location[South of The Border]:
-		return available_amount($item[bitchin' meatcar]) > 0 || available_amount($item[pumpkin carriage]) > 0 
-		  || available_amount($item[Desert Bus pass]) > 0;
+		foreach it in $items[pumpkin carriage,desert bus pass, bitchin' meatcar, tin lizzie]
+			if(available_amount(it) > 0) return true;
+		return false;
 	case $location[Pre-Cyrpt Cemetary]:
 		return my_buffedstat(my_primestat()) >= 11 && get_property("questL07Cyrptic") != "finished"
 		  && get_property("questG03Ego") != "unstarted";
@@ -225,16 +240,19 @@ boolean canadv(location loc) {
 		return get_property("questG02Whitecastle") != "unstarted" 
 		  || $strings[finished, step3, step4] contains get_property("questL11Palindome");
 	case $location[Hippy Camp]:
-		return island() && (get_property("questL12War") == "unstarted" || get_property("sideDefeated") == "fratboys");
+		return unlocked("lastIslandUnlock") && (get_property("questL12War") == "unstarted" || get_property("sideDefeated") == "fratboys");
 	case $location[Frat House]:
-		return island() && (get_property("questL12War") == "unstarted" || get_property("sideDefeated") == "hippies");
+		return unlocked("lastIslandUnlock") && (get_property("questL12War") == "unstarted" || get_property("sideDefeated") == "hippies");
 	case $location[The Obligatory Pirate's Cove]:
-		return island() && ($strings[unstarted, finished] contains get_property("questL12War"));
+		return unlocked("lastIslandUnlock") && ($strings[unstarted, finished] contains get_property("questL12War"));
 	case $location[A-Boo Peak]:
-	case $location[Oil Peak]:
-		return get_property("lastChasmReset").to_int() == my_ascensions() && get_property("chasmBridgeProgress") == "30";
 	case $location[Twin Peak]:
-		return false; // This ceases after peak is lit... Hard to test.
+	case $location[Oil Peak]:
+		return unlocked("lastChasmReset") && get_property("chasmBridgeProgress") == "30";
+	case $location[The Copperhead Club]:
+		return !contains_text(get_property("questL11MacGuffin"), "started"); // Needs to be greater than unstarted or started.
+	case $location[The Red Zeppelin]:
+		return get_property("zeppelinProtestors") >= 80;
 	case $location[The Purple Light District]:
 	case $location[Burnbarrel Blvd.]:
 	case $location[Exposure Esplanade]:
@@ -370,7 +388,7 @@ void get_semirare() {
 		break;
 	}
 	set_property("BaleCC_next", locale);
-	if(adventure(1, locale)) {}
+	(!adventure(1, locale));
 	if(get_property("semirareCounter").to_int() != last) {
 		// semi-rare acquired! Now set up for the next semi-rare
 		if(vars["BaleCC_SellSemirare"].to_boolean() && have_shop())
@@ -579,7 +597,7 @@ string set_goal(string goal, string turns){
 	return goal;
 }
 
-string run_choice(string page_text, string goal) {
+string runWormChoice(string page_text, string goal) {
 	while(contains_text(page_text, "choice.php")) {
 		## Get choice adventure number
 		int begin_choice_adv_num = (index_of(page_text, "whichchoice value=") + 18);
@@ -593,14 +611,14 @@ string run_choice(string page_text, string goal) {
 	return page_text;
 }
 
-boolean getChoiceAdv(int count, location l, string goal) {
+boolean getWormChoiceAdv(int count, location l, string goal) {
 	string last_adventure = "";
 	int n=0;
 	while(n < count && my_adventures() >0) {
 		n = n + 1;
 		last_adventure = visit_url(to_url(l));
 		if(contains_text(last_adventure, "choice.php")){
-			run_choice(last_adventure, goal);
+			runWormChoice(last_adventure, goal);
 			cli_execute("mood execute");
 			return true;
 		} else {
@@ -632,8 +650,8 @@ boolean do_wormwood() {
 	wwgoal = set_goal(wwgoal, turns);
 	
 	int left=have_effect($effect[Absinthe-Minded]);
-	boolean getChoiceAdv(int to_do) {
-		return getChoiceAdv(to_do, wormwood_location(wwgoal, left), wwgoal);
+	boolean getWormChoiceAdv(int to_do) {
+		return getWormChoiceAdv(to_do, wormwood_location(wwgoal, left), wwgoal);
 	}
 
 	switch(left) {
@@ -646,7 +664,7 @@ boolean do_wormwood() {
 			return true;
 		}
 		print("Worm Wood first step...");
-		return getChoiceAdv(left-6);
+		return getWormChoiceAdv(left-6);
 	case 5:
 	case 4:
 		if(turns == "turn 1 only") {
@@ -654,14 +672,64 @@ boolean do_wormwood() {
 			return true;
 		}
 		print("Worm Wood second step...");
-		return getChoiceAdv(left-3);
+		return getWormChoiceAdv(left-3);
 	case 1:
 		print("Worm Wood third step...");
-		return getChoiceAdv(left);
+		return getWormChoiceAdv(left);
 	default:
 		print("Something went wrong with the wormwood counter or script", "red");
 	}
 	return false;
+}
+
+// Handle the 0-turn lights out adventure. Make sure to reset original preferences
+void advLightsOut(location hauntedLoc, string choice) {
+	string originalValue = get_property("lightsOutAutomation");
+	try {
+		set_property("lightsOutAutomation", choice);
+		(!adv1(hauntedLoc, 0, ""));
+	} finally
+		set_property("lightsOutAutomation", originalValue);
+}
+
+location nextLightsOut(boolean [string] rooms) {
+	location nextRoom, failedRoom;
+	foreach prop in rooms {
+		nextRoom = get_property(prop).to_location();
+		if(canadv(nextRoom))
+			return nextRoom;
+		else if(nextRoom != $location[none] && failedRoom == $location[none])
+			failedRoom = nextRoom;
+	}
+	if(failedRoom != $location[none])
+		print_html("<font color=\"blue\">It is time for a <u>Lights Out</u> adventure at <u>"+ failedRoom +"</u>, but that location is inaccessible.</font>");
+	if(get_property("lightsOutAutomation") == "0")
+		print_html("<font color=\"red\">Your <u>Lights Out</u> choice adventures are currently set to <u>show in browser</u>. It is recommended that you change that.</font>");
+	return $location[none];
+}
+
+boolean lightsOut() {
+	if(get_revision() < 14134) // This is the first revision number that automates Lights Out. Fail gracefully if user didn't upgrade mafia.
+		abort("You need to update KoLmafia in order to automate \"Light's Out\" adventures in Spookyraven.");
+	location hauntedLoc;
+	
+	// Check for order to complete quests. In case of ambiguous information, Stephen will be preferred since it makes sense to do him first.
+	if(vars["BaleCC_LightsOutPreferred"].to_lower_case().contains_text("elizabeth") || vars["BaleCC_LightsOutPreferred"].to_lower_case().contains_text("ghost"))
+		hauntedLoc = nextLightsOut($strings[nextSpookyravenElizabethRoom, nextSpookyravenStephenRoom]);
+	else 
+		hauntedLoc = nextLightsOut($strings[nextSpookyravenStephenRoom, nextSpookyravenElizabethRoom]);
+	
+	// Stop if it is the Boss fight and BaleCC_LightsOutFightAutomated is false.
+	if(vars["BaleCC_LightsOutFightAutomated"] == "false" && ($locations[The Haunted Laboratory, The Haunted Gallery] contains hauntedLoc)) {
+		print_html("<font color=\"blue\">It is time to fight "
+			+ (hauntedLoc == $location[The Haunted Laboratory]? "Stephen Spookyraven": "the ghost of Elizabeth Spookyraven") 
+			+ " at <u>"+ hauntedLoc +"</u>.</font>");
+		advLightsOut(hauntedLoc, "0");
+		return false;
+	}
+	if(hauntedLoc != $location[none])
+		advLightsOut(hauntedLoc, "1");
+	return true;
 }
 
 boolean counter_report(int remain, string output) {
@@ -701,12 +769,8 @@ boolean main(string name, int remain) {
 			if(remain < 0 && vars["BaleCC_useDanceCards"].to_boolean() && (can_interact() || item_amount($item[dance card])> 0))
 				use(1, $item[dance card]);
 			return counter_report(remain, "adventure at the <u>Haunted Ballroom</u> for a dance with <i>Rotting Matilda</i>");
-		case "Dude Ranch Vacation":
-			return counter_report(remain, "take a vacation at the <u>Distant Lands Dude Ranch Adventure</u> to get a <i>stick of dynamite</i>");
-		case "Tropical Island Vacation":
-			return counter_report(remain, "take a vacation at the <u>Tropical Paradise Island Getaway</u> to get a <i>tropical orchid</i>");
-		case "Ski Resort Vacation":
-			return counter_report(remain, "take a vacation at the <u>Large Donkey Mountain Ski Resort</u> to get a <i>barbed-wire fence</i>");
+		case "Spookyraven Lights Out":
+			return counter_report(remain, "have a Lights Out adventure at Spookyraven Manor");
 		default:
 			return counter_report(remain, "do something when your <u>"+ name+ "</u> counter is up");
 		}
@@ -738,15 +802,8 @@ boolean main(string name, int remain) {
 		if(vars["BaleCC_useDanceCards"].to_boolean() && (can_interact() || item_amount($item[dance card])> 0))
 			use(1, $item[dance card]);
 		return true;
-	case "Dude Ranch Vacation":
-		counter_report(remain, "take a vacation at the <u>Distant Lands Dude Ranch Adventure</u> to get a <i>stick of dynamite</i>");
-		return false;
-	case "Tropical Island Vacation":
-		counter_report(remain, "take a vacation at the <u>Tropical Paradise Island Getaway</u> to get a <i>tropical orchid</i>");
-		return false;
-	case "Ski Resort Vacation":
-		counter_report(remain, "take a vacation at the <u>Large Donkey Mountain Ski Resort</u> to get a <i>barbed-wire fence</i>");
-		return false;
+	case "Spookyraven Lights Out":
+		return lightsOut();
 	default:
 		// not something we know how to handle
 		counter_report(remain, "do something because your <u>"+ name+ "</u> counter is up");

@@ -464,7 +464,8 @@ void checkForKnownPath()
 	if( !($strings[None, Teetotaler, Boozetafarian, Oxygenarian,
 	    Bees Hate You, Way of the Surprising Fist, Trendy,
 	    Avatar of Boris, Bugbear Invasion,Zombie Slayer,Class Act,
-	    Avatar of Jarlsberg,BIG!,KOLHS,Class Act II: A Class For Pigs,Avatar of Sneaky Pete] contains my_path()) )
+	    Avatar of Jarlsberg,BIG!,KOLHS,Class Act II: A Class For Pigs,
+		Avatar of Sneaky Pete,Slow and Steady] contains my_path()) )
 	{
 		printColor( "Your current challenge path is not recognized by this script.  Proceed with caution.", "red" );
 		wait(2);

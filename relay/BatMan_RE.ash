@@ -43,7 +43,7 @@ if (post contains "setml") {
       "<img src='/images/itemimages/scroll1.gif' style='vertical-align:middle'> <b>Blacklist</b><br><table id='blacktable'>");
    foreach action,amt in blacklist {
       bbox.append("\n<tr><td>");
-	  if (rawlist contains action) bbox.append("<a href='#' class='removeblack' title='"+action+"'><img src='images/itemimages/leftarrow.gif' "+
+      if (rawlist contains action) bbox.append("<a href='#' class='removeblack' title='"+action+"'><img src='images/itemimages/leftarrow.gif' "+
          "height='15' width='15' title='Remove this blacklist entry.' border=0></a>");
       bbox.append("</td><td style='text-align: left'><form name='blacklist_"+action+"' style='display: inline' action=fight.php "+
          "method=post><input type=hidden name=action value='macro'><input type='hidden' name='macrotext' value='"+batround()+action+
@@ -322,32 +322,46 @@ void batman_enhance() {
       if (smack.id != "") {
          actbox.append("\n   <div class='onemenu'><form name='batattack' style='display: inline' action=fight.php method=post><input type=hidden name=action value='macro'>"+
            "<input type='hidden' name='macrotext' value='"+batround()+smack.id+"; call batround"+"'><input type=image src='images/itemimages/"+
-		   (current_hit_stat() == $stat[moxie] ? "crossbow" : "nicesword")+".gif' title='"+smack.id+"' height=22 width=22 onclick='return bjilgt(this);'></form></div>\n<div class='popout'>");
+           (current_hit_stat() == $stat[moxie] ? "crossbow" : "nicesword")+".gif' title='"+smack.id+"' height=22 width=22 onclick='return bjilgt(this);'></form></div>\n<div class='popout'>");
          actbox.append(to_html(smack,0,true)+"<p><span id='attacksort' class='littlesort'><img src='images/itemimages/bgecalendar.gif'> Sort by attack_action()</span></div>");
       }
-	 // siphon
+     // siphon
       if (my_fam() == $familiar[happy medium] && !happened("skill 7117") && get_spirit() != $item[none]) {
-	     item whichspirit = get_spirit();
+         item whichspirit = get_spirit();
          actbox.append("\n   <div class='onemenu'><form name='siphon' style='display: inline' action=fight.php method=post><input type=hidden name=action value='macro'>"+
            "<input type='hidden' name='macrotext' value='"+batround()+"skill 7117; call batround"+"'><input type=image src='images/itemimages/"+whichspirit.image+
            "' title='skill 7117' height=22 width=22 onclick='return bjilgt(this);'></form></div>\n<div class='popout'>");
          actbox.append("Siphon a <span style='color: "+($familiar[happy medium].charges == 1 ? "blue" : ($familiar[happy medium].charges == 2 ? "orange" : "red"))+
             "'><b>"+whichspirit+"</b></span> ("+whichspirit.quality+")<p><small>Adventures: "+whichspirit.adventures+(whichspirit.levelreq > my_level() ? 
             "<br>Level required: "+whichspirit.levelreq : "")+(whichspirit.muscle == "0" ? "" : "<br>Muscle: "+whichspirit.muscle)+
-			(whichspirit.mysticality == "0" ? "" : "<br>Mysticality: "+whichspirit.mysticality)+(whichspirit.moxie == "0" ? "" : "<br>Moxie: "+
-			whichspirit.moxie)+"<p>"+whichspirit.notes+"</small><br><a href='#' class='clilink' title='wiki "+whichspirit+"'>more info</a></div>");
+            (whichspirit.mysticality == "0" ? "" : "<br>Mysticality: "+whichspirit.mysticality)+(whichspirit.moxie == "0" ? "" : "<br>Moxie: "+
+            whichspirit.moxie)+"<p>"+whichspirit.notes+"</small><br><a href='#' class='clilink' title='wiki "+whichspirit+"'>more info</a></div>");
       }	  
      // automate
       actbox.append("\n   <div class='onemenu'><form name='automate' style='display: inline' action=fight.php method=post><input type=hidden name=runcombat "+
          "value=\"heckyes\"><input type=image src='images/otherimages/sigils/recyctat.gif' "+
          "title='Automate' height=22 width=22 onclick='return bjilgt(this);'></form></div>\n<div class='popout'>Hand this combat over to mafia.<p>"+
          round+". "+get_ccs_action(round)+"</div>");
-
+     // macros
+      matcher mac = create_matcher("option value=\"(\\d+)\" picurl=.+?\\>(.+?)\\<\\/option",excise(page,"macrotext",""));
+      boolean ncheese;
+      while (mac.find()) {
+         if (!ncheese) { actbox.append("\n   <div class='onemenu'><img src='images/itemimages/braces.gif' "+
+         "title='Macros' height=22 width=22></div>\n<div class='popout'>Saved combat macros:<ul>"); ncheese = true; }
+         actbox.append("<li><form name='macro"+mac.group(1)+"' action=fight.php method=post><input type=hidden name=action value='macro'>"+
+            "<input type='hidden' name='whichmacro' value='"+mac.group(1)+"'><input type=submit title='macro "+mac.group(1)+
+            "' class='buttlink' value=\""+mac.group(2)+"\" onclick='return bjilgt(this);'></form></li>");
+      } if (ncheese) actbox.append("</ul></div>");
    } else if (my_location() != $location[none] && my_adventures() > 0 && contains_text(page,to_url(my_location()))) {
      // adventure again link, includes location info?
       actbox.append("\n   <div class='onemenu'><a href='"+to_url(my_location())+(my_location() == $location[the boss bat's lair] ? "&confirm2=on" : "")+"'>"+
-      "<img src='../images/itemimages/hourglass.gif' height=22 width=22 border=0></a></div>"+
-      "<div class='popout' id='again'></div>");
+        "<img src='../images/itemimages/hourglass.gif' height=22 width=22 border=0></a></div><div class='popout' id='again'></div>");
+     // semirare helper!
+      if (get_counters("Semirare window begin",0,10) != "" || get_counters("Fortune Cookie",0,10) != "" ||    // if either window/counter is nigh
+          get_counters("Semirare window end",0,my_path() == "Oxygenarian" ? 20 : 40) != "") {                 // or we're IN the window, show
+         actbox.append("\n   <div class='onemenu'><img src='images/itemimages/fortune.gif'  height=22 width=22 border=0 title='Semirare helper'></div>"+
+            "\n<div class='popout' id='srhelper'></div>");
+      }
    }
    string BMRver = check_version("BatMan RE","batman-re",10042);
    string verstuff;
@@ -375,7 +389,7 @@ void batman_enhance() {
         "<th><img src='images/itemimages/mp.gif' title='1 MP = "+rnum(meatpermp,3)+"&mu;' border=0></th>"+
         "<th><img src='images/itemimages/meatstack.gif' title='Profit' border=0></th>"+
         "<th><img src='images/itemimages/scroll1.gif' title='Add to Blacklist' height=26 width=26 border=0></th>"+
-		"<th>A</th><th>...</th><th>S</th><th>U</th></tr></thead>\n<tbody>");
+        "<th>A</th><th>...</th><th>S</th><th>U</th></tr></thead>\n<tbody>");
       foreach i,ev in opts actbox.append(to_html(ev,i));
       actbox.append("\n</tbody></table>\n   ");
   // enhanced Manuel box

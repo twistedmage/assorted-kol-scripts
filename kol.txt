@@ -1,11 +1,16 @@
-16311
-1(2)
-1(1)
-11
+You dream that you are standing on top of a dune in a vast, dry desert. So dry. How dry it is, you think to yourself. How dry I am.
 
+On the horizon, you spot an oasis. You find it in yourself to run toward it, and drink from it. It's filled with whiskey.
 
-rlrrlrllrlrr
-lrllrlrr
+You fall on your back to watch the sky spin. In the center of its gyre a single letter glows, a glyph written in fire.
+
+R
+You wake up with the afterimage of the letter still burned into your retina.
+-------------------------------------------------------------------------------------
+"Thanks again for your help, Adventurer." says the Baron. "Are you enjoying the rewards I gave you?"
+
+"Oh, and don't forget 3xjH9. It's important."
+--------------------------------------------------------------------------------------
 
 =========================TO BUY==============================================
 idol of ak'gyxoth 850m
@@ -980,6 +985,44 @@ total rounds = 26
 damage from aura ~ 1300
 buff to 1.5k hp and wear full item bonus set + fmailiar
 
+===FROSTY======== (350 hp)
+cast vent rage gland 1
+cast frigidalmation 1
+bone homie 1
+boner battallion 1
+<4 passive from buffs>
+3 troll dolls (raspberry, cinammon and grape)
+melee 1
+1) - mayfly swarm (+4=4)
+2) - cinnamon troll doll, skeletal cleric (+10=14)
+3) - final 2xtroll doll (+12=26)
+4) - melee (+13=39)
+5) - melee (+13=52)
+6) - melee (+13=65)
+7) - melee (+13=78)
+8) - melee (+13=91)
+9) - melee (+13=104)
+10) - melee (+13=117)
+11) - melee (+13=130)
+12) - melee (+13=143)
+13) - melee (+13=156)
+14) - melee (+13=169)
+15) - melee (+13=182)
+16) - melee (+13=195)
+17) - melee (+13=208)
+18) - melee (+13=221)
+19) - melee (+13=234)
+20) - melee (+13=247)
+21) - melee (+13=260)
+22) - melee (+13=273)
+23) - melee (+13=286)
+24) - melee (+13=299)
+25) - melee (+13=312)
+---dead---
+total rounds = 25
+damage from aura ~ 1300
+buff to 1.5k hp and wear full item bonus set + fmailiar
+
 ============scarehobos
 6 kills to make each hobo
 each scarehobo kills around 8
@@ -1021,8 +1064,9 @@ watch hobos dance 3 times
 do 22 dances
 kill to finish
 =========================boss fighting==================
--charge mayfly 16 times and charge jack in the box twice, and bag o tricks twice while....
+-charge mayfly 16 times, and bag o tricks twice while....
 ********************************************
+-familiar Jumpsuited Hound Dog
 -adv in seaside megalopolis and choose stay downtown
 -set dead mariachi to items
 -adventure in seaside megalopolis until get blue milk club card (cant skip combats)
@@ -1054,35 +1098,25 @@ kill to finish
 -play all 3 ways on the pool table
 -arena buff (items if done for hippies, stats if done for frat)
 use jukebox -> boom boom boomboom boom
--go to mad hatters tea party with 28 letter hat (bubblewrap bottlecap turtleban)
--use legendary beat; use stabonic scroll; use jingle bell; use all year sucker; use jackass plumber
+-go to mad hatters tea party with 28 letter hat (bubblewrap bottlecap turtleban -> quadrilled)
+-use legendary beat; use stabonic scroll; use jingle bell; use all year sucker; use home game
 - use bag o tricks
 -use platinum card
 -hottub
 ***************************
-<make sure combat macro used on bricko bats doesn't use mayflys>
 buy pufferfish spine and 30 dwarf bread
 fight scratch (stunlock with dwarf bread + 1 pufferfish spine)
--buff phial of hot
--charge jack in the box twice (bricko bats)
--use vent rage gland
+-cast vent rage gland
 -cast frigidalmatian
-fight frosty (use mayflys, troll dolls, then melee)
--remove hotform
+-use skeleton to make skeletal cleric
+fight frosty (use mayflys, cinnamon troll doll + other troll doll, finall troll doll, then melee)
 -remove vent rage gland?
--charge jack in the box twice (bricko bats)
 fight zombo (use mayflys)
 -outfit birthday suit; maximize items, equip mayfly bait necklace, equip old soft shoes, equip sugar shield, equip greatest american
 - recast pants buff
--charge jack in the box twice (bricko bats)
 fight oscus (use mayflys)
--charge jack in the box twice (bricko bats)
 fight chester (use mayflys)
--charge jack in the box twice (bricko bats)
 fight hodgman (use mayflys and melee?)
-
-
-
 
 
 

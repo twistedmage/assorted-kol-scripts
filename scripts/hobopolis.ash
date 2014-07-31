@@ -1,5 +1,5 @@
 import <sims_lib.ash>;
-import <eatdrink.ash>;
+//import <eatdrink.ash>;
 
 //banky and twisted should do cold
 //after completion (twice). remove false from line 464 in a-questing.ash
@@ -9,9 +9,9 @@ boolean wheels_done=false;
 boolean grates_done=false;
 boolean cage_sit=false;
 //FROST
-boolean enough_icicles=false; //CHANGE TO TRUE WHEN 50 PIPES BROKE (40 if more than 1 person is doing it)
+boolean enough_icicles=true; //CHANGE TO TRUE WHEN 50 PIPES BROKE (40 if more than 1 person is doing it)
 //FIRE
-boolean do_tireavalanche=false; //this should be switched to true whenever 34 tires on stack, then back to false after tirevalanche
+boolean do_tireavalanche=true; //this should be switched to true whenever 34 tires on stack, then back to false after tirevalanche
 //SLEAZE
 boolean enter_club=true; //13 pipes + 8 flimflams then change to true
 //SPOOKY: choose 2 players with lots of turns left who can dance
@@ -20,11 +20,11 @@ string dancer2="twistedmage";
 
 //which zones should we do?
 boolean do_scarebo=false;
-boolean do_stench=true;
+boolean do_stench=false;
 boolean do_cold=false;
 boolean do_hot=false;
 boolean do_sleaze=false;
-boolean do_spooky=false;
+boolean do_spooky=true;
 
 //hot part farmers
 string name1 = "twistedmage"; //hot
@@ -110,7 +110,7 @@ void ensure_muscle_buffs()
 	{
 		use(1,$item[blood of the wereseal]);
 	}
-	if(have_effect($effect[having a ball])==0)
+	if(have_effect($effect[having a ball!])==0)
 	{
 //		boolean catch=cli_execute("ballpit");
 	}
@@ -137,9 +137,9 @@ void ensure_nocom_buffs()
 	cli_execute("uneffect Carlweather's Cantata of Confrontation");
 	if(have_effect($effect[fresh scent])==0)
 	{
-		use(1,$item[rock salt]);
+		use(1,$item[chunk of rock salt]);
 	}
-	if(have_effect($effect[sonata of sneakiness])==0 && !to_boolean(get_property("_sonata_requested_"+my_name())))
+	if(have_effect($effect[the sonata of sneakiness])==0 && !to_boolean(get_property("_sonata_requested_"+my_name())))
 	{
 	
 		meatmail("NotBot", 430);
@@ -169,9 +169,10 @@ void ensure_nocom_buffs()
 
 void ensure_com_buffs()
 {
+	cli_execute("mood clear");
 	cli_execute("refresh effects");
 	cli_execute("uneffect fresh scent");
-	cli_execute("uneffect smooth movement");
+	cli_execute("uneffect smooth movements");
 	cli_execute("uneffect the sonata of sneakiness");
 	cli_execute("uneffect ode");
 	if(have_effect($effect[hippy stench])==0)
@@ -302,60 +303,73 @@ boolean farm_scarebo_parts()
 		//set combat action to spankage
 		set_property("customCombatScript","hobopolis");
 		//work out which phial, effect and part is for this char
-		effect my_eff;
-		item my_phial=$item[none];
+//		effect my_eff;
+//		item my_phial=$item[none];
+		string my_tuner="";
 		string part="";
 		if(my_name()==name1)
 		{
-			my_eff=$effect[hotform];
-			my_phial=$item[phial of hotness];
+//			my_eff=$effect[hotform];
+//			my_phial=$item[phial of hotness];
+			my_tuner="Spirit of Cayenne";
 			part="pairs? of charred";
 		}
 		if(my_name()==name2 && scarebo_part_amount(part,richard)>=218)
 		{
-			my_eff=$effect[coldform];
-			my_phial=$item[phial of coldness];
+//			my_eff=$effect[coldform];
+//			my_phial=$item[phial of coldness];
+			my_tuner="Spirit of Peppermint";
 			part="pairs? of frozen";
 		}
 		if(my_name()==name3 && scarebo_part_amount(part,richard)>=218)
 		{
-			my_eff=$effect[sleazeform];
-			my_phial=$item[phial of sleaziness];
+//			my_eff=$effect[sleazeform];
+//			my_phial=$item[phial of sleaziness];
+			my_tuner="Spirit of Bacon Grease";
 			part="hobo crotch";
 		}
 		if(my_name()==name4 && scarebo_part_amount(part,richard)>=218)
 		{
-			my_eff=$effect[spookyform];
-			my_phial=$item[phial of spookiness];
+//			my_eff=$effect[spookyform];
+//			my_phial=$item[phial of spookiness];
+			my_tuner="Spirit of Wormwood";
 			part="creepy";
 		}
 		if(my_name()==name5 && scarebo_part_amount(part,richard)>=218)
 		{
-			my_eff=$effect[stenchform];
-			my_phial=$item[phial of stench];
+//			my_eff=$effect[stenchform];
+//			my_phial=$item[phial of stench];
+			my_tuner="Spirit of Garlic";
 			part="piles? of stinking";
 		}
 		if(my_name()==name6 && scarebo_part_amount(part,richard)>=218)
 		{
-			my_eff=$effect[Butt-Rock Hair]; //dummy effect
-			my_phial=$item[hair spray]; //dummy item
+//			my_eff=$effect[Butt-Rock Hair]; //dummy effect
+//			my_phial=$item[hair spray]; //dummy item
+			use_skill($skill[spirit of nothing]);
+			my_tuner="patience of the tortoise";
 			part="hobo skin";
 		}
 		//farm the parts!
-		if(scarebo_part_amount(part,richard)<218 && my_phial!=$item[none])
+		if(scarebo_part_amount(part,richard)<218 && my_tuner!="")
 		{
 			if(my_adventures()==0)
 			{
 				abort("OUT OF ADVENTURES IN TOWN SQUARE!");
 			}
-			//ensure phial effect
+/*			//ensure phial effect
 			if(have_effect(my_eff)<1)
 			{
 				use(1,my_phial);
 			}
+*/
+			if(have_effect(to_effect(my_tuner))<1)
+			{
+				use_skill(1,to_skill(my_tuner));
+			}
 			//redo equipment for pure damage, ensure muscle weapon is used whatever the class is
 //			take_muscle_gear();
-			cli_execute("maximize muscle, +melee");
+			cli_execute("maximize spell damage percent, 0.01 spell damage, +melee");
 //			ensure_muscle_buffs();
 			//enforce stat level to make parts. 760 muscle should be roughly min
 			if(my_buffedstat($stat[muscle])< 760)

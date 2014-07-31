@@ -331,11 +331,19 @@ boolean populate_skills(int target) {
 	return true;
 }
 
+boolean curse_protect() {
+	return get_property("questL11Worship") != "finished" && (have_effect($effect[Once-Cursed]) > 0 || have_effect($effect[Twice-Cursed]) > 0 || have_effect($effect[Thrice-Cursed]) > 0);
+}
+
 boolean mp_heal(int target);
 // This will cast a skill. The advantage of this over use_skill is to control equipping of -MP Cost items and it sets _meatperhp
 boolean cast(int q, skill it) {
-	if(it == $skill[none]) return false;
-	if(it == $skill[Cannelloni Cocoon] || it == $skill[Shake It Off]) {
+	if(it == $skill[none] || !have_skill(it)) return false;
+	if(it == $skill[Shake It Off] && curse_protect()) return false;
+	if(it == $skill[Shake It Off]) {
+		if(my_hp() < my_maxhp())
+			set_property("_meatperhp", to_string(max(skills[it].mp * get_property("_meatpermp").to_float() / (my_maxhp() - my_hp()), 0.001)));
+	} else if(it == $skill[Cannelloni Cocoon]) {
 		if(my_hp() >= my_maxhp()) return true;
 		set_property("_meatperhp", to_string(max(skills[it].mp * get_property("_meatpermp").to_float() / (my_maxhp() - my_hp()), 0.001)));
 	} else if(!beset($effect[Beaten Up]))
@@ -845,7 +853,7 @@ boolean visit_nuns(int target, string type) {
 
 // This handles all visits to the hot tub, including getting the VIP Key out of Hangks.
 boolean hot_tub() {
-	if(have_effect($effect[Once-Cursed]) > 0 || have_effect($effect[Twice-Cursed]) > 0 || have_effect($effect[Thrice-Cursed]) > 0) return false;
+	if(curse_protect()) return false;
 	if(DontUseHotTub || (in_bad_moon() && get_property("kingLiberated") == "false") 
 	  || available_amount($item[Clan VIP Lounge key]) == 0 || to_int(get_property("_hotTubSoaks")) >4
 	   || my_location() == $location[The Slime Tube])
@@ -1307,7 +1315,7 @@ boolean cure_beatenup(int target){
 	populate_skills(1);
 	
 	// Sneaky Pete has only one trick, but it does EVERYTHING. Check again for the strange case of high HP beaten up later.
-	if(have_skill($skill[Shake It Off]) && my_hp() < my_maxhp() / 5 && my_maxmp() >= skills[$skill[Shake It Off]].mp
+	if(have_skill($skill[Shake It Off]) && !curse_protect() && my_hp() < my_maxhp() / 5 && my_maxmp() >= skills[$skill[Shake It Off]].mp
 		  && (my_mp() >= skills[$skill[Shake It Off]].mp || mp_heal(skills[$skill[Shake It Off]].mp)))
 			return cast(1, $skill[Shake It Off]);
 	
@@ -1354,7 +1362,7 @@ boolean cure_beatenup(int target){
 	}
 	
 	// Sneaky Pete has only one trick, but it does EVERYTHING! If HP is high and character is beaten up, it failed earlier
-	if(have_skill($skill[Shake It Off]) && my_maxmp() >= skills[$skill[Shake It Off]].mp
+	if(have_skill($skill[Shake It Off]) && !curse_protect() && my_maxmp() >= skills[$skill[Shake It Off]].mp
 		  && (my_mp() >= skills[$skill[Shake It Off]].mp || mp_heal(skills[$skill[Shake It Off]].mp)))
 			return cast(1, $skill[Shake It Off]);
 	
@@ -1612,9 +1620,12 @@ void cure_status() {
 	  Turned Into a Skeleton, Sleepy, Apathy, All Covered In Whatsit, Flared Nostrils, Socialismydia]))
 		skill_cure($skill[Bite Minion]);
 	
+	if(have_skill($skill[Shake It Off]) && beset($effects[Barking Dogs, Turned Into a Skeleton, Tenuous Grip on Reality]))
+		skill_cure($skill[Shake It Off]);
+	
 	if(beset($effects[Apathy, Easily Embarrassed, Prestidigysfunction, Tenuous Grip on Reality, 
 	  The Colors...])
-	  && !use_hot_tub() && have_skill($skill[Disco Nap]) && have_skill($skill[Adventurer of Leisure]))
+	  && !use_hot_tub() && !skill_cure($skill[Shake It Off]) && have_skill($skill[Disco Nap]) && have_skill($skill[Adventurer of Leisure]))
 		skill_cure($skill[Disco Nap]);
 
 	if(beset($effect[N-Spatial vision]) && my_location() == $location[Navigation]) {
@@ -1624,7 +1635,7 @@ void cure_status() {
 			use(1, $item[bugbear purification pill]);
 	}
 	
-	if(beset($effects[Cunctatitis, Tetanus, Socialismydia]) && !use_hot_tub()) {
+	if(beset($effects[Cunctatitis, Tetanus, Socialismydia]) && !use_hot_tub() && !skill_cure($skill[Shake It Off])) {
 		if(have_skill($skill[Disco Nap]) && have_skill($skill[Adventurer of Leisure]))
 			skill_cure($skill[Disco Nap]);
 		else if(item_amount($item[ancient Magi-Wipes]) > 0
@@ -1632,7 +1643,7 @@ void cure_status() {
 			use(1, $item[ancient Magi-Wipes]);
 	}
 
-	if(beset($effects[Embarrassed, Sleepy]) && !use_hot_tub()
+	if(beset($effects[Embarrassed, Sleepy]) && !use_hot_tub() && !skill_cure($skill[Shake It Off])
 	  || (my_primestat() == $stat[Mysticality] && beset($effects[Confused, Light-Headed]))) {
 		if(have_skill($skill[Disco Nap]))
 			skill_cure($skill[Disco Nap]);

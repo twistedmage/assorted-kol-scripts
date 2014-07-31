@@ -53,6 +53,7 @@ Version History:
 2014-02-01: Modify the usage of phials slightly and give an informative message when the script tries to do an elemental test without an elemental form.
 			Don't do a lot of refresh calls as Mafia should now hopefully not do strange stuff when swapping loads of outfits any longer (as of r13518)
 			Only do outfit caching once per day to avoid having to redo that process just because the script stopped or was aborted
+2014-03-22: Attempt to rejig the elemental test in order to lower the use of phials
 */
 
 import <zlib.ash>;
@@ -680,19 +681,29 @@ boolean elemental_test(int level, element elem1, element elem2)
 	}
 	for i from 0 to j-1 {
 		cli_execute("whatif " + perform_whatif[i] + "; quiet");
-		if(elemental_damage(level, elem1) + elemental_damage(level, elem2) < my_maxhp() || contains_text(perform_whatif[i], "phial of")) {
+		if(elemental_damage(level, elem1) + elemental_damage(level, elem2) < my_maxhp() && !contains_text(perform_whatif[i], "phial of")) {
 			cli_execute(perform[i]);
 			vprint(6, "purple", 7);
 			break;
-		} else if(i == j-1 && mall_price(elementForm[elem1].i) < to_int(get_property("autoBuyPriceLimit"))) {
-			vprint("Chugging a " + elementForm[elem1].i + " and moving on from there.", 5);
-			cli_execute("use 1 " + elementForm[elem1].i);
 		}
 		cli_execute("whatif quiet");
 	}
 	vprint(7, "purple", 7);
 	cli_execute("whatif quiet");
+	
+	damage = elemental_damage(level, elem1) + elemental_damage(level, elem2);
+	if(damage > my_maxhp())
+		maximize_wrap("hp", ceil(damage), my_maxhp());
+
+	vprint(8, "purple", 7);
+	damage = elemental_damage(level, elem1) + elemental_damage(level, elem2);
+	if(damage > my_maxhp() && mall_price(elementForm[elem1].i) < max_potion_price) {
+			vprint("Chugging a " + elementForm[elem1].i + " and moving on from there.", 5);
+			cli_execute("use 1 " + elementForm[elem1].i);
+	}
+	
 	j = 0;
+	vprint(9, "purple", 7);
 	if(have_effect(elementForm[elem1].e) > 0) {
 		if (elemental_damage(level, elem1) + elemental_damage(level, elem2) > my_maxhp() && have_effect(elementForm[elem1].e) > 0) {
 			foreach i, rec in maximize(to_string(elem2) + " resistance, 0.01 hp" + element_familiar, max_potion_price, 1, true, true) {
@@ -711,7 +722,7 @@ boolean elemental_test(int level, element elem1, element elem2)
 					j += 1;
 				}
 			}	
-			vprint(8, "purple", 7);
+			vprint(10, "purple", 7);
 			for i from 0 to j-1 {
 				cli_execute("whatif " + perform_whatif[i] + "; quiet");
 				if(elemental_damage(level, elem1) + elemental_damage(level, elem2) < my_maxhp()) {
@@ -728,12 +739,8 @@ boolean elemental_test(int level, element elem1, element elem2)
 	} else {
 		vprint("The script was unable to acquire the necessary elemental form. You may need to acquire some phials yourself or raise your autoBuyPriceLimit. Attempting to pass test by HP buffing", 3);
 	}
-	vprint(9, "purple", 7);
-	damage = elemental_damage(level, elem1) + elemental_damage(level, elem2);
-	if(damage > my_maxhp())
-		maximize_wrap("hp", ceil(damage), my_maxhp());
 
-	vprint(10, "purple", 7);
+	vprint(11, "purple", 7);
 	if(elemental_damage(level, elem1) + elemental_damage(level, elem2) < my_maxhp())
 	{
 		restore_hp(my_maxhp());

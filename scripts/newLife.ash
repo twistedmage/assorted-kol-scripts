@@ -649,13 +649,30 @@ void special(boolean bonus_actions) {
 				pull_and_wear_if_good($item[snow suit]);
 			}
 			if(have_skill($skill[torso awaregness]))
+			{
 				if(available_amount($item[astral shirt]) < 1)
-					pull_and_wear_if_good($item[cane-mail shirt]);
+				{
+					pull_and_wear_if_good($item[Sneaky Pete's leather jacket (collar popped)]);
+					if(available_amount($item[sneaky pete's leather jacket (collar popped)])<1)
+					{
+						pull_and_wear_if_good($item[Sneaky Pete's leather jacket]);
+						cli_execute("fold sneaky pete's leather jacket (collar popped)");
+						if(available_amount($item[sneaky pete's leather jacket (collar popped)])<1)
+						{
+							equip($item[Sneaky Pete's leather jacket (collar popped)]);
+						}
+						else
+						{
+							pull_and_wear_if_good($item[cane-mail shirt]);
+						}
+					}
+				}
+			}
 			
 			//back
-			pull_and_wear_if_good($item[buddy bjorn]);
-			if(available_amount($item[buddy bjorn])>0)
+			if(good("buddy bjorn") && my_path()!="Avatar of Boris" && my_path()!="Avatar of Jarlsberg" && my_path()!="Avatar of Sneaky Pete")
 			{
+				pull_and_wear_if_good($item[buddy bjorn]);
 				if(good("el vibrato Megadrone"))
 				{
 					//cli_execute("enthrone El Vibrato Megadrone");

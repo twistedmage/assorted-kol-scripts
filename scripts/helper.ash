@@ -641,6 +641,13 @@ void advise_food()
 	//		add_food(con_map,"- miserable pie (smithereens) ",7,0,2);
 		if(i_a("handful of smithereens")>0  || i_a("this charming flan")>0 || get_property("tomeSummons").to_int()<3)
 			add_food(con_map,"- miserable pie (smithereens) ",11,0,2);
+			
+		if(available_amount($item[tea for one])>0)
+			add_food(con_map,"- tea for one ",2.5,0,1);
+		if(available_amount($item[Custard pie])>0)
+			add_food(con_map,"- Custard pie ",8,0,3);
+		if(available_amount($item[Candy carrot])>0)
+			add_food(con_map,"- Candy carrot cake ",16,1,4);
 	}
 	
 	//sort map
@@ -790,7 +797,19 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 			add_drink(con_map,"- Paint A Vulgar Pitcher (smithereens) ",12,0,2);
 			
 		if(available_amount($item[Snow berries])>0 && available_amount($item[ice harvest])>2)
-			add_food(con_map,"- Ice Island Long Tea ",6,0,1);
+			add_drink(con_map,"- Ice Island Long Tea ",6,0,1);
+			
+		if(available_amount($item[Unnamed cocktail])>0)
+			add_drink(con_map,"- unnamed cocktail ",5,0,2);
+			
+		if(available_amount($item[Flamin' Whatshisname])>0)
+			add_drink(con_map,"-Flamin' Whatshisname ",6,0,2);
+			
+		if(available_amount($item[Bottle of Evermore])>0)
+			add_drink(con_map,"-Bottle of Evermore ",6,0,3
+			
+		if(available_amount($item[red rum])>0)
+			add_drink(con_map,"- make a murderers punch from red rum and orange",9,1,3);
 	}
 	//sort map
 	sort con_map by -value.efficiency;

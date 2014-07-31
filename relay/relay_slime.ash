@@ -95,17 +95,17 @@ boolean write_rcheck(boolean ov, string name, string label) {
 }
 
 float[11] slime_percent;
-slime_percent[0] = .01;
-slime_percent[1] = 5.334167;
-slime_percent[2] = 4.001677;
-slime_percent[3] = 2.9025;
-slime_percent[4] = 2.016667;
-slime_percent[5] = 1.325;
-slime_percent[6] = .805833;
-slime_percent[7] = .4391667;
-slime_percent[8] = .200833;
-slime_percent[9] = .066667;
-slime_percent[10] = .01;
+slime_percent[0] = 0;
+slime_percent[1] = 5.33335;
+slime_percent[2] = 4.00147;
+slime_percent[3] = 2.90220;
+slime_percent[4] = 2.01643;
+slime_percent[5] = 1.32440;
+slime_percent[6] =  .80555;
+slime_percent[7] =  .43835;
+slime_percent[8] =  .20004;
+slime_percent[9] =  .06621;
+slime_percent[10] = .01000;
 
 if( get_property( "badkitty" ) != "" ) max_ml_familiar = get_property( "badkitty" );
 if( get_property( "goodkitty" ) != "" ) min_ml_familiar = get_property( "goodkitty" );
@@ -498,6 +498,10 @@ void run_tube( int adv_to_use )
 				}
 				else print( "Problem casting \"Ode to Booze\" to help your Bandersnatch run away. Probably too many AT Buffs." , "red" );
 				
+			}
+			else if( my_familiar() == $familiar[Pair of stomping boots] && get_property( "_banderRunaways" ).to_int() < floor( numeric_modifier( "Familiar Weight" ) + familiar_weight( $familiar[Pair of stomping boots] ) ) / 5 )
+			{
+				set_property( "battleAction" , "try to run away" );				
 			}
 			else if( ( equipped_amount( $item[Navel Ring of Navel Gazing] ) > 0 || equipped_amount( $item[Greatest American Pants] ) > 0 ) && get_property( "_navelRunaways" ).to_int() < 3 )
 			{

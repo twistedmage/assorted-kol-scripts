@@ -45,7 +45,7 @@ void stock_hotdog(string html, string ingredient, int req_ing, int desired_dogs)
 				break;
 			case "tattered scrap of paper":
 				//optimal dog
-				dog=;
+				dog=102;
 				break;
 			default:
 				abort("Unrecognised dog on ascend line 30, using ingredient "+ingredient);
@@ -207,6 +207,8 @@ void stock_hagnks()
 		//fold loathing legion screwdriver
 		if(item_amount($item[loathing legion screwdriver])<1)
 			cli_execute("fold loathing legion screwdriver");
+		if(item_amount($item[Sneaky Pete's leather jacket (collar popped)])<1)
+			cli_execute("fold Sneaky Pete's leather jacket (collar popped)");
 		if(item_amount($item[boris's helm])>0)
 			cli_execute("fold boris's helm (askew)");
 		//make grogtini
