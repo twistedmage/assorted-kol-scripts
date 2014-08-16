@@ -764,7 +764,7 @@ void special(boolean bonus_actions) {
 						equip($slot[acc1],$item[loathing legion necktie]);
 				}
 			}
-			if(available_amount($item[wrecked generator])<1 && my_path() != "KOLHS")
+			if(available_amount($item[wrecked generator])<1 && can_drink() && my_path() != "KOLHS" && my_path() != "Avatar of Jarlsberg")
 				pull_if_good($item[wrecked generator]);
 			pull_if_good($item[jar of psychoses (The Crackpot Mystic)]);
 					

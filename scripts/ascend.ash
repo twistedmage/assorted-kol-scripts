@@ -43,9 +43,17 @@ void stock_hotdog(string html, string ingredient, int req_ing, int desired_dogs)
 				//junkyard dog
 				dog=-99;
 				break;
+			case "cranberries":
+				//one with everything
+				dog=-94;
+				break;
+			case "gauze hammock":
+				//sleeping dog
+				dog=-101;
+				break;
 			case "tattered scrap of paper":
 				//optimal dog
-				dog=102;
+				dog=-102;
 				break;
 			default:
 				abort("Unrecognised dog on ascend line 30, using ingredient "+ingredient);
@@ -64,15 +72,14 @@ void stock_hotdogs()
 	//title="furry fur"></td><td><b>x 10</b></td><td class=tiny>(0 in stock)
 	string hotdog_str=visit_url("clan_viplounge.php?action=hotdogstand");
 	stock_hotdog(hotdog_str,"furry fur",10,5);
-	stock_hotdog(hotdog_str,"handul of cranberries",10,5);
+	stock_hotdog(hotdog_str,"cranberries",10,5);
 	stock_hotdog(hotdog_str,"skeleton bone",10,5);
 	stock_hotdog(hotdog_str,"hot wad",25,5);
 	stock_hotdog(hotdog_str,"cold wad",25,5);
 	stock_hotdog(hotdog_str,"spooky wad",25,5);
 	stock_hotdog(hotdog_str,"stench wad",25,5);
 	stock_hotdog(hotdog_str,"sleaze wad",25,5);
-	stock_hotdog(hotdog_str,"tattered scap of paper",25,5);
-	stock_hotdog(hotdog_str,"guaze hammock",10,5);
+	stock_hotdog(hotdog_str,"gauze hammock",10,5);
 	stock_hotdog(hotdog_str,"issue of GameInformPowerDailyPro magazine",3,5);
 	stock_hotdog(hotdog_str,"tattered scrap of paper",25,5);
 }
@@ -166,16 +173,16 @@ void stock_hagnks()
 	buy_item($item[reinforced beaded headband],1);
 	buy_item($item[round purple sunglasses],1);
 	//chewing gums
-	buy_item($item[jabanero-flavored chewing gum],1);
+	buy_item($item[jaba&ntilde;ero-flavored chewing gum],1);
 	buy_item($item[handsomeness potion],1);
-	buy_item($item[Meleegra pills],1);
+	buy_item($item[Meleegra&trade; pills],1);
 	buy_item($item[pickle-flavored chewing gum],1);
 	buy_item($item[marzipan skull],1);
 	buy_item($item[tamarind-flavored chewing gum],1);
 	buy_item($item[lime-and-chile-flavored chewing gum],1);
 	get_item($item[jarlsberg's key lime pie],1);
 	get_item($item[pumpkin bomb],5);
-	buy_item($item[icyvapohotness inhaler],3);
+	buy_item($item[Mick's IcyVapoHotness Inhaler],3);
 	buy_item($item[cyclops eyedrops],3);
 	//more quest crap
 	buy_item($item[668 scroll],3);
@@ -200,6 +207,9 @@ void stock_hagnks()
 	buy_item($item[spooky mushroom],1);
 	buy_item($item[killing jar],1);
 	buy_item($item[filthy knitted dread sack],1);
+	buy_item($item[blackberry galoshes],1);
+	buy_item($item[Unconscious Collective Dream Jar],16);
+	buy_item($item[logging hatchet],16);
 	
 	//stuff for twistedmage
 	if(my_name()=="twistedmage")
@@ -244,12 +254,6 @@ void main()
 	cli_execute("mood apathetic");
 	set_property("mpAutoRecovery", "0.4");
 	set_property("mpAutoRecoveryTarget", "0.6");
-	//money
-	if(my_meat()<50000)
-	{
-		take_stash(50,$item[dense meat stack]);
-		autosell(50,$item[dense meat stack]);
-	}
 		
 	//alice
 	cli_execute("alice.ash");
@@ -284,33 +288,18 @@ void main()
 	//fill up empty capacity with pvp food/drink
 	while(my_inebriety() <= inebriety_limit())
 	{
-		if(my_meat()<500)
-		{
-			take_stash(5,$item[dense meat stack]);
-			autosell(5,$item[dense meat stack]);
-		}
 		if(item_amount($item[used beer])==0)
 			buy(1,$item[used beer]);
 		drink(1,$item[used beer]);
 	}
 	while(fullness_limit() - my_fullness() > 1)
 	{
-		if(my_meat()<500)
-		{
-			take_stash(5,$item[dense meat stack]);
-			autosell(5,$item[dense meat stack]);
-		}
 		if(item_amount($item[nailswurst])==0)
 			buy(1,$item[nailswurst]);
 		eat(1,$item[nailswurst]);
 	}
 	while(spleen_limit() - my_spleen_use() > 2)
 	{
-		if(my_meat()<500)
-		{
-			take_stash(5,$item[dense meat stack]);
-			autosell(5,$item[dense meat stack]);
-		}
 		if(spleen_limit() - my_spleen_use() > 5)
 			use(1,$item[Hatorade]);
 		else if(spleen_limit() - my_spleen_use() > 2)
@@ -361,49 +350,11 @@ void main()
 	cli_execute("autosell * torn paper strip");
 	setvar("priceAdvisor_obeyBuyLimit","true");
 	cli_execute("set autoBuyPriceLimit = 20000");
-	if(my_meat()<100000)
-	{
-		print("stash pulling ascension meat","blue");
-		if(stash_amount($item[dense meat stack])>=100)
-		{
-			take_stash(100,$item[dense meat stack]);
-			cli_execute("autosell * dense meat stack");
-		}
-		else
-		{
-			abort("No stacks in stash.");
-		}
-	}
 	stock_hagnks();
 	cli_execute("ocd data creator");
 	print("cleaning inv");
 	cli_execute("ocd inventory control");
 	print("cleaning inv done");
-	if(my_meat()>100000 && my_name()!="twistedmage")
-	{
-		int stacks=(my_meat()-100000)/1000;
-		cli_execute("create "+stacks+" dense meat stack");
-		put_stash(stacks,$item[dense meat stack]);
-	}
-	else if(my_meat()<100000 && my_name()!="twistedmage")
-	{
-		print("stash pulling ascension meat","blue");
-		if(stash_amount($item[dense meat stack])>=100)
-		{
-			take_stash(100,$item[dense meat stack]);
-			cli_execute("autosell * dense meat stack");
-		}
-		else
-		{
-			abort("No stacks in stash.");
-		}
-	}
-	else //if twistedmage dump all to stash
-	{
-		int stacks=my_meat()/1000;
-		cli_execute("create "+stacks+" dense meat stack");
-		put_stash(stacks,$item[dense meat stack]);
-	}	
 	cli_execute("outfit birthday suit");
 	cli_execute("unequip familiar");
 //get trophies=====================================================

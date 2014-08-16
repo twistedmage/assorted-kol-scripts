@@ -56,7 +56,7 @@ void unlock_owe()
 	//one with everything
 	if(i_a("ancient hot dog wrapper")>0)
 		abort("Have a ancient hot dog wrapper! Disable this part of hotdog_ulock.ash");
-	abort("Not implemented");
+	abort("run autobasement");
 }
 void unlock_devil()
 {
@@ -99,7 +99,7 @@ void unlock_ghost()
 	//ghost dog
 	if(i_a("gnawed-up dog bone")>0)
 		abort("Have a gnawed-up dog bone! Disable this part of hotdog_ulock.ash");
-	abort("Not implemented");
+	abort("ghost Not implemented");
 }
 void unlock_junkyard()
 {
@@ -117,20 +117,19 @@ void unlock_wet()
 	//manor 2 open
 	if(can_adv($location[the haunted bedroom]))
 	{
-		print("Going for a wet dog","green");
-		setFamiliar("items");
-		cli_execute("mood clear");
-		//cli_execute("maximize items, -combat frequency");
-		if (have_skill($skill[Smooth Movement])) cli_execute("trigger lose_effect, Smooth Movements, cast 1 smooth movement");
-		if (have_skill($skill[The Sonata of Sneakiness])) cli_execute("trigger lose_effect, The Sonata of Sneakiness, cast 1 sonata of sneakiness");
+		//choiceadvs
+		set_property("choiceAdventure878", 4); //disposablle camera
+		set_property("choiceAdventure880", 2); //elegant nightstick
+		set_property("choiceAdventure879", 4); //sausages or moxie
+
 		while(my_adventures()>0 && !get_property("_wet_checked_today").to_boolean())
 		{
-			set_property("choiceAdventure85", 4);
-			cli_execute("mood execute");
-			string txt=visit_url("adventure.php?snarfblat=108");
-			if(contains_text(txt,"a simple wooden nightstand"))
-				set_property("_wet_checked_today","true");
+			bumAdv($location[the haunted bedroom], "", "", "", "looking for engorged sausages (wet dog)", "");
 			run_combat();
+
+//			cli_execute("mood execute");
+			if(get_property("lastEncounter")=="One Rustic Nightstand")
+				set_property("_wet_checked_today","true");
 		}
 	}
 }
@@ -149,22 +148,22 @@ void unlock_sleeping()
 	//sleeping dog
 	if(i_a("dream of a dog")>0)
 		abort("Have a dream of a dog! Disable this part of hotdog_ulock.ash");
-	abort("Not implemented");
+	abort("sleeping Not implemented");
 }
 	
 void unlock_hotdogs()
 {
-	unlock_video();
-//	unlock_savage();
-	unlock_sly();
-//	unlock_chilly();
-//	unlock_optimal();
-//	unlock_devil();
-//	unlock_ghost();
-//	unlock_junkyard();
-	unlock_sleeping();
-	unlock_owe();
-	unlock_wet();
+	unlock_video(); //2 more
+	unlock_sly(); //4 more
+	unlock_wet(); //2 more
+	unlock_chilly(); //1 more
+	unlock_junkyard(); //1 extra
+	unlock_ghost(); //3 more
+	unlock_optimal(); //1 more
+//	unlock_savage(); //0 more
+//	unlock_sleeping(); //0 more
+//	unlock_owe(); //0 more
+//	unlock_devil(); //0 more
 	abort("Try to get everything again, to wear as gear");
 }
 

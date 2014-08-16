@@ -64,6 +64,41 @@ string clover_string(location wear) {
    return res.to_string();
 }
 
+record quesera {
+   string yield;      // stringlist of all items yielded
+   string note;       // extra infos
+   string category;   // edibles, elements, ascension, fight, buff, combat items
+};
+quesera[location] seras;
+
+string seratable() {
+   if (!file_to_map("semirares.txt",seras)) return "";
+   buffer res;
+   res.append("<h3>Semirare List</h3> This is a simple comprehensive list, not filtered by availability.<br>For a detailed list, "+
+      "<a href='relay_Sera.ash'>visit SeRa</a>.\n<div style='height: 300px; overflow: auto'><table>");
+   matcher ym = create_matcher("(.+?) ?(?:\\((\\d+)\\))?(?:$|, )","");
+   item i;
+   foreach l,rec in seras {
+      res.append("<tr"+(get_property("lastSemirareReset").to_int() == my_ascensions() && l == to_location(get_property("semirareLocation")) ? 
+         " class=dimmed" : "")+"><td><a href='"+to_url(l)+"'>"+l+"</a></td><td>");
+   ym.reset(rec.yield);
+   while (ym.find()) {
+      i = to_item(ym.group(1));
+      if (i == $item[none]) { vprint("'"+ym.group(1)+"' is not an item.",-2); res.append(ym.group(1)); continue; }
+      res.append("<a href=# class='cliimglink' title=\"wiki "+i+"\"><img src='/images/itemimages/"+i.image+
+         "' title=\""+i+" (have: "+rnum(have_item(i))+")\"></a> ");
+      if (is_integer(ym.group(2))) res.append(" ("+ym.group(2)+") ");
+   }
+   if (rec.note != "") {
+      element boron; if (rec.category == "element") foreach e in $elements[] if (contains_text(rec.note,to_string(e))) boron = e;
+      res.append("<br><span style='font-size: 0.7em'"+(boron == $element[none] ? "" : " class='"+boron+"'")+">"+rec.note+"</span>");
+   }
+   res.append("</td></tr>");
+  }
+  res.append("</table></div>");
+  return res;
+}
+
 string[string] post;
 void handle_post() {
    post = form_fields();
@@ -105,13 +140,18 @@ void handle_post() {
       buffer abox;
       abox.append("Adventure again at "+my_location()+".");
       switch (my_location()) {
-//         case $location[]: actbox.append(""); break;
+//         case $location[]: abox.append(""); break;
          case $location[8-bit realm]: abox.append("<table><tr>"); 
             foreach i in $items[red pixel, green pixel, blue pixel, white pixel] 
                abox.append("<td align=center>"+(creatable_amount(i) > 0 ? "<a href=# class='cliimglink' title='create * "+i+"'>" : "")+
                "<img src='/images/itemimages/"+i.image+"' title='"+i+"'>"+(creatable_amount(i) > 0 ? "</a>" : "")+"<br>"+rnum(item_amount(i))+"</td>");
             if (item_amount($item[digital key]) == 0 && creatable_amount($item[digital key]) > 0) abox.append("<td><a href=# class='cliimglink' title='create 1 digital key'><img src='/images/itemimages/pixelkey.gif'></a></td>");
             abox.append("</tr></table>"); break;
+         case $location[the "fun" house]: if (get_property("questG04Nemesis") != "step2") break;
+            if (numeric_modifier("Clownosity") < 4) foreach i in $items[] if (numeric_modifier(i,"Clownosity") > 0 && can_equip(i) && !have_equipped(i) && available_amount(i) > 0)
+               abox.append("<a href=# class='cliimglink' title='equip "+(i == $item[big red clown nose] ?
+                "acc2" : to_slot(i))+" "+i+"'><img src='/images/itemimages/"+i.image+"' class=hand></a> ");
+               abox.append("<p>Clownosity: <b>"+rnum(numeric_modifier("Clownosity"))+" / 4</b>"); break;
          case $location[guano junction]: if (item_amount($item[sonar-in-a-biscuit]) > 0 && !($strings[step3, finished] contains get_property("questL04Bat"))) 
             abox.append("<p><a href=# class='cliimglink' title='use sonar-in-a-biscuit'><img src='/images/itemimages/biscuit.gif' class=hand></a>"); break;
          case $location[the arid, extra-dry desert]: abox.append("<p>The desert is <b>"+get_property("desertExploration")+"%</b> explored.");
@@ -163,6 +203,8 @@ void handle_post() {
             }
             abox.append("<p>"); for i from 819 to 827 abox.append(to_item(i)+(item_amount(to_item(i)) > 0 ? " ("+item_amount(to_item(i))+")" : "")+": "+
             (($strings[blessing, detection, mental acuity, ettin strength, teleportitis] contains get_property("lastBangPotion"+i)) ? "<b>"+get_property("lastBangPotion"+i)+"</b>" : get_property("lastBangPotion"+i))+"<br>"); break;
+         case $location[the haunted ballroom]: if (item_amount($item[dance card]) > 0 && get_counters("Dance Card",0,5) == "") 
+            abox.append("<p><a href=# class='cliimglink' title='use dance card'><img src='/images/itemimages/guildapp.gif' class=hand></a>"); break;
          case $location[the haunted kitchen]: if (item_amount($item[Spookyraven billiards room key]) > 0) break;
             abox.append("<p>You will open <b>"+rnum(max(1,floor(max(numeric_modifier("Hot Resistance"), numeric_modifier("Stench Resistance"))/3)))+"</b> drawers per fight.<p>");
             foreach tores in $elements[hot, stench] abox.append("<b>"+tores+" res:</b> "+rnum(numeric_modifier(tores+" Resistance"))+
@@ -186,10 +228,9 @@ void handle_post() {
                 "acc2" : to_slot(i))+" "+i+"'><img src='/images/itemimages/"+i.image+"' class=hand></a> ");
             abox.append("<b>"+rnum(doctot)+" / 5</b> Doctorosity");
             break;
-         case $location[the black forest]: 
+         case $location[the black forest]: abox.append("<p>Black locations discovered: <b>"+get_property("blackForestProgress")+" / 5</b>");
             if (!have_equipped($item[blackberry galoshes]) && can_equip($item[blackberry galoshes]) && item_amount($item[blackberry galoshes]) > 0)
                abox.append("<p><a href=# class='cliimglink' title='equip acc3 blackberry galoshes'><img src='/images/itemimages/bgaloshes.gif' class=hand></a>");
-            foreach i in $items[reassembled blackbird, reconstituted crow] if (creatable_amount(i) > 0) create(1,i);
             break;
          case $location[The Filthworm Queen's Chamber]:
             if (have_outfit("Frat Warrior")) abox.append("<p><a href='bigisland.php?place=orchard&action=stand&pwd' class='clilink through' title='checkpoint; outfit frat warrior fatigues'>visit stand as frat</a>");
@@ -327,11 +368,11 @@ void handle_post() {
      case "sera":
       buffer sbox;
       if (get_counters("Semirare window begin",0,10) != "") sbox.append("<p><span style='font-weight: bold; font-size: 3.0em'>"+narrowdown("Semirare window begin")+" </span> turns until your semirare window.");
-       else if (get_counters("Fortune Cookie",0,10) != "") sbox.append("<p><span style='font-weight: bold; font-size: 3.0em'>"+narrowdown("Fortune Cookie")+" </span> turns until your semirare!");
-       else sbox.append("<p>Semirare helper info will go here!");
-      if (get_property("lastSemirareReset").to_int() == my_ascensions()) sbox.append("<p>Last semirare found in <b>"+get_property("semirareLocation")+"</b>.");
+       else if (get_counters("Fortune Cookie",1,10) != "") sbox.append("<p><span style='font-weight: bold; font-size: 3.0em'>"+narrowdown("Fortune Cookie")+" </span> turns until your semirare!");
+       else if (get_counters("Fortune Cookie",0,0) != "") sbox.append("<p>Time to get your semirare!");
       if (get_counters("Fortune Cookie",0,220) == "" && my_fullness() < fullness_limit() && can_eat())
          sbox.append("<p><a href=# class='cliimglink' title='eat fortune cookie'><img src='/images/itemimages/fortune.gif' class=hand></a>");
+      sbox.append(seratable());
       sbox.write();
       exit;
      case "wicky":

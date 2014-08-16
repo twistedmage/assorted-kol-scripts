@@ -867,20 +867,6 @@ int effective_price(con_rec con)
   return effective_price(con.it, (con.have > 0));
 }
 
-boolean unknown_bottle(item bottle)
-{
-  if (get_property("lastDustyBottleReset").to_int() == my_ascensions())
-    return false;
-  if (bottle != $item[dusty bottle of Merlot] &&
-      bottle != $item[dusty bottle of Port] &&
-      bottle != $item[dusty bottle of Pinot Noir] &&
-      bottle != $item[dusty bottle of Zinfandel] &&
-      bottle != $item[dusty bottle of Marsala] &&
-      bottle != $item[dusty bottle of Muscat])
-    return false;
-  return true;
-}
-
 boolean unknown_recipe(item it)
 {
   return (get_property("unknownRecipe"+it.to_int()).to_boolean());
@@ -1794,66 +1780,6 @@ con_rec extra_items(con_rec con)
     con.adv.min += 1;
     con.adv.max += 3;
   }
-  //If it's the special dusty bottle, use the right numbers
-  if ((to_int(con.it) >= 2271) && (to_int(con.it) <= 2276))
-  {
-    vprint("Checking "+con.it+" to set special wines.",9);
-    if (my_ascensions( )!= get_property("lastDustyBottleReset").to_int())
-    {
-      cli_execute("dusty");
-      if (my_ascensions( )!= get_property("lastDustyBottleReset").to_int())
-        return con;    
-    }
-    switch (get_property("lastDustyBottle"+to_int(con.it)).to_int())
-    {
-      default:
-        break;
-      case 1:
-        vprint("It's average!",9);
-        con.muscle.min = 5;
-        con.muscle.max = 10;
-        con.moxie.min = 5;
-        con.moxie.max = 10;
-        con.mysticality.min = 5;
-        con.mysticality.max = 10;
-        con.adv.min = 3;
-        con.adv.max = 4;
-        break;
-      case 3:
-        vprint("It's spooky!",9);
-        con.muscle.min = 3;
-        con.muscle.max = 6;
-        con.moxie.min = 3;
-        con.moxie.max = 6;
-        con.mysticality.min = 15;
-        con.mysticality.max = 20;
-        con.adv.min = 3;
-        con.adv.max = 4;
-        break;
-      case 4:
-        vprint("It's great!",9);
-        con.muscle.min = 10;
-        con.muscle.max = 15;
-        con.moxie.min = 10;
-        con.moxie.max = 15;
-        con.mysticality.min = 10;
-        con.mysticality.max = 15;
-        con.adv.min = 5;
-        con.adv.max = 7;
-        break;
-      case 5:
-        vprint("It's glassy!",9);
-        con.muscle.min = 5;
-        con.muscle.max = 10;
-        con.moxie.min = 5;
-        con.moxie.max = 10;
-        con.mysticality.min = 5;
-        con.mysticality.max = 10;
-        con.adv.min = 3;
-        con.adv.max = 4;
-        break;
-    }
-  }
   return con;
 }
 
@@ -1910,7 +1836,7 @@ void update_from_mafia(string type)
         gainadv = totalcost > 0 ? (averange(set_range(it.adventures)) / totalcost) : 0;
         break;
       case "booze":
-        if ((special_values(it, 1) == 1 && get_quality(it) < MINIMUM_QUALITY) || unknown_bottle(it)) continue;
+        if ((special_values(it, 1) == 1 && get_quality(it) < MINIMUM_QUALITY)) continue;
         if (it.fullness > 0 || it.spleen > 0) continue;
         if (my_class() == $class[Avatar of Jarlsberg] && (it.to_int() < 6176 || it.to_int() > 6236)) continue;
         if (my_class() == $class[Avatar of Jarlsberg] && (it.to_int() < 6176 || it.to_int() > 6236)) continue;

@@ -7,7 +7,6 @@
      - uses items containing goals -- move containers to closet to avoid use
      - fights putty monsters/4-d camera monsters for bounties and specified goals
      - whistles for dolphins to get goals or items worth at least 2x the cost of whistling
-     - auto-tames up to n turtles in each zone as a TT -- specify n in [bbb_turtles]
      - eats fortune cookies automatically -- set [auto_semirare] to "always", "timely", or "never"
 
    Have a suggestion to improve this script?  Visit
@@ -108,20 +107,38 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
       case $location[the beanbat chamber]: if (last_monster() == $monster[Screambat] && is_goal($item[sonar-in-a-biscuit]))
          remove_item_condition(1,$item[sonar-in-a-biscuit]); return;
       case $location[the black forest]:
-         if (is_goal($item[blackberry galoshes]) || (!have_skill($skill[unaccompanied miner]) && available_amount($item[blackberry galoshes]) == 0 &&
-             item_amount($item[map to ellsbury's claim]) > 0)) { friendlyset(177,"4","Get goal/skill galoshes."); return; }
-         if (is_goal($item[blackberry slippers])) { friendlyset(177,"1","Get goal of blackberry slippers."); return; }
-         if (is_goal($item[blackberry moccasins])) { friendlyset(177,"2","Get goal of blackberry moccasins."); return; }
-         if (is_goal($item[blackberry combat boots])) { friendlyset(177,"3","Get goal of blackberry combat boots."); return; }
-         switch (my_primestat()) {
-            case $stat[moxie]: if (available_amount($item[blackberry moccasins]) == 0)
-                { friendlyset(177,"2","Get moxie-class blackberry shoes."); return; } else break;
-            case $stat[muscle]: if (available_amount($item[blackberry combat boots]) == 0)
-                { friendlyset(177,"3","Get muscle-class blackberry shoes."); return; } else break;
-            default: if (available_amount($item[blackberry slippers]) == 0)
-                { friendlyset(177,"1","Get myst-class blackberry shoes."); return; }
+        // blackberries
+         if (is_goal($item[blackberry slippers])) friendlyset(928,"1","Get goal of blackberry slippers.");
+          else if (is_goal($item[blackberry moccasins])) friendlyset(928,"2","Get goal of blackberry moccasins.");
+          else if (is_goal($item[blackberry combat boots])) friendlyset(928,"3","Get goal of blackberry combat boots.");
+          else if (is_goal($item[blackberry galoshes]) || available_amount($item[blackberry galoshes]) == 0) friendlyset(928,"4","Get galoshes.");
+          else friendlyset(928,"6","No blackberry footwear needed.");
+         if (get_property("choiceAdventure928") != "6" && item_amount($item[blackberry]) > 2) friendlyset(924,"2","Visit cobbler for footwear.");
+          else friendlyset(924,"1","Fight a bush.");
+        // blacksmith
+         boolean blackgoal; foreach i in $items[black sword, black shield, black helmet, black greaves] if (is_goal(i)) blackgoal = true;
+         int blackchoice = 1; foreach i in $items[black sword, black shield, black helmet, black greaves] { 
+            if (is_goal(i) || (!blackgoal && available_amount(i) == 0 && be_good(i))) { friendlyset(925,blackchoice,"Get goal/lacking "+i+"."); break; }
+            blackchoice += 1;
          }
-         friendlyset(177,"5","Skip getting blackberry shoes.");
+         if (blackchoice == 5) friendlyset(925,"6","No black weaponry needed.");
+        // black gold mine
+         if (is_goal($item[texas tea])) friendlyset(926,"2","Get goal texas tea.");
+          else if (has_goal($item[black gold]) > 0) friendlyset(926,"1","Mine for black gold.");
+          else if (have_effect($effect[black lung]) > 0 || get_property("choiceAdventure926") != "3") friendlyset(926,"6","Nothing to do in the black mine.");
+        // black church
+         if (is_goal($item[black kettle drum])) friendlyset(927,"2","Get goal black kettle drum.");
+          else if (have_equipped($item[black cloak]) && string_modifier("Outfit") == "Black Armaments" && have_effect($effect[salsa satanica]) == 0 && 
+                   (have_equipped($item[dark baconstone ring]) || have_equipped($item[dark hamethyst ring]) || have_equipped($item[dark porquoise ring])))
+             friendlyset(927,"1","Get +50% items buff.");
+          else friendlyset(927,"6","Skip the black church.");
+        // All Over the Map
+         switch (to_int(get_property("blackForestProgress"))) {
+            case 5: case 4: if (get_property("choiceAdventure927") != "6") { friendlyset(923,"4","We have business in the black church."); break; }
+            case 3: if (get_property("choiceAdventure926") != "6") { friendlyset(923,"3","Take care of business in the black mine."); break; }
+            case 2: if (blackgoal || (to_int(get_property("blackForestProgress")) > 4 && blackchoice < 5)) { friendlyset(923,"2","Get black equipment from the black smith."); break; }
+            default: friendlyset(923,"1","Fight a bush or get blackberry footwear.");
+         }
          return;
       case $location[the castle in the clouds in the sky (basement)]:
         // Fitness
@@ -262,10 +279,12 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
             friendlyset(84,"2","Get myst stats from the ornate nightstand.");
           else friendlyset(84,"1","Get meat from the ornate nightstand.");
          return;
-      case $location[the haunted billiards room]:             // allows you to set 1 library key as a condition!
-         if (item_amount($item[spookyraven library key]) == 0 && have_item("pool cue") > 0 &&
+      case $location[the haunted billiards room]:
+         if (item_amount($item[spookyraven library key]) == 0 &&   // probably need some kind of pool skill check here
              have_effect($effect[chalky hand]) == 0 && item_amount($item[handful of hand chalk]) > 0)
             use(1,$item[handful of hand chalk]);
+//            friendlyset(875,"1","Challenge the poolghost.");
+//            friendlyset(875,"2","Hone your pool skills some more.");
          return;
       case $location[the haunted library]:
          if (get_property("lastSecondFloorUnlock").to_int() != my_ascensions())  // Rise
@@ -556,13 +575,6 @@ boolean fight_items() {
    return true;
 }
 
-record turtle_rec {
-   item turtle;      // which turtle can be found
-   item thing;       // what can be made from the turtle
-   int tier;         // 1: pheromones only, 2: also needs rod, 3: also needs familiar
-};
-turtle_rec[location] tdata;
-turtle_rec tort;
 boolean use_fam(familiar f) {
    use_familiar(f);
    if (to_boolean(vars["bbb_famitems"])) switch (my_familiar()) {
@@ -574,111 +586,6 @@ boolean use_fam(familiar f) {
    }
    cli_execute("checkpoint clear");
    return (my_familiar() == f);
-}
-
-boolean ensure_turtlefam(boolean really) {
-   if ($familiars[grinning turtle, syncopated turtle] contains my_familiar()) return true;
-   if (!($familiars[none,grinning turtle,syncopated turtle] contains to_familiar(vars["is_100_run"])) || 
-      my_location() == $location[The Spooky Gravy Burrow]) return false;
-   familiar[int] tfams;
-   tfams[to_int(can_interact())] = $familiar[grinning turtle];
-   tfams[to_int(!can_interact())] = $familiar[syncopated turtle];
-   foreach key,pet in tfams
-      if (have_familiar(pet)) { if (really) return use_fam(pet); return true; }
-       else if (item_amount(to_item(to_string(pet))) > 0) {
-          use(1,to_item(to_string(pet)));
-          if (really) return use_fam(pet); return have_familiar(pet);
-       }
-   return false;
-}
-
-boolean should_tame() {
-   if (tort.tier == 3 && !ensure_turtlefam(false)) return false;
-   if (tort.tier > 1 && (my_path() == "Way of the Surprising Fist" || weapon_hands(equipped_item($slot[weapon])) > 1)) return false;
-   if (to_boolean(vars["bbb_turtlegear"])) {         // handle turtle wax item creation order
-      if (item_amount($item[turtle wax shield]) > 0 && have_item($item[turtle wax helmet]) == 0) use(1,$item[turtle wax shield]);
-      if (item_amount($item[turtle wax helmet]) > 0 && have_item($item[turtle wax greaves]) == 0) use(1,$item[turtle wax helmet]);
-      if (tort.thing != $item[none] && have_item(tort.thing) == 0 && creatable_amount(tort.thing) > 0 && create(1,tort.thing)) {}
-   }
-   int templimit;
-   switch (tort.turtle) {
-      case $item[knobby helmet turtle]:              // if bbb_turtlegear, ensure enough turtles to create gear requiring multiple
-      case $item[soup turtle]:
-      case $item[furry green turtle]: if (to_boolean(vars["bbb_turtlegear"]) && have_item(tort.thing) == 0) templimit = 2;
-      case $item[turtle wax]: foreach itm in $items[turtle wax shield,turtle wax helmet,turtle wax greaves]
-         if (have_item(itm) == 0) return true; break;
-      case $item[turtlemail bits]: foreach itm in $items[turtlemail coif,turtlemail breeches,turtlemail hauberk]
-         if (have_item(itm) == 0 && (!to_boolean(vars["bbb_turtlegear"]) || creatable_amount(itm) == 0 || !create(1,itm))) return true; break;
-      case $item[hedgeturtle]: foreach itm in $items[spiky turtle helmet,spiky turtle shield,spiky turtle shoulderpads]
-         if (have_item(itm) == 0 && (!to_boolean(vars["bbb_turtlegear"]) || creatable_amount(itm) == 0 || !create(1,itm))) return true; break;
-   }
-   if (item_type(tort.turtle) == "familiar larva") {
-      familiar famgoal;
-      if (tort.turtle == $item[sleeping wereturtle]) famgoal = $familiar[wereturtle];
-       else famgoal = to_familiar(to_string(tort.turtle));
-      if (!have_familiar(famgoal) && item_amount(tort.turtle) > 0) use(1,tort.turtle);
-      templimit = 2;
-   }
-   return (have_item(tort.turtle) < max(to_int(vars["bbb_turtles"]),templimit));
-}
-
-void taming_reset() {
-   if (tort.tier > 1) cli_execute("outfit checkpoint");
-   if (tort.tier == 3 && contains_text(get_property("temp"),"|")) use_fam(to_familiar(excise(get_property("temp"),"|","")));
-   set_property("taming","");
-}
-
-boolean now_taming() {
-   if (get_property("taming") == "") return false;          // turtle already found
-   switch (have_effect($effect[eau de tortue])) {
-      case 1: case 2: return (have_item($item[Garter of the Turtle Poacher]) > 0);
-      case 3: return true;
-      case 4: case 5: case 6: case 7:
-      case 8: case 9: case 10: if (have_item($item[Garter of the Turtle Poacher]) > 0) {
-         taming_reset(); return false;
-      } return true;
-   }
-   return false;
-}
-
-boolean taming_check() {
-   if (!now_taming()) set_property("taming","");
-   if (my_class() != $class[turtle tamer] || !guild_store_available()) return true;
-   if (have_equipped($item[fouet de tortue-dressage]) && my_location() == $location[the outer compound] &&
-       have_effect($effect[eau de tortue]) == 0 && get_property("lastNemesisReset").to_int() < my_ascensions() && retrieve_item(1,$item[turtle pheromones]))
-      use(1,$item[turtle pheromones]);
-   if (to_int(vars["bbb_turtles"]) == 0) return true;
-   if (!load_current_map("turtles",tdata)) return vprint("Absolutely massive error loading turtle data.  Recommend buying a new computer.",-1);
-   if (!(tdata contains my_location())) return vprint("This location has no turtle to tame.",5);
-   tort = tdata[my_location()];
-   if (have_effect($effect[eau de tortue]) == 0 && should_tame()) {
-      if (retrieve_item(1,$item[turtle pheromones])) use(1,$item[turtle pheromones]);
-      if (have_effect($effect[eau de tortue]) == 0) return vprint("Unable to acquire the effect 'Eau de Tortue'.",-3);
-      if (tort.tier == 3) set_property("taming",tort.turtle+"|"+my_familiar());
-       else set_property("taming",tort.turtle);
-   }
-   if ($strings["A Rolling Turtle Gathers No Moss","Blue Monday","Boxed In","C'mere, Little Fella",
-        "Capital!","Jewel in the Rough","Kick the Can","Nantucket Snapper","No Man, No Hole",
-        "O Turtle Were Art Thou","Puttin' it on Wax","Turtle in peril","Turtles of the Universe",
-       // Tier II
-        "Allow 6-8 Weeks For Delivery","Duel Nature","Like That Time in Tortuga","More eXtreme Than Usual",
-        "Never Break the Chain","The Horror...","Turtles All The Way Around",
-       // Tier III
-        "Cleansing your Palette","Don't Be Alarmed, Now","Silent Strolling",
-        "Training Day"] contains get_property("lastEncounter")) taming_reset();
-   if (!now_taming()) return true;
-  // prepare for taming
-   vprint("Preparing to tame a "+tort.turtle+"...",2);
-   switch (tort.tier) {
-      case 3: if (!ensure_turtlefam(true)) return vprint("You need a turtle familiar to hunt a "+tort.turtle+" here.",-4);
-      case 2: if (my_location() == $location[the arid, extra-dry desert] && 
-         (have_equipped($item[uv-resistant compass]) || have_equipped($item[ornate dowsing rod]))) return false;
-         cli_execute("checkpoint");
-         if (!have_equipped($item[turtling rod]) && !have_equipped($item[flail of the seven aspects]) &&
-        !equip($item[flail of the seven aspects]) && !equip($item[turtling rod]))
-        return vprint("You need to be able to equip a turtling rod to hunt a "+tort.turtle+" here.",-4);
-   }
-   return true;
 }
 
 familiar dropfam() {
@@ -722,8 +629,8 @@ boolean fam_check() {
       if (my_familiar() != to_familiar(vars["is_100_run"])) return use_fam(to_familiar(vars["is_100_run"]));
       return vprint("Not swapping familiar; is_100_run setting is set to "+my_familiar(),9);
    }
-  // farm familiar items if set (and not auto-taming)
-   if (!to_boolean(vars["bbb_famitems"]) || to_familiar(excise(get_property("taming"),"|","")) != $familiar[none]) return true;
+  // farm familiar items if set
+   if (!to_boolean(vars["bbb_famitems"])) return true;
    return use_fam(dropfam());
 }
 
@@ -732,9 +639,7 @@ boolean fam_check() {
 setvar("auto_semirare","timely");     // auto-eat fortune cookies: always, timely, never (maxcounters)
 setvar("bbb_miniboss_items",1);       // vs.-miniboss items to get in the defiled cyrpt areas before getting stats
 setvar("bbb_adjust_choiceadvs",true); // enable/disable choiceadv adjustment
-setvar("bbb_turtles",1);              // number of each turtle to auto-tame; 0 disables taming
 setvar("bbb_dolphin_goodies",true);   // toggle automatically fighting dolphins for valuable non-goal items
-setvar("bbb_turtlegear",false);       // toggle automatically creating gear from tamed turtles (makes 1 of each)
 setvar("bbb_famitems",false);         // toggle automatically farming familiar-dropped items
 check_version("Best Between Battle","bestbetweenbattle",1240);
 
@@ -812,7 +717,6 @@ void bbb() {
    cookiecheck();
    use_goalcontaining_items();
    fight_items();
-   taming_check();
    fam_check();
    set_choiceadvs();
    auto_mcd(my_location());
