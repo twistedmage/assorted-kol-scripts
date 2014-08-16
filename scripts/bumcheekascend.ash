@@ -1171,7 +1171,18 @@ string bumRunCombat(string consult) {
 		adv1($location[noob cave], -1, "consultCasual");
 	}*/
 	print("BCC: Run_Combat() being used normally.", "purple");
-	string str = to_string(visit_url("fight.php?action=macro&macrotext=&whichmacro=106733&macro=Execute+Macro"));
+	string str;
+	switch(my_name())
+	{
+		case "twistedmage":
+			str = to_string(visit_url("fight.php?action=macro&macrotext=&whichmacro=106733&macro=Execute+Macro"));
+		break;
+		case "anid":
+			str = to_string(visit_url("fight.php?action=macro&macrotext=&whichmacro=107718&macro=Execute+Macro"));
+		break;
+		default:
+			abort("unrecognised player "+my_name());
+	}
 	if(contains_text(str,"Macro Aborted")) abort("Seems like macro failed");
 	return str;
 }
