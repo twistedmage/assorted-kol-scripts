@@ -103,7 +103,7 @@ use confiscator buff items
 	confiscated cell phone - myst
 	confiscated love note - moxie
 update helper.ash with new skills (saucemaven, pizza lover etc)
-mood includes new buffs (grease up, icy glare)
+mood includes new buffs (grease up)
 manor quest better, resistance in kitchen etc
 using banish gear? cheese eye, vivala
 am i wasting fury and not getting passives + batter up
