@@ -2567,7 +2567,7 @@ void defaultMood(boolean castMojo) {
 		use_skill(1,$skill[grab a cold one]);
 	
 	//summon a knife
-	if(have_skill($skill[That's not a knife]))
+	if(have_skill($skill[That's not a knife]) && !get_property("_discoKnife").to_boolean())
 	{		
 		if(my_level()>=11 && available_amount($item[soap knife])<1) //11+
 			use_skill(1,$skill[That's not a knife]);
@@ -9649,6 +9649,8 @@ boolean bcascPirateFledges() {
 			
 			//Now, we'll have the blueprints, so we'll need to make sure we have 8 insults before using them. 
 			while (numPirateInsults() < 6) {
+				if(i_a("the big book of pirate insults")==0 && i_a("massive manual of marauder mockery")==0)
+					abort("Trying to get insults without book");
 				print("BCC: Adventuring one turn at a time to get 6 insults. Currently, we have "+numPirateInsults()+" insults.", "purple");
 				if (my_adventures() == 0)
 				{
