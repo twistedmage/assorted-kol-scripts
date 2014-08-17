@@ -3946,7 +3946,7 @@ void setMood(string combat) {
 		return;
 	}
 
-	if(my_path()=="KOLHS" && (get_property("yearbookCameraPending")!="true" || get_property("_yearbookCameraTarget")==""))
+	if(my_path()=="KOLHS" && get_property("_kolhsAdventures").to_int()>=40 && (get_property("yearbookCameraPending")!="true" || get_property("_yearbookCameraTarget")==""))
 		abort("Need to do the yearbook thing!");
 
 	cli_execute("mood bumcheekascend");
@@ -5982,6 +5982,10 @@ boolean bcascChasm() {
 			max_str+=", +equip loadstone";
 		if(i_a("logging hatchet")>0)
 			max_str+=", +equip logging hatchet";
+		if(my_primestat()==$stat[muscle])
+			max_str+=", +melee";
+		else if(my_primestat()==$stat[moxie])
+			max_str+=", -melee";
 		buMax(max_str);
 		setFamiliar("items");
 		setMood("i");
