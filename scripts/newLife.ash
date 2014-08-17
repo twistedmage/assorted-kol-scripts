@@ -445,6 +445,7 @@ void equip_stuff() {
 		gear+= " -hat";
 	//SIMON ADDED item bonus
 	gear +=", 0.2 items";
+	print("maximize "+gear,"green");
 	maximize(gear, false);
 }
 
@@ -675,10 +676,7 @@ void special(boolean bonus_actions) {
 				pull_and_wear_if_good($item[buddy bjorn]);
 				if(good("el vibrato Megadrone"))
 				{
-					//cli_execute("enthrone El Vibrato Megadrone");
-					
-					visit_url("familiar.php?showback=1");
-					visit_url("familiar.php?&action=backpack&famid=81&pwd");
+					cli_execute("bjornify El Vibrato Megadrone");
 					
 					
 	//				else if(good("Li'l Xenomorph"))

@@ -96,9 +96,9 @@ void advise_pulls(string woods_string)
 	if(can_interact() || in_hardcore())
 		return;
 	print("--- Consider Pulling (after consumables)---","");
-	if(available_amount($item[glass of goats milk])<1 && available_amount($item[milk of magnesium])<1 && my_fullness()< fullness_limit())
+	if(available_amount($item[glass of goat's milk])<1 && available_amount($item[milk of magnesium])<1 && my_fullness()< fullness_limit())
 		print("milk of magnesium","");
-	if(my_path()=="Avatar of Boris" && available_amount($item[mr accessory jr])<3)
+	if(my_path()=="Avatar of Boris" && available_amount($item[mr. accessory jr.])<3)
 		print("mr accessory jr.","");
 	if(!have_skill($skill[inigo's incantation of inspiration]) && ((have_skill($skill[advanced cocktailcrafting]) && !simons_have_bartender() && can_drink())))
 		print("bartender in the box","");
@@ -106,8 +106,8 @@ void advise_pulls(string woods_string)
 		print("chef in the box","");
 //	if(available_amount($item[ring of conflict])<1)
 //		print("ring of conflict (req 25 mys)","");
-	if(my_path()=="Avatar of Boris" && available_amount($item[bounty hunting helmet])<1)
-		print("bounty hunting helmet (req 25 mox)","");
+	if(my_path()=="Avatar of Boris" && available_amount($item[bounty-hunting helmet])<1)
+		print("bounty-hunting helmet (req 25 mox)","");
 	if(my_path()=="Avatar of Boris" && available_amount($item[spooky putty mitre])<1)
 		print("spooky putty mitre","");
 	if(available_amount($item[stinky cheese eye])<1 && available_amount($item[stinky cheese diaper])<1)
@@ -116,9 +116,9 @@ void advise_pulls(string woods_string)
 //		print("monster bait (req 0)","");
 //	if(available_amount($item[hockey stick of furious angry rage])<1)
 //		print("hockey stick (req 35 mys)","");
-	if(available_amount($item[spooky gro fertilizer])<1 && !contains_text(woods_string,"hiddencity.gif") && !contains_text(woods_string,"temple.gif"))
-		print("spooky gro fertilizer","");
-	if(!have_outfit("swashbuckling getup") && available_amount($item[pirate fledges])<1 && available_amount($item[big book of pirate insults])<1)
+	if(available_amount($item[spooky-gro fertilizer])<1 && !contains_text(woods_string,"hiddencity.gif") && !contains_text(woods_string,"temple.gif"))
+		print("spooky-gro fertilizer","");
+	if(!have_outfit("swashbuckling getup") && available_amount($item[pirate fledges])<1 && available_amount($item[the big book of pirate insults])<1)
 		print("pirate insults book","");
 	if(available_amount($item[wet stunt nut stew])<1 && available_amount($item[mega gem])<1)
 	{
@@ -138,12 +138,12 @@ void advise_pulls(string woods_string)
 	}
 	if(available_amount($item[ketchup hound])<1)
 		print("ketchup hound","");
-	if(available_amount($item[drum machine])<1 && available_amount($item[worm riding hooks])<1)
+	if(available_amount($item[drum machine])<1 && available_amount($item[worm-riding hooks])<1)
 		print("drum machine","");
 //	if(available_amount($item[bag o' tricks])<1)
 //		print("bag o' tricks for buffs","");
-	if(available_amount($item[Micks icyvapohotness inhaler])<1)
-		print("Micks icyvapohotness inhaler","");
+	if(available_amount($item[Mick's IcyVapoHotness Inhaler])<1)
+		print("Mick's IcyVapoHotness Inhaler","");
 	if(available_amount($item[cyclops eyedrops])<1)
 		print("cyclops eyedrops","");
 	print("Tower items","");
@@ -206,7 +206,7 @@ void advise_fax(string completed_log, string manor_string, string manor2_string)
 	if(available_amount($item[spangly sombrero])<1 && my_path() != "Bees Hate You")
 		print("- fax + yellow ray sleepy mariachi, for sexy gear (safemox=118).","maroon");
 		
-	if(my_path()!="Bees hate you" && my_level()<6 && available_amount($item[glass of goats milk])<1 && available_amount($item[milk of magnesium])<1)
+	if(my_path()!="Bees hate you" && my_level()<6 && available_amount($item[glass of goat's milk])<1 && available_amount($item[milk of magnesium])<1)
 		print("- Fax (and yellow ray?) dairy goat for milks","maroon");
 	
 	int needed_334=0;
@@ -267,7 +267,7 @@ void add_food(consumable[int] con_map,string text,float avg_adv,int craft_turns,
 	con.fullness=fullness;
 	//account for crafting
 	con.efficiency=con.avg_adv;
-	if(!have_chef() && !(have_skill($skill[inigos incantation of inspiration]) && my_maxmp()>100))
+	if(!have_chef() && !(have_skill($skill[Inigo's Incantation of Inspiration]) && my_maxmp()>100))
 		con.efficiency-=con.craft_turns;
 	con.efficiency/=fullness;
 	//then add it
@@ -291,7 +291,7 @@ void add_drink(consumable[int] con_map,string text,float avg_adv,int craft_turns
 	con.fullness=fullness;
 	//account for crafting
 	con.efficiency=con.avg_adv;
-	if(!have_bartender() && !(have_skill($skill[inigos incantation of inspiration]) && my_maxmp()>100))
+	if(!have_bartender() && !(have_skill($skill[Inigo's Incantation of Inspiration]) && my_maxmp()>100))
 		con.efficiency-=con.craft_turns;
 	con.efficiency/=fullness;
 	//then add it
@@ -337,7 +337,7 @@ void advise_food()
 		{
 			add_food(con_map,"- Moon pie (brought from lunar launch o mat for 100 isotopes) ",30,0,5);
 		}
-		if(available_amount($item[Retenez L'Herbe Pate])>0)
+		if(available_amount($item[Retenez L'Herbe Pat&eacute;])>0)
 		{
 			add_food(con_map,"- Retenez L'Herbe Paté ",16.5,0,3);
 		}
@@ -415,7 +415,7 @@ void advise_food()
 				{
 					add_food(con_map,"-    noodles + mush/saus sauce from knob kitchens (gnoccheti di nietzsche/spaghetti with skullheads) ",24.5,2,6);
 				}
-				if(available_amount($item[bitchin meatcar])>0 && (available_amount($item[marzipan skull])>0 || gnomads_available()))
+				if(available_amount($item[bitchin' meatcar])>0 && (available_amount($item[marzipan skull])>0 || gnomads_available()))
 				{
 					add_food(con_map,"-    noodles + marzipan skullhead sauce (spaghetti con calaveras) ",24,2,6);
 				}
@@ -480,7 +480,7 @@ void advise_food()
 			add_food(con_map,"-    fishy fish (from displaced fish + dehydrated caviar) ",6,0,2);
 		}
 		
-		if((available_amount($item[filet of tangy gnat])!=0 && available_amount($item[ancient spice])!=0) || available_amount($item[gnatloaf])!=0 )
+		if((available_amount($item[filet of tangy gnat (&quot;fotelif&quot;)])!=0 && available_amount($item[ancient spice])!=0) || available_amount($item[gnatloaf])!=0 )
 		{
 			add_food(con_map,"-    gnatload (from filet of gnat + ancient spice) ",6,0,2);
 		}
@@ -527,14 +527,14 @@ void advise_food()
 		if(available_amount($item[nutty organic salad])>0 || (available_amount($item[handful of walnuts])>0 && available_amount($item[mixed wildflower greens])>0))
 			add_food(con_map,"- nutty organic salad (handful of walnuts + mixed wildflower greens) ",13.5,0,3);
 			
-		if(available_amount($item[super kabob])>0 || (available_amount($item[knob ka-bob])>0 && available_amount($item[frat brats])>0))
-			add_food(con_map,"- super kabob (knob ka-bob + frat brats) ",13.5,0,3);
+		if(available_amount($item[super ka-bob])>0 || (available_amount($item[knob ka-bobs])>0 && available_amount($item[frat brats])>0))
+			add_food(con_map,"- super ka-bob (knob ka-bobs + frat brats) ",13.5,0,3);
 			
-		if(available_amount($item[genalen bottle])>0 || available_amount($item[handful of walnuts])>0 || available_amount($item[mixed wildflower greens])>0)
+		if(available_amount($item[Genalen&trade; Bottle])>0 || available_amount($item[handful of walnuts])>0 || available_amount($item[mixed wildflower greens])>0)
 			add_food(con_map,"- Basic hippy food (genalen/wildflower greens/handful of walnuts ",3,0,1);
 			
-		if(available_amount($item[brain meltingly hot chicken wings])>0 || available_amount($item[Frat brats])>0 || available_amount($item[knob ka-bobs])>0)
-			add_food(con_map,"- Basic frat food (brain meltingly hot chicken wings/Frat brats/knob ka-bobs ",3,0,1);
+		if(available_amount($item[brain-meltingly-hot chicken wings])>0 || available_amount($item[Frat brats])>0 || available_amount($item[knob ka-bobs])>0)
+			add_food(con_map,"- Basic frat food (brain-meltingly-hot chicken wings/Frat brats/knob ka-bobs ",3,0,1);
 		
 		if(my_level()>3)
 		{
@@ -548,7 +548,7 @@ void advise_food()
 		{
 			add_food(con_map,"-    pizza + mush/saus from knob kitchens ",6.5,0,3);
 		}
-		if(available_amount($item[wizards shack snack voucher])>0 || get_property("grimoire3Summons").to_int()==0 && my_path()!="Avatar of Boris")
+		if(available_amount($item[Ye Wizard's Shack snack voucher])>0 || get_property("grimoire3Summons").to_int()==0 && my_path()!="Avatar of Boris")
 		{
 			add_food(con_map,"- Pocky from wizard shack (gives 30 turn damage buff. tobiko=spells, wasabi=weapons) ",6.5,0,3);
 		}
@@ -574,7 +574,7 @@ void advise_food()
 			add_food(con_map,"- corned-beef Reuben ",12.5,0,3);
 		if(available_amount($item[Club sandwich])>0)
 			add_food(con_map,"- Club sandwich ",9.5,0,3);
-		if(available_amount($item[PB&amp;BP])>0)
+		if(available_amount($item[PB&BP])>0)
 			add_food(con_map,"- PB&BP ",7,0,3);
 		if(available_amount($item[Taco Dan's Taco Stand Taco])>0)
 			add_food(con_map,"- Taco Dan's Taco Stand Taco ",2.5,0,1);
@@ -632,15 +632,15 @@ void advise_food()
 			add_food(con_map,"- *** spaghetti breakfast (prefer to eat at higher levels, but must be first food of the day)",0.5 + 0.5 * my_level(),0,1);
 		
 		
-		if(available_amount($item[Snow berries]) + available_amount($item[ice harvest])>0)
-			add_food(con_map,"- Snow berries/Ice harvest ",2.5,0,1);
-		if(available_amount($item[Snow berries])>2)
+		if(available_amount($item[Snow berries])>0 && (to_int(get_property("chasmBridgeProgress")) >= 30) && my_level()>=8)
+			add_food(con_map,"- Snow berries ",2.5,0,1);
+		if(available_amount($item[ice harvest])>0 && checkStage("bats1", false))
+			add_food(con_map,"- Ice harvest ",2.5,0,1);
+		if(available_amount($item[Snow berries])>2 && (to_int(get_property("chasmBridgeProgress")) >= 30) && my_level()>=8)
 			add_food(con_map,"- Snow crab ",6,0,1);
 	
-	//	if(i_a("handful of smithereens")>0  || i_a("miserable pie")>0 || get_property("tomeSummons").to_int()<3)
-	//		add_food(con_map,"- miserable pie (smithereens) ",7,0,2);
 		if(i_a("handful of smithereens")>0  || i_a("this charming flan")>0 || get_property("tomeSummons").to_int()<3)
-			add_food(con_map,"- miserable pie (smithereens) ",11,0,2);
+			add_food(con_map,"- this charming flan (smithereens) ",11,0,2);
 			
 		if(available_amount($item[tea for one])>0)
 			add_food(con_map,"- tea for one ",2.5,0,1);
@@ -648,6 +648,27 @@ void advise_food()
 			add_food(con_map,"- Custard pie ",8,0,3);
 		if(available_amount($item[Candy carrot])>0)
 			add_food(con_map,"- Candy carrot cake ",16,1,4);
+
+		if(available_amount($item[Tofurkey nugget])>0)
+			add_food(con_map,"- Tofurkey nugget ",7.5,0,3);
+		if(available_amount($item[Packet of tofurkey gravy])>0)
+			add_food(con_map,"- Packet of tofurkey gravy ",5,0,2);
+		if(available_amount($item[Tofurkey gravy])>0)
+			add_food(con_map,"- Tofurkey gravy ",6.5,0,2);
+		if(available_amount($item[Tofurkey leg])>0)
+			add_food(con_map,"- Tofurkey leg ",10.5,0,3);
+		if(available_amount($item[Tube of cranberry Go-Goo])>0)
+			add_food(con_map,"- Tube of cranberry Go-Goo ",10.5,0,3);
+		if(available_amount($item[Can-shaped gelatinous cranberry sauce])>0)
+			add_food(con_map,"- Can-shaped gelatinous cranberry sauce ",13,0,3);
+		if(available_amount($item[Single-serving herbal stuffing])>0)
+			add_food(con_map,"- Single-serving herbal stuffing ",14,0,4);
+		if(available_amount($item[Herbal stuffing])>0)
+			add_food(con_map,"- Herbal stuffing ",18,0,4);
+
+
+		if(available_amount($item[magicberry tablets])>0)
+			print("**Maybe use magicberry tablets before eating!**","purple");
 	}
 	
 	//sort map
@@ -685,8 +706,8 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 		if(available_amount($item[distilled fortified wine])>0 || (available_amount($item[thermos full of knob coffee])>0 && bees_ok))
 			add_drink(con_map,"Semi-rare (distilled fortified wine/thermos full of knob coffee) ",5.5,0,1);
 		
-		if(available_amount($item[bottle of single barrel whiskey])>0 || (available_amount($item[thermos full of knob coffee])>0 && bees_ok))
-			add_drink(con_map,"Bottle of single barrel whiskey",16.5,0,3);
+		if(available_amount($item[bottle of single-barrel whiskey])>0 || (available_amount($item[thermos full of knob coffee])>0 && bees_ok))
+			add_drink(con_map,"bottle of single-barrel whiskey",16.5,0,3);
 			
 		if(my_path() != "Bees Hate You" && available_amount($item[filthy lucre])>0)
 			add_drink(con_map,"- Oreille Divisée brandy from bounty hunter ",13.5,0,3);
@@ -724,8 +745,8 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 		if((have_outfit("swashbuckling outfit") || available_amount($item[pirate fledges])>0) && (available_amount($item[shot of rotgut])>0 || available_amount($item[cream stout])>0))
 			add_drink(con_map,"- shot of rotgut from barrneys bar or cream stout from f'c'le ",2.5,0,1);
 		
-		if(my_level()>4 && available_amount($item[knob wurstbrau])>0)
-			add_drink(con_map,"- cobb's knob wurstbrau from guards in cobbs knob barracks ",2.5,0,1);
+		if(my_level()>4 && available_amount($item[Cobb's Knob Wurstbrau])>0)
+			add_drink(con_map,"- cobb's Cobb's Knob Wurstbrau from guards in cobbs knob barracks ",2.5,0,1);
 		
 		if(available_amount($item[handful of honey])>4 || available_amount($item[honey mead])>0)
 			add_drink(con_map,"- Honey mead  (made with 4 handful of honey) ",5,0,2);
@@ -736,7 +757,7 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 		if(available_amount($item[cherry])>0 || available_amount($item[lime])>0 || available_amount($item[jumbo olive])>0)
 			add_drink(con_map,"- fruit golem fruits (cherry/lime/jumbo olive) + spirits ",7.5,0,3);
 		
-		if((available_amount($item[wizards shack snack voucher])>0 || get_property("grimoire3Summons").to_int()==0) && my_path()!="Avatar of Boris")
+		if((available_amount($item[Ye Wizard's Shack snack voucher])>0 || get_property("grimoire3Summons").to_int()==0) && my_path()!="Avatar of Boris")
 		{
 			add_drink(con_map,"- Sake from wizard shack (gives 30 turn damage buff. tobiko=spells, natto=weapons) ",7,0,3);
 		}
@@ -752,8 +773,8 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 		
 		if(available_amount($item[Water purification pills])>0)
 			add_drink(con_map,"- Water purification pills ",6,0,3);
-		if(available_amount($item[CSA scoutmaster's water])>0)
-			add_drink(con_map,"- CSA scoutmaster's water ",9,0,3);
+		if(available_amount($item[CSA scoutmaster's &quot;water&quot;])>0)
+			add_drink(con_map,"- CSA scoutmaster's &quot;water&quot; ",9,0,3);
 		if(available_amount($item[CSA cheerfulness ration])>0)
 			add_drink(con_map,"- CSA cheerfulness ration ",4,0,1);
 		if(available_amount($item[peppermint sprout])>0)
@@ -769,8 +790,8 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 		if(available_amount($item[pan-dimensional gargle blaster])>0)
 			add_drink(con_map,"- pan-dimensional gargle blaster ",25,0,5);
 			
-		if(my_primestat()==$stat[muscle] && ((available_amount($item[handful of barley])>0 && available_amount($item[cluster of hops])>0) || available_amount($item[can of brutalbrau])>0))
-			add_drink(con_map,"- can of brutalbrau ",6,0,1);
+		if(my_primestat()==$stat[muscle] && ((available_amount($item[handful of barley])>0 && available_amount($item[cluster of hops])>0) || available_amount($item[can of Br&uuml;talbr&auml;u])>0))
+			add_drink(con_map,"- can of Br&uuml;talbr&auml;u ",6,0,1);
 		if(my_primestat()==$stat[mysticality] && ((available_amount($item[handful of barley])>0 && available_amount($item[cluster of hops])>0) || available_amount($item[can of drooling monk])>0))
 			add_drink(con_map,"- can of drooling monk ",6,0,1);
 		if(my_primestat()==$stat[moxie] && ((available_amount($item[handful of barley])>0 && available_amount($item[cluster of hops])>0) || available_amount($item[can of impetuous scofflaw])>0))
@@ -794,7 +815,7 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 		if(available_amount($item[cold one])>0 || (have_skill($skill[grab a cold one]) && !get_property("_coldOne").to_boolean()))
 			add_drink(con_map,"- cold one (prefer to drink at higher levels)",6,0,1);
 		if(i_a("handful of smithereens")>0  || i_a("Paint A Vulgar Pitcher")>0 || get_property("tomeSummons").to_int()<3)
-			add_drink(con_map,"- Paint A Vulgar Pitcher (smithereens) ",12,0,2);
+			add_drink(con_map,"- Paint A Vulgar Pitcher (smithereens) ",11,0,2);
 			
 		if(available_amount($item[Snow berries])>0 && available_amount($item[ice harvest])>2)
 			add_drink(con_map,"- Ice Island Long Tea ",6,0,1);
@@ -806,7 +827,7 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 			add_drink(con_map,"-Flamin' Whatshisname ",6,0,2);
 			
 		if(available_amount($item[Bottle of Evermore])>0)
-			add_drink(con_map,"-Bottle of Evermore ",6,0,3
+			add_drink(con_map,"-Bottle of Evermore ",6,0,3);
 			
 		if(available_amount($item[red rum])>0)
 			add_drink(con_map,"- make a murderers punch from red rum and orange",9,1,3);
@@ -847,7 +868,7 @@ void advise_spleen()
 		{
 			print("- Fill up with wads from pulverizing (1.0)","gray");
 		}
-		if(i_a("handful of smithereens")>0  || i_a("Paint A Vulgar Pitcher")>0 || get_property("tomeSummons").to_int()<3)
+		if(i_a("handful of smithereens")>0  || get_property("tomeSummons").to_int()<3)
 			print("- handfuls of smithereens (1.5)","gray");
 	}
 }
@@ -1035,7 +1056,7 @@ void advise_summon()
 			if(available_amount($item[frosty halo])<1)
 				print("-    frost halo +25% items (donut,snow,snow)","black");
 		}
-		if(my_path()!="Way of the Surprising Fist" && (available_amount($item[unicorn sticker])<3 || available_amount($item[UPC sticker])<3))
+		if(my_path()!="Way of the Surprising Fist" && (available_amount($item[scratch 'n' sniff unicorn sticker])<3 || available_amount($item[scratch 'n' sniff upc sticker])<3))
 		{
 			print("-    summon stickers","black");
 		}
@@ -1067,7 +1088,7 @@ void advise_main_goal()
 		print("- Level 6, Friars Quest, Azazel in hell. For steel organ.","lime");
 		return;
 	}
-	if(available_amount($item[glass of goats milk])<1 && available_amount($item[milk of magnesium])<1)
+	if(available_amount($item[glass of goat's milk])<1 && available_amount($item[milk of magnesium])<1)
 	{
 		print("- Level 8, Mining outfit + mine ore, Farm goatlet for goats milk to make milk of magnesium.","lime");
 		return;
@@ -1641,7 +1662,7 @@ void main()
 			print("- Pull insults book and collect insults.","green");
 		suggest_fam("items", -1);
 	}
-	if(have_outfit("swashbuckling getup") && ((available_amount($item[abridged dictionary])<1 && available_amount($item[bridge])<1 && !check_page("mountains.php","valley2.gif")) || (available_amount($item[The Big Book of Pirate Insults])<1 && available_amount($item[Massive Manual of Marauder Mockery])<1) ))
+	if(have_outfit("swashbuckling getup") && ((available_amount($item[abridged dictionary])<1 && available_amount($item[bridge])<1 && !check_page("mountains.php","valley2.gif")) || (available_amount($item[The the big book of pirate insults])<1 && available_amount($item[Massive Manual of Marauder Mockery])<1) ))
 	{
 		print("- Buy dictionary/insults at pirate store.","green");
 	}
@@ -1962,7 +1983,7 @@ void main()
 	}
 	if(available_amount($item[worm-riding hooks])>0)
 	{
-		print("- equip worm riding hooks and use drum machine.","green");
+		print("- equip worm-riding hooks and use drum machine.","green");
 	}
 	if(contains_text(beach_string,"desert.gif")  && available_amount($item[bronzed locust])<1 && contains_text(telescope,"amber waves of grain"))
 	{

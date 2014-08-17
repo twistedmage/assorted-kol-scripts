@@ -6,9 +6,6 @@ if monstername mer-kin drifter && !haseffect Everything Looks Yellow
 	use pulled yellow taffy
 endif
 use mer-kin killscroll
-if match "<b>"
-	abort "Note the religious word"
-endif
 while !missed 2
 	attack
 endwhile

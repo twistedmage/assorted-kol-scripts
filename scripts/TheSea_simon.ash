@@ -75,7 +75,8 @@ void prepare_for(string type,location loc)
 			if(i_a("Mer-kin worktea")<1)
 				buy(1,$item[Mer-kin worktea]);
 			GetSushiMat();
-			cli_execute("create bento box");
+			//cli_execute("create bento box");
+			abort("PLEASE CREATE A BENTO BOX (\"create bento box\" seems to be broken)");
 		}
 		else if(inebriety_limit() - my_inebriety() > 2)
 		{
@@ -377,7 +378,7 @@ boolean solveHatred(boolean scrolling)
 
 void prepHatred()
 {
-	print("Preparing for the big fight!");
+	print("Preparing for the big fight!","blue");
 	set_combat_macro_name(false);
 	cli_execute("familiar squamous");
 	//reduce hp
@@ -398,17 +399,17 @@ void prepHatred()
 	switch (my_primestat())
 	{
 		case $stat[Muscle]:
-			maximize("sea, outfit mer-kin scholar, -acc1, -acc2, -acc3, -1000 hp, mainstat, +melee, +shield, 100 elemental damage", false);
+			maximize("sea, outfit mer-kin scholar, -acc1, -acc2, -acc3, -10 hp, 0.1 mainstat, +melee, +shield, elemental damage, -equip buddy bjorn", false);
 			break;
 		case $stat[Mysticality]:
-			maximize("sea, outfit mer-kin scholar, -acc1, -acc2, -acc3, -1000 hp, mainstat, spell damage", false);
+			maximize("sea, outfit mer-kin scholar, -acc1, -acc2, -acc3, -10 hp, 0.1 mainstat, 0.1 spell damage, -equip buddy bjorn", false);
 			break;
 		case $stat[Moxie]:
-			maximize("sea, outfit mer-kin scholar, -acc1, -acc2, -acc3, -1000 hp, mainstat, -melee, 100 elemental damage", false);
+			maximize("sea, outfit mer-kin scholar, -acc1, -acc2, -acc3, -10 hp, 0.1 mainstat, -melee, elemental damage, -equip buddy bjorn", false);
 			break;
 	}
 	cli_execute("restore hp");
-	print("Now go and prosper greatly!");
+	print("Now go and prosper greatly!","blue");
 }
 
 void smiteHatred()
@@ -1538,16 +1539,16 @@ void main()
 				avail2 = available_amount($item[scepter of loathing]);
 				avail3 = available_amount($item[girdle of hatred]);
 				avail4 = available_amount($item[belt of loathing]);
-				if (avail1 + avail2 < 2) route = "scholar";
-				else if (avail3 + avail4<3) route = "gladiator";
+				if (avail1 + avail2 < 2) route = "gladiator";
+				else if (avail3 + avail4<3) route = "scholar";
 				break;
 			case $class[pastamancer]:
 				avail1 = available_amount($item[novelty belt buckle of violence]);
 				avail2 = available_amount($item[belt of loathing]);
-				avail3 = available_amount($item[staff of simmering hatred]);
-				avail4 = available_amount($item[stick-knife of loathing]);
+				avail3 = available_amount($item[staff of simmering hatred]); //1
+				avail4 = available_amount($item[stick-knife of loathing]); //3
 				if (avail1 + avail2 < 2) route = "gladiator";
-				else if (avail3 + avail4 < 2) route = "scholar";
+				else if (avail3 + avail4 < 4) route = "scholar";
 				break;
 			case $class[sauceror]:
 				avail1 = available_amount($item[lens of violence]);
@@ -1578,7 +1579,7 @@ void main()
 		}
 		if(route=="")
 		{
-			if(user_confirm("Couldn't find a useful path to take. Do you want to take the \"dad\" path this time?"))
+			if(user_confirm("Couldn't find a useful path to take. Do you want to take the \"dad\" path this time (probably no point since you have clothing of loathing)?"))
 			{
 				route="dad";
 			}

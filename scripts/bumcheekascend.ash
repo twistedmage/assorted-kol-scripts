@@ -363,6 +363,28 @@ void set_combat_macro()
 		set_combat_macro(false);
 }
 
+void get_dungeon_kit()
+{
+	//only do it in ronin, or we'll waste any we have saved
+	if(!can_interact())
+	{
+		while(i_a("GameInformPowerDailyPro magazine")>0)
+		{
+			int num_kits = i_a("dungeoneering kit");
+			//use it
+			string str=visit_url("inv_use.php?pwd&which=3&whichitem=6174");
+			str=visit_url("inv_use.php?pwd&confirm=Yep.&whichitem=6174");
+			//now adv in dungeon for kit
+			cli_execute("mood clear"); //no need to fire mood when we won't spend an adv
+			adv1($location[Video Game Level 1],0,"");
+			if(i_a("dungeoneering kit") != (num_kits+1))
+				abort("Seems to have failed, went from "+num_kits.to_string()+" to "+i_a("dungeoneering kit").to_string());
+		}
+		//got all the kits we can, now use them
+		cli_execute("use * dungeoneering kit");
+	}
+}
+
 void vamp_out()
 {
 	print("Checking vamping","lime");
@@ -1090,7 +1112,14 @@ boolean buMax(string maxme, int maxMainstat) {
 	cli_execute(max_str);
 	return true;
 }
-boolean buMax(string maxme) { return buMax(maxme, 999999999); }
+boolean buMax(string maxme)
+{
+	boolean out= buMax(maxme, 999999999);
+	//SIMON added to prevent messing with bjorn
+	if(equipped_amount($item[buddy bjorn])>0)
+		cli_execute("bjornify El Vibrato Megadrone");
+	return out;
+}
 boolean buMax() { return buMax(""); }
 
 //This is just a glorified wrapper for adventure()
@@ -2534,7 +2563,7 @@ void defaultMood(boolean castMojo) {
 	//summon dreadsylvania food and booze
 	if(have_skill($skill[spaghetti breakfast]) && !get_property("_spaghettiBreakfast").to_boolean())
 		use_skill(1,$skill[spaghetti breakfast]);
-	if(have_skill($skill[grab a cold one]) && !get_property("_coldOne").to_boolean())
+	if(have_skill($skill[grab a cold one]) && !get_property("_coldOne").to_boolean() && my_path()!="Avatar of Jarlsberg" && my_path()!="KOLHS")
 		use_skill(1,$skill[grab a cold one]);
 	
 	//summon a knife
@@ -2570,8 +2599,12 @@ void defaultMood(boolean castMojo) {
 		use(1,$item[Effermint&trade; tablets]);
 	if(i_a("Ogres and Oubliettes&trade; module")>0 && have_effect($effect[Ogred and Oublietted])==0)
 		use(1,$item[Ogres and Oubliettes&trade; module]);
+
+	//it's wimpy (unless low llevel) but might as well use it
+	if(i_a("scroll of Puddingskin")>0 && have_effect($effect[Puddingskin])==0)
+		use(1,$item[scroll of Puddingskin]);
 		
-	//random pant item buffs
+	//random pantsgiving item buffs
 	if(i_a("Gym membership card")>0)
 		use(1,$item[Gym membership card]);
 	if(i_a("Old candy wrapper")>0 && have_effect($effect[litterbug])==0)
@@ -3548,19 +3581,19 @@ boolean innerSetFamiliar(string famtype) {
 		}
 	}
 	
-	//if we still need a psycho jar
-	if(get_property("_jungDrops")==0 && have_path_familiar($familiar[angry jung man]))
-	{
-		use_familiar($familiar[angry jung man]);
-		return true;
-	}
-	
 	//try for crayon shavings for bugbears
 	if(my_path()=="Bugbear Invasion" && to_int(get_property("_hipsterAdv"))< 7)
 	{
 		use_familiar(to_familiar("artistic goth kid"));
 		return true;
 	}		
+	
+	//if we still need a psycho jar
+/*	if(get_property("_jungDrops")==0 && have_path_familiar($familiar[angry jung man]))
+	{
+		use_familiar($familiar[angry jung man]);
+		return true;
+	}*/
 	
 	//If we set a familiar as default, use it. 
 	if (get_property("bcasc_defaultFamiliar") != "") {
@@ -3913,9 +3946,26 @@ void setMood(string combat) {
 		return;
 	}
 
+	if(my_path()=="KOLHS" && (get_property("yearbookCameraPending")!="true" || get_property("_yearbookCameraTarget")==""))
+		abort("Need to do the yearbook thing!");
+
 	cli_execute("mood bumcheekascend");
 	cli_execute("mood clear");
 	defaultMood(combat == "");
+
+
+
+	//use heavy rains buff items
+	if(my_path()=="Heavy Rains")
+	{
+		//stop items washing away
+		if(contains_text(combat,"i") && i_a("catfish whiskers")>0 && have_effect($effect[Fishy Whiskers])==0)
+			use(1,$item[catfish whiskers]);
+		//init to help fighting
+		if(i_a("gourmet gourami oil")>0 && have_effect($effect[Fishy\, Oily])==0)
+			use(1,$item[gourmet gourami oil]);
+	}
+
 	//SIMON CHANGED
 	if (my_path() != "Avatar of Boris" && my_path() != "Zombie Slayer" && my_path() !="Avatar of Jarlsberg" && my_path() != "Avatar of Sneaky Pete") {
 		print("setting normal paths mood","lime");
@@ -3935,7 +3985,7 @@ void setMood(string combat) {
 				cli_execute("trigger gain_effect, Carlweather's Cantata of Confrontation, uneffect Carlweather's Cantata of Confrontation");
 
 				//if we dont need any more snow boards, use them for -combat
-				if(i_a("snow berries")>0 && (to_int(get_property("chasmBridgeProgress")) >= 30))
+				if(i_a("snow berries")>0 && (to_int(get_property("chasmBridgeProgress")) >= 30) && my_level()>=8)
 				{
 					if(have_effect($effect[snow shoes])==0)
 					{
@@ -4121,23 +4171,6 @@ void setMood(string combat) {
 					use_skill($skill[Bind Penne Dreadful]);
 			}
 		}
-		else
-		{		
-/*			if (contains_text(combat,"i") && have_skill($skill[Bind Spice Ghost]) && my_maxmp()>=250 && my_meat()>1000) //item drops
-				cli_execute("trigger lose_effect, Spice Haze, cast 1 Bind Spice Ghost");
-			else */if (contains_text(combat,"m") && have_skill($skill[Bind Lasagmbie])) //meat
-				cli_execute("trigger lose_effect, Pasta Eyeball, cast 1 Bind Lasagmbie");
-			else if (contains_text(combat,"n") && have_skill($skill[Bind Angel Hair Wisp])) //initiative
-				cli_execute("trigger lose_effect, whispering strands, cast 1 Bind Angel Hair Wisp");
-			else if (my_primestat()==$stat[muscle] && have_skill($skill[Bind Undead Elbow Macaroni])) //muscle
-				cli_execute("trigger lose_effect, Macaroni Coating, cast 1 Bind Undead Elbow Macaroni");
-			else if (have_skill($skill[Bind Penne Dreadful])) //mox
-				cli_execute("trigger lose_effect, Penne Fedora, cast 1 Bind Penne Dreadful");
-			else if (have_skill($skill[Bind Vampieroghi])) //hp regen
-				cli_execute("trigger lose_effect, bloody potato bits, cast 1 Bind Vampieroghi");
-			else if (have_skill($skill[Bind Vermincelli])) //max mp
-				cli_execute("trigger lose_effect, stinking noodle glob, cast 1 Bind Vermincelli");
-		}
 		
 		//level up the thrall
 		if(my_class()==$class[pastamancer])
@@ -4159,7 +4192,7 @@ void setMood(string combat) {
 		if(contains_text(combat,"n") && have_skill($skill[Soul Saucery]))
 			cli_execute("trigger lose_effect, soulerskates, ash if(my_soulsauce() >= 25){cli_execute(\"cast 1 Soul Rotation\");}");
 		
-		if(have_skill($skill[Soul Saucery])) //if we get full, burn some off
+		if(my_class()==$class[sauceror] && have_skill($skill[Soul Saucery])) //if we get full, burn some off
 			cli_execute("trigger lose_effect, Soul Funk, ash if(my_soulsauce() >= 100){cli_execute(\"cast 1 Soul Funk\");}");
 			
 	} else if(my_path() == "Avatar of Boris"){
@@ -4294,7 +4327,7 @@ void setMood(string combat) {
 		if (i_a("resolution: be happier") > 0) cli_execute("trigger unconditional, ,ashq if(item_amount($item[resolution: be happier]) > 0 && have_effect($effect[Joyful Resolve]) <= 1) {use(1, $item[resolution: be happier]);}");
 		if (i_a("blue snowcone") > 0) cli_execute("trigger unconditional, ,ashq if(item_amount($item[blue snowcone]) > 0 && have_effect($effect[blue tongue]) <= 1 && have_effect($effect[red tongue]) == 0) {use(1, $item[blue snowcone]);}");
 		if (have_skill($skill[Empathy of the Newt]) && my_maxmp() > mp_cost($skill[Empathy of the Newt]) * 2 && have_castitems($class[turtle tamer], true)) cli_execute("trigger lose_effect, Empathy, cast 1 Empathy of the Newt");
-		if (i_a("green candy hear") > 0) cli_execute("trigger unconditional, ,ashq if(item_amount($item[green candy heart]) > 0 && have_effect($effect[Heart of Green]) <= 1) {use(1, $item[green candy heart]);}");
+		if (i_a("green candy heart") > 0) cli_execute("trigger unconditional, ,ashq if(item_amount($item[green candy heart]) > 0 && have_effect($effect[Heart of Green]) <= 1) {use(1, $item[green candy heart]);}");
 		get_kolhs_buff("items");
 	}
 	
@@ -5367,7 +5400,7 @@ boolean bcascBats2() {
 		}
 		
 		if (canMCD()) cli_execute("mcd 4");
-		bumAdv($location[The Boss Bat's Lair], "", "meatbossbat", "1 Boss Bat bandana", "WTFPWNing the Boss Bat", "m");
+		bumAdv($location[The Boss Bat's Lair], "", "meatbossbat", "1 batskin belt", "WTFPWNing the Boss Bat", "m");
 		visit_url("council.php");
 		set_property("lastCouncilVisit", my_level());
 	}
@@ -5423,7 +5456,7 @@ void bcascBugbearHunt() {
 		if (bcasc_doWarAs == "frat")
 			bumAdv($location[The Hippy Camp (Bombed Back to the Stone Age)], (i_a("bugbear detector") > 0 ? "+equip bugbear detector" : ""), "",  "+" + (9 - to_int(get_property("statusGalley"))) + " BURT", "BCC: Hunting for trendy bugbear chefs.", "");
 		else
-			bumAdv($location[The Frat House (Bombed Back to the Stone Age)], (i_a("bugbear detector") > 0 ? "+equip bugbear detector" : ""), "",  "+" + (9 - to_int(get_property("statusGalley"))) + " BURT", "BCC: Hunting for trendy bugbear chefs.", "");
+			bumAdv($location[The Orcish Frat House (Bombed Back to the Stone Age)], (i_a("bugbear detector") > 0 ? "+equip bugbear detector" : ""), "",  "+" + (9 - to_int(get_property("statusGalley"))) + " BURT", "BCC: Hunting for trendy bugbear chefs.", "");
 	}
 }
 
@@ -5994,6 +6027,8 @@ boolean bcascChasm() {
 		maximize("spooky resistance, cold resistance, " + ((bcasc_100familiar == "" || bcasc_100familiar.to_familiar() == $familiar[Exotic Parrot]) && have_path_familiar($familiar[exotic parrot]) ? "switch exotic parrot" : "") + " -1 tie", false);
 		if (have_effect($effect[elemental saucesphere]) == 0 && have_skill($skill[elemental saucesphere])) use_skill(1, $skill[elemental saucesphere]);
 		if (have_effect($effect[astral shell]) == 0 && have_skill($skill[astral shell]) && have_castitems($class[turtle tamer], true)) use_skill(1, $skill[astral shell]);
+		if (have_effect($effect[Protection from Bad Stuff]) == 0 && available_amount($item[scroll of Protection from Bad Stuff])>0) use(1, $item[scroll of Protection from Bad Stuff]);
+
 		restore_hp(my_maxhp());
 		
 		int expected_boo_damage(int unmodified)
@@ -6672,7 +6707,7 @@ boolean bcascFriarsSteel() {
 		return (have_skill($skill[Liver of Steel]) || have_skill($skill[Spleen of Steel]) || have_skill($skill[Stomach of Steel]));
 	}
 	if (checkStage("friarssteel")) return true;
-	if (can_interact() || get_property("bcasc_skipSteel") == "true") return checkStage("friarssteel", true);
+	if (get_property("bcasc_skipSteel") == "true") return checkStage("friarssteel", true);
 	if (have_steel()) return checkStage("friarssteel", true);
 	if (my_path() == "Avatar of Boris" && (minstrel_instrument() != $item[Clancy's lute] && i_a("Clancy's lute") == 0)) return false;
 
@@ -6721,7 +6756,6 @@ boolean bcascFriarsSteel() {
 	boolean steelDoIt() {
 		if (!can_drink() && !can_eat()) { return use(1,$item[steel-scented air freshener]); }
 		if (!can_drink() || my_path() == "Avatar of Boris" || my_path()=="Zombie Slayer") { return eatsilent(1,$item[steel lasagna]); }
-		if(my_path() == "KOLHS") abort("We shouldnt' be trying to use a steel thing in kolhs?");
 		return overdrink(1,$item[steel margarita]);
 	}
 	//SIMON CHANGEd
@@ -6794,7 +6828,7 @@ boolean bcascFriarsSteel() {
 	
 		//Adventure in Belilafs Comedy Club until you encounter Larry of the Field of Signs. Equip the observational glasses and Talk to Mourn. 
 		print("BCC: Getting Azazel's lollipop", "purple");
-		eat_hot_dog("Video Games Hot dog",$location[The Laugh Floor]);
+		eat_hot_dog("junkyard dog",$location[The Laugh Floor]);
 		while (i_a($item[observational glasses]) == 0) bumAdv($location[The Laugh Floor], "", "items", "1 observational glasses, 5 imp air", "Getting the Observational Glasses", "i");
 		if (my_path() != "Avatar of Boris") cli_execute("unequip weapon");
 		if (my_path() != "Way of the Surprising Fist" && my_path() != "Avatar of Boris") tryThis($item[Victor, the Insult Comic Hellhound Puppet], "insult");
@@ -8372,7 +8406,7 @@ boolean bcascMacguffinPalindome() {
 
 	//Unlock Dr. Awkward
 	if(i_a("I Love Me Vol I")>0)
-		use(1,$item[I Love Me Vol. I]);
+		use(1,$item[&quot;I Love Me\, Vol. I&quot;]);
 
 	//unlock Mr. Alarm
 	buffer palindome;
@@ -8675,6 +8709,7 @@ boolean bcascMacguffinSpooky() {
 				cli_execute("use can of black paint");
 			if(i_a("pec oil")>0 && have_effect($effect[Oiled-Up])<1)
 				cli_execute("use pec oil");
+			if (have_effect($effect[Protection from Bad Stuff]) == 0 && available_amount($item[scroll of Protection from Bad Stuff])>0) use(1, $item[scroll of Protection from Bad Stuff]);
 
 			//try to use gap buff
 			if(available_amount($item[greatest american pants])>0)
@@ -9508,31 +9543,48 @@ boolean bcascPirateFledges() {
 		if (index_of(visit_url("cove.php"), "cove3_3x1b.gif") == -1) {
 			//put away insult book
 			if(i_a("big book of pirate insults")>1)
+			{
 				cli_execute("closet put big book of pirate insults");
+			}
 			if(i_a("massive manual of marauder mockery")>1)
+			{
 				cli_execute("closet put massive manual of marauder mockery");
+			}
 			
 			string maxstr;
 			if(my_path() != "Avatar of Boris")
 			{
 				maxstr="+outfit swashbuckling getup";
-				//try to make a light and add it to maxstr
-				if(i_a("A Light that Never Goes Out")<1 && have_skill($skill[summon smithsness]))
-				{
-					if(i_a("brituminous coal")==0)
-						use_skill(1,$skill[summon smithsness]);
-					cli_execute("create a light that never goes out");
-				}
-				if(i_a("A Light that Never Goes Out")<1 && stash_amount($item[a light that never goes out])>0)
-					cli_execute("pull a light that never goes out");
-				if(i_a("A Light that Never Goes Out")>0)
-					maxstr=maxstr+", +equip A Light that Never Goes Out";
 				
-				if(i_a("ice harvest")>2)
+				if(i_a("ice harvest")>2 || i_a("ice bucket")>0)
 				{
-					create(1,$item[ice bucket]);
+					if(i_a("ice bucket")==0)
+					{
+						create(1,$item[ice bucket]);
+					}
 					maxstr=maxstr+", +equip ice bucket";
-				}		
+				}
+				else
+				{
+					//try to make a light and add it to maxstr
+					if(i_a("A Light that Never Goes Out")<1 && have_skill($skill[summon smithsness]))
+					{
+						if(i_a("brituminous coal")==0)
+						{
+							use_skill(1,$skill[summon smithsness]);
+						}
+						cli_execute("create a light that never goes out");
+					}
+
+					if(i_a("A Light that Never Goes Out")<1 && stash_amount($item[a light that never goes out])>0)
+					{
+						cli_execute("pull a light that never goes out");
+					}
+					if(i_a("A Light that Never Goes Out")>0)
+					{
+						maxstr=maxstr+", +equip A Light that Never Goes Out";
+					}
+				}
 					
 				buMax(maxstr);
 			} else {
@@ -10038,6 +10090,8 @@ boolean bcascTrapper() {
 			cli_execute("mood clear");
 			print("BCC: Climbing up to the The Icy Peak and searching for Groar.", "purple");
 			//SIMON ADDED NEXT FEW LINES OF COLD RES STUFF
+			if(elemental_resistance($element[cold]) <48 && have_effect($effect[oilsphere])<4 && have_skill($skill[oilsphere]))
+				use_skill($skill[oilsphere]);
 			if(elemental_resistance($element[cold]) <48 && have_effect($effect[elemental saucesphere])<4 && have_skill($skill[elemental saucesphere]))
 				use_skill(1,$skill[elemental saucesphere]);
 			if(elemental_resistance($element[cold]) <48 && have_effect($effect[scarysauce])<4 && have_skill($skill[scarysauce]))
@@ -10052,8 +10106,8 @@ boolean bcascTrapper() {
 				use(1,$item[cold powder]);
 			if(elemental_resistance($element[cold]) <48 && have_effect($effect[fever from the flavor])<4 && available_amount($item[bottle of antifreeze])>0)
 				use(1,$item[bottle of antifreeze]);
-			if(elemental_resistance($element[cold]) <48 && have_effect($effect[oilsphere])<4 && have_skill($skill[oilsphere]))
-				use_skill($skill[oilsphere]);
+			if (elemental_resistance($element[cold]) <48 && have_effect($effect[Protection from Bad Stuff]) == 0 && available_amount($item[scroll of Protection from Bad Stuff])>0) use(1, $item[scroll of Protection from Bad Stuff]);
+
 			//try to use gap buff
 			if(available_amount($item[greatest american pants])>0)
 			{
@@ -10121,6 +10175,8 @@ boolean bcascTrapper() {
 			
 			//SIMON ADDED NEXT FEW LINES OF COLD RES STUFF
 			buMax();
+			if(elemental_resistance($element[cold]) <48 && have_effect($effect[oilsphere])<4 && have_skill($skill[oilsphere]))
+				use_skill($skill[oilsphere]);
 			if(elemental_resistance($element[cold]) <48 && have_effect($effect[elemental saucesphere])<4 && have_skill($skill[elemental saucesphere]))
 				use_skill(1,$skill[elemental saucesphere]);
 			if(elemental_resistance($element[cold]) <48 && have_effect($effect[scarysauce])<4 && have_skill($skill[scarysauce]))
@@ -10135,6 +10191,7 @@ boolean bcascTrapper() {
 				use(1,$item[cold powder]);
 			if(elemental_resistance($element[cold]) <48 && have_effect($effect[fever from the flavor])<4 && available_amount($item[bottle of antifreeze])>0)
 				use(1,$item[bottle of antifreeze]);
+			if (elemental_resistance($element[cold]) <48 && have_effect($effect[Protection from Bad Stuff]) == 0 && available_amount($item[scroll of Protection from Bad Stuff])>0) use(1, $item[scroll of Protection from Bad Stuff]);
 			//try to use gap buff
 			if(available_amount($item[greatest american pants])>0)
 			{
@@ -10208,40 +10265,47 @@ boolean bcascToot() {
 
 void bcascKOLHS()
 {
-	//what is our inttrinsic? also se choiceadv
-	effect intrinsic=$effect[nerd is the word]; //myst
-	set_property("choiceAdventure700","2");
-	location zone=$location[chemistry class];
-	
-	if(my_primestat()==$stat[muscle])
+	if(get_property("_kolhsAdventures").to_int()<40)
 	{
-		intrinsic=$effect[jamming with the jocks];
-		set_property("choiceAdventure700","1");
-		zone=$location[shop class];
-	}
-	else if(my_primestat()==$stat[moxie])
-	{
-		intrinsic=$effect[greaser lightnin'];
-		set_property("choiceAdventure700","3");
-		zone=$location[art class];
-	}
+		set_property("choiceAdventure772",0); //in case we accidentally go too far
+		//what is our inttrinsic? also se choiceadv
+		effect intrinsic=$effect[nerd is the word]; //myst
+		set_property("choiceAdventure700","2");
+		location zone=$location[chemistry class];
 		
-	cli_execute("outfit bumcheekascend; unequip hat");
-	//burn 40 turns
-	while(get_property("_kolhsAdventures").to_int()<40)
-	{
-		use_familiar($familiar[steam-powered cheerleader]); //no weight restriction
-		
-		//if we have enough approval but no intrinsic, get it
-		if(get_property("_kolhsAdventures").to_int() > 20 && have_effect(intrinsic)==0)
+		if(my_primestat()==$stat[muscle])
 		{
-			print("Getting intrisic: "+intrinsic,"blue");
-			bumMiniAdv(1,$location[The Hallowed Halls]);
+			intrinsic=$effect[jamming with the jocks];
+			set_property("choiceAdventure700","1");
+			zone=$location[shop class];
 		}
-		else
+		else if(my_primestat()==$stat[moxie])
 		{
-			print("burning school","blue");
-			bumMiniAdv(1,zone);
+			intrinsic=$effect[greaser lightnin'];
+			set_property("choiceAdventure700","3");
+			zone=$location[art class];
+		}
+		
+		buMax("");
+		cli_execute("unequip hat");
+		setMood("");
+		use_familiar($familiar[steam-powered cheerleader]); //no weight restriction, unlike other fams
+
+		//burn 40 turns
+		while(get_property("_kolhsAdventures").to_int()<40)
+		{
+			
+			//if we have enough approval but no intrinsic, get it
+			if(get_property("_kolhsAdventures").to_int() > 20 && have_effect(intrinsic)==0)
+			{
+				print("Getting intrisic: "+intrinsic,"blue");
+				bumMiniAdv(1,$location[The Hallowed Halls]);
+			}
+			else
+			{
+				print("burning school","blue");
+				bumMiniAdv(1,zone);
+			}
 		}
 	}
 }
@@ -10317,6 +10381,7 @@ boolean bcascWand() {return bcascWand(false);}
 void bcs1() {
 	if(my_path()=="KOLHS")
 		bcascKOLHS();
+	get_dungeon_kit();
 	if(my_level()>2)
 		bcascTavern();
 	//SImON ADDED: check for friars before others
@@ -10442,6 +10507,10 @@ void bcs7() {
 		bcascManorBedroom();
 		bcascManorGallery();
 		bcascManorBallroom();
+	}
+	else
+	{
+		abort("Simon wants to set_property(\"bcasc_bedroom\",\"true\"");
 	}
 	
 	levelMe(53, true);
@@ -10806,6 +10875,7 @@ void bcs12() {
 					cli_execute("pull half a purse");
 				//Put on the outfit and adventure, printing debug information each time. 
 				buMax("nuns");
+				get_kolhs_buff("meat");
 				cli_execute("condition clear");
 				while (my_adventures() > 0 && prepSNS() != "whatever" && bumMiniAdv(1, $location[The Themthar Hills]) && get_property("currentNunneryMeat").to_int() < 100000) {
 					print("BCC: Nunmeat retrieved: "+get_property("currentNunneryMeat")+" Estimated adventures remaining: "+estimated_advs(), "green");

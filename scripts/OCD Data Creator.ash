@@ -4291,11 +4291,46 @@ save [$item[programmable turtle]] = 0;
 save [$item[mocking turtle]] = 0;
 save [$item[cigar box turtle]] = 0;
 save [$item[frozen turtle shell]] = 0;
-
-
+save [$item[black cloak]] = 1;
+save [$item[New Zealand iced tea]] = 0;
+save [$item[spectral pickle]] = 0;
+save [$item[wind-up Whatsian robot]] = 0;
+save [$item[wind-up vampire teeth]] = 0;
+save [$item[wind-up navigation droid]] = 0;
+save [$item[wind-up owl]] = 0;
+save [$item[wind-up ensign]] = 0;
+save [$item[dark hamethyst ring]] = 3;
+save [$item[dark baconstone ring]] = 3;
+save [$item[dark porquoise ring]] = 3;
+save [$item[space beast fur]] = 0;
+save [$item[cap gun]] = 3;
+save [$item[carrot-on-a-stick]] = 3;
+save [$item[weasel stomping pants]] = 2;
+save [$item[gummi sword]] = 3;
+save [$item[chocolate cow bone]] = 3;
+save [$item[magnum of fancy champagne]] = 0;
+save [$item[witch's bread]] = 0;
+save [$item[witch's brew]] = 0;
+save [$item[broken warbear gyrocopter]] = 0;
+save [$item[gnawed-up dog bone]] = 3;
+save [$item[too legit potion]] = 0;
 
 
 //stuff to sell later;s
+save [$item[mulberry]] = -1;
+save [$item[lemony scales]] = -1;
+save [$item[sour powder]] = -1;
+save [$item[anise-flavored venom]] = -1;
+save [$item[candied pecan]] = -1;
+save [$item[candy mountain oyster]] = --1;
+save [$item[chocolate rabbit's foot]] = -1;
+save [$item[candy carrot]] = -1;
+save [$item[Steam Card: Space Trip (#1)]] = -1;
+save [$item[Steam Card: Space Trip (#2)]] = -1;
+save [$item[Steam Card: Meteoid (#3)]] = -1;
+save [$item[Steam Card: Jackass Plumber (#3)]] = -1;
+save [$item[Steam Card: Meteoid (#2)]] = -1;
+save [$item[Steam Card: Jackass Plumber (#1)]] = -1;
 save [$item[bottle of Bloodweiser]] = -1;
 save [$item[Steam Card: Dungeon Fist (#2)]] = -1;
 save     [$item[chunk of hot iron]] = -1;

@@ -220,432 +220,8 @@ void cindyCrime() {
 	//<7 turns left>
 }
 
-//disease rumor = +2
-//doctored soap = +3
-//klepto rumour = +3
-
-void cindyVomitCrime() {
-    //Lounge, Get cigar 30
-	cindyOption(2, "lounge");
-    cindyOption(3, "lounge");	//start rumour 29
-    	visit_url("choice.php?pwd&whichchoice=826&option=4"); //klepto
-	//inspect pantry 28
-	cindyOption(2, "kitchen");
-    //Balcony, Examine flowers 27
-	cindyOption(2, "balcony"); 
-
-    //Balcony, talk to baroness 26
-	cindyOption(3, "balcony");
-    //Balcony, talk to baroness 25
-	cindyOption(3, "balcony");
-    //Dance floor, steal hairpin from baroness 24
-	cindyOption(2, "dancefloor");
-
-    //Restroom, medicine cabinet, pick lock, take aspirin 23
-	cindyOption(3, "restroom");
-		visit_url("choice.php?pwd&whichchoice=822&option=1");
-		visit_url("choice.php?pwd&whichchoice=822&option=2");
-    //Restroom, Take soap 22
-	cindyOption(2, "restroom");
-    //Canapes, Take cheese 21
-	cindyOption(2, "canapes");
-
-	//get cigar box 20
-	cindyOption(2, "lounge");
-	//mousetrap with soap 19
-	cindyOption(3, "kitchen");
-
-	//Kick soap at butler (dance floor) 18
-	cindyOption(2, "dancefloor");
-
-    //Restroom, medicine cabinet, pick lock, take laudanum 17
-	cindyOption(3, "restroom");
-		visit_url("choice.php?pwd&whichchoice=822&option=2");
-
-	//Spike the whiskey with the laudanum (lounge) 16
-	cindyOption(2, "lounge"); //not sure about number
-
-    cindyOption(3, "lounge");	//examin cabinet 15
-	//Offer the Baroness some aspirin. She will then offer to be a co-conspirator. (balcony) 14
-	cindyOption(3, "balcony");
-
-    //Restroom, medicine cabinet, pick lock, take ipecac 13
-	cindyOption(3, "restroom");
-		visit_url("choice.php?pwd&whichchoice=822&option=1");
-	//get mouse out of trap 12
-	cindyOption(2, "kitchen");
-    //Kitchen, dose canoli tray with ipecac 11
-	cindyOption(4, "kitchen");
-
-	//Pick the lock in on the curio cabinet (lounge) (available with 10 turns remaining) 10
-	cindyOption(4, "lounge");
-
-    //Canapes, give cinderella the canoli 9
-	cindyOption(7, "canapes");
-	//Slip the silver cow creamer into Cinderella's purse (canapes table) 8
-	cindyOption(2, "canapes"); 
-		visit_url("choice.php?pwd&whichchoice=827&option=5");
-
-    //Canapes, ask for handkerchief 7
-	cindyOption(6, "canapes");
-	//put mouse in cinderella's purse 6
-	cindyOption(2, "canapes");
-		visit_url("choice.php?pwd&whichchoice=827&option=3");
-
-	//get flower 5
-	cindyOption(2, "balcony");
-	//doctor soap 4
-	cindyOption(3, "restroom");
-
-	<get soap> //3
-	<trip cindy> //2
-
-	<ballroom coin + watch vomit 1>? (do I have to watch?) 1
-}
-<make her eat 2 canolli instead of 1, need cinammon?>
-
-
-
-
-
-void cindyVomitCrime2() {
-    //Lounge, Get cigar 30
-	cindyOption(2, "lounge");
-    cindyOption(3, "lounge");	//start rumour 29
-    	visit_url("choice.php?pwd&whichchoice=826&option=4"); //klepto
-	//inspect pantry 28
-	cindyOption(2, "kitchen");
-    //Restroom, Take soap 27
-	cindyOption(2, "restroom");
-    //Canapes, Take cheese 26
-	cindyOption(2, "canapes");
-
-    //Balcony, Examine flowers 25
-	cindyOption(2, "balcony"); 
-	//get cigar box 24
-	cindyOption(2, "lounge");
-	//mousetrap with soap 23
-	cindyOption(3, "kitchen");
-
-    //Balcony, talk to baroness 22
-	cindyOption(3, "balcony");
-    //Balcony, talk to baroness 21
-	cindyOption(3, "balcony");
-    //Dance floor, steal hairpin from baroness 20
-	cindyOption(2, "dancefloor");
-
-    //Restroom, medicine cabinet, pick lock, take aspirin 19
-	cindyOption(3, "restroom");
-		visit_url("choice.php?pwd&whichchoice=822&option=1");
-		visit_url("choice.php?pwd&whichchoice=822&option=2");
-
-    cindyOption(3, "lounge");	//examin cabinet 18
-	//get mouse out of trap 17
-	cindyOption(2, "kitchen");
-
-	//Kick soap at butler (dance floor) 16
-	cindyOption(2, "dancefloor");
-
-    //Restroom, medicine cabinet, pick lock, take laudanum 15
-	cindyOption(3, "restroom");
-		visit_url("choice.php?pwd&whichchoice=822&option=2");
-
-	//Spike the whiskey with the laudanum (lounge) 14
-	cindyOption(2, "lounge"); //not sure about number
-
-	//Offer the Baroness some aspirin. She will then offer to be a co-conspirator. (balcony) 13
-	cindyOption(3, "balcony");
-
-    //Restroom, medicine cabinet, pick lock, take ipecac 12
-	cindyOption(3, "restroom");
-		visit_url("choice.php?pwd&whichchoice=822&option=1");
-    //Kitchen, dose canoli tray with ipecac 11
-	cindyOption(4, "kitchen");
-
-	//Pick the lock in on the curio cabinet (lounge) (available with 10 turns remaining) 10
-	cindyOption(4, "lounge");
-
-    //Canapes, give cinderella the canoli 9
-	cindyOption(7, "canapes");
-	//Slip the silver cow creamer into Cinderella's purse (canapes table) 8
-	cindyOption(2, "canapes"); 
-		visit_url("choice.php?pwd&whichchoice=827&option=5");
-
-    //Canapes, ask for handkerchief 7
-	cindyOption(6, "canapes");
-	//put mouse in cinderella's purse 6
-	cindyOption(2, "canapes");
-		visit_url("choice.php?pwd&whichchoice=827&option=3");
-
-	//get flower 5
-	cindyOption(2, "balcony");
-	//doctor soap 4
-	cindyOption(3, "restroom");
-
-	<get soap> //3
-	<trip cindy> //2
-
-	<ballroom coin + watch vomit 1>? (do I have to watch?) 1
-}
-<creamer in purse>
-<ask hanky>
-<mouse in purse>
-<ask hanky>
-<give ipecac canapes 16>
-<>
-
-
-
-
-void cindyDrunkCrime() {
-    //Lounge, Get cigar 30
-	cindyOption(2, "lounge");
-    cindyOption(3, "lounge");	//start rumour 29
-    	visit_url("choice.php?pwd&whichchoice=826&option=4"); //klepto
-	// 28
-	<>
-    //Balcony, Examine flowers 27
-	cindyOption(2, "balcony"); 
-
-    //Balcony, talk to baroness 26
-	cindyOption(3, "balcony");
-    //Balcony, talk to baroness 25
-	cindyOption(3, "balcony");
-    //Dance floor, steal hairpin from baroness 24
-	cindyOption(2, "dancefloor");
-
-    //Restroom, medicine cabinet, pick lock, take aspirin 23
-	cindyOption(3, "restroom");
-		visit_url("choice.php?pwd&whichchoice=822&option=1");
-		visit_url("choice.php?pwd&whichchoice=822&option=2");
-    //Restroom, Take soap 22
-	cindyOption(2, "restroom");
-    // 21
-	<>
-
-	//get cigar box 20
-	<>
-	//mousetrap with soap 19
-	<>
-
-	//Kick soap at butler (dance floor) 18
-	cindyOption(2, "dancefloor");
-
-    //Restroom, medicine cabinet, pick lock, take laudanum 17
-	cindyOption(3, "restroom");
-		visit_url("choice.php?pwd&whichchoice=822&option=2");
-
-	//Spike the whiskey with the laudanum (lounge) 16
-	cindyOption(2, "lounge"); //not sure about number
-
-    cindyOption(3, "lounge");	//examin cabinet 15
-	//Offer the Baroness some aspirin. She will then offer to be a co-conspirator. (balcony) 14
-	cindyOption(3, "balcony");
-
-    //Restroom, medicine cabinet, pick lock, take ipecac 13
-	cindyOption(3, "restroom");
-		visit_url("choice.php?pwd&whichchoice=822&option=1");
-	//get mouse out of trap 12
-	<>
-    //Kitchen, dose canoli tray with ipecac 11
-	cindyOption(4, "kitchen");
-
-	//Pick the lock in on the curio cabinet (lounge) (available with 10 turns remaining) 10
-	cindyOption(4, "lounge");
-
-    //Canapes, give cinderella the canoli 9
-	cindyOption(7, "canapes");
-	//Slip the silver cow creamer into Cinderella's purse (canapes table) 8
-	cindyOption(2, "canapes"); 
-		visit_url("choice.php?pwd&whichchoice=827&option=5");
-
-    //Canapes, ask for handkerchief 7
-	cindyOption(6, "canapes");
-	//put mouse in cinderella's purse 6
-	<>
-
-	//get flower 5
-	cindyOption(2, "balcony");
-	//doctor soap 4
-	cindyOption(3, "restroom");
-
-	<get soap> //3
-	<trip cindy> //2
-
-	<ballroom coin + watch vomit 1>? (do I have to watch?) 1
-}
-<flask in purse?>
-<drunk rumour + tripping?>
-<spike things?>
-
-
-
-
-
-
-
-
-
-
-
-<give prince carnation>
-void cindyDrunkVomit() {
-    //Lounge, Get cigar 30
-	cindyOption(2, "lounge");
-    //Balcony, talk to baroness 29
-	cindyOption(3, "balcony");
-    //Balcony, Examine flowers 28
-	cindyOption(2, "balcony"); 
-	//give carnation to prince 27
-	cindyOption(2, "canapes");
-	//inspect pantry 26
-	cindyOption(2, "kitchen");
-
-    //Balcony, Examine flowers 25
-	cindyOption(2, "balcony"); 
-
-    //Balcony, talk to baroness 24
-	cindyOption(3, "balcony");
-    //steal hairpin from baroness 23
-	cindyOption(2, "dancefloor");
-
-    //Restroom, medicine cabinet, pick lock, take ipecac 22
-	cindyOption(3, "restroom");
-		visit_url("choice.php?pwd&whichchoice=822&option=1");
-		visit_url("choice.php?pwd&whichchoice=822&option=1");
-    //Kitchen, dose canoli tray with ipecac 21
-	cindyOption(3, "kitchen");
-    //Canapes, Take cheese 20
-	cindyOption(6, "canapes");
-	//get cigar box 19
-	cindyOption(2, "lounge");
-
-    //Canapes, give cinderella the canoli 18
-	cindyOption(5, "canapes");
-
-	//mousetrap with no additives 17
-	cindyOption(2, "kitchen");
-
-    cindyOption(4, "lounge");	//start rumour 16
-    	visit_url("choice.php?pwd&whichchoice=826&option=3"); //disease?
-
-	//get flower 15
-	cindyOption(2, "balcony");
-	//doctor soap 14
-	cindyOption(3, "restroom");
-	//get some soap 13 <?>
-	cindyOption(2, "restroom");
-    //Kitchen, dose canoli tray with ipecac 12
-	cindyOption(4, "kitchen");
-	//get mouse out of trap 11
-	cindyOption(2, "kitchen");
-
-	//get whiskey flask 10 <?>
-	cindyOption(2, "lounge"); 
-
-    //Canapes, give cinderella the canoli 9
-	cindyOption(7, "canapes");
-
-	//put mouse in cinderella's purse 8
-	<>
-
-    //Canapes, ask for handkerchief 7
-	cindyOption(6, "canapes");
-
-	//spike cindys glass 6 <?>
-	cindyOption(, "canapes");
-	//trip cindy 5 <?>
-	cindyOption(, "dancefloor");
-	//get soap 4 <?>
-	cindyOption(2, "restroom");
-	//trip cindy 3 <?>
-	cindyOption(, "dancefloor");
-	//get soap 2 <?>
-	cindyOption(2, "restroom");
-	//trip cindy 1 <?>
-	cindyOption(, "dancefloor");
-}
-
-
-<give prince carnation>
-void cindyDrunkVomit() {
-    //Lounge, Get cigar 30
-	cindyOption(2, "lounge");
-    //Balcony, talk to baroness 29
-	cindyOption(3, "balcony");
-    //Balcony, Examine flowers 28
-	cindyOption(2, "balcony"); 
-	//give carnation to prince 27
-	cindyOption(2, "canapes");
-    cindyOption(4, "lounge");	//start rumour 26
-    	visit_url("choice.php?pwd&whichchoice=826&option=3"); //disease?
-
-    //Balcony, Examine flowers 25
-	cindyOption(2, "balcony"); 
-
-    //Balcony, talk to baroness 24
-	cindyOption(3, "balcony");
-    //steal hairpin from baroness 23
-	cindyOption(2, "dancefloor");
-
-    //Restroom, medicine cabinet, pick lock, take ipecac 22
-	cindyOption(3, "restroom");
-		visit_url("choice.php?pwd&whichchoice=822&option=1");
-		visit_url("choice.php?pwd&whichchoice=822&option=1");
-    //Kitchen, dose canoli tray with ipecac 21
-	cindyOption(3, "kitchen");
-	//inspect pantry (cinamon) 20
-	cindyOption(2, "kitchen");
-	//cinamon in canoli 19
-	cindyOption(2, "kitchen");
-
-    //Canapes, give cinderella the canoli 18
-	cindyOption(5, "canapes");
-
-	//cinamon in purse 17
-	cindyOption(2, "canapes");
-		visit_url("choice.php?pwd&whichchoice=827&option=3");
-	//ask for hanky 16
-	cindyOption(4, "canapes");
-
-	//get flower 15
-	cindyOption(2, "balcony");
-	//doctor soap 14
-	cindyOption(3, "restroom");
-
-	//get some soap 13 <?>
-	cindyOption(2, "restroom");
-    //Kitchen, dose canoli tray with ipecac 12
-	cindyOption(3, "kitchen");
-
-	//get whiskey flask 11 <?>
-	cindyOption(3, "lounge"); 
-
-    //Canapes, give cinderella the canoli 10
-	cindyOption(<>, "canapes");
-
-	//spike cindys glass 9
-	cindyOption(2, "canapes");
-	<>
-	<>
-	<>
-	//trip cindy 5 <?>
-	cindyOption(2, "dancefloor");
-	//get soap 4 <?>
-	cindyOption(2, "restroom");
-	//trip cindy 3 <?>
-	cindyOption(2, "dancefloor");
-	//get soap 2 <?>
-	cindyOption(2, "restroom");
-	//trip cindy 1 <?>
-	cindyOption(2, "dancefloor");
-}
-
-
-
-
 //best so far, gives 27
-void cindyDrunkVomit() {
+void cindyHigh() {
     //Lounge, Get cigar 30
 	cindyOption(2, "lounge");
     //Balcony, talk to baroness 29
@@ -706,7 +282,8 @@ void cindyDrunkVomit() {
 		visit_url("choice.php?pwd&whichchoice=827&option=3");
 	//ask for hanky 7
 	cindyOption(6, "canapes");
-	<>
+	//Waste turn for coin <> 6
+	cindyOption(1, "kitchen");
 	//trip cindy 5 <vomit> <?>
 	cindyOption(2, "dancefloor");
 	//get soap 4 <?>
@@ -721,32 +298,172 @@ void cindyDrunkVomit() {
 
 
 
+void witch()
+{
+	if(available_amount($item[peanut brittle shield])<3)
+		abort("Get some peanut brittle shields from kbay");
+
+	//create some lemon gear
+	if(available_amount($item[lemon party hat])<1)
+		create(1,$item[lemon party hat]);
+	if(available_amount($item[lemon shirt])<1)
+		create(1,$item[lemon shirt]);
+	if(available_amount($item[lemon drop trousers])<1)
+		create(1,$item[lemon drop trousers]);
+
+	//food and drink buffs
+	while(have_effect($effect[Sweet Tooth])<30 && (inebriety_limit()-my_inebriety()>=1))
+		drink(1,$item[snakebite]);
+	while(have_effect($effect[High Blood Chocolate Content])<30 && (inebriety_limit()-my_inebriety()>=3))
+		drink(1,$item[chocotini]);
+	while(have_effect($effect[sweet nostalgia])<30 && (inebriety_limit()-my_inebriety()>=5))
+		drink(1,$item[mulled berry wine]);
+
+	while(have_effect($effect[Improved Candy Vision])<30 && (fullness_limit()-my_fullness()>=4))
+		eat(1,$item[Candy carrot cake]);
+	while(have_effect($effect[Pecan Pied Piper])<30 && (fullness_limit()-my_fullness()>=3))
+		eat(1,$item[pecan pie]);
+
+	//potion buffs
+	while(have_effect($effect[sourpuss])<30)
+		use(1,$item[lemonhead caviar]);
+	while(have_effect($effect[sweet taste])<30)
+		use(1,$item[small gummi fin]);
+	while(have_effect($effect[Rootin' Around])<30)
+		use(1,$item[Licorice root]);
+//TOO EXPENSIVE
+//	while(have_effect($effect[puckered up])<80)
+//		use(1,$item[sour powder]);
+
+	//fam buffs
+	cli_execute("pool aggressive;pool aggressive;pool aggressive");
+	cli_execute("concert optimist primal");
+	while(have_effect($effect[empathy])<30)
+		use_skill(1,$skill[empathy of the newt]);
+	while(have_effect($effect[leash of linguini])<30)
+		use_skill(1,$skill[leash of linguini]);
+	while(have_effect($effect[chorale of companionship])<30)
+	{
+		if(my_class()==$class[accordion thief] && my_level()>=15)
+			use_skill(1,$skill[chorale of companionship]);
+		else
+			use(1,$item[recording of chorale of companionship]);
+	}
+	while(have_effect($effect[heavy petting])<30)
+		use(1,$item[knob goblin pet-buffing spray]);
+	while(have_effect($effect[Blue Swayed])<80)
+		use(1,$item[pulled blue taffy]);
+	while(have_effect($effect[Cold Hearted])<50)
+		use(1,$item[love song of icy revenge]);
+	while(have_effect($effect[green tongue])<30)
+		use(1,$item[green snowcone]);
+	while(have_effect($effect[kindly resolve])<30)
+		use(1,$item[resolution: be kinder]);
+	while(have_effect($effect[Man's Worst Enemy])<30)
+		use(1,$item[disintegrating spiky collar]);
+	while(have_effect($effect[bestial sympathy])<30)
+		use(1,$item[half-orchid]);
+	while(have_effect($effect[Heart of Green])<30)
+		use(1,$item[green candy heart]);
+	//fam exp
+	if(familiar_weight(my_familiar())<20 && have_skill($skill[Curiosity of Br'er Tarrypin]))
+	{
+		cli_execute("friars familiar");
+		while(have_effect($effect[Curiosity of Br'er Tarrypin])<30)
+			use_skill(1,$skill[Curiosity of Br'er Tarrypin]);
+	}
 
 
+	//before we start, set up gear etc for candy
+	use_familiar($familiar[peppermint rhino]);
+	cli_execute("maximize candy drop, equip chocolate cow bone");
+	cli_execute("use moveable feast");
+
+	abort("Done buffing, now do stuff!");
+//first adv per zone free
+//4 combats, noncom, 3 combats, noncom, combat
+//combats at gumdrop forest to get axies
+//first round, noncom 1 at lake to find out
+//		noncom 2 at <>
+//
+//second round, noncom 1 at forest, 2 random defences
+//		noncome 2 at <>
+//
+//third round, non
+
+//noncom 1 at lake (837) choice 1, tells us 2 people who won't be in attack
+//noncom 1 at <> (841) choice 2 gives 2 random defences
+//<noncoms>
+//<use pixie axies from gumdrop forest?>
+//with 897.5% candy drop
+//
+//rabbit 895,937,912,903,878,890
+//prarie dogs = 889,889,927,1015,952,842,815 Candy,	114hp,	152 def (1 smack to kill)
+//weasel 976,986,949,842
+//default candy must be x*(1+8.975) = 900   around 90
+//
+//pixie 648, 592,560,596,563
+//snake 609,629
+//
+//minnow 853,643,848
+//pllwaioasaur 848
+//
+//gummi sword gives 50% which is around 45 candy
+//peanut shield gives 100% which is about 90 candy
+//chocolate cow bone gives 30% which is around 30 candy, and 25 extra on first smack
+//licorice whip gives 100 on a crit
+//furious wallop for SC forces crit
+}
+//spooky = fearful fettucini
+//stench = kasesostrum
+//
+
+//Cinnamon arsonists, 	Chubby Brutes, 	Pole Vaulters
+//piranha cold, 		weasel sleaze, 	tree spooky
+
+
+//Bubble gum balloonists, 	Cinnamon arsonists,	Chubby Brutes, 	Tunnelers, 		Pole Vaulters
+//pixie hot, 				piranha cold, 		weasel sleaze, 	snake stench, 	tree spooky
 
 
 void main(string option) {
 	cli_execute("clear mood");
 	switch (option) {
 		case "vomit" :
+			set_property("choiceAdventure829", 1);
 			use(1, $item[grimstone mask]);
-			visit_url("choice.php?whichchoice=829&option=1&pwd=");
+			set_property("choiceAdventure829", 0);
 			cindyVomit();
 		break;
 		case "kill" :
+			set_property("choiceAdventure829", 1);
 			use(1, $item[grimstone mask]);
-			visit_url("choice.php?whichchoice=829&option=1&pwd=");
+			set_property("choiceAdventure829", 0);
 			cindyKill();
 		break;
 		case "crime" :
+			set_property("choiceAdventure829", 1);
 			use(1, $item[grimstone mask]);
-			visit_url("choice.php?whichchoice=829&option=1&pwd=");
+			set_property("choiceAdventure829", 0);
 			cindyCrime();
 		break;
 		case "high" :
+			set_property("choiceAdventure829", 1);
 			use(1, $item[grimstone mask]);
-			visit_url("choice.php?whichchoice=829&option=1&pwd=");
+			set_property("choiceAdventure829", 0);
 			cindyHigh();
+		break;
+		case "witch" :
+			set_property("choiceAdventure829", 3);
+			use(1, $item[grimstone mask]);
+			set_property("choiceAdventure829", 0);
+			witch();
 		break;
 	}
 }
+//12229108
+//12166000
+//first try ~8k
+//second try 9129
+//third try 11110
+//seems to be best to get candy on combats, and defences on noncombats (always 2 random, then 1 to balance)

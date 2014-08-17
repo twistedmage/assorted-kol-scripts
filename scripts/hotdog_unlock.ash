@@ -73,7 +73,7 @@ void unlock_chilly()
 	//chilly dog
 	if(i_a("jar of frostigkraut")>0)
 		abort("Have a jar of frostigkraut! Disable this part of hotdog_ulock.ash");
-	if(!get_property("_chilly_checked_today").to_boolean())
+	if(get_property("last_chilly_checked_asc").to_int()<my_ascensions())
 	{
 		//extreme peak open
 		if(contains_text(visit_url("place.php?whichplace=mclargehuge"),"adventure.php?snarfblat=273"))
@@ -91,23 +91,40 @@ void unlock_chilly()
 				adventure(1,$location[The extreme slope]);
 			}
 		}
-		set_property("_chilly_checked_today","true");
+		set_property("last_chilly_checked_asc",my_ascensions());
 	}
 }
 void unlock_ghost()
 {
 	//ghost dog
-	if(i_a("gnawed-up dog bone")>0)
+	int desired_bones=1;
+	if(my_name()=="twistedmage")
+		desired_bones=3;
+	if(i_a("gnawed-up dog bone")>=desired_bones)
 		abort("Have a gnawed-up dog bone! Disable this part of hotdog_ulock.ash");
-	abort("ghost Not implemented");
+	if(my_name()!="twistedmage")
+	{
+		print("************* SKIPPING GHOST DOG FOR NON TWISTEDMAGE CHARS**************","red");
+		return;
+	}
+	use_familiar($familiar[nosy nose]);
+	abort("line 111 Set combat macro to skeletal_cat");
+	while(my_adventures()>0 && i_a("gnawed-up dog bone")<desired_bone)
+	{
+		print("Hunting for dog bone","blue");
+		adventure(1,$location[haunted conservatory]);
+	}
 }
 void unlock_junkyard()
 {
 	//junkyard dog
 	if(i_a("Grey Guanon")>0)
 		abort("Have a Grey Guanon! Disable this part of hotdog_ulock.ash");
-	while(my_adventures()>0 && can_adv($location[cobb's knob menagerie\, level 1]) && i_a("Grey Guanon")<1)
-		bumAdv($location[guano junction], "", "", "", "Hunting for guanon", "");
+
+	while(my_adventures()>0 && i_a("Grey Guanon")<1)
+	{
+		bumAdv($location[guano junction], "stench res", "", "", "Hunting for guanon", "");
+	}
 }
 void unlock_wet()
 {
@@ -138,6 +155,13 @@ void unlock_optimal()
 	//optimal dog
 	if(i_a("optimal spreadsheet")>0)
 		abort("Have a optimal spreadsheet! Disable this part of hotdog_ulock.ash");
+	//unlock menagerie
+	while(my_adventures()>0 && !can_adv($location[cobb's knob menagerie\, level 1]))
+	{
+		adventure(1,$location[cobb's knob laboratory]);
+	}
+
+
 	setFamiliar("items");
 	cli_execute("mood clear");
 	while(my_adventures()>0 && can_adv($location[cobb's knob menagerie\, level 1]))
