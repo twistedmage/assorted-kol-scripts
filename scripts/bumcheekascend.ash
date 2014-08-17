@@ -734,6 +734,7 @@ void bcCrumHorn() {
 	if ((my_path() == "Avatar of Boris") && ((minstrel_instrument() != $item[clancy's crumhorn]) && (i_a("clancy's crumhorn") == 0)) && (contains_text(clancyOptions,"C"))) {
 		if (my_meat() > 3000) {
 			print("BCC: buying the Crumhorm from uncle P's", "purple");
+			if(i_a("post-holiday sale coupon")>0)use(1,$item[post-holiday sale coupon]);
 			buy(1 , $item[clancy's crumhorn]);
 		} else {
 			print("BCC: not enough meat yet for a Crumhorn", "purple");
@@ -1075,9 +1076,9 @@ boolean buMax(string maxme, int maxMainstat) {
 		cli_execute("maximize "+max_bees+" beeosity, mainstat -ml, "+maxme); 
 		return true;
 	}
-	if (maxme.contains_text("item") && have_path_familiar($familiar[Mad Hatrack])) {
-		maxme += " -equip spangly sombrero";
-	} else if (maxme.contains_text("item") && have_path_familiar($familiar[Fancypants Scarecrow])) {
+	if (maxme.contains_text("item") && have_path_familiar($familiar[Fancypants Scarecrow])) {
+		maxme += " -equip spangly mariachi pants";
+	}else if (maxme.contains_text("item") && have_path_familiar($familiar[Mad Hatrack])) {
 		maxme += " -equip spangly mariachi pants";
 	}
 	//The hilarious comedy prop is basically never the good choice.
@@ -1295,31 +1296,107 @@ print("a","lime");
 }
 int cloversAvailable() { return cloversAvailable(false); }
 
+boolean get_smiths_item(item it)
+{
+	if(available_amount(it)>0)
+		return true;
+
+	//try to make it, either by summoning or just crafting
+	if(available_amount(it)<1 && have_skill($skill[summon smithsness]))
+	{
+		if(i_a("brituminous coal")==0)
+		{
+			use_skill(1,$skill[summon smithsness]);
+		}
+		create(1,it);
+	}
+
+	//last resort to pull it
+	if(available_amount(it)<1 && stash_amount(it)>0)
+	{
+		cli_execute("pull "+it);
+	}
+	
+	if(available_amount(it)>0)
+		return true;
+	return false;
+}
+
 //Checks for saucepans and turtle totems and summons if not found and asked to
 boolean have_castitems(class who, boolean get_them) {
-//	switch(who) {
-//		 case $class[sauceror]:
-				 if (i_a("saucepan") + i_a("5-Alarm Saucepan") + i_a("17-alarm Saucepan") + i_a("Windsor Pan of the Source") > 0)
+	switch(who) {
+		case $class[sauceror]:
+				if (i_a("saucepan") + i_a("5-Alarm Saucepan") + i_a("17-alarm Saucepan") + i_a("Windsor Pan of the Source") + i_a("warbear oil pan") + i_a("oil pan") + i_a("saucepanic") + i_a("frying brainpan") > 0)
+						return true;
+				else if(get_them)
+				{
+					//saucepanic is better than basically anything, so prefer to grab that
+			 		if(get_them && i_a("saucepanic")==0)
+						if(get_smiths_item($item[saucepanic]))
+							return true;
+					//last restort, get a crap pan
+					while (i_a("saucepan") == 0) {
+						use(1, $item[chewing gum on a string]);
+						if (i_a("saucepan") > 0)
+							return true;
+					}
+				}
+				return false;
+		case $class[turtle tamer]:
+				//if we are willing to get something, make sure we have the best possible, don't settle for something crap because we will probably burn a lot of mana
+				if(get_them)
+				{
+					//best is to pull a mace of the tortoise (10 turns)
+					if(i_a("mace of the tortoise")==0)
+						cli_execute("pull mace of the tortoise");
+					if(i_a("mace of the tortoise")>0)
+						return true;
+
+					//if that failed, try to get a smiths one (7 turns)
+					if(get_smiths_item($item[Ouija Board, Ouija Board]))
+						return true;
+
+					//if that failed, settle for a crap totem (that's gonna be expensive)
+					while (i_a("Turtle totem") == 0) {
+						use(1, $item[chewing gum on a string]);
+						if (i_a("Turtle totem") > 0)
+							return true;
+					}
+				}
+				//not getting new, just checking
+				if (i_a("Turtle totem") + i_a("Mace of the Tortoise") + i_a("Chelonian Morningstar") + i_a("Flail of the Seven Aspects") + i_a("Ouija Board, Ouija Board") > 0)
+					return true;
+				return false;
+		case $class[accordion thief]:
+
+		 		//non ats only have 2 choices
+		 		if(my_class()!=$class[accordion thief])
+		 		{
+		 			if(i_a("antique accordion")==0 && get_them)
+		 			{
+		 				if(my_meat()>2500)
+		 				{
+							if(i_a("post-holiday sale coupon")>0)use(1,$item[post-holiday sale coupon]);
+							buy(1,$item[antique accordion]);
+							cli_execute("autosell * toy accordion");
+		 				}
+		 			}
+				 	if (i_a("toy accordion") + i_a("antique accordion") > 0)
+						return true;
+					return false;
+		 		}
+
+		 		//ats have many choices, mostly stolen
+		 		if(get_them && i_a("Shakespeare's Sister's Accordion")==0)
+					get_smiths_item($item[Shakespeare's Sister's Accordion]);
+		 		//do we have anything?
+				if (i_a("accord ion") + i_a("accordion file") + i_a("Accordion of Jordion") + i_a("accordionoid rocca") + i_a("alarm accordion") + i_a("autocalliope") + i_a("Bal-musette accordion") + i_a("baritone accordion") + i_a("beer-battered accordion") + i_a("bone bandoneon") + i_a("Cajun accordion") + i_a("ghost accordion") + i_a("guancertina") + i_a("mama's squeezebox") + i_a("non-Euclidean non-accordion") + i_a("peace accordion") + i_a("pentatonic accordion") + i_a("pygmy concertinette") + i_a("quirky accordion") + i_a("toy accordion") + i_a("antique accordion") + i_a("Shakespeare's Sister's Accordion") + i_a("Rock and Roll Legend") + i_a("Skipper's accordion") + i_a("Squeezebox of the Ages") + i_a("Stolen accordion") + i_a("The Trickster's Trikitixa") + i_a("Warbear exhaust manifold") + i_a("Zombie accordion") > 0)
 						 return true;
-				 else if(get_them)
-						 while (i_a("saucepan") == 0) {
-								 use(1, $item[chewing gum on a string]);
-								 if (i_a("saucepan") > 0)
-										 return true;
-						 }
-//				 return false;
-//		 case $class[turtle tamer]:
-				 if (i_a("Turtle totem") + i_a("Mace of the Tortoise") + i_a("Chelonian Morningstar") + i_a("Flail of the Seven Aspects") > 0)
-						 return true;
-				 else if(get_them)
-						 while (i_a("Turtle totem") == 0) {
-								 use(1, $item[chewing gum on a string]);
-								 if (i_a("Turtle totem") > 0)
-										 return true;
-						 }
 				 return false;
-//	 }
-	 return false;
+		default:
+			abort("Unrecognised class equipment requested: "+who);
+	}
+	return false;
 }
 
 
@@ -2452,6 +2529,14 @@ string consultObtuse(int round, string opp, string text) {
 		}
 		return ((my_primestat() == $stat[Mysticality] && in_hardcore()) ? consultMyst(round, opp, text) : get_ccs_action(round)); 
 	}
+	if (my_familiar() == $familiar[Reanimated Reanimator]) {
+		print("BCC: Reanimated Reanimator detected.", "purple");
+		if (contains_text(text, "wink at "+my_familiar().name)) {
+			print("BCC: wink at "+my_familiar().name+" Detected.", "purple");
+			return "skill wink at "+my_familiar().name;
+		}
+		return ((my_primestat() == $stat[Mysticality] && in_hardcore()) ? consultMyst(round, opp, text) : get_ccs_action(round)); 
+	}
 	return ((my_primestat() == $stat[Mysticality] && in_hardcore()) ? consultMyst(round, opp, text) : get_ccs_action(round)); 
 }
 
@@ -2477,7 +2562,8 @@ void drink_booze(item booze)
 		cli_execute("shrug fat leons phat loot lyric");
 	else if(have_effect($effect[the moxious madrigal])>0)
 		cli_execute("shrug the moxious madrigal");
-	use_skill(1,$skill[the ode to booze]);
+	if(have_skill($skill[the ode to booze]) && have_castitems($class[accordion thief], true))
+		use_skill(1,$skill[the ode to booze]);
 	drink(1,booze);
 }
 
@@ -2494,12 +2580,17 @@ void defaultMood(boolean castMojo) {
 		cli_execute("trigger lose_effect, empathy , cast 1 Empathy of the Newt");
 	if (have_skill($skill[Leash of Linguini]))
 		cli_execute("trigger lose_effect, Leash of Linguini, cast 1 Leash of Linguini");
+
+	if (my_class()==$class[accordion thief] && my_level()>=15 && have_skill($skill[Chorale of Companionship]) && my_maxmp() > mp_cost($skill[Chorale of Companionship]) * 2 && have_castitems($class[accordion thief], true)) cli_execute("trigger lose_effect, Chorale of Companionship, cast 1 Chorale of Companionship");
+
 	if(my_path()!="BIG!")
 	{
-		if (have_skill($skill[Ur-Kel's Aria of Annoyance]))
+		if (have_skill($skill[Ur-Kel's Aria of Annoyance]) && have_castitems($class[accordion thief], true))
 				cli_execute("trigger lose_effect, Ur-Kel's Aria of Annoyance, cast 1 Ur-Kel's Aria of Annoyance");
-		if (have_skill($skill[Drescher's Annoying Noise]))
+		if (have_skill($skill[Drescher's Annoying Noise]) && have_castitems($class[accordion thief], true))
 				cli_execute("trigger lose_effect, Drescher's Annoying Noise, cast 1 Drescher's Annoying Noise");
+		if (have_skill($skill[pride of the puffin]))
+				cli_execute("trigger lose_effect, pride of the puffin, cast 1 pride of the puffin");
 	}
 	if(familiar_weight(my_familiar())<20)
 		if (have_skill($skill[Curiosity of Br'er Tarrypin]))
@@ -2599,6 +2690,8 @@ void defaultMood(boolean castMojo) {
 		use(1,$item[Effermint&trade; tablets]);
 	if(i_a("Ogres and Oubliettes&trade; module")>0 && have_effect($effect[Ogred and Oublietted])==0)
 		use(1,$item[Ogres and Oubliettes&trade; module]);
+	if(i_a("Gummi turtle")>0 && have_effect($effect[Gummi-Grin])==0)
+		use(1,$item[Gummi turtle]);
 
 	//it's wimpy (unless low llevel) but might as well use it
 	if(i_a("scroll of Puddingskin")>0 && have_effect($effect[Puddingskin])==0)
@@ -2609,7 +2702,61 @@ void defaultMood(boolean castMojo) {
 		use(1,$item[Gym membership card]);
 	if(i_a("Old candy wrapper")>0 && have_effect($effect[litterbug])==0)
 		use(1,$item[Old candy wrapper]);
-	
+	if(i_a("Finger exerciser")>0 && have_effect($effect[Strong Grip])==0)
+		use(1,$item[Finger exerciser]);
+	if(i_a("Dented spoon")>0 && have_effect($effect[There Is A Spoon])==0)
+		use(1,$item[Dented spoon]);
+	if(i_a("Nail file")>0 && have_effect($effect[Extra-Sharp Weapon])==0)
+		use(1,$item[Nail file]);
+	if(i_a("Old love note")>0 && have_effect($effect[Memories of Puppy Love])==0)
+		use(1,$item[Old love note]);
+
+	//confiscated items
+	if(i_a("Confiscated cell phone")>0 && have_effect($effect[OMG WTF])==0)
+		use(1,$item[Confiscated cell phone]);
+	if(i_a("Confiscated comic book")>0 && have_effect($effect[Superheroic])==0)
+		use(1,$item[Confiscated comic book]);
+	if(i_a("Confiscated love note")>0 && have_effect($effect[Notably Lovely])==0)
+		use(1,$item[Confiscated love note]);
+
+
+	if(i_a("old bronzer")>0 && have_effect($effect[sepia tan])==0)
+		use(1,$item[old bronzer]);
+	if(i_a("old rosewater cream")>0 && have_effect($effect[rosewater mark])==0)
+		use(1,$item[old rosewater cream]);
+	if(i_a("old eyebrow pencil")>0 && have_effect($effect[Browbeaten])==0)
+		use(1,$item[old eyebrow pencil]);
+
+	//wizards buffs if we are in softcore because we wont be eating the food/drink
+	if(can_interact() && i_a("Ye Wizard's Shack snack voucher")>0)
+	{
+		if(my_primestat()==$stat[muscle])
+			use(1,$item[wasabi marble soda]);
+		else if(my_primestat()==$stat[mysticality])
+			use(1,$item[tobiko marble soda]);
+		else
+			use(1,$item[natto marble soda]);
+	}
+
+	//galloping grill
+	if(i_a("liquid smoke")>0 && have_effect($effect[liquidy smoky])==0)
+		use(1,$item[liquid smoke]);
+	if(i_a("bowl of marinade")>0 && have_effect($effect[marinated])==0)
+		use(1,$item[bowl of marinade]);
+	if(i_a("Dollop of barbecue sauce")>0 && have_effect($effect[Barbecue Saucy])==0)
+		use(1,$item[Dollop of barbecue sauce]);
+	if(i_a("hot ashes")>0 && have_effect($effect[ashen burps])==0)
+		use(1,$item[ash soda]);
+	if(i_a("Bottle of lighter fluid")>0 && have_effect($effect[lit up])==0)
+		use(1,$item[Bottle of lighter fluid]);
+
+	if(i_a("mocking turtle")>0 && have_effect($effect[Tortious])==0)
+		use(1,$item[mocking turtle]);
+	if(i_a("cigar box turtle")>0 && have_effect($effect[Colorful Gratitude])==0)
+		use(1,$item[cigar box turtle]);
+	if(i_a("irradiated turtle")>0 && have_effect($effect[Turtle Power])==0)
+		use(1,$item[irradiated turtle]);
+
 	//have to be a bit conservative in wosf
 	if(my_path() == "Way of the Surprising Fist") {
 		if (my_level() < 7 && castMojo && have_skill($skill[The Magical Mojomuscular Melody]) && my_path() != "BIG!") cli_execute("trigger lose_effect, The Magical Mojomuscular Melody, cast 1 The Magical Mojomuscular Melody");
@@ -2623,46 +2770,47 @@ void defaultMood(boolean castMojo) {
 		if (have_skill($skill[Walberg's Dim Bulb]) && my_maxmp() > mp_cost($skill[Walberg's Dim Bulb]) * 2) cli_execute("trigger lose_effect, Walberg's Dim Bulb, cast 1 Walberg's Dim Bulb");
 
 		//these are prettyt pointless, only use them when we have too much mana to use
-		if(equipped_amount($item[crown of thrones])>0 && cli_execute("ash import zlib; be_good($item[crown of thrones])") && cli_execute("ash import zlib; be_good($familiar[el vibrato megadrone])"))
+		if((equipped_amount($item[crown of thrones])>0 || equipped_amount($item[buddy bjorn])>0) && cli_execute("ash import zlib; be_good($familiar[el vibrato megadrone])"))
 		{
 			if(can_interact())
 			{
-				if (have_skill($skill[antibiotic saucesphere]))
+				if (have_skill($skill[antibiotic saucesphere]) && have_castitems($class[sauceror], true))
 					cli_execute("trigger lose_effect, antibiotic saucesphere, cast 1 antibiotic saucesphere");
-				if (have_skill($skill[ghostly shell]))
+				if (have_skill($skill[ghostly shell]) && have_castitems($class[turtle tamer], true))
 					cli_execute("trigger lose_effect, ghostly shell, cast 1 ghostly shell");
 				if (have_skill($skill[iron palm technique])) cli_execute("trigger lose_effect, iron palms, cast 1 iron palm technique");
 				if (have_skill($skill[springy fusilli])) cli_execute("trigger lose_effect, springy fusilli, cast 1 springy fusilli");
 				if (have_skill($skill[holiday weight gain]))
 					cli_execute("trigger lose_effect, a few extra pounds, cast 1 holiday weight gain");
-				if (have_skill($skill[jingle bells]))
+				if (have_skill($skill[jingle bells]) && have_castitems($class[turtle tamer], true))
 					cli_execute("trigger lose_effect, jingle jangle jingle, cast 1 jingle bells");
-				if (have_skill($skill[elemental saucesphere])) cli_execute("trigger lose_effect, elemental saucesphere, cast 1 elemental saucesphere");
-				if (have_skill($skill[reptilian fortitude]))
+				if (have_skill($skill[elemental saucesphere]) && have_castitems($class[sauceror], true)) cli_execute("trigger lose_effect, elemental saucesphere, cast 1 elemental saucesphere");
+				if (have_skill($skill[reptilian fortitude]) && have_castitems($class[turtle tamer], true))
 					cli_execute("trigger lose_effect, reptilian fortitude, cast 1 reptilian fortitude");
-				if (have_skill($skill[scarysauce]))
+				if (have_skill($skill[scarysauce]) && have_castitems($class[sauceror], true))
 					cli_execute("trigger lose_effect, scarysauce, cast 1 scarysauce");
 				//these are guaranteed for myst, but others can use them to spend mana
-				if (have_skill($skill[Jalape&ntilde;o Saucesphere]))
+				if (have_skill($skill[Jalape&ntilde;o Saucesphere]) && have_castitems($class[sauceror], true))
 					cli_execute("trigger lose_effect, jalape&ntilde;o saucesphere, cast 1 jalape&ntilde;o saucesphere");
 			}
 		}
 		switch (my_primestat()) {
 			case $stat[Muscle] :
 				if (my_level() > 5 && my_path() != "Bees Hate You" && my_path() != "BIG!") { cli_execute("trigger lose_effect, Tiger!, use 5 Ben-Gal Balm"); }
-				if (my_level() < 7 && castMojo && have_skill($skill[The Magical Mojomuscular Melody]) && my_path() != "BIG!") cli_execute("trigger lose_effect, The Magical Mojomuscular Melody, cast 1 The Magical Mojomuscular Melody");
+				if (my_level() < 7 && castMojo && have_skill($skill[The Magical Mojomuscular Melody]) && my_path() != "BIG!" && have_castitems($class[accordion thief], true)) cli_execute("trigger lose_effect, The Magical Mojomuscular Melody, cast 1 The Magical Mojomuscular Melody");
 				if (anHero()) {
-		//			if (have_skill($skill[The Power Ballad of the Arrowsmith])) cli_execute("trigger lose_effect, Power Ballad of the Arrowsmith, cast 1 The Power Ballad of the Arrowsmith");
+		//			if (have_skill($skill[The Power Ballad of the Arrowsmith]) && have_castitems($class[accordion thief], true)) cli_execute("trigger lose_effect, Power Ballad of the Arrowsmith, cast 1 The Power Ballad of the Arrowsmith");
 				} else {
-					if (castMojo && have_skill($skill[The Moxious Madrigal]) && my_path() != "BIG!") cli_execute("trigger lose_effect, The Moxious Madrigal, cast 1 The Moxious Madrigal");
+					if (castMojo && have_skill($skill[The Moxious Madrigal]) && my_path() != "BIG!" && have_castitems($class[accordion thief], true)) cli_execute("trigger lose_effect, The Moxious Madrigal, cast 1 The Moxious Madrigal");
 				}
 				if (have_skill($skill[Patience of the Tortoise]) && my_path() != "BIG!") cli_execute("trigger lose_effect, Patience of the Tortoise, cast 1 Patience of the Tortoise");
 				if (have_skill($skill[Seal Clubbing Frenzy]) && my_path() != "BIG!") cli_execute("trigger lose_effect, Seal Clubbing Frenzy, cast 1 Seal Clubbing Frenzy");
 				if (my_level() > 9 && have_skill($skill[Rage of the Reindeer])) cli_execute("trigger lose_effect, Rage of the Reindeer, cast 1 Rage of the Reindeer");
-				if (have_skill($skill[tenacity of the snapper]))
+				if (have_skill($skill[tenacity of the snapper]) && have_castitems($class[turtle tamer], true))
 					cli_execute("trigger lose_effect, tenacity of the snapper, cast 1 tenacity of the snapper");
-				if (have_skill($skill[spiky shell]))
+				if (have_skill($skill[spiky shell]) && have_castitems($class[turtle tamer], true))
 					cli_execute("trigger lose_effect, spiky shell, cast 1 spiky shell");
+				if (have_skill($skill[Grease Up])) cli_execute("trigger lose_effect, Takin' It Greasy, cast 1 Grease Up");
 			break;
 			
 			case $stat[Mysticality] :
@@ -2672,14 +2820,14 @@ void defaultMood(boolean castMojo) {
 				} else {
 					if (my_level() > 5 && my_meat() > 2000) { cli_execute("trigger lose_effect, Butt-Rock Hair, use 5 hair spray"); }
 					if (my_level() > 5 && my_meat() > 2000) { cli_execute("trigger lose_effect, Glittering Eyelashes, use 5 glittery mascara"); }
-					if ((my_level() < 7 && castMojo && have_skill($skill[The Moxious Madrigal])) && my_path() != "BIG!") cli_execute("trigger lose_effect, The Moxious Madrigal, cast 1 The Moxious Madrigal");
+					if ((my_level() < 7 && castMojo && have_skill($skill[The Moxious Madrigal]) && have_castitems($class[accordion thief], true)) && my_path() != "BIG!") cli_execute("trigger lose_effect, The Moxious Madrigal, cast 1 The Moxious Madrigal");
 					if (my_level() < 7  && have_skill($skill[Springy Fusilli])) cli_execute("trigger lose_effect, Springy Fusilli, cast 1 Springy Fusilli");
 					if (have_skill($skill[Manicotti Meditation]) && my_level() < 5) cli_execute("trigger lose_effect, Pasta Oneness, cast 1 Manicotti Meditation");
 					if (have_skill($skill[Sauce Contemplation]) && my_level() < 5) cli_execute("trigger lose_effect, Saucemastery, cast 1 Sauce Contemplation");
 					if ((i_a("saucepan") + i_a("5-alarm saucepan") + i_a("17-alarm saucepan") > 0) && have_skill($skill[Jalape&ntilde;o Saucesphere]) && my_class() == $class[sauceror]) cli_execute("trigger lose_effect, Jalape&ntilde;o Saucesphere, cast 1 Jalape&ntilde;o Saucesphere");
 					if (have_skill($skill[Flavour of magic]) && have_effect($effect[Spirit of Peppermint]) == 0) use_skill(1, $skill[Spirit of Peppermint]);
 					if (have_skill($skill[Springy Fusilli]) && my_class() == $class[Pastamancer]) cli_execute("trigger lose_effect, Springy Fusilli, cast 1 Springy Fusilli");
-					if (have_skill($skill[spiky shell]))
+					if (have_skill($skill[spiky shell]) && have_castitems($class[turtle tamer], true))
 						cli_execute("trigger lose_effect, spiky shell, cast 1 spiky shell");
 					if (have_skill($skill[Sauce Monocle]))
 						cli_execute("trigger lose_effect, Sauce Monocle, cast 1 Sauce Monocle");
@@ -2690,13 +2838,16 @@ void defaultMood(boolean castMojo) {
 			break;
 			
 			case $stat[Moxie] :
-				if (castMojo && have_skill($skill[The Moxious Madrigal])) cli_execute("trigger lose_effect, The Moxious Madrigal, cast 1 The Moxious Madrigal");
-				if (my_level() < 7 && castMojo && have_skill($skill[The Magical Mojomuscular Melody]) && my_path() != "BIG!") cli_execute("trigger lose_effect, The Magical Mojomuscular Melody, cast 1 The Magical Mojomuscular Melody");
+				if (castMojo && have_skill($skill[The Moxious Madrigal]) && have_castitems($class[accordion thief], true)) cli_execute("trigger lose_effect, The Moxious Madrigal, cast 1 The Moxious Madrigal");
+				if (my_level() < 7 && castMojo && have_skill($skill[The Magical Mojomuscular Melody]) && my_path() != "BIG!" && have_castitems($class[accordion thief], true)) cli_execute("trigger lose_effect, The Magical Mojomuscular Melody, cast 1 The Magical Mojomuscular Melody");
 				if (my_level() > 5) { cli_execute("trigger lose_effect, Butt-Rock Hair, use 5 hair spray"); }
-				if (have_skill($skill[snarl of the timberwolf]))
-					cli_execute("trigger lose_effect, snarl of the timberwolf, cast 1 snarl of the timberwolf");
 				if (have_skill($skill[tenacity of the snapper]))
 					cli_execute("trigger lose_effect, tenacity of the snapper, cast 1 tenacity of the snapper");
+				if (have_skill($skill[Grease Up])) cli_execute("trigger lose_effect, Takin' It Greasy, cast 1 Grease Up");
+
+				if (my_class()==$class[accordion thief] && my_level()>=15 && have_skill($skill[Benetton's Medley of Diversity]) && my_maxmp() > mp_cost($skill[Benetton's Medley of Diversity]) * 2 && have_castitems($class[accordion thief], true)) cli_execute("trigger lose_effect, Benetton's Medley of Diversity, cast 1 Benetton's Medley of Diversity");
+				
+				if (my_class()==$class[accordion thief] && my_level()>=15 && have_skill($skill[Prelude of Precision]) && my_maxmp() > mp_cost($skill[Prelude of Precision]) * 2 && have_castitems($class[accordion thief], true)) cli_execute("trigger lose_effect, Prelude of Precision, cast 1 Prelude of Precision");
 			break;
 		}
 		
@@ -3372,7 +3523,7 @@ boolean innerSetFamiliar(string famtype) {
 		if(have_skill($skill[Cream Puff]) && famtype == "ml" && i_a("cosmic cream") > cream_to_save) {
 			use_skill(1, $skill[Cream Puff]);
 			return true;
-		} else if(have_skill($skill[egg man]) && (famtype == "items" || famtype == "equipmentnc" || famtype == "itemsnc" || famtype == "obtuseangel") && i_a("cosmic egg") > 0) {
+		} else if(have_skill($skill[egg man]) && (famtype == "items" || famtype == "equipmentnc" || famtype == "itemsnc" || famtype == "obtuseangel" || famtype=="obtuseangel_simon") && i_a("cosmic egg") > 0) {
 			use_skill(1, $skill[egg man]);
 			return true;
 		} //if we need init prefer that
@@ -3410,25 +3561,24 @@ boolean innerSetFamiliar(string famtype) {
 	if ((have_effect($effect[Everything Looks Yellow]) > 0 || (my_path() == "Bees Hate You") || my_path() == "Avatar of Boris" || my_path() == "Avatar of Jarlsberg" && my_path() != "Avatar of Sneaky Pete") && famtype == "hebo") { famtype = "items"; }
 		
 	//THEN a quick check for a spanglerack
-	if (i_a("spangly sombrero") > 0 && have_path_familiar($familiar[Mad Hatrack]) &&
-	(contains_text(famtype, "item") || contains_text(famtype, "equipment")) && famtype!="itemsw") { //not underwater
-		print("BCC: We are going to be using a spanglerack for items. Yay Items!", "purple");
-		use_familiar($familiar[Mad Hatrack]);
-		if (equipped_item($slot[familiar]) != $item[spangly sombrero]) equip($slot[familiar], $item[spangly sombrero]);
-		if (equipped_item($slot[familiar]) == $item[spangly sombrero]) return true;
-		print("BCC: There seemed to be a problem and you don't have a spangly sombrero equipped. I'll use a 'normal' item drop familiar.", "purple");
-	} else if(i_a("spangly mariachi pants") > 0 && have_path_familiar($familiar[fancypants scarecrow]) &&
+	if(i_a("spangly mariachi pants") > 0 && have_path_familiar($familiar[fancypants scarecrow]) &&
 	(contains_text(famtype, "item") || contains_text(famtype, "equipment")) && famtype!="itemsw") { //not underwater
 		print("BCC: We are going to be using the spanglepants for items. Yay Items!", "purple");
 		use_familiar($familiar[Fancypants Scarecrow]);
 		if (equipped_item($slot[familiar]) != $item[spangly mariachi pants]) equip($slot[familiar], $item[spangly mariachi pants]);
 		if (equipped_item($slot[familiar]) == $item[spangly mariachi pants]) return true;
 		print("BCC: There seemed to be a problem and you don't have the spangly mariachi pants equipped. I'll use a 'normal' item drop familiar.", "purple");
-	}
+	}else if (i_a("spangly sombrero") > 0 && have_path_familiar($familiar[Mad Hatrack]) &&
+	(contains_text(famtype, "item") || contains_text(famtype, "equipment")) && famtype!="itemsw") { //not underwater
+		print("BCC: We are going to be using a spanglerack for items. Yay Items!", "purple");
+		use_familiar($familiar[Mad Hatrack]);
+		if (equipped_item($slot[familiar]) != $item[spangly sombrero]) equip($slot[familiar], $item[spangly sombrero]);
+		if (equipped_item($slot[familiar]) == $item[spangly sombrero]) return true;
+		print("BCC: There seemed to be a problem and you don't have a spangly sombrero equipped. I'll use a 'normal' item drop familiar.", "purple");
+	} 
 	
 	//then a cheerleader check
-	if(my_path()=="KOLHS" && have_familiar($familiar[Steam-powered cheerleader])
-		&& get_property("_cheerleaderSteam").to_int()>0) //cheerleader is a possibility
+	if(have_familiar($familiar[Steam-powered cheerleader]) && get_property("_cheerleaderSteam").to_int()>0) //cheerleader is a possibility
 	{
 		if(famtype=="itemsnc" || (famtype=="items" && !have_familiar($familiar[jumpsuited hound dog]))) //and is suitable
 		{
@@ -3603,6 +3753,26 @@ boolean innerSetFamiliar(string famtype) {
 	
 	print("BCC: Using a default stat familiar.", "purple");
 	//Now either we have neither of the above, or we have enough spleen today.
+	
+	//Sombrero type familiars are probably best in all zones from itznotyerzitz mine onwards (level 8 quest plus)
+	//but to simplify things since we don't know the zone, lets just prefer a sombrero at all times
+	//THIS ONLY APPLIES IF WE HAVE A LOT OF ML
+	if(numeric_modifier("monster level")>100)
+	{
+		if (have_path_familiar($familiar[galloping grill])) {
+			use_familiar($familiar[galloping grill]);
+			return true;
+		}
+		if (have_path_familiar($familiar[baby sandworm])) {
+			use_familiar($familiar[baby sandworm]);
+			return true;
+		}
+		if (have_path_familiar($familiar[hovering sombrero])) {
+			use_familiar($familiar[hovering sombrero]);
+			return true;
+		}
+	}
+	//if we went through the above (low ml, no fams, can't use them on path) try some volleyball types
 	if (have_path_familiar($familiar[Frumious Bandersnatch])) {
 		use_familiar($familiar[Frumious Bandersnatch]);
 		if((i_a("crimsilion jub-jub bird")+i_a("aquaviolet jub-jub bird") + i_a("charpuce jub-jub bird")) == 0 && ((have_skill($skill[summon clip art]) && tomes_left()) || i_a("box of familiar jacks")>0))
@@ -3617,22 +3787,28 @@ boolean innerSetFamiliar(string famtype) {
 			cli_execute("fold "+chosen_bird);
 		equip(chosen_bird);
 		return true;
-	} else if (have_path_familiar($familiar[baby bugged bugbear])) {
+	} 
+	if (have_path_familiar($familiar[baby bugged bugbear])) {
 		use_familiar($familiar[baby bugged bugbear]);
 		return true;
-	} else if (have_path_familiar($familiar[Li'l Xenomorph])) {
+	} 
+	if (have_path_familiar($familiar[Li'l Xenomorph])) {
 		use_familiar($familiar[Li'l Xenomorph]);
 		return true;
-	} else if (have_path_familiar($familiar[Hovering Skull])) {
+	} 
+	if (have_path_familiar($familiar[Hovering Skull])) {
 		use_familiar($familiar[Hovering Skull]);
 		return true;
-	} else if (have_path_familiar($familiar[Gluttonous Green Ghost])) {
+	} 
+	if (have_path_familiar($familiar[Gluttonous Green Ghost])) {
 		use_familiar($familiar[Gluttonous Green Ghost]);
 		return true;
-	} else if (have_path_familiar($familiar[Smiling Rat])) {
+	} 
+	if (have_path_familiar($familiar[Smiling Rat])) {
 		use_familiar($familiar[Smiling Rat]);
 		return true;
-	} else if (have_path_familiar($familiar[Blood-Faced Volleyball])) {
+	} 
+	if (have_path_familiar($familiar[Blood-Faced Volleyball])) {
 		use_familiar($familiar[Blood-Faced Volleyball]);
 		return true;
 	}
@@ -3652,7 +3828,7 @@ boolean setFamiliar(string famtype) {
 		//open decorate page
 		string catch=visit_url("inv_use.php?pwd&which=2&whichitem=6150");
 		//do we need items?
-		if(famtype=="items" || famtype=="itemsnc" || famtype=="equipmentnc" || famtype=="hebo" || famtype=="obtuseangel")
+		if(famtype=="items" || famtype=="itemsnc" || famtype=="equipmentnc" || famtype=="hebo" || famtype=="obtuseangel" || famtype=="obtuseangel_simon")
 			catch=visit_url("choice.php?pwd&whichchoice=640&option=3&choiceform3=Add+a+Sensitive+Carrot+Nose");
 		else //otherwise go for mp regen hat
 			catch=visit_url("choice.php?pwd&whichchoice=640&option=5&choiceform5=Add+a+Magical+Hat");
@@ -3973,15 +4149,17 @@ void setMood(string combat) {
 			if (willMood()) {
 				print("BCC: Need moar combat! WAAARGH!", "purple");
 				if (have_skill($skill[Musk of the Moose]) && my_maxmp() > mp_cost($skill[Musk of the Moose]) * 2) cli_execute("trigger lose_effect, Musk of the Moose, cast 1 Musk of the Moose");
-				if (have_skill($skill[Carlweather's Cantata of Confrontation]) && my_maxmp() > mp_cost($skill[Carlweather's Cantata of Confrontation]) * 2) cli_execute("trigger lose_effect, Carlweather's Cantata of Confrontation, cast 1 Carlweather's Cantata of Confrontation");
+				if (have_skill($skill[Carlweather's Cantata of Confrontation]) && my_maxmp() > mp_cost($skill[Carlweather's Cantata of Confrontation]) * 2 && have_castitems($class[accordion thief], true)) cli_execute("trigger lose_effect, Carlweather's Cantata of Confrontation, cast 1 Carlweather's Cantata of Confrontation");
 				cli_execute("trigger gain_effect, The Sonata of Sneakiness, uneffect sonata of sneakiness");
+				if(i_a("musk turtle")>0 && have_effect($effect[High Colognic])==0)
+					use(1,$item[musk turtle]);
 			}
 		} 
 		if (contains_text(combat,"-")) {
 			if (willMood()) {
 				print("BCC: Need less combat, brave Sir Robin!", "purple");
 				if (have_skill($skill[Smooth Movement]) && my_maxmp() > mp_cost($skill[Smooth Movement]) * 2) cli_execute("trigger lose_effect, Smooth Movements, cast 1 smooth movement");
-				if (have_skill($skill[The Sonata of Sneakiness]) && my_maxmp() > mp_cost($skill[The Sonata of Sneakiness]) * 2) cli_execute("trigger lose_effect, The Sonata of Sneakiness, cast 1 sonata of sneakiness");
+				if (have_skill($skill[The Sonata of Sneakiness]) && my_maxmp() > mp_cost($skill[The Sonata of Sneakiness]) * 2 && have_castitems($class[accordion thief], true)) cli_execute("trigger lose_effect, The Sonata of Sneakiness, cast 1 sonata of sneakiness");
 				cli_execute("trigger gain_effect, Carlweather's Cantata of Confrontation, uneffect Carlweather's Cantata of Confrontation");
 
 				//if we dont need any more snow boards, use them for -combat
@@ -3999,18 +4177,28 @@ void setMood(string combat) {
 		if (contains_text(combat,"i")) {
 			if (willMood()) {
 				print("BCC: Need items!", "purple");
-				if (have_skill($skill[Fat Leon's Phat Loot Lyric]) && my_maxmp() > mp_cost($skill[Fat Leon's Phat Loot Lyric]) * 2) cli_execute("trigger lose_effect, Fat Leon's Phat Loot Lyric, cast 1 Fat Leon's Phat Loot Lyric");
-				if (have_skill($skill[The Ballad of Richie Thingfinder]) && my_maxmp() > mp_cost($skill[The Ballad of Richie Thingfinder]) * 2) cli_execute("trigger lose_effect, The Ballad of Richie Thingfinder, cast 1 The Ballad of Richie Thingfinder");
+				if (have_skill($skill[Fat Leon's Phat Loot Lyric]) && my_maxmp() > mp_cost($skill[Fat Leon's Phat Loot Lyric]) * 2 && have_castitems($class[accordion thief], true)) cli_execute("trigger lose_effect, Fat Leon's Phat Loot Lyric, cast 1 Fat Leon's Phat Loot Lyric");
+				if (my_class()==$class[accordion thief] && my_level()>=15 && have_skill($skill[The Ballad of Richie Thingfinder]) && my_maxmp() > mp_cost($skill[The Ballad of Richie Thingfinder]) * 2 && have_castitems($class[accordion thief], true)) cli_execute("trigger lose_effect, The Ballad of Richie Thingfinder, cast 1 The Ballad of Richie Thingfinder");
 				if (have_skill($skill[Leash of Linguini]) && my_maxmp() > mp_cost($skill[Leash of Linguini]) * 2) cli_execute("trigger lose_effect, Leash of Linguini, cast 1 Leash of Linguini");
 				if (bcasc_castEmpathy && have_skill($skill[Empathy of the Newt]) && my_maxmp() > mp_cost($skill[Empathy of the Newt]) * 2 && have_castitems($class[turtle tamer], true)) cli_execute("trigger lose_effect, Empathy, cast 1 Empathy of the Newt");
 				if (have_skill($skill[Singer's Faithful Ocelot]) && my_maxmp() > mp_cost($skill[Singer's Faithful Ocelot]) * 2) cli_execute("trigger lose_effect, Singer's Faithful Ocelot, cast 1 Singer's Faithful Ocelot");
 			}
 		}
 		if (contains_text(combat,"n")) {
+			//talk to grim brother if not already done
+			if(have_familiar($familiar[grim brother]) && !get_property("_grimBuff").to_boolean())
+			{
+				abort("url for talking to him?");
+				visit_url("");
+				visit_url("choice"); //choice 1, soles of glass
+			}
+
 			if (willMood()) {
 				print("BCC: Need initiative!", "purple");
+				if(i_a("giraffe-necked turtle")>0 && have_effect($effect[Adorable Lookout])==0)
+					use(1,$item[giraffe-necked turtle]);
 				if (have_skill($skill[Springy Fusilli]) && my_maxmp() > mp_cost($skill[Springy Fusilli]) * 2) cli_execute("trigger lose_effect, Springy Fusilli, cast 1 Springy Fusilli");
-				if (have_skill($skill[Cletus's Canticle of Celerity]) && my_maxmp() > mp_cost($skill[Cletus's Canticle of Celerity]) * 2) cli_execute("trigger lose_effect, Cletus's Canticle of Celerity, cast 1 Cletus's Canticle of Celerity");
+				if (have_skill($skill[Cletus's Canticle of Celerity]) && my_maxmp() > mp_cost($skill[Cletus's Canticle of Celerity]) * 2 && have_castitems($class[accordion thief], true)) cli_execute("trigger lose_effect, Cletus's Canticle of Celerity, cast 1 Cletus's Canticle of Celerity");
 				if (have_skill($skill[Walberg's Dim Bulb]) && my_maxmp() > mp_cost($skill[Walberg's Dim Bulb]) * 2) cli_execute("trigger lose_effect, Walberg's Dim Bulb, cast 1 Walberg's Dim Bulb");
 				//its so rare that we need initiative, lets just go all out
 				if(item_amount($item[Okee-Dokee soda])>0) cli_execute("trigger lose_effect, , use 1 Okee-Dokee soda");
@@ -4023,8 +4211,8 @@ void setMood(string combat) {
 		}
 		if (contains_text(combat,"m")) {
 			print("BCC: Need meat (this will always trigger)!", "purple");
-			if (have_skill($skill[The Polka of Plenty])) cli_execute("trigger lose_effect, Polka of Plenty, cast 1 Polka of Plenty");
-			if (have_skill($skill[The Ballad of Richie Thingfinder]) && my_maxmp() > mp_cost($skill[The Ballad of Richie Thingfinder]) * 2) cli_execute("trigger lose_effect, The Ballad of Richie Thingfinder, cast 1 The Ballad of Richie Thingfinder");
+			if (have_skill($skill[The Polka of Plenty]) && have_castitems($class[accordion thief], true)) cli_execute("trigger lose_effect, Polka of Plenty, cast 1 Polka of Plenty");
+			if (my_class()==$class[accordion thief] && my_level()>=15 && have_skill($skill[The Ballad of Richie Thingfinder]) && my_maxmp() > mp_cost($skill[The Ballad of Richie Thingfinder]) * 2 && have_castitems($class[accordion thief], true)) cli_execute("trigger lose_effect, The Ballad of Richie Thingfinder, cast 1 The Ballad of Richie Thingfinder");
 		}
 		if (contains_text(combat,"l") && my_path()!="BIG!") {
 			if (willMood()) {
@@ -4087,7 +4275,7 @@ void setMood(string combat) {
 			cli_execute("trigger lose_effect, disco smirk, cast 1 disco smirk");
 
 		//tt blessings + boons
-		if(have_effect($effect[spirit pariah])==0)
+		if(have_effect($effect[spirit pariah])==0 && my_class()==$class[turtle tamer])
 		{
 			if (contains_text(combat,"n") && have_skill($skill[Blessing of the Storm Tortoise])) //init + mp
 			{
@@ -4189,7 +4377,7 @@ void setMood(string combat) {
 		}
 		
 		//soul sauce
-		if(contains_text(combat,"n") && have_skill($skill[Soul Saucery]))
+		if(contains_text(combat,"n") && have_skill($skill[Soul Saucery]) && my_class()==$class[sauceror])
 			cli_execute("trigger lose_effect, soulerskates, ash if(my_soulsauce() >= 25){cli_execute(\"cast 1 Soul Rotation\");}");
 		
 		if(my_class()==$class[sauceror] && have_skill($skill[Soul Saucery])) //if we get full, burn some off
@@ -4328,6 +4516,10 @@ void setMood(string combat) {
 		if (i_a("blue snowcone") > 0) cli_execute("trigger unconditional, ,ashq if(item_amount($item[blue snowcone]) > 0 && have_effect($effect[blue tongue]) <= 1 && have_effect($effect[red tongue]) == 0) {use(1, $item[blue snowcone]);}");
 		if (have_skill($skill[Empathy of the Newt]) && my_maxmp() > mp_cost($skill[Empathy of the Newt]) * 2 && have_castitems($class[turtle tamer], true)) cli_execute("trigger lose_effect, Empathy, cast 1 Empathy of the Newt");
 		if (i_a("green candy heart") > 0) cli_execute("trigger unconditional, ,ashq if(item_amount($item[green candy heart]) > 0 && have_effect($effect[Heart of Green]) <= 1) {use(1, $item[green candy heart]);}");
+		if(i_a("polka pop")==0)
+			cli_execute("pull 2 polka pop");
+		if(i_a("polka pop")!=0 && have_effect($effect[polka face])==0)
+			use(2,$item[polka pop]);
 		get_kolhs_buff("items");
 	}
 	
@@ -4920,7 +5112,7 @@ boolean bumAdv(location loc, string maxme, string famtype, string goals, string 
 			}
 			//SIMON : Commented below
 //			if (f == $monster[rampaging adding machine]) abort("Can't fight the adding machine. Do this manually.");
-			if (f == $monster[lobsterfrogman]) {setFamiliar("obtuseangel"); }
+			if (f == $monster[lobsterfrogman]) {setFamiliar("obtuseangel_simon"); }
 			//Have to do this rather than use() because otherwise, mafia fights immediately.
 			visit_url("inv_use.php?pwd=&which=3&whichitem=4873");
 			bumRunCombat((f == $monster[lobsterfrogman]) ? "consultObtuse" : "");
@@ -5322,7 +5514,8 @@ boolean bcascBats1() {
 				if(i_a("snow berries")>3 && i_a("ice harvest")>0)
 				{
 					create(1,$item[snow shovel]);
-					use(1,$item[snow shovel]);
+					string str=visit_url("inv_use.php?which=2&whichitem=7085");
+					//use(1,$item[snow shovel]);
 				}
 				else //wait until we can get one (tomorrow)
 				{
@@ -5948,6 +6141,7 @@ boolean bcascChasm() {
 	if (to_int(get_property("chasmBridgeProgress")) < 30) {
 		if ((i_a("dictionary") == 0 && is_not_yet(get_property("questM15Lol"), "finished")) && index_of(visit_url("place.php?whichplace=orc_chasm"), "cross_chasm.gif") == -1) {
 			cli_execute("outfit swashbuckling getup");
+			if(i_a("post-holiday sale coupon")>0)use(1,$item[post-holiday sale coupon]);
 			cli_execute("buy 1 abridged dictionary");
 			print("BCC: Using the dictionary.", "purple");
 			if (is_not_yet(get_property("questM01Untinker"), "finished"))
@@ -6029,7 +6223,7 @@ boolean bcascChasm() {
 		//TODO: Add some cheap/easily accesible +HP and +res consumables
 		maximize("hp", false);
 		maximize("spooky resistance, cold resistance, " + ((bcasc_100familiar == "" || bcasc_100familiar.to_familiar() == $familiar[Exotic Parrot]) && have_path_familiar($familiar[exotic parrot]) ? "switch exotic parrot" : "") + " -1 tie", false);
-		if (have_effect($effect[elemental saucesphere]) == 0 && have_skill($skill[elemental saucesphere])) use_skill(1, $skill[elemental saucesphere]);
+		if (have_effect($effect[elemental saucesphere]) == 0 && have_skill($skill[elemental saucesphere]) && have_castitems($class[sauceror], true)) use_skill(1, $skill[elemental saucesphere]);
 		if (have_effect($effect[astral shell]) == 0 && have_skill($skill[astral shell]) && have_castitems($class[turtle tamer], true)) use_skill(1, $skill[astral shell]);
 		if (have_effect($effect[Protection from Bad Stuff]) == 0 && available_amount($item[scroll of Protection from Bad Stuff])>0) use(1, $item[scroll of Protection from Bad Stuff]);
 
@@ -6205,6 +6399,7 @@ boolean bcascChasm() {
 				if(i_a("jar of oil")<1)
 					cli_execute("create 1 jar of oil");	
 				setMood("-i");
+				buMax("items");
 				cli_execute("mood execute");
 				loop = true;
 				while(loop == true) {
@@ -6714,6 +6909,7 @@ boolean bcascFriarsSteel() {
 	if (get_property("bcasc_skipSteel") == "true") return checkStage("friarssteel", true);
 	if (have_steel()) return checkStage("friarssteel", true);
 	if (my_path() == "Avatar of Boris" && (minstrel_instrument() != $item[Clancy's lute] && i_a("Clancy's lute") == 0)) return false;
+	if (my_path() == "KOLHS") return false; //in kolhs you don't get enough booze to go over 10 drunkeness anyway
 
 	boolean logicPuzzleDone() {
 		/*    
@@ -8707,10 +8903,15 @@ boolean bcascMacguffinSpooky() {
 			restore_hp(my_maxhp());
 			if (have_skill($skill[Elemental Saucesphere]) && have_castitems($class[sauceror], true))
 				cli_execute("cast Elemental Saucesphere");
-			if(have_skill($skill[astral shell]) && have_effect($effect[astral shell])<1)
+			if(have_skill($skill[astral shell]) && have_effect($effect[astral shell])<1 && have_castitems($class[turtle tamer], true))
 				cli_execute("cast astral shell");
 			if(my_meat()>1000 && have_effect($effect[red door syndrome])<1)
+			{
+				if(i_a("post-holiday sale coupon")>0)use(1,$item[post-holiday sale coupon]);
 				cli_execute("use can of black paint");
+			}
+			if(i_a("programmable turtle")>0 && have_effect($effect[Spiro Gyro])==0)
+				use(1,$item[programmable turtle]);
 			if(i_a("pec oil")>0 && have_effect($effect[Oiled-Up])<1)
 				cli_execute("use pec oil");
 			if (have_effect($effect[Protection from Bad Stuff]) == 0 && available_amount($item[scroll of Protection from Bad Stuff])>0) use(1, $item[scroll of Protection from Bad Stuff]);
@@ -8848,6 +9049,7 @@ boolean bcascMacguffinPyramid() {
 		//buy + hand in black paint
 		if((get_property("gnasirProgress").to_int() & 2)==0)
 		{
+			if(i_a("post-holiday sale coupon")>0)use(1,$item[post-holiday sale coupon]);
 			buy(1, $item[can of black paint]);
 			cli_execute("inventory refresh");
 			if(i_a("can of black paint")==0)
@@ -9023,14 +9225,6 @@ boolean bcascManorBedroom() {
 	set_property("choiceAdventure880", "1"); // Elegant=Gown
 
 	if(my_buffedstat(my_primestat()) >= 85) {
-		while (i_a("disposable instant camera") == 0) {
-			print("adventuring for gown","green");
-			bumminiAdv(1,$location[The Haunted Bedroom]);
-			print("finished adv, running combat","green");
-			run_combat();
-			print("ran combat, continuing","green");
-		}
-
 		if (i_a("Lord Spookyraven's spectacles") == 0) {
 			set_property("choiceAdventure878", "3"); // Ornate=Spectacles
 		} else {
@@ -9038,6 +9232,16 @@ boolean bcascManorBedroom() {
 		}
 		while (i_a("Lady Spookyraven's finest gown") == 0) {
 			print("adventuring for gown","green");
+			bumminiAdv(1,$location[The Haunted Bedroom]);
+			print("finished adv, running combat","green");
+			run_combat();
+			print("ran combat, continuing","green");
+		}
+		//if we still haven't got a camera, try to pull
+		if(i_a("disposable instant camera") == 0)
+			cli_execute("pull disposable instant camera");
+		while (i_a("disposable instant camera") == 0) {
+			print("adventuring for instant camera","green");
 			bumminiAdv(1,$location[The Haunted Bedroom]);
 			print("finished adv, running combat","green");
 			run_combat();
@@ -9152,10 +9356,12 @@ boolean bcascManorBilliards() {
 	//Kitchen
 	if (item_amount($item[Spookyraven billiards room key]) == 0) {
 		print("BCC: Getting the Billiards Key", "purple");
-		buMax("+1000 stench res");
+		cli_execute("familiar parrot");
+		buMax("+1000 stench res, +1000 hot res");
 		while (item_amount($item[Spookyraven billiards room key]) == 0) {
-			if (have_effect($effect[elemental saucesphere]) == 0 && have_skill($skill[elemental saucesphere])) use_skill(1, $skill[elemental saucesphere]);
+			if (have_effect($effect[elemental saucesphere]) == 0 && have_skill($skill[elemental saucesphere]) && have_castitems($class[sauceror], true)) use_skill(1, $skill[elemental saucesphere]);
 			if (have_effect($effect[astral shell]) == 0 && have_skill($skill[astral shell]) && have_castitems($class[turtle tamer], true)) use_skill(1, $skill[astral shell]);
+			if (have_effect($effect[Protection from Bad Stuff]) == 0 && available_amount($item[scroll of Protection from Bad Stuff])>0) use(1, $item[scroll of Protection from Bad Stuff]);
 			bumMiniAdv(1, $location[The Haunted Kitchen]);
 		}
 	}
@@ -9277,7 +9483,10 @@ boolean bcascMeatcar() {
 		}
 	} else {
 		if(my_meat() > 5000)
+		{
+			if(i_a("post-holiday sale coupon")>0) use(1,$item[post-holiday sale coupon]);
 			cli_execute("buy 1 desert bus pas");
+		}
 		else
 			abort("BCC: Bees Hate You. You have no pumpkins. You have no meat. Go fix!");
 	}
@@ -9600,12 +9809,12 @@ boolean bcascPirateFledges() {
 			
 			if (my_path() != "Bees Hate You") {
 				if (i_a("the big book of pirate insults") == 0) {
-					//if(i_a("post-holiday sale coupon")>0)use(1,$item[post-sale holiday coupon]);
+					if(i_a("post-holiday sale coupon")>0)use(1,$item[post-holiday sale coupon]);
 					buy(1, $item[the big book of pirate insults]);
 				}
 			} else {
 				if (i_a("Massive Manual of Marauder Mockery") == 0) {
-					//if(i_a("post-holiday sale coupon")>0)use(1,$item[post-sale holiday coupon]);
+					if(i_a("post-holiday sale coupon")>0)use(1,$item[post-holiday sale coupon]);
 					buy(1, $item[Massive Manual of Marauder Mockery]);
 				}
 			}
@@ -10075,7 +10284,7 @@ boolean bcascTrapper() {
 
 			setMood("+n");
 			if(my_class() == $class[Pastamancer] && have_skill($skill[flavour of magic])) use_skill(1, $skill[spirit of cayenne]);
-			 if ((i_a("saucepan") + i_a("5-alarm saucepan") + i_a("17-alarm saucepan") > 0) && have_skill($skill[Jalape&ntilde;o Saucesphere]) && my_class() == $class[sauceror]) cli_execute("trigger lose_effect, Jalape&ntilde;o Saucesphere, cast 1 Jalape&ntilde;o Saucesphere");
+			 if (have_castitems($class[sauceror], true) && have_skill($skill[Jalape&ntilde;o Saucesphere]) && my_class() == $class[sauceror]) cli_execute("trigger lose_effect, Jalape&ntilde;o Saucesphere, cast 1 Jalape&ntilde;o Saucesphere");
 			buMax("initiative");
 			
 			if(canMCD()){
@@ -10276,19 +10485,22 @@ void bcascKOLHS()
 		set_property("choiceAdventure772",0); //in case we accidentally go too far
 		//what is our inttrinsic? also se choiceadv
 		effect intrinsic=$effect[nerd is the word]; //myst
-		set_property("choiceAdventure700","2");
+		effect wrong_intrinsic1=$effect[greaser lightnin'];
+		effect wrong_intrinsic2=$effect[jamming with the jocks];
 		location zone=$location[chemistry class];
 		
 		if(my_primestat()==$stat[muscle])
 		{
 			intrinsic=$effect[jamming with the jocks];
-			set_property("choiceAdventure700","1");
+			effect wrong_intrinsic1=$effect[greaser lightnin'];
+			effect wrong_intrinsic2=$effect[nerd is the word];
 			zone=$location[shop class];
 		}
 		else if(my_primestat()==$stat[moxie])
 		{
 			intrinsic=$effect[greaser lightnin'];
-			set_property("choiceAdventure700","3");
+			effect wrong_intrinsic1=$effect[nerd is the word];
+			effect wrong_intrinsic2=$effect[jamming with the jocks];
 			zone=$location[art class];
 		}
 		
@@ -10300,15 +10512,30 @@ void bcascKOLHS()
 		//burn 40 turns
 		while(get_property("_kolhsAdventures").to_int()<40)
 		{
+			//set choiceadv for intrinsic
+			if(have_effect($effect[jamming with the jocks])!=0)
+			{
+				set_property("choiceAdventure700","1");
+			}
+			else if(have_effect($effect[greaser lightnin'])!=0)
+			{
+				set_property("choiceAdventure700","3");
+			}
+			else if(have_effect($effect[nerd is the word])!=0)
+			{
+				set_property("choiceAdventure700","2");
+			}
 			
 			//if we have enough approval but no intrinsic, get it
-			if(get_property("_kolhsAdventures").to_int() > 20 && have_effect(intrinsic)==0)
+			if(get_property("_kolhsAdventures").to_int() < 20 && have_effect(intrinsic)==0 && have_effect(wrong_intrinsic1)==0 && have_effect(wrong_intrinsic2)==0)
 			{
 				print("Getting intrisic: "+intrinsic,"blue");
 				bumMiniAdv(1,$location[The Hallowed Halls]);
 			}
 			else
 			{
+				if(have_effect(intrinsic)==0)
+					print("Got wrong (or no) intrinsic :(","red");
 				print("burning school","blue");
 				bumMiniAdv(1,zone);
 			}
@@ -10854,6 +11081,16 @@ void bcs12() {
 						cli_execute("pull 2 mick's icyvapohotness inhaler");
 					bumUse(2, $item[mick's icyvapohotness inhaler]);
 				}
+				if (have_effect($effect[Big Meat Big Prizes]) == 0)
+				{
+					if(i_a("Meat-inflating powder")<1 && !in_hardcore())
+						cli_execute("pull 2 Meat-inflating powder");
+					bumUse(2, $item[Meat-inflating powder]);
+				}
+				if(i_a("polka pop")==0)
+					cli_execute("pull 2 polka pop");
+				if(i_a("polka pop")!=0 && have_effect($effect[polka face])==0)
+					bumUse(2,$item[polka pop]);
 				if (have_effect($effect[red tongue]) == 0) bumUse(3, $item[red snowcone]);
 				if (get_property("sidequestArenaCompleted") == "fratboy" && cli_execute("concert 2")) {}
 				if (get_property("demonName2") != "" && cli_execute("summon 2")) {}
@@ -10863,10 +11100,11 @@ void bcs12() {
 				bumUse(ceil((estimated_advs()-have_effect($effect[heart of pink]))/10), $item[pink candy heart]);
 				bumUse(ceil((estimated_advs()-have_effect($effect[heart of green]))/10), $item[green candy heart]);
 				bumUse(ceil((estimated_advs()-have_effect($effect[Greedy Resolve]))/20), $item[resolution: be wealthier]);
-				if (have_skill($skill[The Polka of Plenty])) cli_execute("trigger lose_effect, Polka of Plenty, cast 1 The Polka of Plenty");
-				if (have_skill($skill[The Ballad of Richie Thingfinder]) && my_maxmp() > mp_cost($skill[The Ballad of Richie Thingfinder]) * 2) cli_execute("trigger lose_effect, The Ballad of Richie Thingfinder, cast 1 The Ballad of Richie Thingfinder");
+				if (have_skill($skill[The Polka of Plenty]) && have_castitems($class[accordion thief], true)) cli_execute("trigger lose_effect, Polka of Plenty, cast 1 The Polka of Plenty");
+				if (my_class()==$class[accordion thief] && my_level()>=15 && have_skill($skill[The Ballad of Richie Thingfinder]) && my_maxmp() > mp_cost($skill[The Ballad of Richie Thingfinder]) * 2 && have_castitems($class[accordion thief], true)) cli_execute("trigger lose_effect, The Ballad of Richie Thingfinder, cast 1 The Ballad of Richie Thingfinder");
 				if (have_skill($skill[Empathy of the Newt]) && have_castitems($class[turtle tamer], true)) cli_execute("trigger lose_effect, Empathy, cast 1 Empathy of the Newt");
 				if (have_skill($skill[Leash of Linguini])) cli_execute("trigger lose_effect, Leash of Linguini, cast 1 Leash of Linguini");
+				if (my_class()==$class[accordion thief] && my_level()>=15 && have_skill($skill[Chorale of Companionship]) && my_maxmp() > mp_cost($skill[Chorale of Companionship]) * 2 && have_castitems($class[accordion thief], true)) cli_execute("trigger lose_effect, Chorale of Companionship, cast 1 Chorale of Companionship");
 				if (dispensary_available()) cli_execute("trigger lose_effect, Wasabi Sinuses, use 1 Knob Goblin nasal spray");
 				if (dispensary_available()) cli_execute("trigger lose_effect, Heavy Petting, use 1 Knob Goblin pet-buffing spray");
 				
@@ -11302,11 +11540,6 @@ void mainWrapper() {
 	cli_execute("goals clear");
 	
 	//Before we start, we'll need an accordion. Let's get one. 
-	if (my_class() != $class[Accordion Thief] && my_path() != "Avatar of Boris" && my_path() != "Zombie Slayer" && (i_a("toy accordion") + i_a("antique accordion")) == 0 && (checkStage("toot")) && npc_price($item[toy accordion]) > 0 && my_meat() > 500) {
-
-		print("BCC: Getting an Accordion before we start. By the way, you might want to tell the script to sell your pork gems using the relay script if this fails due to lack of meat.", "purple");
-		buy(1, $item[toy accordion]);
-	}
 	sellJunk();
 	//Do a quick check to see if the person has set the script to adventure at the daily dungeon every day.
 	if (my_level() > 6 && get_property("bcasc_dailyDungeonEveryday") == "true") {

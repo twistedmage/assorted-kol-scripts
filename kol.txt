@@ -64,58 +64,53 @@ discoveries
 items and skills from heavy rains?
 	buy non quest items from general store (3 water wings, life preserver, umbrella) skills?
 finish avatar of jarlsberg, finish avatar of sneaky pete, fully upgrade kolhs camera
+use fun guy spores
+items from new mansion
+	3 haunted paddle ball
+	make doll eye amulet (inigo)
+	creepy doll head
+	creepy voice box
+	ghost toga
+	make deluxe layer cake
+	2 moose antlers
+	make picture of you
+	rubber ribcage
+	3 half melted spoon
+	make staff of the electric range
+	3 jacobs rung
+	coal shovel
+	brams choker (SR in boilerroom)
+	Sommelier's towel
+	Tarnished tastevin
+	(maybe already have 3 plaid pocket square and 2 plaid skirt)
+
+
 
 ------------bca-------------------
 *change mana burning, summon divines until 1-2 rares for the day, then summon resolutions*
+kolhs specific items by after school crafting with intrinsics
+	Superwater
+	Miniature suspension bridge
+	Universal key
+	Modeling claymore
+	Quasireligious sculpture
 put call to get_kolhs_buff("xxxx") into setMood
-maybe platinum card is worth a pull for mp + daily dungeon?
-keep an appropriate flavour of magic
-use Disposable instant camera against racecar bob or bob racecar
-items from new mansion
 Little Geneticist DNA-Splicing Lab
-Sneaky Pete's leather jacket
-Airplane charter: Spring Break Beach
-Galloping Grill
-items from summon confiscated
-new turtle mechanics
 red zeppelin
-use fun guy spores
-spring break gear
 yearbook camera worth using in kolhs? <blinding flash in combat macro>;
 drink speakeasy drinks in ascension / helper
 change garden mid run?
-change mad hatrack to fancy scarecrow - "tional effort. With the frilly skirt equipped it acts as a quadruple-weight fairy capped at 8lbs (32lbs effective). With the double-ice britches it acts as a triple-weight leprechaun capped at 17lbs (51lbs effective). With the swashbuckling pants it is a triple-weight potato capped at 20lbs (60lbs effective), useful for Tower killing. Finally, if you're"
 hipster combats actually working? use during desert exploration
 use batter up banishing skill?
-pull polka pop?
-steam powered cheerleader when more powerful (eq equip)
-grimstone golem
-brother grim
-use wizards snack voucher potions
 semirares, optimal hot dog semirare
-stats from:
-	mox - old bronzer - sepia tan
-	mys - old rosewater cream - rosewater mark
-	mus - old eyebrow pencil - Browbeaten
-pull meat-inflating powder for nuns (and buy in ascend.ash)
-use confiscator buff items 
-	confiscated comic book - musc
-	confiscated cell phone - myst
-	confiscated love note - moxie
+spirit bell, seal medal etc as gear for asc? what about for non twistedmage chars?
 update helper.ash with new skills (saucemaven, pizza lover etc)
-mood includes new buffs (grease up)
 manor quest better, resistance in kitchen etc
 using banish gear? cheese eye, vivala
 am i wasting fury and not getting passives + batter up
-using resist buffs at aboo peak
-summon Shakespeare's sister's accordion for ATs (accordion appreciation doubles everything)(maybe, or is my weapon better? maybe only in hc?)
-in a big run, use hobo accordion buffs
 use nanorhino
-slimeling?
 gelatinous cubeling
-happy medium in run
-use galloping grill buff items (liquid smoke - liquidy smoky, marinade - marinated, Dollop of barbecue sauce - Barbecue Saucy, Bottle of lighter fluid - lit up, make ash soda and use it for ashen burps ml buff)
-spirit bell, seal medal etc as gear for asc? what about for non twistedmage chars?
+maybe platinum card is worth a pull for mp + daily dungeon?
 
 
 ---skills---

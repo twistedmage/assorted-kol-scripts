@@ -415,10 +415,10 @@ familiar start_familiar() {
 	if(my_path() == "Zombie Slayer" && have_familiar($familiar[Hovering Skull]))
 		return $familiar[Hovering Skull];
 	
-	foreach f in $familiars[He-Boulder, Frumious Bandersnatch, Baby Bugged Bugbear, Bloovian Groose, Gluttonous Green Ghost, 
+	foreach f in $familiars[He-Boulder, galloping grill, baby sandworm, hovering sombrero, Frumious Bandersnatch, Baby Bugged Bugbear, Bloovian Groose, Gluttonous Green Ghost, 
 	  Spirit Hobo, Fancypants Scarecrow, Ancient Yuletide Troll, Cheshire Bat, Cymbal-Playing Monkey, Nervous Tick, 
 	  Hunchbacked Minion, Uniclops, Chauvinist Pig, Dramatic Hedgehog, Blood-Faced Volleyball, Reagnimated Gnome, 
-	  Jill-O-Lantern, Hovering Sombrero]
+	  Jill-O-Lantern]
 		if(have_familiar(f) && good(f)) return f;
 	
 	return $familiar[none];
@@ -719,11 +719,32 @@ void special(boolean bonus_actions) {
 			}
 			if(my_path()=="BIG!")
 			{
-				 if(my_primestat()==$stat[moxie])
-					pull_and_wear_if_good($item[bottle-rocket crossbow]);
-				else
-					pull_and_wear_if_good($item[haiku katana]);
+				if(my_class()==$class[accordion thief])
+				{
+					print("creating a Shakespeare's Sister's Accordion, better than bottle rocket","purple");
 					
+					//try to craft
+					if(available_amount($item[Shakespeare's Sister's Accordion])<1 && have_skill($skill[summon smithsness]))
+					{
+						if(available_amount($item[brituminous coal])==0)
+							use_skill(1,$skill[summon smithsness]);
+							
+						create(1,$item[Shakespeare's Sister's Accordion]);
+						equip($item[Shakespeare's Sister's Accordion]);
+					}
+					//pull
+					if(available_amount($item[Shakespeare's Sister's Accordion])<1)
+						pull_and_wear_if_good($item[Shakespeare's Sister's Accordion]);
+				}
+				//get somethign else instead
+				if(equipped_amount($item[Shakespeare's Sister's Accordion])==0)
+				{
+					if(my_primestat()==$stat[moxie])
+						pull_and_wear_if_good($item[bottle-rocket crossbow]);
+					else
+						pull_and_wear_if_good($item[haiku katana]);
+				}
+
 				pull_and_wear_if_good($item[v for vivala mask],$slot[acc2]);
 				pull_and_wear_if_good($item[mr. accessory jr.],$slot[acc1]);
 				if(available_amount($item[astral mask])>0)
@@ -733,19 +754,25 @@ void special(boolean bonus_actions) {
 			}
 			else //not big
 			{
-				if(my_class()==$class[sauceror])
+				if(my_class()==$class[sauceror] && have_skill($skill[summon smithsness]))
 				{
 					print("creating a saucepanic, better stats than  ice sickle","purple");
-					
+					//try to craft
 					if(available_amount($item[saucepanic])<1 && have_skill($skill[summon smithsness]))
+					{
 						if(available_amount($item[brituminous coal])==0)
 							use_skill(1,$skill[summon smithsness]);
 							
-					create(1,$item[saucepanic]);
-					equip($item[saucepanic]);
+						create(1,$item[saucepanic]);
+						equip($item[saucepanic]);
+					}
+					//pull
+					if(available_amount($item[saucepanic])<1)
+						pull_and_wear_if_good($item[saucepanic]);
 				}
-				else
+				if(equipped_amount($item[saucepanic])<1)
 					pull_and_wear_if_good($item[ice sickle]);
+
 				pull_and_wear_if_good($item[juju mojo mask],$slot[acc2]);
 				//if we have no astral belt, wear fangs. Else pull fangs as superclover but dont wear 
 				if(available_amount($item[astral belt])<1)

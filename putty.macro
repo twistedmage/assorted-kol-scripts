@@ -50,7 +50,7 @@ if (monstername black ops bugbear || monstername ancient unspeakable bugbear || 
 endif
 
 #unstunnable
-if (monstername oil * || monstername monstrous boiler || monstername plaque of locusts)
+if (monstername oil *)
 	#suck out oil
 	if monstername oil * && hascombatitem duskwalker syringe
 		use duskwalker syringe
@@ -105,8 +105,13 @@ if monstername * pirate
 	goto generic_spells2
 endif
 
-if hasskill transcendent olfaction && !haseffect on the trail          &&    (monstername dairy goat || monstername tomb rat || monstername blooper || monstername Hellion || monstername Bob Racecar || monstername Quiet Healer || monstername Goth Giant || monstername Blur || monstername Green Ops Soldier || monstername Zombie waltzers || monstername Shaky Clown || monstername Knott Yeti || monstername Hellion || monstername Violent Fungus || monstername Endless Conference Call || monstername * survivor || monstername pygmy bowler)
-	skill transcendent olfaction
+if (monstername writing desk || monstername dairy goat || monstername tomb rat || monstername blooper || monstername Hellion || monstername Bob Racecar || monstername Quiet Healer || monstername Goth Giant || monstername Blur || monstername Green Ops Soldier || monstername Zombie waltzers || monstername Shaky Clown || monstername Knott Yeti || monstername Hellion || monstername Violent Fungus || monstername Endless Conference Call || monstername * survivor || monstername pygmy bowler)
+	if hasskill transcendent olfaction && !haseffect on the trail
+		skill transcendent olfaction
+	endif
+	if (monstername Bob Racecar || monstername racecar bob) && hascombatitem disposable instant camera
+		use disposable instant camera
+	endif
 endif
 
 if !monstername Battlie Knight Ghost && !monstername ghost miner && !monstername Claybender Sorcerer Ghost && !monstername Dusken Raider Ghost && !monstername Space Tourist Explorer Ghost && !monstername Whatsian Commando Ghost  && !monstername sheet ghost && !monstername plaid ghost && (monstername lobsterfrogman || monstername ghost || monstername bricko bat || monstername angry bassist || monstername blue-haired girl || monstername evil ex-girlfriend || monstername peeved roommate || monstername random scenester || monstername black crayon * || monstername smut orc pervert)
