@@ -766,7 +766,7 @@ boolean main(string name, int remain) {
 		case "Wormwood":
 			return counter_report(remain, "adventure at <u>Wormwood</u> for "+get_property("wormwood"));
 		case "Dance Card":
-			if(remain < 0 && vars["BaleCC_useDanceCards"].to_boolean() && (can_interact() || item_amount($item[dance card])> 0))
+			if(remain < 0 && vars["BaleCC_useDanceCards"].to_boolean() && (item_amount($item[dance card])> 0))
 				use(1, $item[dance card]);
 			return counter_report(remain, "adventure at the <u>Haunted Ballroom</u> for a dance with <i>Rotting Matilda</i>");
 		case "Spookyraven Lights Out":

@@ -24,15 +24,26 @@
 <This Morse code was "-.. --- - -.. .- ... .... -.. --- - --. .- .--. -.. .- ... .... -.. --- - --. .- .--. -.. --- - --. .- .--. -.. --- - -.. --- - -.. .- ... .... --. .- .--. -.. .- ... .... -.. --- - -.. --- - -.. --- - --. .- .--. -.. --- - --. .- .--. -.. --- - -.. .- ... ....", which is interpreted as "DOTDASHDOTGAPDASHDOTGAPDOTGAPDOTDOTDASHGAPDASHDOTDOTDOTGAPDOTGAPDOTDASH". Interpreted again as Morse code, this is "RNEUBEA". Decoded with ROT13, this is "EARHORN".>
 
 sea stuff?
-make rings with black gold
+	//make
+	1 stick knifes of loathing
+	//gladiator
+	3 (4) pigsticker of violence (DB)
+	2 jodhpurs of violence (AT)
+	//scholar
+	2 lens of hatred (AT)
+	1 fuzzy slippers of hatred (DB)
+	1 pantaloons of hatred (SA)
+	1 (2) staff of simmering hatred (P)
+make rings with black gold <use inigos; 2 dark bacon, 2 dark ham>
+warbear dress gear?
 thinknerd warhouse - deactivated putty buddy, tiny plastics
 permanently get 10 pool skill with semirares (25 visits)
-	4 times
+	5 times
 unlock speakeasy
 unlock hotdogs
 additional hot dog unlock  (especially defective token, use token in ascension (pool skill, resistance, smithsness))
-spring break outfit, tattoo, skills
-ghast iron gear (+tatoo?)
+spring break outfit, tattoo, skills (last mind destroyer 16/08/2014 next (on/after?) 23rd)
+ghast iron gear (+tatoo?) USE INIGOS
 *girls gone wild*rl
 *wet t shirt*rl
 unlock avatars from steam elemental
@@ -44,21 +55,21 @@ trophies -
 	FANTASY - master rumplestiltskin
 	equip all 1 day stuff from thinknerd packages
 rumplestiltskin etc
-items from grimstone mask stuff
+win + misc items from grimstone mask stuff
 	tortoise + hare
-	witch
-
+	wolf
 	rumplestiltskin practice - parchment 59, glass 19
-	<greed, gluttony>
-	mother - vanity
-	father - lust lazy/violent
 dreadsylv gear (skele sword)
 discoveries
+items and skills from heavy rains?
+	buy non quest items from general store (3 water wings, life preserver, umbrella) skills?
+finish avatar of jarlsberg, finish avatar of sneaky pete, fully upgrade kolhs camera
 
 ------------bca-------------------
-which eudora are better?
 *change mana burning, summon divines until 1-2 rares for the day, then summon resolutions*
-use reagnimator instead of obtuse angel (don't need fam equip for 3 appearances? also change combat macro)
+put call to get_kolhs_buff("xxxx") into setMood
+maybe platinum card is worth a pull for mp + daily dungeon?
+keep an appropriate flavour of magic
 use Disposable instant camera against racecar bob or bob racecar
 items from new mansion
 Little Geneticist DNA-Splicing Lab
@@ -70,6 +81,7 @@ new turtle mechanics
 red zeppelin
 use fun guy spores
 spring break gear
+yearbook camera worth using in kolhs? <blinding flash in combat macro>;
 drink speakeasy drinks in ascension / helper
 change garden mid run?
 change mad hatrack to fancy scarecrow - "tional effort. With the frilly skirt equipped it acts as a quadruple-weight fairy capped at 8lbs (32lbs effective). With the double-ice britches it acts as a triple-weight leprechaun capped at 17lbs (51lbs effective). With the swashbuckling pants it is a triple-weight potato capped at 20lbs (60lbs effective), useful for Tower killing. Finally, if you're"
@@ -90,17 +102,14 @@ use confiscator buff items
 	confiscated comic book - musc
 	confiscated cell phone - myst
 	confiscated love note - moxie
-finish avatar of jarlsberg, finish avatar of sneaky pete
 update helper.ash with new skills (saucemaven, pizza lover etc)
 mood includes new buffs (grease up, icy glare)
-use items found from pocket crumbs
 manor quest better, resistance in kitchen etc
 using banish gear? cheese eye, vivala
 am i wasting fury and not getting passives + batter up
 using resist buffs at aboo peak
 summon Shakespeare's sister's accordion for ATs (accordion appreciation doubles everything)(maybe, or is my weapon better? maybe only in hc?)
 in a big run, use hobo accordion buffs
-with 2500 meat buy antique accordion for buffing
 use nanorhino
 slimeling?
 gelatinous cubeling
@@ -110,13 +119,11 @@ spirit bell, seal medal etc as gear for asc? what about for non twistedmage char
 
 
 ---skills---
-inner sauce - s
 testudinal teachings - tt
-curse of weaksauce -s 
 grease up
 deft hands - db
 utensil twist + hand that rocks the ladle - p
-icy gllare
+icy glare
 wry smile - s
 patient smile - tt
 knowing smile - at
@@ -160,11 +167,12 @@ In this paper we answer this question and propose solutions.
 
 -----------------------dinala------------------------------------------------------
 1 =  F2uoA: index 17-21 (yuzRV)
-2 = <> : index - (<> in bafh)
+2 = 1RBF5 : index 28-32 (mLnwx in kola)
+3 = <> : index - (<> in bafh)
 --------------------------------------------------------------------------------------
 kol addicts = Jc1DKGM7es KfuWedyuzR VD2LFb2mLn wxArVXmYEG MDtXvmS5NH T2CYW
 bafh 		= t1GT9j8DmT CP5cFHB53A KS1Um9io6y im9r82r6qr 7et1Eb57aP nQYQt
-me 			= ______UmW3 x_____F2uo A__regK1__ _________9 xen9__r7jn F35uR     +3xjH9?
+me 			= ______UmW3 x_____F2uo A__regK1RB F5_______9 xen9__r7jn F35uR     +3xjH9?
 
 
 -BRACHYDOMES

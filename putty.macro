@@ -73,8 +73,8 @@ endif
 if hasskill steal accordion
 	skill steal accordion
 endif
-if hasskill steal accordion
-	skill steal accordion
+if hasskill summon mayfly swarm
+	skill summon mayfly swarm
 endif
 
 if hascombatitem rain-doh blue balls 
@@ -109,8 +109,13 @@ if hasskill transcendent olfaction && !haseffect on the trail          &&    (mo
 	skill transcendent olfaction
 endif
 
-if hasskill Fire a badly romantic arrow&&  !monstername Battlie Knight Ghost && !monstername ghost miner && !monstername Claybender Sorcerer Ghost && !monstername Dusken Raider Ghost && !monstername Space Tourist Explorer Ghost && !monstername Whatsian Commando Ghost  && !monstername sheet ghost && !monstername plaid ghost && (monstername lobsterfrogman || monstername ghost || monstername bricko bat || monstername angry bassist || monstername blue-haired girl || monstername evil ex-girlfriend || monstername peeved roommate || monstername random scenester || monstername black crayon * || monstername smut orc pervert)
-	skill Fire a badly romantic arrow
+if !monstername Battlie Knight Ghost && !monstername ghost miner && !monstername Claybender Sorcerer Ghost && !monstername Dusken Raider Ghost && !monstername Space Tourist Explorer Ghost && !monstername Whatsian Commando Ghost  && !monstername sheet ghost && !monstername plaid ghost && (monstername lobsterfrogman || monstername ghost || monstername bricko bat || monstername angry bassist || monstername blue-haired girl || monstername evil ex-girlfriend || monstername peeved roommate || monstername random scenester || monstername black crayon * || monstername smut orc pervert)
+	if hasskill Fire a badly romantic arrow
+		skill Fire a badly romantic arrow
+	endif
+	if hasskill wink at gronald
+		skill wink at gronald
+	endif
 endif
 
 mark stunners

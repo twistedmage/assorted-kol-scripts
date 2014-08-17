@@ -685,7 +685,7 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 	consumable [int] con_map;
 	boolean bees_ok= (my_path() != "Bees hate you");
 
-	if(my_inebriety()< inebriety_limit() && can_drink())
+	if(my_inebriety()< inebriety_limit() && can_drink() && my_path()!="KOLHS")
 	{
 		print("","olive");
 			
@@ -1041,8 +1041,6 @@ void advise_summon()
 			print("-    familiar jacks and use with bandersnatch(cat,cat,cat)","black");
 		if(available_amount($item[quadroculars])<1)
 			print("-    familiar jacks and use with he boulder(cat,cat,cat)","black");
-		if(available_amount($item[quake of arrows])<1)
-			print("-    familiar jacks and use with obtuse angel(cat,cat,cat)","black");
 		if(available_amount($item[microwave stogie])<1 && in_hardcore())
 			print("-    familiar jacks and use with organ grinder (cat,cat,cat)","black");
 		if(available_amount($item[furry halo])<1)

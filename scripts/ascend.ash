@@ -210,6 +210,7 @@ void stock_hagnks()
 	buy_item($item[blackberry galoshes],1);
 	buy_item($item[Unconscious Collective Dream Jar],16);
 	buy_item($item[logging hatchet],1);
+	buy_item($item[hot wing],3);
 	
 	//stuff for twistedmage
 	if(my_name()=="twistedmage")
