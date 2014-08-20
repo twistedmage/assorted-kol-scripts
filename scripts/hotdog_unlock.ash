@@ -109,7 +109,7 @@ void unlock_ghost()
 	}
 	use_familiar($familiar[nosy nose]);
 	abort("line 111 Set combat macro to skeletal_cat");
-	while(my_adventures()>0 && i_a("gnawed-up dog bone")<desired_bone)
+	while(my_adventures()>0 && i_a("gnawed-up dog bone")<desired_bones)
 	{
 		print("Hunting for dog bone","blue");
 		adventure(1,$location[haunted conservatory]);
