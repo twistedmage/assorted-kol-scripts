@@ -746,7 +746,7 @@ void bcascBugbearHunt(); //Pre-declare so that the next function won't crash
 
 void get_kolhs_buff(string bufftype)
 {
-	if(my_path()=="KOLHS")
+	if(my_path()=="KOLHS" && to_int(get_property("_kolhsSavedByTheBell"))<3)
 	{
 		//which buff is for us
 		effect mybuff;
@@ -787,7 +787,17 @@ void get_kolhs_buff(string bufftype)
 		if(have_effect(mybuff)<1)
 		{
 			set_property("choiceAdventure772",mychoice);
-			bumAdv($location[The Hallowed Halls]);
+			cli_execute("checkpoint");
+			familiar fam = my_familiar();
+			use_familiar($familiar[steam-powered cheerleader]);
+			cli_execute("unequip hat");
+			print("trying to get kolhs buff","blue");
+			adv1($location[The Hallowed Halls],1,"");
+			print("finished trying","blue");
+			use_familiar(fam);
+			cli_execute("outfit checkpoint");
+			if(have_effect(mybuff)==0)
+				abort("Failed to get kolhs buff");
 		}
 	}
 }
@@ -1209,6 +1219,12 @@ string bumRunCombat(string consult) {
 		break;
 		case "anid":
 			str = to_string(visit_url("fight.php?action=macro&macrotext=&whichmacro=107718&macro=Execute+Macro"));
+		break;
+		case "dinala":
+			str = to_string(visit_url("fight.php?action=macro&macrotext=&whichmacro=107605&macro=Execute+Macro"));
+		break;
+		case "asica":
+			str = to_string(visit_url("fight.php?action=macro&macrotext=&whichmacro=107719&macro=Execute+Macro"));
 		break;
 		default:
 			abort("unrecognised player "+my_name());
@@ -4122,7 +4138,7 @@ void setMood(string combat) {
 		return;
 	}
 
-	if(my_path()=="KOLHS" && get_property("_kolhsAdventures").to_int()>=40 && (get_property("yearbookCameraPending")!="true" || get_property("_yearbookCameraTarget")==""))
+	if(my_path()=="KOLHS" && get_property("_kolhsAdventures").to_int()>=40 && (get_property("yearbookCameraPending")!="true" || get_property("yearbookCameraTarget")==""))
 		abort("Need to do the yearbook thing!");
 
 	cli_execute("mood bumcheekascend");
@@ -4188,9 +4204,8 @@ void setMood(string combat) {
 			//talk to grim brother if not already done
 			if(have_familiar($familiar[grim brother]) && !get_property("_grimBuff").to_boolean())
 			{
-				abort("url for talking to him?");
-				visit_url("");
-				visit_url("choice"); //choice 1, soles of glass
+				visit_url("familiar.php?action=chatgrim&pwd");
+				visit_url("choice.php?pwd&whichchoice=835&option=1&choiceform1=The+One+About+the+Stepdaughter+and+the+Glass+Clothing"); //choice 1, soles of glass
 			}
 
 			if (willMood()) {
@@ -7413,12 +7428,15 @@ boolean bcascKnobKing() {
 	
 	if (can_interact()) {
 		print("BCC: You can interact, so do this the lazy way.", "purple");
-		while (!is_not_yet(get_property("questL05Goblin"), "finished")) {
+		while (is_not_yet(get_property("questL05Goblin"), "finished")) {
 			cli_execute("outfit Knob Goblin Harem Girl disguise");
 			cli_execute("use knob goblin perfume");
 			bumAdv($location[Throne Room], "+outfit Knob Goblin Harem Girl disguise", "meatboss", "", "Killing the Knob King");
 		}
-		return checkStage("knobking", true);
+		if(get_property("questL05Goblin")=="finished")
+			return checkStage("knobking", true);
+		else
+			abort("Somehow failed to beat the goblin king");
 	}
 	
 	if (is_not_yet(get_property("questL05Goblin"), "finished")) {
@@ -10536,7 +10554,7 @@ void bcascKOLHS()
 			{
 				if(have_effect(intrinsic)==0)
 					print("Got wrong (or no) intrinsic :(","red");
-				print("burning school","blue");
+				print("burning school "+get_property("_kolhsAdventures")+"/40","blue");
 				bumMiniAdv(1,zone);
 			}
 		}

@@ -437,7 +437,9 @@ void checkBoss()
 		path == "Zombie Slayer" ||
 		path == "Avatar of Jarlsberg" ||
 		path == "KOLHS" ||
-		path == "Avatar of Sneaky Pete" ) 
+		path == "Avatar of Sneaky Pete" ||
+		path == "Heavy Rains"
+	  ) 
 	{
 		return;
 	}
@@ -465,7 +467,7 @@ void checkForKnownPath()
 	    Bees Hate You, Way of the Surprising Fist, Trendy,
 	    Avatar of Boris, Bugbear Invasion,Zombie Slayer,Class Act,
 	    Avatar of Jarlsberg,BIG!,KOLHS,Class Act II: A Class For Pigs,
-		Avatar of Sneaky Pete,Slow and Steady] contains my_path()) )
+		Avatar of Sneaky Pete,Slow and Steady,Heavy Rains] contains my_path()) )
 	{
 		printColor( "Your current challenge path is not recognized by this script.  Proceed with caution.", "red" );
 		wait(2);
