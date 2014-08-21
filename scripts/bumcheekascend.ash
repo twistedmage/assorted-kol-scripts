@@ -9374,7 +9374,8 @@ boolean bcascManorBilliards() {
 	//Kitchen
 	if (item_amount($item[Spookyraven billiards room key]) == 0) {
 		print("BCC: Getting the Billiards Key", "purple");
-		cli_execute("familiar parrot");
+		if(have_path_familiar($familiar[Exotic Parrot]))
+			cli_execute("familiar parrot");
 		buMax("+1000 stench res, +1000 hot res");
 		while (item_amount($item[Spookyraven billiards room key]) == 0) {
 			if (have_effect($effect[elemental saucesphere]) == 0 && have_skill($skill[elemental saucesphere]) && have_castitems($class[sauceror], true)) use_skill(1, $skill[elemental saucesphere]);
@@ -10888,24 +10889,24 @@ void bcs12() {
 				}
 				else
 					while(get_property("flyeredML").to_int() < 9999)
+					{
 						if(my_path()!="Bugbear Invasion")
 						{
-	
 							//place florist friar plants
 							choose_all_plants("l", $location[The Hole in the Sky]);
 							eat_hot_dog("chilly dog",$location[The Hole in the Sky]);
-				
+							print("flyering hits","blue");
 							bumMiniAdv(1,$location[The Hole in the Sky]);
 						}
 						else
 						{
-	
 							//place florist friar plants
 							choose_all_plants("l", $location[The Middle Chamber]);
 							eat_hot_dog("chilly dog",$location[The Middle Chamber]);
-							
+							print("flyering middle chamber","blue");
 							bumMiniAdv(1,$location[the middle chamber]);
 						}
+					}
 				
 				//hand in
 				cli_execute("outfit "+bcasc_warOutfit);

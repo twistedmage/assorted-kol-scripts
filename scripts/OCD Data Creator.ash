@@ -196,7 +196,7 @@ save [$item[anti-anti-antidote]] = 0;
 save [$item[cold wad]] = 0;
 save [$item[epic wad]] = 0;
 save [$item[hot wad]] = 0;
-save [$item[prismatic wad]] = 0;
+save [$item[prismatic wad]] = 10;
 save [$item[soft green echo eyedrop antidote]] = 0;
 save [$item[sleaze wad]] = 0;
 save [$item[spooky wad]] = 0;
@@ -3425,7 +3425,7 @@ save [$item[Taco Dan's Taco Stand Flier]] = 1;
 save [$item[Taco Dan's Taco Stand Taco]] = 0;
 save [$item[Taco Dan's Taco Stand Chimichangarita]] = 0;
 save [$item[Taco Dan's Taco Stand Chillacious Churro]] = 0;
-save [$item[Unconscious Collective Dream Jar]] = 0;
+save [$item[Unconscious Collective Dream Jar]] = 16;
 save [$item[Claybender glasses]] = 3;
 save [$item[Duskwalker fangs]] = 3;
 save [$item[Space Tourist Phaser]] = 3;
@@ -4314,6 +4314,11 @@ save [$item[witch's brew]] = 0;
 save [$item[broken warbear gyrocopter]] = 0;
 save [$item[gnawed-up dog bone]] = 3;
 save [$item[too legit potion]] = 0;
+save [$item[oil shell]] = 1;
+save [$item[tofurkey nugget]] = 0;
+save [$item[shocked shell]] = 1;
+save     [$item[ingot turtle]] = 0;
+
 
 
 //stuff to sell later;s

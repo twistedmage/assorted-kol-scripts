@@ -418,15 +418,15 @@ void main()
 	}
 	cli_execute("Tourguide 0.9.ash");
 	visit_url("ascend.php");
-	if(my_name()=="twistedmage")
-	{
+//	if(my_name()=="twistedmage")
+//	{
 		abort("Choose the familiar yourself!");
-	}
-	else
-	{
+//	}
+//	else
+//	{
 		//Squamous Gibberer familiar
-		visit_url("ascend.php?action=ascend&ascend=Squamous%2BGibberer&confirm=on&confirm2=on&pwd");
-		visit_url("valhalla.php?place=inn&pwd");
-		visit_url("valhalla.php?place=consultant&pwd");
-	}
+//		visit_url("ascend.php?action=ascend&ascend=Squamous%2BGibberer&confirm=on&confirm2=on&pwd");
+//		visit_url("valhalla.php?place=inn&pwd");
+//		visit_url("valhalla.php?place=consultant&pwd");
+//	}
 }

@@ -5,9 +5,9 @@
 //		<put mouse
 //	ask for hanky at canapes
 //ipecac in canoli
-
 script "bumfantasy.ash";
 notify bumcheekcity;
+import bumcheekascend;
 
 void cindyOption(int choice, string place) {
 	switch (place) {
@@ -426,6 +426,79 @@ void witch()
 //pixie hot, 				piranha cold, 		weasel sleaze, 	snake stench, 	tree spooky
 
 
+
+void hare()
+{
+	cli_execute("mood clear");
+	use_familiar($familiar[disembodied hand]);
+	maximize("spell damage percent",false);
+	
+	while(have_effect($effect[song of sauce])<30)
+		use_skill(1,$skill[song of sauce]);
+	while(have_effect($effect[pisces in the skyces])<30)
+		use(1,$item[tobiko marble soda]);
+	while(have_effect($effect[Medieval Mage Mayhem])<30)
+		use(1,$item[scroll case]);
+	cli_execute("use jackass plumber home game");
+	cli_execute("pool strategic; pool strategic; pool strategic");
+	while(have_effect($effect[Elron's Explosive Etude])<30 && my_class()==$class[accordion thief] && my_level()>=15)
+		use_skill(1,$skill[Elron's Explosive Etude]);
+	
+	while(have_effect($effect[Puzzle Fury])<30)
+		use(1,$item[37x37x37 puzzle cube]);
+	while(have_effect($effect[Concentrated Concentration])<30)
+		use(1,$item[concentrated cordial of concentration ]);
+	while(have_effect($effect[sweet and red])<30)
+		use(1,$item[Sugar cherry]);
+	while(have_effect($effect[Concentration])<30)
+		use(1,$item[cordial of concentration]);
+	while(have_effect($effect[Aquarius Rising])<30)
+		use(1,$item[disco horoscope (Aquarius)]);
+	while(have_effect($effect[Erudite])<30)
+		use(1,$item[black sheepskin diploma]);
+		
+	while(have_effect($effect[Witch Breaded])<30 && fullness_limit() - my_fullness() >=3)
+		eat(1,$item[Witch's bread]);
+	while(have_effect($effect[You're Not Cooking])<30 && fullness_limit() - my_fullness() >=2)
+		eat(1,$item[fireman's lunch]);
+	while(have_effect($effect[Filled with Magic])<30 && fullness_limit() - my_fullness() >=1)
+		eat(1,$item[occult jelly donut ]);
+	while(have_effect($effect[Egg Burps])<30 && fullness_limit() - my_fullness() >=1)
+		eat(1,$item[plumber's lunch]);
+	while(have_effect($effect[Greasy Visage])<30 && fullness_limit() - my_fullness() >=1)
+		eat(1,$item[Can of Adultwitch]);
+	while(have_effect($effect[Night of the Nachos])<30 && fullness_limit() - my_fullness() >=1)
+		eat(1,$item[Nachos of the night]);
+	while(have_effect($effect[Cold Throat])<30 && fullness_limit() - my_fullness() >=1)
+		eat(1,$item[Ice cream sandwich]);
+	while(have_effect($effect[])<30 && fullness_limit() - my_fullness() >=1)
+		eat(1,$item[]);
+		
+	while(have_effect($effect[Drunk With Power])<30 && inebriety_limit() - my_inebriety() >=3)
+		drink(1,$item[elven moonshine]);
+		
+	while(have_effect($effect[Drunk With Power])<30 && inebriety_limit() - my_inebriety() >=3)
+		drink(1,$item[elven moonshine]);
+		
+	while(have_effect($effect[Indescribable Flavor])<30 && spleen_limit() - my_spleen_use() >=4)
+		use(1,$item[Indescribably horrible paste]);
+	while(have_effect($effect[crimbo Flavor])<30 && spleen_limit() - my_spleen_use() >=4)
+		use(1,$item[Crimbo paste]);
+	
+	//could also have put some spell crit stuff here - wizard squint, inner dog, cosmic flavour, ninja please, liquid luck?
+		
+	clear_combat_macro();
+	set_property("customCombatScript","hare");
+	set_property("battleAction","custom combat script");
+	while(contains_text(visit_url("woods.php"),"i911.gif"))
+	{
+		cli_execute("restore mp");
+		adventure(1,$location[A deserted stretch of I-911]);
+	}
+}
+
+
+
 void main(string option) {
 	cli_execute("clear mood");
 	switch (option) {
@@ -458,6 +531,15 @@ void main(string option) {
 			use(1, $item[grimstone mask]);
 			set_property("choiceAdventure829", 0);
 			witch();
+		break;
+		case "hare" :
+			if(have_effect($effect[hare-brained])==0)
+			{
+				set_property("choiceAdventure829", 5);
+				use(1, $item[grimstone mask]);
+				set_property("choiceAdventure829", 0);
+			}
+			hare();
 		break;
 	}
 }
