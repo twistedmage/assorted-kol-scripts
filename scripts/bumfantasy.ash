@@ -466,13 +466,11 @@ void hare()
 	while(have_effect($effect[Egg Burps])<30 && fullness_limit() - my_fullness() >=1)
 		eat(1,$item[plumber's lunch]);
 	while(have_effect($effect[Greasy Visage])<30 && fullness_limit() - my_fullness() >=1)
-		eat(1,$item[Can of Adultwitch]);
+		eat(1,$item[Can of Adultwitch&trade;]);
 	while(have_effect($effect[Night of the Nachos])<30 && fullness_limit() - my_fullness() >=1)
 		eat(1,$item[Nachos of the night]);
 	while(have_effect($effect[Cold Throat])<30 && fullness_limit() - my_fullness() >=1)
 		eat(1,$item[Ice cream sandwich]);
-	while(have_effect($effect[])<30 && fullness_limit() - my_fullness() >=1)
-		eat(1,$item[]);
 		
 	while(have_effect($effect[Drunk With Power])<30 && inebriety_limit() - my_inebriety() >=3)
 		drink(1,$item[elven moonshine]);
@@ -497,6 +495,62 @@ void hare()
 	}
 }
 
+//238 381
+//228 361
+void wolf()
+{
+	//noncom buffs
+	while(have_effect($effect[Smooth Movements])<30)
+		use_skill(1,$skill[Smooth Movement]);
+	while(have_effect($effect[The Sonata of Sneakiness])<30)
+		use_skill(1,$skill[The Sonata of Sneakiness]);
+	while(have_effect($effect[Fresh Scent])<30)
+		use(1,$item[chunk of rock salt ]);
+		
+	use_familiar($familiar[evil teddy bear]);
+	cli_execute("friars familiar");
+	cli_execute("maximize hp regen min, hp regen max, 0.01 hp, 0.01 familiar weight, -7 combat");
+	while(have_effect($effect[Green Tongue])<30)
+		use(1,$item[green snowcone]);
+	while(have_effect($effect[Curiosity of Br'er Tarrypin])<30)
+		use_skill(1,$skill[Curiosity of Br'er Tarrypin]);
+	while(have_effect($effect[Heart of White])<30)
+		use(1,$item[white candy heart]);
+	while(have_effect($effect[Blue Swayed])<30)
+		use(1,$item[pulled blue taffy]);
+	
+	boolean improved_howling=false
+	int turns_left=30;
+	
+	while(turns_left>30)
+	{
+		cli_execute("restore hp");
+		if(get_property("lastEncounter"=="Back Room Dealings")
+			improved_howling=true;
+			
+		if(!improved_howling)
+		{
+			//get howling
+			set_property("choiceAdventure830","3"); 
+			set_property("choiceAdventure834","1"); 
+			adventure(1,$location[inner wolf gym])	
+		}
+		else //got howling
+		{
+			//get elemental attacks
+			set_property("choiceAdventure830","2"); 
+			set_property("choiceAdventure833","1"); 
+			<use moveable feast before going to slums>
+		}
+	}
+	//try and get improved howling?
+}
+//nc on 23, nc on 13, 4
+//combat with 22, 6/6, 10, 16, 2 = 10
+//combat with 12, 9/9, 13, 22, 1 (5 elemental) = 24
+//combat with 3, 12/12, 16, 25, 1 (5 elemental) = 
+//hp regen doesn't trigger... nor does campfire
+//should only fight brick houses, huff others
 
 
 void main(string option) {
@@ -540,6 +594,15 @@ void main(string option) {
 				set_property("choiceAdventure829", 0);
 			}
 			hare();
+		break;
+		case "wolf" :
+			if(!contains_text(visit_url("woods.php"),"skidrow.gif"))
+			{
+				set_property("choiceAdventure829", 2);
+				use(1, $item[grimstone mask]);
+				set_property("choiceAdventure829", 0);
+			}
+			wolf();
 		break;
 	}
 }

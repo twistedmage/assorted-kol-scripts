@@ -9172,13 +9172,14 @@ boolean bcascManorBathroom() {
 
 	string questLog = visit_url("questlog.php?which=1");
 	if(contains_text(questLog, "Lady Spookyraven's Dance")) {
+		visit_url("place.php?whichplace=manor2&action=manor2_ladys");
 		if (!contains_text(questLog, "her powder puff from the Haunted Bathroom") && contains_text(questLog, "her powder puff")) {
 			checkStage("manorbathroom", true);
 			return true;
 		}
 	} else {
 		visit_url("place.php?whichplace=manor2&action=manor2_ladys");
-		if(!contains_text(visit_url("questlog.php?which=1"), "Lady Spookyraven's Dance")) {
+		if(!contains_text(visit_url("questlog.php?which=1"), "Lady Spookyraven's Dance") && !contains_text(visit_url("questlog.php?which=7"),"Lady Spookyraven's Necklace")) {
 			checkStage("manorbathroom", true);
 			return true;
 		}
@@ -9226,7 +9227,7 @@ boolean bcascManorBedroom() {
 		}
 	} else {
 		visit_url("place.php?whichplace=manor2&action=manor2_ladys");
-		if(!contains_text(visit_url("questlog.php?which=1"), "Lady Spookyraven's Dance")) {
+		if(!contains_text(visit_url("questlog.php?which=1"), "Lady Spookyraven's Dance") && !contains_text(visit_url("questlog.php?which=1"), "Lady Spookyraven's Necklace")) {
 			checkStage("manorbedroom", true);
 			return true;
 		}
@@ -9286,7 +9287,7 @@ boolean bcascManorGallery() {
 		}
 	} else {
 		visit_url("place.php?whichplace=manor2&action=manor2_ladys");
-		if(!contains_text(visit_url("questlog.php?which=1"), "Lady Spookyraven's Dance")) {
+		if(!contains_text(visit_url("questlog.php?which=1"), "Lady Spookyraven's Dance") && !contains_text(visit_url("questlog.php?which=1"), "Lady Spookyraven's Necklace")) {
 			checkStage("manorgallery", true);
 			return true;
 		}
@@ -9424,14 +9425,28 @@ boolean bcascManorLibrary() {
 		set_property("choiceAdventure889", "1");  //Fall - skip
 	}
 	
+	//already done?
+	visit_url("place.php?whichplace=manor1&action=manor1_ladys");
+	if(!contains_text(visit_url("questlog.php?which=7"),"Lady Spookyraven's Necklace"))
+	{
+		visit_url("place.php?whichplace=manor2&action=manor2_ladys");
+		checkStage("manorlibrary", true);
+		return true;
+	}
+		
 	//Open up the second floor of the manor. 
-	while (available_amount($item[ghost of a necklace]) + available_amount($item[Lady Spookyraven's necklace]) == 0) {
+	while (available_amount($item[Lady Spookyraven's necklace]) == 0) {
 		bumAdv($location[The Haunted Library], "", "", "1 lady spookyraven's necklace", "Opening Second floor of the Manor", "+");
 	}
 	if (available_amount($item[Lady Spookyraven's necklace]) > 0) {
 		visit_url("place.php?whichplace=manor1&action=manor1_ladys");
 	}
-	if (available_amount($item[ghost of a necklace]) > 0) {
+	else
+		abort("Failed to get necklace");
+	
+	//if we are done, get next stage
+	if(!contains_text(visit_url("questlog.php?which=7"),"Lady Spookyraven's Necklace"))
+	{
 		visit_url("place.php?whichplace=manor2&action=manor2_ladys");
 		checkStage("manorlibrary", true);
 		return true;
@@ -11481,6 +11496,26 @@ void bumcheekcend() {
 }
 
 void mainWrapper() {
+	//use gyro if poss
+	if(!to_boolean(get_property("_warbearGyrocopterUsed")))
+	{
+		print("----------CAN USE GYROCOPTER!---------","red");
+		if(i_a("warbear gyrocopter")==0)
+			print("----------(BUT DON'T HAVE ONE!---------","red");
+		else
+		{	
+			//use gryo
+			visit_url("curse.php?whichitem=7038");
+			if(my_name()=="twistedmage")
+				visit_url("curse.php?action=use&pwd&whichitem=7038&targetplayer=dinala&curse=0");
+			else
+				visit_url("curse.php?action=use&pwd&whichitem=7038&targetplayer=twistedmage&curse=0");
+		}
+		cli_execute("inventory refresh");
+		if(can_interact() && i_a("warbear gyro")>0 && my_name()!="twistedmage")
+			cli_execute("csend * warbear gyro to twistedmage");		
+	}
+		
 //	if(my_level()==4 || my_level()==5)
 //		abort("do cola battlefield");
 	if(to_boolean(get_property("_jickJarAvailable")))
