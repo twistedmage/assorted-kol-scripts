@@ -4318,7 +4318,10 @@ save [$item[oil shell]] = 1;
 save [$item[tofurkey nugget]] = 0;
 save [$item[shocked shell]] = 1;
 save     [$item[ingot turtle]] = 0;
-
+save [$item[pentatonic accordion]] = 1;
+save [$item[coal dust]] = 0;
+save [$item[extra-flat panini]] = 0;
+save [$item[whatsit-covered turtle shell]] = 1;
 
 
 //stuff to sell later;s

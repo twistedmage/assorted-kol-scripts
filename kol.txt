@@ -155,13 +155,15 @@ In this paper we answer this question and propose solutions.
 -----------------------asica------------------------------------------------------
 1 = 9xen9 : index 40-44 (GMDtX in kola)
 2 = F35uR : index 51-55 (T2CYW in kola)
-3 = <> : index - (<> in bafh)
+3 = jH9jB : index 12-16 (P5cFH in bafh)
+4 =  : index - ( in bafh)
 --------------------------------------------------------------------------------------
 
 -----------------------anid------------------------------------------------------
 1 = regK1 : index 24-28 (LFb2m)
 2 = F35uR : index 51-55 (T2CYW in kola)
-3 = <> : index - (<> in bafh)
+3 = xen9N : index 41-45 (7et1E in bafh)
+4 =  : index - ( in bafh)
 --------------------------------------------------------------------------------------
 
 -----------------------dinala------------------------------------------------------
@@ -171,7 +173,7 @@ In this paper we answer this question and propose solutions.
 --------------------------------------------------------------------------------------
 kol addicts = Jc1DKGM7es KfuWedyuzR VD2LFb2mLn wxArVXmYEG MDtXvmS5NH T2CYW
 bafh 		= t1GT9j8DmT CP5cFHB53A KS1Um9io6y im9r82r6qr 7et1Eb57aP nQYQt
-me 			= ______UmW3 x_____F2uo A1zregK1RB F5_______9 xen9__r7jn F35uR     +3xjH9?
+me 			= ______UmW3 xjH9jBF2uo A1zregK1RB F5_______9 xen9N_r7jn F35uR     +3xjH9?
 
 
 -BRACHYDOMES
