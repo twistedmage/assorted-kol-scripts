@@ -3773,7 +3773,7 @@ boolean innerSetFamiliar(string famtype) {
 	//Sombrero type familiars are probably best in all zones from itznotyerzitz mine onwards (level 8 quest plus)
 	//but to simplify things since we don't know the zone, lets just prefer a sombrero at all times
 	//THIS ONLY APPLIES IF WE HAVE A LOT OF ML
-	if(numeric_modifier("monster level")>100)
+	if(numeric_modifier("monster level")>=100)
 	{
 		if (have_path_familiar($familiar[galloping grill])) {
 			use_familiar($familiar[galloping grill]);
@@ -6924,7 +6924,7 @@ boolean bcascFriarsSteel() {
 	if (get_property("bcasc_skipSteel") == "true") return checkStage("friarssteel", true);
 	if (have_steel()) return checkStage("friarssteel", true);
 	if (my_path() == "Avatar of Boris" && (minstrel_instrument() != $item[Clancy's lute] && i_a("Clancy's lute") == 0)) return false;
-	if (my_path() == "KOLHS") return false; //in kolhs you don't get enough booze to go over 10 drunkeness anyway
+	if (my_path() == "KOLHS" && my_name()!="twistedmage") return false; //in kolhs you don't get enough booze to go over 10 drunkeness, unless you have huge +item available and get it in hallowed halls
 
 	boolean logicPuzzleDone() {
 		/*    
@@ -10526,15 +10526,15 @@ void bcascKOLHS()
 		if(my_primestat()==$stat[muscle])
 		{
 			intrinsic=$effect[jamming with the jocks];
-			effect wrong_intrinsic1=$effect[greaser lightnin'];
-			effect wrong_intrinsic2=$effect[nerd is the word];
+			wrong_intrinsic1=$effect[greaser lightnin'];
+			wrong_intrinsic2=$effect[nerd is the word];
 			zone=$location[shop class];
 		}
 		else if(my_primestat()==$stat[moxie])
 		{
 			intrinsic=$effect[greaser lightnin'];
-			effect wrong_intrinsic1=$effect[nerd is the word];
-			effect wrong_intrinsic2=$effect[jamming with the jocks];
+			wrong_intrinsic1=$effect[nerd is the word];
+			wrong_intrinsic2=$effect[jamming with the jocks];
 			zone=$location[art class];
 		}
 		
@@ -10564,10 +10564,25 @@ void bcascKOLHS()
 			if(get_property("_kolhsAdventures").to_int() < 20 && have_effect(intrinsic)==0 && have_effect(wrong_intrinsic1)==0 && have_effect(wrong_intrinsic2)==0)
 			{
 				print("Getting intrisic: "+intrinsic,"blue");
+				setMood("i");
+//TEMP TO GET 
+clear_combat_macro();
+visit_url("account.php?actions[]=autoattack&autoattack=99125693&flag_aabosses=1&flag_wowbar=1&flag_compactmanuel=1&pwd&action=Update");
+string skill_str =visit_url("account.php?tab=combat");
+matcher skill_mtch = create_matcher("option selected=\"selected\" value=\"(\\d*)\">([\\w \(\)]*)",skill_str);
+if(skill_mtch.find())
+{
+	print("combat macro set to \""+skill_mtch.group(2)+"\"","lime");
+}
+else
+	abort("Matcher couldn't work out what combat macro was chosen");
+//abort("get intrinsic for trophy");
+				
 				bumMiniAdv(1,$location[The Hallowed Halls]);
 			}
 			else
 			{
+				setMood("i");
 				if(have_effect(intrinsic)==0)
 					print("Got wrong (or no) intrinsic :(","red");
 				print("burning school "+get_property("_kolhsAdventures")+"/40","blue");
@@ -11506,10 +11521,10 @@ void mainWrapper() {
 		{	
 			//use gryo
 			visit_url("curse.php?whichitem=7038");
-			if(my_name()=="twistedmage")
-				visit_url("curse.php?action=use&pwd&whichitem=7038&targetplayer=dinala&curse=0");
+			if(my_name()=="dinala")
+				visit_url("curse.php?action=use&pwd&whichitem=7038&targetplayer=anid&curse=0");
 			else
-				visit_url("curse.php?action=use&pwd&whichitem=7038&targetplayer=twistedmage&curse=0");
+				visit_url("curse.php?action=use&pwd&whichitem=7038&targetplayer=dinala&curse=0");
 		}
 		cli_execute("inventory refresh");
 		if(can_interact() && i_a("warbear gyro")>0 && my_name()!="twistedmage")

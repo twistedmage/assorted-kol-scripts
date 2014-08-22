@@ -473,10 +473,10 @@ void handle_starting_items() {
 
 void recovery_settings() {
 	// Optimal restoration settings for level 1. These will need to be changed by level 4
-		set_choice("hpAutoRecovery", "0.25", "Resetting HP/MP restoration settings to minimal");
-		set_choice("hpAutoRecoveryTarget", "0.95", "");
-		set_choice("manaBurningTrigger", "-0.05", "");
-		set_choice("manaBurningThreshold", "0.80", "");
+	set_choice("hpAutoRecovery", "0.25", "Resetting HP/MP restoration settings to minimal");
+	set_choice("hpAutoRecoveryTarget", "0.95", "");
+	set_choice("manaBurningTrigger", "-0.05", "");
+	set_choice("manaBurningThreshold", "0.80", "");
 	// Zombie Slayers have an alternative to using mana
 	if(my_path() == "Zombie Slayer") {
 		if(get_property("baleUr_ZombieAuto") != "")
@@ -488,8 +488,8 @@ void recovery_settings() {
 		// Turn off mana restoration in combat. It causes problems in zombiecore
 		set_property("autoManaRestore", "false");
 	} else {
-		set_choice("mpAutoRecovery", "0.0", "");
-		set_choice("mpAutoRecoveryTarget", "0.0", "");
+		set_choice("mpAutoRecovery", "0.3", "");
+		set_choice("mpAutoRecoveryTarget", "0.6", "");
 	}
 	
 }

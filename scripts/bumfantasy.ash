@@ -519,36 +519,51 @@ void wolf()
 	while(have_effect($effect[Blue Swayed])<30)
 		use(1,$item[pulled blue taffy]);
 	
-	boolean improved_howling=false
+	boolean improved_howling=false;
+	boolean vending=true; //start true, only go to vendor on second/third
 	int turns_left=30;
 	
-	while(turns_left>30)
+	while(turns_left>0)
 	{
 		cli_execute("restore hp");
-		if(get_property("lastEncounter"=="Back Room Dealings")
+		if(get_property("lastEncounter")=="Back Room Dealings")
 			improved_howling=true;
+		if(get_property("lastEncounter")=="Vendie, Vidi, Vici")
+			vending=true;
 			
 		if(!improved_howling)
 		{
 			//get howling
 			set_property("choiceAdventure830","3"); 
-			set_property("choiceAdventure834","1"); 
-			adventure(1,$location[inner wolf gym])	
+			set_property("choiceAdventure834","2"); 
+			adventure(1,$location[inner wolf gym]);
 		}
-		else //got howling
+		else if(!vending)//got howling
 		{
 			//get elemental attacks
 			set_property("choiceAdventure830","2"); 
-			set_property("choiceAdventure833","1"); 
-			<use moveable feast before going to slums>
+			set_property("choiceAdventure833","2"); 
+			adventure(1,$location[inner wolf gym]);
 		}
+		else
+		{
+			cli_execute("use moveable feast");
+			abort("go to skid row");
+		}
+		turns_left-=1;
 	}
+	<florist?>
 	//try and get improved howling?
 }
 //nc on 23, nc on 13, 4
 //combat with 22, 6/6, 10, 16, 2 = 10
 //combat with 12, 9/9, 13, 22, 1 (5 elemental) = 24
-//combat with 3, 12/12, 16, 25, 1 (5 elemental) = 
+//combat with 3, 12/12, 16, 25, 1 (5 elemental) = 49
+//
+//24, 6/6, 13, 13, 1 = 15
+//15, 7/7, 19, 16, 2 = 24
+//3, 11/11, 22, 19, 3 =48
+//
 //hp regen doesn't trigger... nor does campfire
 //should only fight brick houses, huff others
 

@@ -636,7 +636,7 @@ void advise_food()
 			add_food(con_map,"- Snow berries ",2.5,0,1);
 		if(available_amount($item[ice harvest])>0 && checkStage("bats1", false))
 			add_food(con_map,"- Ice harvest ",2.5,0,1);
-		if(available_amount($item[Snow berries])>2 && (to_int(get_property("chasmBridgeProgress")) >= 30) && my_level()>=8)
+		if(available_amount($item[Snow berries])>2 && checkStage("bats1", false) && (to_int(get_property("chasmBridgeProgress")) >= 30) && my_level()>=8)
 			add_food(con_map,"- Snow crab ",6,0,1);
 	
 		if(i_a("handful of smithereens")>0  || i_a("this charming flan")>0 || get_property("tomeSummons").to_int()<3)

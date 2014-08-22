@@ -676,6 +676,10 @@ spread m_regular() {               // damage dealt by monster attack
       case $monster[pufferfish]: return to_spread(2 + 2**round);
       case $monster[the unkillable skeleton (hard mode)]: return to_spread(my_maxhp()*0.09);
       case $monster[great wolf of the air (hard mode)]: if (round % 2 == 1) return to_spread(my_maxhp() + 50 - max(0,numeric_modifier("Damage Reduction"))); break;
+      case $monster[ninja snowman assassin]: spread res;
+         res[m.attack_element] = (max(0,monster_stat("att") - my_defstat()) + 110)*
+          (1 - minmax((square_root(max(0,numeric_modifier("Damage Absorption"))/10) - 1)/10,0,0.9));
+         return res;
    }
    spread res;
    res[m.attack_element] = max(1.0,max(0,max(0,monster_stat("att")) - my_defstat(true)) + 0.225*max(0,monster_stat("att")) - max(0,numeric_modifier("Damage Reduction"))) *
@@ -1469,7 +1473,7 @@ void set_monster(monster elmo) {  // should be called once per BB instance; init
    }
   // set default monster attributes
    nostun = false; nomultistun = false; nomiss = false; nohit = false; nospells = false; isseal = false;
-   howmanyfoes = 1; maxround = 30; damagecap = 0; capexp = 0; noitems = 0; noskills = 0;
+   howmanyfoes = 1; maxround = 30; damagecap = 0; capexp = 1; noitems = 0; noskills = 0;
    mvalcache = monstervalue();
    if (happened("use 5048")) mres = get_resistance($element[cold]);
     else mres = get_resistance(m.defense_element);
@@ -1480,7 +1484,7 @@ void set_monster(monster elmo) {  // should be called once per BB instance; init
       switch (attr) {
          case "maxround": if (is_integer(val)) maxround = to_int(val); vprint("This combat may last up to "+rnum(maxround)+" rounds.",8); break;
          case "group": if (is_integer(val)) howmanyfoes = to_int(val); vprint("This monster is a group of "+rnum(howmanyfoes)+".",8); break;
-         case "damagecap": if (is_integer(val)) damagecap = to_int(val); vprint("This monster has a soft damage cap of "+rnum(damagecap)+".",8); break;
+         case "damagecap": if (is_integer(val)) damagecap = to_int(val); vprint("This monster has a damage cap of "+rnum(damagecap)+".",8); break;
          case "capexp": capexp = to_float(val); vprint_html("Damage in excess of the damage cap will be reduced to X<sup>"+rnum(capexp)+"</sup>.",8); break;
          case "nohit": nohit = vprint("This monster has no attack.",8); break;
          case "nomiss": nomiss = vprint("This monster never misses.",8); break;
@@ -1506,7 +1510,7 @@ void set_monster(monster elmo) {  // should be called once per BB instance; init
    }
    switch (m) {
      // TODO: reanimated skeletons resist everything except pottery
-      case $monster[your shadow]: foreach te,it,rd in factors                  // delete regular damage, add healing as damage
+      case $monster[your shadow]: foreach te,it,rd in factors                // delete regular damage, add healing as damage
          factors[te,it].dmg = (rd.pdmg.length() > 1 && substring(rd.pdmg,0,1) == "-") ? substring(rd.pdmg,1) : "0"; break;
       case $monster[warbear officer]:
       case $monster[high-ranking warbear officer]:
@@ -1516,7 +1520,7 @@ void set_monster(monster elmo) {  // should be called once per BB instance; init
             case "Poly-Phasic":  mres[$element[none]] = 0.85; break;
 //          default: vprint("Unsupported warbear attribute: "+excise(page," the "," Warbear"),3);
          }
-         matcher drone = create_matcher("wbdrone(\\d+)\\.gif",page);      // store drone number in fvars, checked by m_event
+         matcher drone = create_matcher("wbdrone(\\d+)\\.gif",page);        // store drone number in fvars, checked by m_event
          if (drone.find()) { vprint("DRONE DETECTED: "+drone.group(1),4); fvars["wardrone"] = to_int(drone.group(1)); } break;
    }
    switch (my_location()) {
@@ -1559,11 +1563,13 @@ void set_monster(monster elmo) {  // should be called once per BB instance; init
       } break;
    }
   // account for +ML
-   if (numeric_modifier("_spec", "Monster Level") > 25) {
-      float ml_res = min(numeric_modifier("_spec", "Monster Level") * .004, .5);
-      foreach res,amt in mres mres[res] = ml_res + amt - (ml_res * amt);
-      if (numeric_modifier("_spec", "Monster Level") > 150) setmatt("nostun","");
-       else if (numeric_modifier("_spec", "Monster Level") > 100) setmatt("nomultistun","");
+   float ml = numeric_modifier("_spec", "Monster Level");
+   if (my_path() == "Heavy Rains") ml += (my_location().water_level + numeric_modifier("_spec", "Water Level"))*10;
+   if (ml > 25) {
+      if (ml > 150) setmatt("nostun","");
+       else if (ml > 100) setmatt("nomultistun","");
+      ml = min(ml * .004, .5);
+      foreach res,amt in mres mres[res] = ml + amt - (ml * amt);
    }
    parse_factors();
   // initialize effects/gear

@@ -55,6 +55,10 @@ void stock_hotdog(string html, string ingredient, int req_ing, int desired_dogs)
 				//optimal dog
 				dog=-102;
 				break;
+			case "sleaze wad":
+				//optimal dog
+				dog=-100;
+				break;
 			default:
 				abort("Unrecognised dog on ascend line 30, using ingredient "+ingredient);
 		}

@@ -4283,7 +4283,7 @@ save [$item[ancient hot dog wrapper]] = 1;
 save [$item[charrrm bracelet]] = 0;
 save [$item[sharpened spoon]] = 3;
 save     [$item[candy knife]] = 3;
-save [$item[soap     knife]] = 3;
+save [$item[soap knife]] = 3;
 save [$item[bottle of laundry sherry]] = 0;
 save [$item[giraffe-necked turtle]] = 0;
 save [$item[musk turtle]] = 0;
@@ -4322,9 +4322,45 @@ save [$item[pentatonic accordion]] = 1;
 save [$item[coal dust]] = 0;
 save [$item[extra-flat panini]] = 0;
 save [$item[whatsit-covered turtle shell]] = 1;
+save [$item[&quot;KICK ME&quot; sign]] = 0;
+save [$item[giant neckbeard]] = 0;
+save     [$item[steampunk potion]] = 0;
+save     [$item[Redeye&trade; Eyedrops]] = 0;
+save     [$item[Dweebisol&trade; inhaler]] = 0;
+save     [$item[Lewd Lemmy Hair Oil]] = 0;
+save     [$item[voodoo glowskull]] = 0;
+save [$item[sommelier's towel]] = 1;
+save     [$item[tarnished tastevin]] = 1;
+save     [$item[ghast iron Garibaldi]] = 2;
+save     [$item[ghast iron heater shield]] = 1;
+save     [$item[ghast iron codpiece]] = 2;
+save     [$item[turtle-shaped rock]] = 0;
+save [$item[rubber ribcage]] = 1;
+save     [$item[half-melted spoon]] = 3;
+save     [$item[creepy doll head]] = 1;
+save     [$item[creepy voice box]] = 1;
+save     [$item[ghost toga]] = 1;
+save [$item[coal shovel]] = 1;
+save     [$item[Bram's choker]] = 1;
+save [$item[Jerks' Health&trade; Magazine]] = 0;
+save     [$item[chocolate-stained collar]] = 1;
+save     [$item[Outer Wolf&trade; cologne]] = 0;
+save [$item[hi-octane carrot juice]] = 0;
+save [$item[fireman's lunch]] = 0;
+save     [$item[plain paper hat]] = 2;
+save [$item[skull gearshift knob]] = 1;
+save [$item[Sketcherz&trade;]]     = 3;
+save [$item[can of Adultwitch&trade;]] = 0;
+
+
+
 
 
 //stuff to sell later;s
+save [$item[jigsaw blade]] = -1;
+save     [$item[wood screw]] = -1;
+save     [$item[government cheese]] = -1;
+save     [$item[LCD game: Garbage River]] = -1;
 save [$item[mulberry]] = -1;
 save [$item[lemony scales]] = -1;
 save [$item[sour powder]] = -1;
