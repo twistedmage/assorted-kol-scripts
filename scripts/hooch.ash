@@ -83,15 +83,27 @@ void farm_hooch()
 	else
 		setFamiliar("items");
 	string max_str = "0.01 "+to_string(my_primestat());
-	max_str += ", +equip super-absorbent tarp, +equip birdbone corset, +equip law-abiding citizen cane, +equip hep waders, +equip banjo kazoo mount, +equip flask flops, +equip time-twitching toolbelt";
+	max_str += ", +equip super-absorbent tarp, +equip law-abiding citizen cane, +equip hep waders, +equip banjo kazoo mount, +equip flask flops, +equip time-twitching toolbelt";
+	if(have_skill($skill[torso awaregness]))
+		max_str += ", +equip birdbone corset";
 	if(i_a("time lord participation mug")>0)
 		max_str +=", +equip time lord participation mug";
-	+equip 4-dimensional fez, 
 	cli_execute("maximize "+max_str);
 	setMood("i");
 	
 	while(true)
+	{
+		matcher hooch_mtch = create_matcher("Hooch:</td><td align=left><b>(\\d*) / (\\d*)",visit_url("charpane.php"));
+		find(hooch_mtch);
+		int cur_hooch = group(hooch_mtch,1).to_int();
+		int max_hooch = group(hooch_mtch,2).to_int();
+		if(max_hooch - cur_hooch < 5)
+		{
+			visit_url("place.php?whichplace=twitch&action=twitch_shoerepair");
+			visit_url("choice.php?pwd&whichchoice=973&option=2&choiceform2=Turn+in+Hooch+%281+Adventure%29");
+		}
 		adventure(1,$location[An illicit bohemian party]);
+	}
 	//need to hand in
 }
 
@@ -126,7 +138,8 @@ void capsule_farm()
 
 void dump_gear()
 {
-	if(i_a("4-dimensional fez")>0)
+	cli_execute("outfit birthday suit");
+/*	if(i_a("4-dimensional fez")>0)
 		cli_execute("stash put * 4-dimensional fez");
 	if(i_a("super-absorbent tarp")>0)
 		cli_execute("stash put * super-absorbent tarp");
@@ -140,24 +153,24 @@ void dump_gear()
 		cli_execute("stash put * banjo kazoo mount");
 	if(i_a("flask flops")>0)
 		cli_execute("stash put * flask flops");
+	if(i_a("time lord participation mug")>0)
+		cli_execute("stash put * time lord participation mug");*/
 	if(i_a("time-twitching toolbelt")>0)
 		cli_execute("stash put * time-twitching toolbelt");
-	if(i_a("time lord participation mug")>0)
-		cli_execute("stash put * time lord participation mug");
 }
 
 void pull_gear()
 {
-	cli_execute("refresh stash");
-	cli_execute("stash take * 4-dimensional fez");
+	cli_execute("refresh_stash");
+/*	cli_execute("stash take * 4-dimensional fez");
 	cli_execute("stash take * super-absorbent tarp");
 	cli_execute("stash take * birdbone corset");
 	cli_execute("stash take * law-abiding citizen cane");
 	cli_execute("stash take * hep waders");
 	cli_execute("stash take * banjo kazoo mount");
 	cli_execute("stash take * flask flops");
-	cli_execute("stash take * time-twitching toolbelt");
-	cli_execute("stash take * time lord participation mug");	
+	cli_execute("stash take * time lord participation mug");*/
+	cli_execute("stash take * time-twitching toolbelt");	
 }
 
 
@@ -168,7 +181,12 @@ void main()
 	set_combat_macro();
 	set_property("valueOfAdventure","2000");
 	if(!get_property("SIMON_CAVVEDONE").to_boolean())
+	{
 		cave();
+	}
 	else
-		farm_hooch();
+	{
+		capsule_farm();
+	}
+//		farm_hooch();
 }
