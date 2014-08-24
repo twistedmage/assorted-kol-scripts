@@ -252,7 +252,7 @@ record consumable
 };
 
 //take details of a food, and add it to the con_map with it's efficiency
-void add_food(consumable[int] con_map,string text,float avg_adv,int craft_turns,int fullness)
+void add_food(consumable[int] con_map,string text,float avg_adv,int craft_turns,int fullness, boolean is_pizza=false)
 {
 	//check we can eat it
 	if(fullness>(fullness_limit() - my_fullness()))
@@ -263,6 +263,10 @@ void add_food(consumable[int] con_map,string text,float avg_adv,int craft_turns,
 	consumable con;
 	con.text=text;
 	con.avg_adv=avg_adv;
+	if(is_pizza && have_skill($skill[pizza lover]))
+	{
+		con.avg_adv = avg_adv + fullness;
+	}
 	con.craft_turns=craft_turns;
 	con.fullness=fullness;
 	//account for crafting
@@ -542,11 +546,11 @@ void advise_food()
 		}
 		if(have_outfit("filthy hippy") && available_amount($item[goat cheese])>0)
 		{
-			add_food(con_map,"-    pizza + goat cheese ",6.5,0,3);
+			add_food(con_map,"-    pizza + goat cheese ",6.5,0,3,true);
 		}
 		if(have_outfit("filthy hippy") && (available_amount($item[knob mushroom])>0 || available_amount($item[knob sausage])>0))
 		{
-			add_food(con_map,"-    pizza + mush/saus from knob kitchens ",6.5,0,3);
+			add_food(con_map,"-    pizza + mush/saus from knob kitchens ",6.5,0,3,true);
 		}
 		if(available_amount($item[Ye Wizard's Shack snack voucher])>0 || get_property("grimoire3Summons").to_int()==0 && my_path()!="Avatar of Boris")
 		{
@@ -665,6 +669,9 @@ void advise_food()
 			add_food(con_map,"- Single-serving herbal stuffing ",14,0,4);
 		if(available_amount($item[Herbal stuffing])>0)
 			add_food(con_map,"- Herbal stuffing ",18,0,4);
+			
+		if(available_amount($item[incredible pizza])>0)
+			add_food(con_map,"- incredible pizza ",13.5,0,4,true);
 
 
 		if(available_amount($item[magicberry tablets])>0)

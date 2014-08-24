@@ -2726,6 +2726,15 @@ void defaultMood(boolean castMojo) {
 		use(1,$item[Nail file]);
 	if(i_a("Old love note")>0 && have_effect($effect[Memories of Puppy Love])==0)
 		use(1,$item[Old love note]);
+	
+	
+	if(i_a("orcish hand lotion")>0 && have_effect($effect[hairy palms])==0)
+		use(1,$item[orcish hand lotion]);
+//	if(i_a("")>0 && have_effect($effect[])==0)
+//		use(1,$item[]);
+//	if(i_a("")>0 && have_effect($effect[])==0)
+//		use(1,$item[]);
+	
 
 	//confiscated items
 	if(i_a("Confiscated cell phone")>0 && have_effect($effect[OMG WTF])==0)
@@ -2761,7 +2770,7 @@ void defaultMood(boolean castMojo) {
 		use(1,$item[bowl of marinade]);
 	if(i_a("Dollop of barbecue sauce")>0 && have_effect($effect[Barbecue Saucy])==0)
 		use(1,$item[Dollop of barbecue sauce]);
-	if(i_a("hot ashes")>0 && have_effect($effect[ashen burps])==0)
+	if((i_a("ashen soda")>0 || (i_a("hot ashes")>0 && (i_a("soda water")>0 || my_meat()>=70))) && have_effect($effect[ashen burps])==0)
 		use(1,$item[ash soda]);
 	if(i_a("Bottle of lighter fluid")>0 && have_effect($effect[lit up])==0)
 		use(1,$item[Bottle of lighter fluid]);
@@ -3769,6 +3778,13 @@ boolean innerSetFamiliar(string famtype) {
 	
 	print("BCC: Using a default stat familiar.", "purple");
 	//Now either we have neither of the above, or we have enough spleen today.
+	
+	if(my_name()=="twistedmage")
+	{
+		print("TEMPORARILY USING SQUAMOUS TO GET ADVS FOR TOMORROW","red");
+		use_familiar($familiar[squamous gibberer]);
+		return true;
+	}
 	
 	//Sombrero type familiars are probably best in all zones from itznotyerzitz mine onwards (level 8 quest plus)
 	//but to simplify things since we don't know the zone, lets just prefer a sombrero at all times
@@ -5413,6 +5429,7 @@ boolean bcasc8Bit() {
 			bumAdv($location[8-bit realm], "+equip continuum transfunctioner +item drop", "items", "1 digital key", "Getting the digital key (from 8 bit)", "i");
 		}
 	}
+		
 	if(have_effect($effect[consumed by fear])>0)
 		cli_execute("hottub");
 	if(have_effect($effect[consumed by fear])>0)
@@ -10036,7 +10053,7 @@ boolean bcascSpookyForest() {
 		return true;
 	}
 	
-	if (to_int(get_property("lastTempleUnlock")) != my_ascensions() && get_property("bcasc_openTempleLater") == "false") {
+	if (to_int(get_property("lastTempleUnlock")) != my_ascensions() && get_property("bcasc_openTempleLater") != "true") {
 		bcascOpenTemple();
 	}
 	bprint("spookyforest");
@@ -10582,6 +10599,7 @@ else
 			}
 			else
 			{
+				set_combat_macro();
 				setMood("i");
 				if(have_effect(intrinsic)==0)
 					print("Got wrong (or no) intrinsic :(","red");
@@ -10661,6 +10679,8 @@ boolean bcascWand() {return bcascWand(false);}
 ********************************************************/
 
 void bcs1() {
+if(my_level()>=4 && my_level()<=5)
+	abort("Go to cola battlefield wiith earhorn");
 	if(my_path()=="KOLHS")
 		bcascKOLHS();
 	get_dungeon_kit();
@@ -10718,7 +10738,7 @@ void bcs4() {
 	//SIMON ADDED
 	if(my_path()=="Zombie Slayer")
 		bcascDailyDungeon();
-	if (my_buffedstat(my_primestat()) > 35) bcasc8Bit();
+	bcasc8Bit();
 	levelMe(20, true);
 }
 
