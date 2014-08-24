@@ -78,11 +78,15 @@ void farm_hooch()
 		use(1,$item[borrowed time]);
 		
 	//get hooch gear
-	setFamiliar("items");
+	if(have_familiar($familiar[disembodied hand]))
+		use_familiar($familiar[disembodied hand]);
+	else
+		setFamiliar("items");
 	string max_str = "0.01 "+to_string(my_primestat());
-	max_str += ", +equip 4-dimensional fez, +equip super-absorbent tarp, +equip birdbone corset, +equip law-abiding citizen cane, +equip hep waders, +equip banjo kazoo mount, +equip flask flops, +equip time-twitching toolbelt";
+	max_str += ", +equip super-absorbent tarp, +equip birdbone corset, +equip law-abiding citizen cane, +equip hep waders, +equip banjo kazoo mount, +equip flask flops, +equip time-twitching toolbelt";
 	if(i_a("time lord participation mug")>0)
 		max_str +=", +equip time lord participation mug";
+	+equip 4-dimensional fez, 
 	cli_execute("maximize "+max_str);
 	setMood("i");
 	
@@ -144,15 +148,16 @@ void dump_gear()
 
 void pull_gear()
 {
-	cli_execute("stash pull * 4-dimensional fez");
-	cli_execute("stash pull * super-absorbent tarp");
-	cli_execute("stash pull * birdbone corset");
-	cli_execute("stash pull * law-abiding citizen cane");
-	cli_execute("stash pull * hep waders");
-	cli_execute("stash pull * banjo kazoo mount");
-	cli_execute("stash pull * flask flops");
-	cli_execute("stash pull * time-twitching toolbelt");
-	cli_execute("stash pull * time lord participation mug");	
+	cli_execute("refresh stash");
+	cli_execute("stash take * 4-dimensional fez");
+	cli_execute("stash take * super-absorbent tarp");
+	cli_execute("stash take * birdbone corset");
+	cli_execute("stash take * law-abiding citizen cane");
+	cli_execute("stash take * hep waders");
+	cli_execute("stash take * banjo kazoo mount");
+	cli_execute("stash take * flask flops");
+	cli_execute("stash take * time-twitching toolbelt");
+	cli_execute("stash take * time lord participation mug");	
 }
 
 
