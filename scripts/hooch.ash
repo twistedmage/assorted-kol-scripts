@@ -86,7 +86,8 @@ void farm_hooch()
 	cli_execute("maximize "+max_str);
 	setMood("i");
 	
-	adventure(1,$location[An illicit bohemian party]);
+	while(true)
+		adventure(1,$location[An illicit bohemian party]);
 	//need to hand in
 }
 
