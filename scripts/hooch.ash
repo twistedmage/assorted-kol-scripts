@@ -91,7 +91,7 @@ void farm_hooch()
 	cli_execute("maximize "+max_str);
 	setMood("i");
 	
-	while(true)
+	while(my_adventures()>0)
 	{
 		matcher hooch_mtch = create_matcher("Hooch:</td><td align=left><b>(\\d*) / (\\d*)",visit_url("charpane.php"));
 		find(hooch_mtch);
@@ -125,7 +125,7 @@ void capsule_farm()
 	setMood("i");
 	setFamiliar("items");
 			
-	while(true)
+	while(my_adventures()>0)
 	{
 		set_property("choiceAdventure955", 2); //capsule
 		adventure(1,$location[The cave before time]);
