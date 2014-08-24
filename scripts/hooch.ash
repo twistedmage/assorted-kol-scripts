@@ -1,23 +1,5 @@
 import bumcheekascend;
 
-void farm_hooch()
-{
-	if(!get_property("_borrowedTimeUsed").to_boolean())
-		use(1,$item[borrowed time]);
-		
-	//get hooch gear
-	setFamiliar("hipster");
-	string max_str = "0.01 "+to_string(my_primestat());
-	max_str += ", +equip 4-dimensional fez, +equip super-absorbent tarp, +equip birdbone corset, +equip law-abiding citizen cane, +equip hep waders, +equip banjo kazoo mount, +equip flask flops, +equip time-twitching toolbelt";
-	if(i_a("time lord participation mug")>0)
-		max_str +=", +equip time lord participation mug";
-	cli_execute("maximize "+max_str);
-	setMood("i");
-	
-	adventure(1,$location[An illicit bohemian party]);
-	//need to hand in
-}
-
 void cave()
 {
 	if(!get_property("_borrowedTimeUsed").to_boolean())
@@ -50,8 +32,7 @@ void cave()
 		cli_execute("outfit save twitch");
 	}
 	setMood("i");
-	while(true)
-	{
+	
 /*		if(have_familiar($familiar[mini-hipster]))
 		{
 			if(get_property("_hipsterAdv").to_int()<7)
@@ -68,6 +49,9 @@ void cave()
 		}
 		else*/
 			setFamiliar("items");
+			
+	while(true)
+	{
 		set_property("choiceAdventure955", 3); //talk to ook
 /*		if(get_property("SIMON_OOK").to_int()==3)
 			set_property("choiceAdventure954", 3); //ask password
@@ -82,13 +66,99 @@ void cave()
 //		abort("a");
 	}
 }
+//asica - done all
+//anid - done all
 //dinala - done all
-//twistedmage - done paper, 109
+//twistedmage - done all, 80
 //play chance, trade paper, trade scissors, play chance
+
+void farm_hooch()
+{
+	if(!get_property("_borrowedTimeUsed").to_boolean())
+		use(1,$item[borrowed time]);
+		
+	//get hooch gear
+	setFamiliar("items");
+	string max_str = "0.01 "+to_string(my_primestat());
+	max_str += ", +equip 4-dimensional fez, +equip super-absorbent tarp, +equip birdbone corset, +equip law-abiding citizen cane, +equip hep waders, +equip banjo kazoo mount, +equip flask flops, +equip time-twitching toolbelt";
+	if(i_a("time lord participation mug")>0)
+		max_str +=", +equip time lord participation mug";
+	cli_execute("maximize "+max_str);
+	setMood("i");
+	
+	adventure(1,$location[An illicit bohemian party]);
+	//need to hand in
+}
+
+
+void capsule_farm()
+{	
+	//setup gear etc
+	if(have_outfit("twitch"))
+	{
+		cli_execute("outfit twitch");
+	}
+	else
+	{
+		string max_str = "0.01 "+to_string(my_primestat());
+		max_str += ", items, +equip time-twitching toolbelt";
+		cli_execute("maximize "+max_str);
+		cli_execute("outfit save twitch");
+	}
+	setMood("i");
+	setFamiliar("items");
+			
+	while(true)
+	{
+		set_property("choiceAdventure955", 2); //capsule
+		adventure(1,$location[The cave before time]);
+		if(i_a("Twitching time capsule")!=0)
+		{
+			cli_execute("stash put * twitching time capsule");
+		}
+	}
+}
+
+void dump_gear()
+{
+	if(i_a("4-dimensional fez")>0)
+		cli_execute("stash put * 4-dimensional fez");
+	if(i_a("super-absorbent tarp")>0)
+		cli_execute("stash put * super-absorbent tarp");
+	if(i_a("birdbone corset")>0)
+		cli_execute("stash put * birdbone corset");
+	if(i_a("law-abiding citizen cane")>0)
+		cli_execute("stash put * law-abiding citizen cane");
+	if(i_a("hep waders")>0)
+		cli_execute("stash put * hep waders");
+	if(i_a("banjo kazoo mount")>0)
+		cli_execute("stash put * banjo kazoo mount");
+	if(i_a("flask flops")>0)
+		cli_execute("stash put * flask flops");
+	if(i_a("time-twitching toolbelt")>0)
+		cli_execute("stash put * time-twitching toolbelt");
+	if(i_a("time lord participation mug")>0)
+		cli_execute("stash put * time lord participation mug");
+}
+
+void pull_gear()
+{
+	cli_execute("stash pull * 4-dimensional fez");
+	cli_execute("stash pull * super-absorbent tarp");
+	cli_execute("stash pull * birdbone corset");
+	cli_execute("stash pull * law-abiding citizen cane");
+	cli_execute("stash pull * hep waders");
+	cli_execute("stash pull * banjo kazoo mount");
+	cli_execute("stash pull * flask flops");
+	cli_execute("stash pull * time-twitching toolbelt");
+	cli_execute("stash pull * time lord participation mug");	
+}
+
 
 //ash set_property("SIMON_CAVVEDONE","true");
 void main()
 {
+	pull_gear();
 	set_combat_macro();
 	set_property("valueOfAdventure","2000");
 	if(!get_property("SIMON_CAVVEDONE").to_boolean())
