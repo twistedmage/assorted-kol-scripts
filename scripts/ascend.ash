@@ -56,8 +56,12 @@ void stock_hotdog(string html, string ingredient, int req_ing, int desired_dogs)
 				dog=-102;
 				break;
 			case "sleaze wad":
-				//optimal dog
+				//wet dog
 				dog=-100;
+				break;
+			case "skeleton bone":
+				//sly dog
+				dog=-95;
 				break;
 			default:
 				abort("Unrecognised dog on ascend line 30, using ingredient "+ingredient);
@@ -223,8 +227,8 @@ void stock_hagnks()
 	if(my_name()=="twistedmage")
 	{
 		//fold loathing legion screwdriver
-		if(item_amount($item[loathing legion screwdriver])<1)
-			cli_execute("fold loathing legion screwdriver");
+		if(item_amount($item[loathing legion universal screwdriver])<1)
+			cli_execute("fold loathing legion universal screwdriver");
 		if(item_amount($item[Sneaky Pete's leather jacket (collar popped)])<1)
 			cli_execute("fold Sneaky Pete's leather jacket (collar popped)");
 		if(item_amount($item[boris's helm])>0)
@@ -255,6 +259,9 @@ void stock_hagnks()
 
 void main()
 {
+	if(get_clan_name()!="PAIN")
+		abort("change clan back to PAIN");
+		
 	//pull all
 	string catch=visit_url("storage.php?action=pullall&pwd");
 	cli_execute("breakfast");
@@ -311,7 +318,7 @@ void main()
 		if(spleen_limit() - my_spleen_use() > 5)
 			use(1,$item[Hatorade]);
 		else if(spleen_limit() - my_spleen_use() > 2)
-			use(1,$item[watered down red minotaur]);
+			use(1,$item[watered-down red minotaur]);
 	}
 	//do pvp
 	do_fights();

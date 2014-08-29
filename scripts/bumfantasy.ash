@@ -499,6 +499,9 @@ void hare()
 //228 361
 void wolf()
 {
+	//remove ml
+	cli_execute("mcd 0; clear mood;shrug urkel; shrug drescher; shrug pride of the puffin");
+
 	//noncom buffs
 	while(have_effect($effect[Smooth Movements])<30)
 		use_skill(1,$skill[Smooth Movement]);
@@ -509,7 +512,7 @@ void wolf()
 		
 	use_familiar($familiar[evil teddy bear]);
 	cli_execute("friars familiar");
-	cli_execute("maximize hp regen min, hp regen max, 0.01 hp, 0.01 familiar weight, -7 combat");
+	cli_execute("maximize hp regen min, hp regen max, 0.01 hp, 0.01 familiar weight, -7 combat, +equip pigsticker");
 	while(have_effect($effect[Green Tongue])<30)
 		use(1,$item[green snowcone]);
 	while(have_effect($effect[Curiosity of Br'er Tarrypin])<30)
@@ -536,14 +539,14 @@ void wolf()
 			//get howling
 			set_property("choiceAdventure830","3"); 
 			set_property("choiceAdventure834","2"); 
-			adventure(1,$location[inner wolf gym]);
+			adventure(1,$location[the inner wolf gym]);
 		}
 		else if(!vending)//got howling
 		{
 			//get elemental attacks
 			set_property("choiceAdventure830","2"); 
 			set_property("choiceAdventure833","2"); 
-			adventure(1,$location[inner wolf gym]);
+			adventure(1,$location[the inner wolf gym]);
 		}
 		else
 		{
@@ -552,7 +555,6 @@ void wolf()
 		}
 		turns_left-=1;
 	}
-	<florist?>
 	//try and get improved howling?
 }
 //nc on 23, nc on 13, 4
@@ -563,6 +565,11 @@ void wolf()
 //24, 6/6, 13, 13, 1 = 15
 //15, 7/7, 19, 16, 2 = 24
 //3, 11/11, 22, 19, 3 =48
+//
+//
+//23, 6/6, 16, 13, 1 = 18
+//14, 10/10, 19, 13, 2 = 36
+//3, 13/13, 25, 19, 2 = 69
 //
 //hp regen doesn't trigger... nor does campfire
 //should only fight brick houses, huff others
