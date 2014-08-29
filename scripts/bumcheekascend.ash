@@ -10818,6 +10818,8 @@ else
 			}
 			else
 			{
+if($location[shop class] != get_property("semirareLocation").to_location())
+abort("Eat spaghetti breakfast, then optimal dog, and fight shop teacher in shop class");
 				set_combat_macro();
 				setMood("i");
 				if(have_effect(intrinsic)==0)

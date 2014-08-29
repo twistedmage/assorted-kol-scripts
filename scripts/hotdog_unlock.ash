@@ -121,9 +121,12 @@ void unlock_junkyard()
 	if(i_a("Grey Guanon")>0)
 		abort("Have a Grey Guanon! Disable this part of hotdog_ulock.ash");
 
+	buMax("stench res");
+	setMood("");
+	setFamiliar("");
 	while(my_adventures()>0 && i_a("Grey Guanon")<1)
 	{
-		bumAdv($location[guano junction], "stench res", "", "", "Hunting for guanon", "");
+		bumMiniAdv(1,$location[guano junction]);
 	}
 }
 void unlock_wet()
