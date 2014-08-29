@@ -67,14 +67,16 @@ if !sauceror && hasskill Curse of the Thousand Islands
 	skill Curse of the Thousand Islands
 endif
 
-if hasskill intimidating bellow
-	skill intimidating bellow
-endif
-if hasskill steal accordion
-	skill steal accordion
-endif
-if hasskill summon mayfly swarm
-	skill summon mayfly swarm
+if hasskill intimidating bellow || hasskill steal accordion || hasskill summon mayfly swarm
+	if hasskill intimidating bellow
+		skill intimidating bellow
+	endif
+	if hasskill steal accordion
+		skill steal accordion
+	endif
+	if hasskill summon mayfly swarm
+		skill summon mayfly swarm
+	endif
 endif
 
 if hascombatitem rain-doh blue balls 
@@ -139,14 +141,16 @@ if turtletamer && hasskill shell up
 endif
 	
 mark generic_spells2
-if hasskill feed
-	skill feed
-endif
+if hasskill feed || hasskill spring raindrop attack
+	if hasskill feed
+		skill feed
+	endif
 
-if hasskill spring raindrop attack
-	skill spring raindrop attack
-	if hasskill summer siesta
-		skill summer siesta
+	if hasskill spring raindrop attack
+		skill spring raindrop attack
+		if hasskill summer siesta
+			skill summer siesta
+		endif
 	endif
 endif
 
@@ -154,6 +158,19 @@ if hasskill pocket crumbs
 	skill pocket crumbs
 endif
 
+#try to get some dna
+#good candidates during ascension
+#	mob penguin capo - copperhead bar or whatever its called
+#	spiders - sleazy back alley
+#	Ninja Snowman, 
+#	consetlations - hits
+#	Amateur ninja, ancient insane monk - haiku dungeon?
+#if hascombatitem DNA extraction syringe
+#if monstername Mob Penguin hitman || monstername Mob Penguin Capo || monstername black crayon penguin || monstername beebee king || monstername beebee queue ||  monstername beebee gunners ||  monstername buzzerker ||  monstername Big creepy spider ||  monstername Black Crayon Beetle ||  monstername black widow ||  monstername Buzzy Beetle ||  monstername Cluster of angry bacteria ||  monstername Completely different spider ||  monstername Dodecapede ||  monstername Filthworm drone ||  monstername Filthworm royal guard ||  monstername Giant giant giant centipede ||  monstername Bee swarm ||  monstername Bee thoven ||  monstername Mad flagellate ||  monstername Mayonnaise wasp ||  monstername Moneybee ||  monstername Mumblebee ||  monstername Natural spider ||  monstername Plaque of locusts ||  monstername Larval filthworm ||  monstername Giant tardigrade ||  monstername Giant sandworm ||  monstername Giant giant moth ||  monstername Tan Gnat ||  monstername Swarm of scarab beatles ||  monstername Swarm of lowercase As ||  monstername Swarm of Knob lice ||  monstername Swarm of killer bees ||  monstername Swarm of fire ants ||  monstername Rock scorpion ||  monstername Queen filthworm ||  monstername Queen Bee ||  monstername Ninja Snowman ||  monstername Rolling stone ||  monstername Black Crayon Elemental ||  monstername Family Jewels ||  monstername Flange  ||  monstername Hooded Warrior ||  monstername Junk ||  monstername Honey Pot ||  monstername Bush ||  monstername Camel's Toe ||  monstername Burrowing Bishop ||  monstername box ||  monstername Black Crayon Constellation ||  monstername Beaver ||  monstername Axe Wound ||  monstername Astronomer ||  monstername Tonic water elemental ||  monstername Steam elemental ||  monstername skinflute ||  monstername Trouser Snake ||  monstername Pork Sword ||  monstername Muff ||  monstername One-Eyed Willie ||  monstername Twig and Berries ||  monstername Little Man in the Canoe ||  monstername 1335 HaXx0r ||  monstername Burly Sidekick ||  monstername Bubblemint Twins ||  monstername Bob Racecar ||  monstername Blur ||  monstername Blue Oyster cultist ||  monstername Blue-haired girl ||  monstername Black magic woman ||  monstername Black Knight ||  monstername Black friar ||  monstername Black Crayon Man ||  monstername Big Wheelin' Twins ||  monstername Angry Space Marine ||  monstername Angry bassist ||  monstername Amateur ninja ||  monstername ancient insane monk ||  monstername Creepy Ginger Twin ||  monstername Drab Bard ||  monstername Dweebie ||  monstername Drunk pygmy ||  monstername Deputy Nick Soames ||  monstername Dirty thieving brigand ||  monstername Copperhead Club bartender ||  monstername Confused goth music student ||  monstername Charity the Zombie Hunter ||  monstername Guy with a pitchfork, and his wife ||  monstername Herman East, Relivinator ||  monstername Hank North, Photojournalist ||  monstername Handsome mariachi ||  monstername Irate mariachi ||  monstername Jefferson pilot ||  monstername knight ||  monstername Ninja dressed as a waiter ||  monstername Norville Rogers ||  monstername Motorhead ||  monstername Me4t begZ0r ||  monstername Menacing thug ||  monstername Man with the red buttons ||  monstername Mariachi bandolero ||  monstername Lamz0r N00b ||  monstername Lynyrd skinner ||  monstername Mismatched Twins ||  monstername Fleet woodsman ||  monstername Father Nikolai Ravonovich ||  monstername Father McGruber ||  monstername Fan dancer ||  monstername Evil ex-girlfriend ||  monstername pygmy * ||  monstername Racecar Bob ||  monstername Rag-tag band of survivors ||  monstername Random scenester ||  monstername Red Herring ||  monstername Quiet Healer ||  monstername Spam Witch ||  monstername Sporto ||  monstername Spunky Princess ||  monstername Scott the Miner ||  monstername Protagonist ||  monstername Peeved roommate ||  monstername oasis monster ||  monstername Quantum_Mechanic ||  monstername Suburban_security_civilian
+#	if monstername Mob Penguin hitman || monstername Mob Penguin Capo || monstername black crayon penguin || monstername Big creepy spider || monstername Completely different spider ||  monstername Ninja Snowman ||  monstername Rolling stone ||  monstername Black Crayon Elemental ||  monstername Family Jewels ||  monstername Flange  ||  monstername Hooded Warrior ||  monstername Junk ||  monstername Honey Pot ||  monstername Bush ||  monstername Camel's Toe ||  monstername Burrowing Bishop ||  monstername box ||  monstername Black Crayon Constellation ||  monstername Beaver ||  monstername Axe Wound ||  monstername Astronomer || monstername skinflute ||  monstername Trouser Snake ||  monstername Pork Sword ||  monstername Muff ||  monstername One-Eyed Willie ||  monstername Twig and Berries ||  monstername Little Man in the Canoe ||  monstername Amateur ninja ||  monstername Ancient insane monk
+#		use DNA extraction syringe
+#	endif
+#endif
 
 #smash and graaagh some monsters
 if hasskill infectious bite

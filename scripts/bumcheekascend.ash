@@ -608,6 +608,7 @@ void bcAutoAvatar(string avatar) {
 	}
 }
 
+boolean bumAdv(location loc, string maxme, string famtype, string goals, string printme, string combat, string consultScript);
 void setMood(string combat); //Predeclare to make clancy work
 string bumRunCombat();
 boolean bumAdv(location loc);
@@ -1016,6 +1017,16 @@ boolean buMax(string maxme, int maxMainstat) {
 		if (i_a("Boris's Helm") > 0) maxme += " +equip Boris's Helm";
 		else if (i_a("Boris's Helm (askew)") > 0) maxme += " +equip Boris's Helm (askew)";
 	}
+	
+	//folding
+	if(my_name()=="twistedmage")
+	{
+		if (i_a("Loathing Legion necktie") == 0)
+			cli_execute("fold Loathing Legion necktie");
+		if (i_a("Sneaky Pete's leather jacket") > 0)
+			cli_execute("fold Sneaky Pete's leather jacket (collar popped)");		
+	}
+	
 	if(my_path() == "Avatar of Sneaky Pete" && !contains_text(maxme, "outfit")) {
 		if (i_a("Sneaky Pete's leather jacket") > 0) maxme += " +equip Sneaky Pete's leather jacket";
 		else if (i_a("Sneaky Pete's leather jacket (collar popped)") >0) maxme += " +equip Sneaky Pete's leather jacket (collar popped)";
@@ -1197,6 +1208,8 @@ string bumRunCombat(string consult) {
 		return to_string(run_combat());
 	}
 	
+	print("Calling bumruncombat with consult "+consult,"purple");
+	
 	if (consult != "") {
 		print("BCC: This isn't actually adventuring at noob cave. Don't worry! (Consult Script = "+consult+")", "purple");
 		adv1($location[noob cave], -1, consult);
@@ -1229,7 +1242,7 @@ string bumRunCombat(string consult) {
 		default:
 			abort("unrecognised player "+my_name());
 	}
-	if(contains_text(str,"Macro Aborted")) abort("Seems like macro failed");
+	if(contains_text(str,"Macro Aborted")) abort("Seems like macro failed :"+str);
 	return str;
 }
 string bumRunCombat() { return bumRunCombat(""); }
@@ -2201,6 +2214,17 @@ string consultBugbear(int round, string opp, string text) {
 	return ((my_primestat() == $stat[Mysticality] && in_hardcore()) ? consultMyst(round, opp, text) : get_ccs_action(round));
 }		
 
+string consultSyringe(int round, string opp, string text) {
+	print("called consult syringe","purple");
+	if (i_a("DNA extraction syringe")>0)
+	{
+		print("Trying to use syringe","purple");
+		throw_item($item[DNA extraction syringe]);
+		print("Tried to use syringe","purple");
+	}
+	return bumRunCombat();
+}
+
 string consultCasual(int round, string opp, string text) {
 	print("BCC: Round: "+round+" Opp: "+opp, "purple");
 
@@ -2790,13 +2814,14 @@ void defaultMood(boolean castMojo) {
 		if (have_skill($skill[worldpunch])) cli_execute("trigger lose_effect, Earthen Fist, cast 1 Worldpunch");
 	}	
 	else {
-		//bit of init is helpful
-		if (have_skill($skill[Springy Fusilli]) && my_maxmp() > mp_cost($skill[Springy Fusilli]) * 2) cli_execute("trigger lose_effect, Springy Fusilli, cast 1 Springy Fusilli");
-		if (have_skill($skill[Walberg's Dim Bulb]) && my_maxmp() > mp_cost($skill[Walberg's Dim Bulb]) * 2) cli_execute("trigger lose_effect, Walberg's Dim Bulb, cast 1 Walberg's Dim Bulb");
 
 		//these are prettyt pointless, only use them when we have too much mana to use
 		if((equipped_amount($item[crown of thrones])>0 || equipped_amount($item[buddy bjorn])>0) && cli_execute("ash import zlib; be_good($familiar[el vibrato megadrone])"))
 		{
+			//bit of init is helpful
+			if (have_skill($skill[Springy Fusilli]) && my_maxmp() > mp_cost($skill[Springy Fusilli]) * 2) cli_execute("trigger lose_effect, Springy Fusilli, cast 1 Springy Fusilli");
+			if (have_skill($skill[Walberg's Dim Bulb]) && my_maxmp() > mp_cost($skill[Walberg's Dim Bulb]) * 2) cli_execute("trigger lose_effect, Walberg's Dim Bulb, cast 1 Walberg's Dim Bulb");
+			
 			if(can_interact())
 			{
 				if (have_skill($skill[antibiotic saucesphere]) && have_castitems($class[sauceror], true))
@@ -3778,14 +3803,6 @@ boolean innerSetFamiliar(string famtype) {
 	
 	print("BCC: Using a default stat familiar.", "purple");
 	//Now either we have neither of the above, or we have enough spleen today.
-	
-	if(my_name()=="twistedmage")
-	{
-		print("TEMPORARILY USING SQUAMOUS TO GET ADVS FOR TOMORROW","red");
-		use_familiar($familiar[squamous gibberer]);
-		return true;
-	}
-	
 	//Sombrero type familiars are probably best in all zones from itznotyerzitz mine onwards (level 8 quest plus)
 	//but to simplify things since we don't know the zone, lets just prefer a sombrero at all times
 	//THIS ONLY APPLIES IF WE HAVE A LOT OF ML
@@ -4144,6 +4161,197 @@ void zapKeys() {
 	}
 }
 
+void get_gene_tonic()
+{
+	string str = visit_url("campground.php?action=workshed");
+	str = visit_url("campground.php?action=dnapotion");
+}
+
+void use_genetics_lab(string req)
+{
+	cli_execute("inventory refresh");
+	if(i_a("DNA extraction syringe")>0)
+	{
+		string curDNA = get_property("dnaSyringe");
+		
+		//hybridize ourselves with penguin/dude
+		if(!get_property("_dnaHybrid").to_boolean())
+		{
+			if(my_level()>=11)	//high enough to find a penguin
+			{
+				if(curDNA=="penguin" && have_effect($effect[Human-Penguin Hybrid])==0)
+				{
+					string str = visit_url("campground.php?action=workshed");
+					str = visit_url("campground.php?action=dnainject");
+					return;
+				}
+			}
+			else //use a dude
+			{
+				if(curDNA=="dude" && have_effect($effect[Human-Penguin Hybrid])==0)
+				{
+					string str = visit_url("campground.php?action=workshed");
+					str = visit_url("campground.php?action=dnainject");
+					return;
+				}
+			}
+		}
+				
+		//use gene tonics
+		if(contains_text(req,"n") && have_effect($effect[Human-Insect Hybrid])==0 && i_a("Gene Tonic: Insect")>0)
+		{
+			use(1,$item[Gene Tonic: Insect]);
+		}
+		if(contains_text(req,"m") && have_effect($effect[Human-Constellation Hybrid  ])==0 && i_a("Gene Tonic: Constellation")>0)
+		{
+			use(1,$item[Gene Tonic: Constellation]);
+		}
+		if(contains_text(req,"orchard") && have_effect($effect[Human-Human Hybrid])==0 && i_a("Gene Tonic: Dude")>0)
+		{
+			use(1,$item[Gene Tonic: Dude]);
+		}
+		if(contains_text(req,"res") && have_effect($effect[Human-Elemental Hybrid])==0 && i_a("Gene Tonic: Elemental")>0)
+		{
+			use(1,$item[Gene Tonic: Elemental]);
+		}
+		
+		//make new gene tonics
+		if(get_property("_dnaPotionsMade").to_int() > 2)
+			return;
+			
+		if(curDNA=="insect"  && i_a("Gene Tonic: insect")==0)
+		{
+			get_gene_tonic();
+			return;
+		}
+		if(curDNA=="constellation"  && i_a("Gene Tonic: constellation")==0)
+		{
+			get_gene_tonic();
+			return;
+		}
+		if(curDNA=="dude" && i_a("Gene Tonic: dude")==0)
+		{
+			get_gene_tonic();
+			return;
+		}
+		if(curDNA=="elemental" && i_a("Gene Tonic: Elemental")==0)
+		{
+			get_gene_tonic();
+			return;
+		}
+		//could also use weird - 4 stats (posessed toy chest, barrel mimic, )
+	}
+}
+
+void collect_dna(string req)
+{
+	cli_execute("inventory refresh");
+	if(i_a("DNA extraction syringe")>0)
+	{
+		string curDNA = get_property("dnaSyringe");
+		
+		if(contains_text(req,"i") && !get_property("_dnaHybrid").to_boolean())
+		{
+			if(my_level()>=11) //go for penguin
+			{
+				//try to get to copperhead club
+				if(!can_adv($location[the copperhead club]))
+				{
+					council();
+					use(1,$item[Your father's MacGuffin diary]);
+				}
+				if(curDNA=="penguin")
+				{
+					use_genetics_lab("i");
+						set_combat_macro();
+					return;
+				}
+				clear_combat_macro();
+				while(have_effect($effect[Human-Penguin Hybrid])==0)
+				{
+					//look for mob penguin capo
+					print("Trying to get dna from mob penguin capo","purple");
+					bumAdv($location[The copperhead club], "", "", "", "Getting penguin dna", "", "consultSyringe");
+				
+					curDNA = get_property("dnaSyringe");
+					if(contains_text(get_property("lastEncounter"),"Mob Penguin Capo") && curDNA!="penguin")
+						abort("We just fought a mob penguin capo and didn't get our dna!");
+					
+					if(curDNA=="penguin")
+					{
+						use_genetics_lab("i");
+						set_combat_macro();
+						return;
+					}
+				}
+			}
+			else //go for dude
+			{
+				if(curDNA=="dude")
+				{
+					use_genetics_lab("i");
+					return;
+				}
+				
+				clear_combat_macro();
+				while(have_effect($effect[Human-Human Hybrid])==0)
+				{		
+					//look for mob penguin capo
+					print("Trying to get dna from amateur ninja or ancient insane monk","purple");
+					bumAdv($location[The Haiku Dungeon], "", "", "", "Getting dude dna", "", "consultSyringe");
+					
+					//need to refresh dna since mafia doesn't follow it in haiku dungeon
+					string str = visit_url("campground.php?action=workshed");
+					
+					curDNA = get_property("dnaSyringe");
+					if(contains_text(get_property("lastEncounter"),"Amateur ninja") && curDNA!="dude")
+						abort("We just fought an Amateur ninja and didn't get our dna!");
+					if(contains_text(get_property("lastEncounter"),"Ancient insane monk") && curDNA!="dude")
+						abort("We just fought an Ancient insane monk and didn't get our dna!");
+						
+					if(curDNA=="dude")
+					{
+						use_genetics_lab("i");
+						set_combat_macro();
+						return;
+					}
+				}
+			}
+		}
+		
+		//check for gene tonics
+		if(get_property("_dnaPotionsMade").to_int() > 2)
+			return;
+		
+		//insect = spiders - sleazy back alley
+		//elemental = Ninja Snowman, 
+		//humanoid could also give low level meat, but support isn't in combat macro or use_genetics_lab	
+		if(curDNA=="constellation")
+		{
+			use_genetics_lab("m");
+			return;
+		}
+		
+		clear_combat_macro();
+		while(contains_text(req,"m") && have_effect($effect[Human-Constellation Hybrid])==0 && i_a("steam-powered model rocketship")>0)
+		{			
+			//look for constellation
+			print("Trying to get dna from constellation","purple");
+			bumAdv($location[The hole in the sky], "", "", "", "Getting constellation dna", "", "consultSyringe");
+			
+			curDNA = get_property("dnaSyringe");
+			if(contains_text(get_property("lastAdventure"),"The hole in the sky") && curDNA!="constellation")
+				abort("We just fought a Constellation and didn't get our dna!");
+			
+			if(curDNA=="constellation")
+			{
+				use_genetics_lab("m");
+				return;
+			}
+		}
+	}
+}
+
 /***********************************************
 * BEGIN FUNCTIONS THAT RELY ON OTHER FUNCTIONS *
 ***********************************************/
@@ -4161,7 +4369,8 @@ void setMood(string combat) {
 	cli_execute("mood clear");
 	defaultMood(combat == "");
 
-
+	//gene tonics
+	use_genetics_lab(combat);
 
 	//use heavy rains buff items
 	if(my_path()=="Heavy Rains")
@@ -5314,13 +5523,18 @@ boolean bumAdv(location loc, string maxme, string famtype, string goals, string 
 		choose_all_plants(combat, loc);
 		betweenBattle();
 		use_putty();
+		
 		if (can_interact()) {
+			print("adventuring with consultCasual","purple");
 			used_adv=adventure(1, loc, "consultCasual");
 		} else if (consultScript != "") {
+			print("adventuring with consult="+consultScript,"purple");
 			used_adv=adventure(1, loc, consultScript);
 		} else if (my_primestat() == $stat[Mysticality] && in_hardcore()) {
+			print("adventuring with consultMyst","purple");
 			used_adv=adventure(1, loc, "consultMyst");
 		} else {
+			print("adventuring without consult function handle","purple");
 			used_adv=adventure(1, loc);
 		}
 		print("c","lime");
@@ -6256,6 +6470,7 @@ boolean bcascChasm() {
 		maximize("hp", false);
 		maximize("spooky resistance, cold resistance, " + ((bcasc_100familiar == "" || bcasc_100familiar.to_familiar() == $familiar[Exotic Parrot]) && have_path_familiar($familiar[exotic parrot]) ? "switch exotic parrot" : "") + " -1 tie", false);
 		if (have_effect($effect[elemental saucesphere]) == 0 && have_skill($skill[elemental saucesphere]) && have_castitems($class[sauceror], true)) use_skill(1, $skill[elemental saucesphere]);
+		use_genetics_lab("res");
 		if (have_effect($effect[astral shell]) == 0 && have_skill($skill[astral shell]) && have_castitems($class[turtle tamer], true)) use_skill(1, $skill[astral shell]);
 		if (have_effect($effect[Protection from Bad Stuff]) == 0 && available_amount($item[scroll of Protection from Bad Stuff])>0) use(1, $item[scroll of Protection from Bad Stuff]);
 
@@ -6781,6 +6996,7 @@ boolean bcascDinghyHippy() {
 	
 	while ((i_a("filthy knitted dread sack") == 0 || i_a("filthy corduroys") == 0) && have_effect($effect[Everything Looks Yellow]) == 0)
 		bumAdv($location[Hippy Camp], "", "hebo", "1 filthy knitted dread sack, 1 filthy corduroys", "Getting Hippy Kit", "i", "consultHeBo");
+		
 	
 	if (i_a("filthy knitted dread sack") > 0 && i_a("filthy corduroys") > 0) {
 		checkStage("dinghy", true);
@@ -9395,6 +9611,7 @@ boolean bcascManorBilliards() {
 		if(have_path_familiar($familiar[Exotic Parrot]))
 			cli_execute("familiar parrot");
 		buMax("+1000 stench res, +1000 hot res");
+		use_genetics_lab("res");
 		while (item_amount($item[Spookyraven billiards room key]) == 0) {
 			if (have_effect($effect[elemental saucesphere]) == 0 && have_skill($skill[elemental saucesphere]) && have_castitems($class[sauceror], true)) use_skill(1, $skill[elemental saucesphere]);
 			if (have_effect($effect[astral shell]) == 0 && have_skill($skill[astral shell]) && have_castitems($class[turtle tamer], true)) use_skill(1, $skill[astral shell]);
@@ -10584,7 +10801,9 @@ void bcascKOLHS()
 				setMood("i");
 //TEMP TO GET 
 clear_combat_macro();
-visit_url("account.php?actions[]=autoattack&autoattack=99125693&flag_aabosses=1&flag_wowbar=1&flag_compactmanuel=1&pwd&action=Update");
+//NERD INTRINSIC visit_url("account.php?actions[]=autoattack&autoattack=99125693&flag_aabosses=1&flag_wowbar=1&flag_compactmanuel=1&pwd&action=Update");
+//JOCK
+visit_url("account.php?actions[]=autoattack&autoattack=99126147&flag_aabosses=1&flag_wowbar=1&flag_compactmanuel=1&pwd&action=Update");
 string skill_str =visit_url("account.php?tab=combat");
 matcher skill_mtch = create_matcher("option selected=\"selected\" value=\"(\\d*)\">([\\w \(\)]*)",skill_str);
 if(skill_mtch.find())
@@ -10679,11 +10898,13 @@ boolean bcascWand() {return bcascWand(false);}
 ********************************************************/
 
 void bcs1() {
-if(my_level()>=4 && my_level()<=5)
-	abort("Go to cola battlefield wiith earhorn");
+if(my_level()>=4 && my_level()<=5 && my_basestat($stat[mysticality])>=20)
+	abort("Go to cola battlefield with Lord Spookyraven's ear trumpet");
 	if(my_path()=="KOLHS")
 		bcascKOLHS();
 	get_dungeon_kit();
+	//dna intrinsic
+	collect_dna("i");
 	if(my_level()>2)
 		bcascTavern();
 	//SImON ADDED: check for friars before others
@@ -11099,10 +11320,17 @@ void bcs12() {
 					visit_yossarian(true);
 				visit_yossarian(false);
 				while (get_property("currentJunkyardTool") != "" && available_amount(to_item(get_property("currentJunkyardTool")))<1) {
-					cli_execute("maximize "+my_primestat()+", +DA, +10DR, -ml, "
+					cli_execute("maximize "+my_primestat()+", +DA, +10DR, " //-ml, "
 							+(my_primestat() == $stat[moxie] ? " -melee " : "+melee ")
 							+(available_amount($item[greatest american pants])==0 ? "" : " +equip greatest american pants "));
 						//Force to 0 in Junkyard
+					setFamiliar("");
+					if(have_familiar($familiar[frumious bandersnatch]))
+					{
+						use_familiar($familiar[frumious bandersnatch]); //don't use galloping grill or it will kill them
+						if(have_skill($skill[the ode to booze]) && have_effect($effect[ode to booze])==0)
+							use_skill(1,$skill[the ode to booze]);
+					}
 					
 					if (canMCD()) cli_execute("mcd 0");
 					//simon: check super structure
@@ -11136,6 +11364,7 @@ void bcs12() {
 					abort("For some reason script is trying to run nuns in WOSF!");
 				if (get_property("sidequestNunsCompleted") != "none") return true;
 				print("BCC: doSideQuest(Nuns)", "purple");
+				collect_dna("m");
 				setFamiliar("meat");
 				
 				//Set up buffs and use items as necessary.
