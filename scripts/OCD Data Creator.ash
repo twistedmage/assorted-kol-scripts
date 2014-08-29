@@ -4417,10 +4417,19 @@ save [$item[Five Second Energy]] = 0;
 save [$item[tisket]] = 1;
 save [$item[Cloaca-Cola-issue combat knife]] =     3;
 save [$item[ice skate doll]] = 0;
+save [$item[antimatter wad]] = 0;
+save [$item[red hot     boilermaker]] = 0;
+save [$item[Nayztameetjoo trading card]] = 0;
+save [$item[sheet cake]] = 0;
+save [$item[Bruno's blessing of Mars]] = 0;
+save [$item[fleetwood mac 'n' cheese]] = 0;
+save [$item[synthetic marrow]] = 0;
 
 
 
 //stuff to sell later;s
+save     [$item[yabba dabba doo rag]] = 2;
+save     [$item[flapper floppers]] = 1;
 save [$item[Helvella Haemophilia mushroom]] = -1;
 save [$item[time-twitching toolbelt]] = 1;
 save [$item[gumshoes]] = -1;
@@ -4439,6 +4448,8 @@ save [$item[candied pecan]] = -1;
 save [$item[candy mountain oyster]] = --1;
 save [$item[chocolate rabbit's foot]] = -1;
 save [$item[candy carrot]] = -1;
+save [$item[Steam Card: Dungeon Fist (#1)]] = -1;
+save [$item[Steam Card: Jackass Plumber (#2)]]     = -1;
 save [$item[Steam Card: Space Trip (#1)]] = -1;
 save [$item[Steam Card: Space Trip (#2)]] = -1;
 save [$item[Steam Card: Meteoid (#3)]] = -1;
