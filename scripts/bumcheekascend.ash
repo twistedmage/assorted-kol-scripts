@@ -2230,7 +2230,7 @@ string consultCasual(int round, string opp, string text) {
 
 	if (get_property("bcasc_doCasualAsHC") != "false") {
 		print("BCC: You have selected to do casual runs like hardcore (using your CCS). Feel free to change this setting in the relay browser if you want a one-day-casual set of runaways..", "purple");
-		return get_ccs_action(round);
+		bumRunCombat();
 	} else {
 		print("BCC: You do not have the option set to do casual runs as Hardcore. This means the script will attempt to use the default action specified in your bcasc_defaultCasualAction setting. The current setting is designed for a one-day casual. To make this all go away, set bcasc_doCasualAsHC to true in the relay script.", "purple");
 	}
