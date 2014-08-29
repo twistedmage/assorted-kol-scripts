@@ -252,7 +252,7 @@ record consumable
 };
 
 //take details of a food, and add it to the con_map with it's efficiency
-void add_food(consumable[int] con_map,string text,float avg_adv,int craft_turns,int fullness, boolean is_pizza=false)
+void add_food(consumable[int] con_map,string text,float avg_adv,int craft_turns,int fullness, boolean is_pizza)
 {
 	//check we can eat it
 	if(fullness>(fullness_limit() - my_fullness()))
@@ -277,6 +277,10 @@ void add_food(consumable[int] con_map,string text,float avg_adv,int craft_turns,
 	//then add it
 	int new_index=count(con_map);
 	con_map[new_index]=con;
+}
+void add_food(consumable[int] con_map,string text,float avg_adv,int craft_turns,int fullness)
+{
+	add_food(con_map, text, avg_adv, craft_turns, fullness, false);
 }
 
 //copy of add food, but compare against drunken limits and bartender

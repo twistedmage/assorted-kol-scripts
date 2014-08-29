@@ -88,7 +88,7 @@ void unlock_chilly()
 			if (have_skill($skill[The Sonata of Sneakiness])) cli_execute("trigger lose_effect, The Sonata of Sneakiness, cast 1 sonata of sneakiness");
 			while(my_adventures()>0 && get_property("lastEncounter") != "Duffel on the Double")
 			{
-				adventure(1,$location[The extreme slope]);
+				adv1($location[The extreme slope], -1, "");
 			}
 		}
 		set_property("last_chilly_checked_asc",my_ascensions());

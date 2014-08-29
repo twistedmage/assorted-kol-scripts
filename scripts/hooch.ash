@@ -174,19 +174,73 @@ void pull_gear()
 }
 
 
+
+void roman_farm()
+{
+	//setup gear etc
+	if(have_outfit("twitch"))
+	{
+		cli_execute("outfit twitch");
+	}
+	else
+	{
+		string max_str = "0.01 "+to_string(my_primestat());
+		max_str += ", items, +equip time-twitching toolbelt";
+		if(i_a("pantsgiving")>0)
+			max_str +=", +equip pantsgiving";
+		cli_execute("maximize "+max_str);
+		cli_execute("outfit save twitch");
+	}
+	setMood("i");
+	setFamiliar("items");
+	int advs=1;
+	int desired_gear = 2;
+	while(my_adventures()>0)
+	{
+//		adventure(1,$location[The Roman Forum]);
+		if(available_amount(to_item(7722))<desired_gear || available_amount(to_item(7724))<desired_gear)
+		{
+			set_property("choiceAdventure979", 2); //99 cent store
+			if(available_amount(to_item(7722))<desired_gear)
+				set_property("choiceAdventure982", 1); //buy hat
+			else
+				set_property("choiceAdventure982", 2); //pteruges
+		}
+		else
+		{
+			//set_property("choiceAdventure979", 1); //blessings
+			set_property("choiceAdventure979", 6); //gamble
+			set_property("choiceAdventure983", 1); //gamble		for real
+		}
+		/*
+		betweenBattle();
+		print("adventure "+to_string(advs),"purple");
+		visit_url("adventure.php?snarfblat=414");
+		string str=bumRunCombat();*/
+		adventure(1,$location[the roman forum]);
+		advs+=1;
+//		if(!contains_text(str,"WINWINWIN"))
+//			abort("Seem to have failed?");
+	}
+}
+
+
 //ash set_property("SIMON_CAVVEDONE","true");
 void main()
 {
 	pull_gear();
 	set_combat_macro();
-	set_property("valueOfAdventure","2000");
+//	set_property("valueOfAdventure","2000");
 	if(!get_property("SIMON_CAVVEDONE").to_boolean())
 	{
 		cave();
 	}
 	else
 	{
-		capsule_farm();
+		roman_farm();
+		//capsule_farm();
 	}
 //		farm_hooch();
 }
+
+//mars blessing - musc
