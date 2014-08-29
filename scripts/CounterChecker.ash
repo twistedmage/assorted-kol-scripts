@@ -316,6 +316,8 @@ void eat_cookie() {
 	}
 	
 	boolean toEat() {
+		if(my_path() == "Zombie Slayer")
+			return vprint("You can not find a brain flavored fortune cookie, so you will have to drink a Lucky Lindy on your own.", -3);
 		matcher cooks = create_matcher("(timely|always|true|never|false) ?([1-3]?)", vars["auto_semirare"]);
 		if(cooks.find())
 			switch(cooks.group(1)) {
@@ -721,10 +723,20 @@ boolean lightsOut() {
 	
 	// Stop if it is the Boss fight and BaleCC_LightsOutFightAutomated is false.
 	if(vars["BaleCC_LightsOutFightAutomated"] == "false" && ($locations[The Haunted Laboratory, The Haunted Gallery] contains hauntedLoc)) {
+		visit_url(to_url(hauntedLoc));
+		if(hauntedLoc == $location[The Haunted Laboratory]) {
+			visit_url("choice.php?pwd&whichchoice=903&option=1");
+			visit_url("choice.php?pwd&whichchoice=903&option=1");
+			visit_url("choice.php?pwd&whichchoice=903&option=3");
+			visit_url("choice.php?pwd&whichchoice=903&option=1");
+			visit_url("choice.php?pwd&whichchoice=903&option=1");
+		} else 
+			visit_url("choice.php?pwd&whichchoice=896&option=4");
+		# advLightsOut(hauntedLoc, "0");
 		print_html("<font color=\"blue\">It is time to fight "
 			+ (hauntedLoc == $location[The Haunted Laboratory]? "Stephen Spookyraven": "the ghost of Elizabeth Spookyraven") 
 			+ " at <u>"+ hauntedLoc +"</u>.</font>");
-		advLightsOut(hauntedLoc, "0");
+		abort();
 		return false;
 	}
 	if(hauntedLoc != $location[none])
@@ -766,7 +778,7 @@ boolean main(string name, int remain) {
 		case "Wormwood":
 			return counter_report(remain, "adventure at <u>Wormwood</u> for "+get_property("wormwood"));
 		case "Dance Card":
-			if(remain < 0 && vars["BaleCC_useDanceCards"].to_boolean() && (item_amount($item[dance card])> 0))
+			if(remain < 0 && vars["BaleCC_useDanceCards"].to_boolean() && (can_interact() || item_amount($item[dance card])> 0))
 				use(1, $item[dance card]);
 			return counter_report(remain, "adventure at the <u>Haunted Ballroom</u> for a dance with <i>Rotting Matilda</i>");
 		case "Spookyraven Lights Out":

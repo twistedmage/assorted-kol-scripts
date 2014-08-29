@@ -13,9 +13,9 @@ import <zlib.ash>
 
 // globals
 monster m;
-boolean isseal, nostun, nomultistun, nomiss, nohit, nospells;  // monster attributes not included in proxy records
+boolean isseal, nomultistun, nomiss, nohit, nospells;  // monster attributes not included in proxy records
 int round, howmanyfoes, damagecap, maxround;
-float noitems, noskills, capexp, mvalcache;
+float noitems, noskills, nostagger, capexp, mvalcache;
 effect dangerpoison;             // threatening poison effect of this monster
 boolean should_putty, should_olfact, should_pp;
 boolean havemanuel, functops;
@@ -216,8 +216,8 @@ advevent to_event(string id, spread dmg, spread pdmg, string special, int howman
    while (bittles.find()) switch (bittles.group(1)) {
       case "att": res.att = aoe*eval(bittles.group(2),fvars); break;
       case "def": res.def = aoe*eval(bittles.group(2),fvars); break;
-      case "stun": if (nostun) break; res.stun = (bittles.group(2) == "" ? 1 : eval(bittles.group(2),fvars));
-         if (nomultistun && res.stun > 1) res.stun = 0; break;    // stun immunities mean 0
+      case "stun": if (nostagger == 1) break; res.stun = (bittles.group(2) == "" ? 1 : eval(bittles.group(2),fvars));
+         if (nomultistun && res.stun > 1) res.stun = 0; else res.stun *= (1.0 - nostagger); break;
       case "mp": if (my_class() == $class[zombie master]) continue;
          res.mp = eval(bittles.group(2),fvars); break;
       case "meat": res.meat = eval(bittles.group(2),fvars); break;
@@ -1472,8 +1472,8 @@ void set_monster(monster elmo) {  // should be called once per BB instance; init
       foreach i in get_inventory() if (item_type(i) == "knife" && can_equip(i) && get_power(i) > fvars["bestknife"]) fvars["bestknife"] = get_power(i);
    }
   // set default monster attributes
-   nostun = false; nomultistun = false; nomiss = false; nohit = false; nospells = false; isseal = false;
-   howmanyfoes = 1; maxround = 30; damagecap = 0; capexp = 1; noitems = 0; noskills = 0;
+   nomultistun = false; nomiss = false; nohit = false; nospells = false; isseal = false;
+   howmanyfoes = 1; maxround = 30; damagecap = 0; capexp = 1; noitems = 0; noskills = 0; nostagger = 0;
    mvalcache = monstervalue();
    if (happened("use 5048")) mres = get_resistance($element[cold]);
     else mres = get_resistance(m.defense_element);
@@ -1488,13 +1488,15 @@ void set_monster(monster elmo) {  // should be called once per BB instance; init
          case "capexp": capexp = to_float(val); vprint_html("Damage in excess of the damage cap will be reduced to X<sup>"+rnum(capexp)+"</sup>.",8); break;
          case "nohit": nohit = vprint("This monster has no attack.",8); break;
          case "nomiss": nomiss = vprint("This monster never misses.",8); break;
-         case "nostun": nostun = vprint("This monster is immune to all stuns.",8); break;
+         case "nostun": nostagger = to_int(vprint("This monster is immune to all stuns.",8)); break;  // deprecated
+         case "nostagger": if (val != "") nostagger = minmax(to_float(val),0,1); if (nostagger == 0) nostagger = 1.0;
+                           vprint("Staggers have a "+rnum(nostagger*100.0)+"% chance of being blocked.",8); break;
          case "nomultistun": nomultistun = vprint("This monster is immune to multiple-round stunners.",8); break;
          case "seal": isseal = vprint("This monster is a seal, and can only be damaged by clubs.",8); break;
          case "noitems": if (val != "") noitems = minmax(to_float(val),0,1); if (noitems == 0) noitems = 1.0;
                          vprint("Items have a "+rnum(noitems*100.0)+"% chance of being blocked.",8); break;
          case "noskills": if (val != "") noskills = minmax(to_float(val),0,1); if (noskills == 0) noskills = 1.0;
-                         vprint("Skills have a "+rnum(noskills*100.0)+"% chance of being blocked.",8); break;
+                          vprint("Skills have a "+rnum(noskills*100.0)+"% chance of being blocked.",8); break;
          case "nospells": nospells = vprint("This monster is immune to spells.",8); break;
          case "retal": if (weapon_type(equipped_item($slot[weapon])) == $stat[moxie]) break; onhit.pdmg = merge(onhit.pdmg,to_spread(val));
                        vprint_html("Hitting this monster will deal "+to_html(to_spread(val))+" damage to yourself.",8); break;
@@ -1542,7 +1544,7 @@ void set_monster(monster elmo) {  // should be called once per BB instance; init
           case "shimmering": foreach el in $elements[] mres[el] = 1; break;
           case "terrifying": base.pdmg[$element[spooky]] += my_maxhp()*0.2; break;
           case "thorny": setmatt("retal","50"); break;   // arbitrarily chosen value; unspaded!
-          case "unstoppable": setmatt("nostun",""); break;
+          case "unstoppable": setmatt("nostagger",""); break;
           case "shiny": setmatt("nospells",""); break;
           case "deadly": case "giant": case "nimble": case "thick": case "smelling":
           case "shifty": break;  // 'shifty' handled in hitchance
@@ -1556,21 +1558,21 @@ void set_monster(monster elmo) {  // should be called once per BB instance; init
           case "Hot aura": base.pdmg[$element[hot]] += 7; break;
           case "Blocks combat items": setmatt("noitems",""); break;
           case "Reduced physical damage": mres[$element[none]] = 0.5; break;
-          case "Stun resistance": setmatt("nostun",""); break;
+          case "Stun resistance": setmatt("nostagger",""); break;
           case "Elemental Resistance": foreach el in $elements[] mres[el] = 0.3; break;
           case "Passive damage": onhit.pdmg[$element[none]] += 10;   // how much damage do the spikes do?
           default: vprint("Unsupported boss attribute: " + get_property("gameProBossSpecialPower"),"gray",3); // Ignores armor, Reduced damage from spells
       } break;
    }
   // account for +ML
-   float ml = numeric_modifier("_spec", "Monster Level");
-   if (my_path() == "Heavy Rains") ml += (my_location().water_level + numeric_modifier("_spec", "Water Level"))*10;
-   if (ml > 25) {
-      if (ml > 150) setmatt("nostun","");
-       else if (ml > 100) setmatt("nomultistun","");
-      ml = min(ml * .004, .5);
+   if (monster_level_adjustment() > 25) {
+      float ml = min(monster_level_adjustment() * 0.004, 0.5);
       foreach res,amt in mres mres[res] = ml + amt - (ml * amt);
-   }
+      if (monster_level_adjustment() > 50) {
+         if (nostagger < 1) setmatt("nostagger", rnum(max(nostagger, (monster_level_adjustment() - 50) * 0.01)));
+         if (monster_level_adjustment() > 100) setmatt("nomultistun","");
+      }
+   }   
    parse_factors();
   // initialize effects/gear
    fxngear();
@@ -1581,7 +1583,7 @@ void set_monster(monster elmo) {  // should be called once per BB instance; init
       pres[el] = elemental_resistance(el)/100.0;
    }
    beatenup = beatenup_cost() + runaway_cost();
-  // determine whether or not the poison of this monster is dangerous and should be removed
+// determine whether or not the poison of this monster is dangerous and should be removed
   // a poison is dangerous if a) the monster will be able to hit you, or 2) attack_action won't be able to win
    dangerpoison = m.poison;
    reset_queue();
@@ -1642,6 +1644,8 @@ string act(string action) {
    if (contains_text(action,"CRITICAL")) set_happened("crit");
    if (contains_text(action,"FUMBLE")) set_happened("fumble");
    if (contains_text(action,"monstermanuel.gif") && vprint("You got a factoid!","#8585FF",5)) set_happened("factoid");
+   if (!nomultistun && contains_text(action,"Unfazed, your opponent attacks you anyway!") && 
+      vprint("This monster is stun immune!  That information should be added to batfactors.","red",2)) nomultistun = true;
    if (have_equipped($item[operation patriot shield]) && happened($skill[throw shield]) && happened("crit")) set_happened("shieldcrit");
    if (have_equipped($item[bag o' tricks])) switch {
       case (happened($skill[open the bag o' tricks])): set_property("bagOTricksCharges","0"); break;
