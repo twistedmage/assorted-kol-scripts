@@ -199,6 +199,7 @@
 		14-02-18:Remove special support for video game bosses and use BatBrain for that
 				 Attempt to use DIsco Dances somewhat intelligently to gain Disco Momentum until BatBrain/SS has a better idea
 		14-03-11:Take a photo of Racecar Bob or Bob Racecar if we need one.
+		14-08-29:nostun is nostagger and a float
 ***********************************************************************************************************************/
 import <SmartStasis.ash>;
 
@@ -1082,7 +1083,7 @@ void build_custom_WHAM() {
 	
 	//Disco Dances for Dicso Bandits
 	if(my_class() == $class[Disco Bandit]) {
-		if(have_skill($skill[Disco State of Mind]) && have_skill($skill[Disco Greed]) && have_skill($skill[Flashy Dancer]) && !nostun) {
+		if(have_skill($skill[Disco State of Mind]) && have_skill($skill[Disco Greed]) && have_skill($skill[Flashy Dancer]) && nostagger < 1) {
 			if(has_option(get_action($skill[Disco Dance of Doom])))
 				encustom(get_action($skill[Disco Dance of Doom]));
 			if(has_option(get_action($skill[Disco Dance II: Electric Boogaloo])))

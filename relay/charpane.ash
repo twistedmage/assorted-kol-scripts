@@ -534,7 +534,7 @@ string helperSemiRare() {
 	if(get_property("kingLiberated") == "true") {
 		rewards[$location[An Octopus's Garden]] = "bigpearl.gif|Fight a moister oyster|148";
 	} else {
-		if(available_amount($item[stone wool]) < 2 && get_property("questL11Worship") != "finished")
+		if(available_amount($item[stone wool]) < 2 && get_property("lastTempleUnlock").to_int() == my_ascensions() && get_property("questL11Worship") != "finished")
 			rewards[$location[The Hidden Temple]] = "stonewool.gif|Fight Baa'baa'bu'ran|5";
 		if(!have_outfit("Knob Goblin Elite Guard Uniform") && my_path() != "Way of the Surprising Fist" && my_path() != "Way of the Surprising Fist")
 			rewards[$location[Cobb's Knob Kitchens]] = "elitehelm.gif|Fight KGE Guard Captain|20";
@@ -3906,7 +3906,7 @@ void bakeQuests() {
 		biodata[count(biodata)] = new bio("Battlefield (Frat Outfit)", "statusGalley", 9);
 	}
 	
-	// Interpret readout for Oil Peak. u is µB/Hg.
+	// Interpret readout for Oil Peak. u is B/Hg.
 	string to_slick(float u) {
 		float ml = monster_level_adjustment();
 		string oil = "cartel";
@@ -4515,13 +4515,12 @@ void bakeTracker() {
 		result.append("</td></tr>");
 	}
 	
-	//L11: questL11Pyramid
-	if(started("questL11Pyramid")) {
-		string questL11Pyramid = get_property("questL11Pyramid");
+
+
+
+	//L11: questL11Desert
+	if(started("questL11Desert")) {
 		result.append("<tr><td>");
-		// Step-by-step
-		switch(questL11Pyramid) {
-		case "started": case "step1": case "step2": case "step3": case "step4": case "step5": case "step6": case "step7": case "step8": case "step9": case "step10":
 			result.append('Find the pyramid at the <a target="mainpane" href="beach.php">Beach</a><br>');
 			int desertExploration = get_property("desertExploration").to_int();
 			if(desertExploration < 10)
@@ -4547,18 +4546,37 @@ void bakeTracker() {
 				}
 				result.append(gnasir);
 			}
-			break;
-		// Open the Bottom Chamber of the Pyramid
-		case "step11":
-				result.append('Open the <a target="mainpane" href="beach.php?action=woodencity">Pyramid</a><br>');
+		result.append("</td></tr>");
+
+	}
+
+	//L11: questL11Pyramid
+	if(get_property("questL11Desert")=="finished" && get_property("questL11Pyramid")=="unstarted") {
+		result.append("<tr><td>");
+		result.append('Open the <a target="mainpane" href="beach.php?action=woodencity">Pyramid</a>:<br>');
 				result.append(item_report($item[Staff of Fats], "Staff of Fats, "));
 				result.append(item_report($item[ancient amulet], "amulet, "));
 				result.append(item_report($item[Eye of Ed], "Eye of Ed"));
 				result.append("<br>");
-		case "step12":
+		result.append("</td></tr>");
+
+	}
+	
+	if(started("questL11Pyramid")) {
+		string questL11Pyramid = get_property("questL11Pyramid");
+		result.append("<tr><td>");
+		switch(questL11Pyramid) {
+		case "started":
+			result.append('Unlock the <a target="mainpane" href="pyramid.php">Middle Chamber</a><br>');
+			break;
+		case "step1": case "step2":
+			result.append('Unlock the <a target="mainpane" href="pyramid.php">Control Room</a><br>');
+			break;
+		}
 			if(get_property("pyramidBombUsed")=="false") {
 				result.append('Find Ed in the <a target="mainpane" href="pyramid.php">Pyramid</a><br>');
-				result.append(item_report($item[tomb ratchet], "tomb ratchets: "+item_amount($item[tomb ratchet])));
+			result.append(item_report($item[tomb ratchet], "tomb ratchets: "+item_amount($item[tomb ratchet]))+"<br>");
+			result.append(item_report($item[crumbling wooden wheel], "wooden wheels: "+item_amount($item[crumbling wooden wheel])));
 				result.append("<br>");
 				if(item_amount($item[ancient bomb]) == 0) {
 					boolean token = item_amount($item[ancient bronze token]) > 0;
@@ -4582,13 +4600,17 @@ void bakeTracker() {
 					else
 						result.append("Turn wheel to blow up chamber");
 				}
-			} else
+		} else {
 				result.append('<a target="mainpane" href="pyramid.php">Pyramid</a>: Kill Ed');
-
 		}
+
 		result.append("</td></tr>");
 	}
 
+	
+	
+	
+	
 	//L12: War, questL12War
 	if(started("questL12War")) {
 		result.append("<tr><td>");

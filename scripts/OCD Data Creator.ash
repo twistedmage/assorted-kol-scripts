@@ -4424,6 +4424,7 @@ save [$item[sheet cake]] = 0;
 save [$item[Bruno's blessing of Mars]] = 0;
 save [$item[fleetwood mac 'n' cheese]] = 0;
 save [$item[synthetic marrow]] = 0;
+save [$item[carrot juice]] = 0;
 
 
 
