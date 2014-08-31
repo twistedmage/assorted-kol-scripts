@@ -252,7 +252,7 @@ record consumable
 };
 
 //take details of a food, and add it to the con_map with it's efficiency
-void add_food(consumable[int] con_map,string text,float avg_adv,int craft_turns,int fullness, boolean is_pizza)
+void add_food(consumable[int] con_map,string text,float avg_adv,int craft_turns,int fullness, boolean is_pizza, boolean is_saucey)
 {
 	//check we can eat it
 	if(fullness>(fullness_limit() - my_fullness()))
@@ -267,6 +267,13 @@ void add_food(consumable[int] con_map,string text,float avg_adv,int craft_turns,
 	{
 		con.avg_adv = avg_adv + fullness;
 	}
+	if(is_saucey && have_skill($skill[saucemaven]))
+	{
+		if(my_class()==$class[pastamancer] || my_class()==$class[sauceror])
+			con.avg_adv = avg_adv + 10;
+		else
+			con.avg_adv = avg_adv + 5;
+	}
 	con.craft_turns=craft_turns;
 	con.fullness=fullness;
 	//account for crafting
@@ -278,9 +285,13 @@ void add_food(consumable[int] con_map,string text,float avg_adv,int craft_turns,
 	int new_index=count(con_map);
 	con_map[new_index]=con;
 }
+void add_food(consumable[int] con_map,string text,float avg_adv,int craft_turns,int fullness, boolean is_pizza)
+{
+	add_food(con_map, text, avg_adv, craft_turns, fullness, is_pizza, false);
+}
 void add_food(consumable[int] con_map,string text,float avg_adv,int craft_turns,int fullness)
 {
-	add_food(con_map, text, avg_adv, craft_turns, fullness, false);
+	add_food(con_map, text, avg_adv, craft_turns, fullness, false, false);
 }
 
 //copy of add food, but compare against drunken limits and bartender
@@ -361,7 +372,7 @@ void advise_food()
 		{			
 			if(my_path() != "Bees Hate You" && my_level()>5 && (available_amount($item[scrumptious reagent])!=0 || available_amount($item[scrumdiddlyumptious solution])!=0 )&& (my_class()==$class[sauceror] || my_class()==$class[pastamancer]) && have_skill($skill[transcendental noodlecraft]) && have_skill($skill[the way of sauce]))
 			{
-				add_food(con_map,"-    noodles + elemental nuggets + scrumdidly solution (<element> hi mein) ",24.5-1,1,5);
+				add_food(con_map,"-    noodles + elemental nuggets + scrumdidly solution (<element> hi mein) ",24.5-1,1,5,false,true);
 			}
 			
 			if(have_outfit("filthy hippy") || available_amount($item[herbs])>0)
@@ -413,19 +424,19 @@ void advise_food()
 			{
 				if(my_level()>5 && (available_amount($item[hellion cube])>0 || available_amount($item[hell broth])>0  || available_amount($item[hell ramen])>0))
 				{
-					add_food(con_map,"-    noodles + hell broth ",25,2,6);
+					add_food(con_map,"-    noodles + hell broth ",25,2,6,false,true);
 				}
-				if(my_level()>7 && available_amount($item[goat cheese])>0)
+				if(my_level()>7 && (available_amount($item[goat cheese])>0 || available_amount($item[fettucini inconnu])>0))
 				{
-					add_food(con_map,"-    noodles + goat cheese sauce (fettucini inconnu) ",24.5,2,6);
+					add_food(con_map,"-    noodles + goat cheese sauce (fettucini inconnu) ",24.5,2,6,false,true);
 				}
-				if(my_level()>4 && (available_amount($item[knob mushroom])>0 || available_amount($item[knob sausage])>0))
+				if(my_level()>4 && (available_amount($item[knob mushroom])>0 || available_amount($item[knob sausage])>0 || available_amount($item[gnocchetti di Nietzsche])>0 || available_amount($item[spaghetti with skullheads])>0))
 				{
-					add_food(con_map,"-    noodles + mush/saus sauce from knob kitchens (gnoccheti di nietzsche/spaghetti with skullheads) ",24.5,2,6);
+					add_food(con_map,"-    noodles + mush/saus sauce from knob kitchens (gnoccheti di nietzsche/spaghetti with skullheads) ",24.5,2,6,false,true);
 				}
 				if(available_amount($item[bitchin' meatcar])>0 && (available_amount($item[marzipan skull])>0 || gnomads_available()))
 				{
-					add_food(con_map,"-    noodles + marzipan skullhead sauce (spaghetti con calaveras) ",24,2,6);
+					add_food(con_map,"-    noodles + marzipan skullhead sauce (spaghetti con calaveras) ",23,2,6,false,true);
 				}
 			}
 			if(available_amount($item[spices])>0)
@@ -676,6 +687,12 @@ void advise_food()
 			
 		if(available_amount($item[incredible pizza])>0)
 			add_food(con_map,"- incredible pizza ",13.5,0,4,true);
+			
+		if(available_amount($item[Sogg-Os])>0)
+			add_food(con_map,"- Sogg-Os ",5,0,1);
+			
+		if(available_amount($item[Filet of The Fish])>0)
+			add_food(con_map,"- Filet of The Fish ",99999,0,3);
 
 
 		if(available_amount($item[magicberry tablets])>0)
@@ -840,8 +857,11 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 		if(available_amount($item[Bottle of Evermore])>0)
 			add_drink(con_map,"-Bottle of Evermore ",6,0,3);
 			
-		if(available_amount($item[red rum])>0)
+		if(available_amount($item[red rum])>0 || available_amount($item[murderer's punch])>0 )
 			add_drink(con_map,"- make a murderers punch from red rum and orange",9,1,3);
+			
+		if(available_amount($item[Wet Russian])>0)
+			add_drink(con_map,"- Wet Russian",13,0,3);
 	}
 	//sort map
 	sort con_map by -value.efficiency;

@@ -215,6 +215,7 @@ void stock_hagnks()
 	buy_item($item[spooky mushroom],1);
 	buy_item($item[killing jar],1);
 	buy_item($item[filthy knitted dread sack],1);
+	buy_item($item[filthy corduroys],1);
 	buy_item($item[blackberry galoshes],1);
 	buy_item($item[Unconscious Collective Dream Jar],16);
 	buy_item($item[logging hatchet],1);
@@ -222,6 +223,7 @@ void stock_hagnks()
 	buy_item($item[Meat-inflating powder],2);
 	buy_item($item[disposable instant camera],1);
 	buy_item($item[polka pop],10);
+	buy_item($item[crappy waiter disguise],1);
 	
 	//stuff for twistedmage
 	if(my_name()=="twistedmage")

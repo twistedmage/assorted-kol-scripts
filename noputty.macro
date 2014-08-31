@@ -107,7 +107,7 @@ if monstername * pirate
 	goto generic_spells2
 endif
 
-if (monstername writing desk || monstername dairy goat || monstername tomb rat || monstername blooper || monstername Hellion || monstername Bob Racecar || monstername Quiet Healer || monstername Goth Giant || monstername Blur || monstername Green Ops Soldier || monstername Zombie waltzers || monstername Shaky Clown || monstername Knott Yeti || monstername Hellion || monstername Violent Fungus || monstername Endless Conference Call || monstername * survivor || monstername pygmy bowler)
+if (monstername writing desk || monstername dairy goat || monstername tomb rat || monstername blooper || monstername Hellion || monstername Bob Racecar || monstername Quiet Healer || monstername Goth Giant || monstername Blur || monstername Green Ops Soldier || monstername Zombie waltzers || monstername Shaky Clown || monstername Knott Yeti || monstername Hellion || monstername Violent Fungus || monstername Endless Conference Call || monstername * survivor || monstername pygmy bowler || monstername morbid skulll)
 	if hasskill transcendent olfaction && !haseffect on the trail
 		skill transcendent olfaction
 	endif
@@ -212,6 +212,9 @@ if (monstername  A.M.C. gremlin || monstername  Sabre-toothed goat || monsternam
 	endif
 	if hasskill Batter Up
 		skill Batter Up
+	endif
+	if hasskill thunder clap
+		skill thunder clap
 	endif
 	if hascombatitem short writ of habeas corpus && (monstername pygmy shaman || monstername pygmy witch lawyer || monstername pygmy orderlies || monstername pygmy witch nurse || monstername pygmy witch surgeon || monstername pygmy headhunter || monstername drunk pygmy)
 		use short writ of habeas corpus
