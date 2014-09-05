@@ -105,24 +105,26 @@ void do_fights()
 //	}	
 	print("Done with pvp today");
 	int swagger=check_swagger();
-	if(swagger>10000 && available_amount($item[cursed microwave])<1 && can_interact())
+	if(swagger>1000)
+		print("**********************BUY BLACK BOOTY?******************************","red");
+/*	if(swagger>10000 && available_amount($item[cursed microwave])<1 && can_interact())
 		abort("buy cursed microwave");
 	if(swagger>10000 && available_amount($item[cursed pony keg])<1 && can_interact())
 		abort("buy cursed pony keg");
 	if(swagger>1000 && available_amount($item[insulting hat])<1 && can_interact())
 		abort("buy insulting hat");
-//	if(swagger>2000 && available_amount($item[offensive moustache])<1 && can_interact())
-//		abort("buy offensive moustache");
-//	if(swagger>2000 && available_amount($item[hairshirt])<1 && can_interact())
-//		abort("buy hairshirt");
-//	if(swagger>2000 && available_amount($item[How to Tolerate Jerks])<1 && can_interact())
-//		abort("buy How to Tolerate Jerks");
-//	if(swagger>5000 && available_amount($item[slap and slap again recipe])<1 && can_interact())
-//		abort("buy slap and slap again recipe");
-//	if(swagger>5000 && available_amount($item[fettucini épines Inconnu recipe])<1 && can_interact())
-//		abort("buy fettucini épines Inconnu recipe");
-//	if(swagger>5000 && !have_skill($skill[Summon Annoyance]) && can_interact())
-//		abort("buy another level of Essence of Annoyance");
+	if(swagger>2000 && available_amount($item[offensive moustache])<1 && can_interact())
+		abort("buy offensive moustache");
+	if(swagger>2000 && available_amount($item[hairshirt])<1 && can_interact())
+		abort("buy hairshirt");
+	if(swagger>2000 && available_amount($item[How to Tolerate Jerks])<1 && can_interact())
+		abort("buy How to Tolerate Jerks");
+	if(swagger>5000 && available_amount($item[slap and slap again recipe])<1 && can_interact())
+		abort("buy slap and slap again recipe");
+	if(swagger>5000 && available_amount($item[fettucini &eacute;pines Inconnu recipe])<1 && can_interact())
+		abort("buy fettucini épines Inconnu recipe");
+	if(swagger>5000 && !have_skill($skill[Summon Annoyance]) && can_interact())
+		abort("buy another level of Essence of Annoyance");*/
 }
 
 void main()

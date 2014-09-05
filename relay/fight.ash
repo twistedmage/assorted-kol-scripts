@@ -74,8 +74,8 @@ quesera[location] seras;
 string seratable() {
    if (!file_to_map("semirares.txt",seras)) return "";
    buffer res;
-   res.append("<h3>Semirare List</h3> This is a simple comprehensive list, not filtered by availability.<br>For a detailed list, "+
-      "<a href='relay_Sera.ash'>visit SeRa</a>.\n<div style='height: 300px; overflow: auto'><table>");
+   res.append("<h3>Unfiltered, Unsorted Semirare List</h3> "+
+      "(<a href='relay_Sera.ash'>filtered, sorted list</a>)\n<div style='height: 300px; overflow: auto'><table>");
    matcher ym = create_matcher("(.+?) ?(?:\\((\\d+)\\))?(?:$|, )","");
    item i;
    foreach l,rec in seras {
@@ -139,6 +139,13 @@ void handle_post() {
      case "annae":
       buffer abox;
       abox.append("Adventure again at "+my_location()+".");
+      if (my_path() == "Heavy Rains") {  abox.append(" <img style='vertical-align: text-top' height=22 width=22 src='/images/itemimages/");
+         switch (my_location().environment) {
+            case "underground": abox.append("echo.gif' title='Underground: Thunder'>"); break;
+            case "indoor": abox.append("blooddrops.gif' title='Indoors: Rain'>"); break;
+            case "outdoor": abox.append("lightningrod.gif' title='Outdoors: Lightning'>"); break;
+         }
+      }
       switch (my_location()) {
 //         case $location[]: abox.append(""); break;
          case $location[8-bit realm]: abox.append("<table><tr>"); 
@@ -147,8 +154,8 @@ void handle_post() {
                "<img src='/images/itemimages/"+i.image+"' title='"+i+"'>"+(creatable_amount(i) > 0 ? "</a>" : "")+"<br>"+rnum(item_amount(i))+"</td>");
             if (item_amount($item[digital key]) == 0 && creatable_amount($item[digital key]) > 0) abox.append("<td><a href=# class='cliimglink' title='create 1 digital key'><img src='/images/itemimages/pixelkey.gif'></a></td>");
             abox.append("</tr></table>"); break;
-         case $location[the "fun" house]: if (get_property("questG04Nemesis") != "step2") break;
-            if (numeric_modifier("Clownosity") < 4) foreach i in $items[] if (numeric_modifier(i,"Clownosity") > 0 && can_equip(i) && !have_equipped(i) && available_amount(i) > 0)
+         case $location[the "fun" house]: if ($strings[step3, step4, finished] contains get_property("questG04Nemesis")) break; abox.append("<p>");
+            if (numeric_modifier("Clownosity") < 4) foreach i in $items[] if (numeric_modifier(i,"Clownosity") > 0 && can_equip(i) && !have_equipped(i) && available_amount(i) + creatable_amount(i) > 0)
                abox.append("<a href=# class='cliimglink' title='equip "+(i == $item[big red clown nose] ?
                 "acc2" : to_slot(i))+" "+i+"'><img src='/images/itemimages/"+i.image+"' class=hand></a> ");
                abox.append("<p>Clownosity: <b>"+rnum(numeric_modifier("Clownosity"))+" / 4</b>"); break;
@@ -166,7 +173,8 @@ void handle_post() {
             if ((tpprog & 1) == 0) abox.append("<br><b>Stench res:</b> "+rnum(numeric_modifier("Stench Resistance"))+"/4 needed"+
                (numeric_modifier("Stench Resistance") < 4 ? " <a href=# class='clilink'>maximize stench res, -tie</a>" : ""));
             if ((tpprog & 2) == 0) abox.append("<br><b>Food drops:</b> "+rnum(foodDrop())+"/50 needed"+
-               (foodDrop() < 50 ? " <a href=# class='clilink'>maximize 1.1 food drop, items, -tie</a>" : ""));
+               (foodDrop() < 50 ? " <a href=# class='clilink'>maximize 1.1 food drop, items, -tie</a>"+
+                (get_property("friarsBlessingReceived") == "false" ? " <a href=# class='clilink'>friars food</a>" : "") : ""));
             if ((tpprog & 4) == 0) abox.append("<br>You <b>"+(item_amount($item[jar of oil]) == 0 ? "lack" : "have")+"</b> a jar of oil."+
                (item_amount($item[jar of oil]) == 0 ? " <a href='adventure.php?snarfblat=298' class='clilink through' title=''>Oil Peak (1)</a>" : ""));
             if (tpprog == 7) abox.append("<br><b>Initiative:</b> "+rnum(numeric_modifier("Initiative"))+"/40 needed"+
@@ -210,9 +218,9 @@ void handle_post() {
             foreach tores in $elements[hot, stench] abox.append("<b>"+tores+" res:</b> "+rnum(numeric_modifier(tores+" Resistance"))+
                " <a href=# class='clilink'>maximize "+tores+" res, -tie</a><br>"); break;
          case $location[the haunted billiards room]: if (item_amount($item[Spookyraven library key]) > 0) break;
-            int poolishness = to_int(get_property("poolSharkCount")) + (min(my_inebriety(),10) - max(0,my_inebriety() - 10)*2) + 
-               to_int(numeric_modifier("Pool Skill")) + to_int(get_property("poolSkill"));
-            abox.append("<p>You have <b>"+rnum(poolishness)+"</b> pool skill.<ul><li>Pool sharkiness: <b>"+get_property("poolSharkCount")+
+            int poolishness = min(10,floor(2*square_root(to_float(get_property("poolSharkCount"))))) + (min(my_inebriety(),10) - 
+               max(0,my_inebriety() - 10)*2) + to_int(numeric_modifier("Pool Skill")) + to_int(get_property("poolSkill"));
+            abox.append("<p>You have <b>"+rnum(poolishness)+"</b> pool skill.<ul><li>Pool sharkiness: <b>"+min(10,floor(2*square_root(to_float(get_property("poolSharkCount")))))+
                "</b></li><li>Drunkenness: <b>"+rnum(min(my_inebriety(),10) - max(0,my_inebriety() - 10)*2)+"</b></li><li>Practicing: <b>"+get_property("poolSkill")+
                "</b></li><li>Equipment/buffs: <b>"+rnum(to_float(numeric_modifier("Pool Skill")))+"</b>");
             if (item_amount($item[handful of hand chalk]) > 0 && have_effect($effect[chalky hand]) == 0)
@@ -367,8 +375,8 @@ void handle_post() {
       exit;
      case "sera":
       buffer sbox;
-      if (get_counters("Semirare window begin",0,10) != "") sbox.append("<p><span style='font-weight: bold; font-size: 3.0em'>"+narrowdown("Semirare window begin")+" </span> turns until your semirare window.");
-       else if (get_counters("Fortune Cookie",1,10) != "") sbox.append("<p><span style='font-weight: bold; font-size: 3.0em'>"+narrowdown("Fortune Cookie")+" </span> turns until your semirare!");
+      if (get_counters("Semirare window begin",0,6) != "") sbox.append("<p><span style='font-weight: bold; font-size: 3.0em'>"+narrowdown("Semirare window begin")+" </span> turns until your semirare window.");
+       else if (get_counters("Fortune Cookie",1,6) != "") sbox.append("<p><span style='font-weight: bold; font-size: 3.0em'>"+narrowdown("Fortune Cookie")+" </span> turns until your semirare!");
        else if (get_counters("Fortune Cookie",0,0) != "") sbox.append("<p>Time to get your semirare!");
       if (get_counters("Fortune Cookie",0,220) == "" && my_fullness() < fullness_limit() && can_eat())
          sbox.append("<p><a href=# class='cliimglink' title='eat fortune cookie'><img src='/images/itemimages/fortune.gif' class=hand></a>");

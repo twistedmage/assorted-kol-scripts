@@ -859,6 +859,12 @@ string parseMods(string ef) {
 	evm = replace_string(evm,"Stench","<span class=modstench>Stench</span>");
 	evm = replace_string(evm,"Sleaze","<span class=modsleaze>Sleaze</span>");
 	evm = replace_string(evm,"Prismatic","<span class=modspooky>P</span><span class=modhot>ri</span><span class=modsleaze>sm</span><span class=modstench>at</span><span class=modcold>ic</span>");
+	//highlight items and meat
+	evm = replace_string(evm,"Item","<span class=moditem>Item</span>");
+	evm = replace_string(evm,"Meat","<span class=moditem>Meat</span>");
+	//highlight ML
+	evm = replace_string(evm,"ML","<span class=modml>ML</span>");
+
 
 	return evm;
 
@@ -873,6 +879,7 @@ record buff {
 	boolean isIntrinsic;
 };
 
+
 buff parseBuff(string source) {
 	buff myBuff;
 
@@ -883,9 +890,13 @@ buff parseBuff(string source) {
 	string spoiler, style;
 
 	matcher parse = create_matcher('(?:<td[^>]*>(.*?)</td>)?<td[^>]*>(<.*?itemimages/([^"]*).*?)</td><td[^>]*>[^>]*>(.*?) +\\((?:(.*?), )?((?:<a[^>]*>)?(\\d+||&infin;)(?:</a>)?)\\)(?:(?:</font>)?&nbsp;(<a.*?</a>))?.*?</td>', source);
-	// The ? stuff at the end is because those arrows are a mafia option that might not be present
+	// The ? stuff at the end is because those arrows are a mafia option that might not be present "
 	if(parse.find()) {
 		columnIcon = parse.group(2);	// This is full html for the icon
+		
+		//ckb: eliminate the heigh and width callout so we can controll it with css instead
+		columnIcon = replace_string(columnIcon,"width=30 height=30","");
+		
 		myBuff.effectImage = parse.group(3);
 		myBuff.effectName = parse.group(4);
 		spoiler = parse.group(5);		// This appears for "Form of...Bird!" and "On the Trail"
@@ -3955,14 +3966,15 @@ void bakeQuests() {
 	result.append('<tr><th><img src="');
 	result.append(imagePath);
 	result.append('quests.png"><a target="mainpane" href="questlog.php">Current Quests</a></th></tr>');
-	
+
 	matcher showAll = create_matcher('<a style="display.+?"showall".+?</a>', source);
 	if(showAll.find()) {
 		result.append('<tr><td>');
 		result.append(showAll.group(0));
 		result.append('</td></tr>');
 	}
-	
+	//fix my syntax highlighting "
+
 	if(bugbears != "")
 		result.append(bugbears);	
 	
@@ -4039,6 +4051,7 @@ void bakeQuests() {
 	chitBricks["quests"] = result;
 	chitTools["quests"] = "Current Quests|quests.png";
 }
+
 
 // Tracker brick created by ckb
 void bakeTracker() {
@@ -4153,6 +4166,43 @@ void bakeTracker() {
 		result.append("</td></tr>");
 	}
 	*/
+	
+	//questM02Artist
+	if(started("questM02Artist")) {
+		result.append("<tr><td>");
+		result.append('Find the <a target="mainpane" href="town_wrong.php">Artists</a> supplies: <br>');
+		result.append(item_report($item[pretentious palette], "Palette")+" (<a target=\"mainpane\" href=\"manor.php\">Pantry</a>)<br>");
+		result.append(item_report($item[pail of pretentious paint], "Paint")+" (<a target=\"mainpane\" href=\"town_wrong.php\">Back Alley</a>)<br>");
+		result.append(item_report($item[pretentious paintbrush], "Paintbrush")+" (<a target=\"mainpane\" href=\"plains.php\">Outskirts</a>)");
+		result.append("</td></tr>");
+	}
+
+	//questM01Untinker
+	if(started("questM01Untinker")) {
+		result.append("<tr><td>");
+		result.append('Find the <a target="mainpane" href="forestvillage.php">Untinkers</a> ');
+		result.append(item_report($item[rusty screwdriver], "screwdriver"));
+		result.append("</td></tr>");
+	}
+
+	//questM20Necklace
+	if(started("questM20Necklace")) {
+		result.append("<tr><td>");
+		result.append("Find ");
+		result.append(item_report($item[Lady Spookyraven's necklace]));
+		result.append(" at the <a target=\"mainpane\" href=\"manor.php\">Manor</a>");
+		result.append("</td></tr>");
+	}
+	
+	//questM21Dance
+	if(started("questM21Dance")) {
+		result.append("<tr><td>");
+		result.append("Find Lady Spookyravens with her dancin supplies:<br>");
+		result.append(item_report($item[Lady Spookyraven's dancing shoes], "dancing shoes")+", ");
+		result.append(item_report($item[Lady Spookyraven's finest gown], "finest gown")+", ");
+		result.append(item_report($item[Lady Spookyraven's powder puff], "powder puff"));
+		result.append("</td></tr>");
+	}
 	// L1: Open Manor
 	/*
 	if(get_property("lastManorUnlock").to_int() != my_ascensions()) {
@@ -4399,42 +4449,40 @@ void bakeTracker() {
 		}
 		result.append("</td></tr>");
 	}
-	//lastDustyBottle2271=0
-	//lastDustyBottle2272=0
-	//lastDustyBottle2273=0
-	//lastDustyBottle2274=0
-	//lastDustyBottle2275=0
-	//lastDustyBottle2276=0
-	//lastDustyBottleReset==my_ascensions()
-	//wineCellarProgress=3
-	//cellarLayout=1092
-	//lastCellarReset
 		
 	//L11: questL11Palindome
 	if (started("questL11Palindome")) {
 		result.append("<tr><td>");
-		if(get_property("questL11Palindome") == "step4")
-			result.append('<a target="mainpane" href="plains.php">Palindome</a>: Kill Dr. Awkward');
-		else
-			result.append('Seek Dr. Awkward at <a target="mainpane" href="plains.php">Palindome</a>');
+		if(get_property("questL11Palindome") == "step5") {
+			result.append('<a target="mainpane" href="place.php?whichplace=palindome">Palindome</a>: Kill Dr. Awkward');
+		} else {
+			result.append('Seek Dr. Awkward at <a target="mainpane" href="place.php?whichplace=palindome">Palindome</a>');
+		}
 		// pirate fledges found from island.php
-		if(available_amount($item[pirate fledges])==0)
+		if(available_amount($item[pirate fledges])==0) {
 			result.append('<br>Get some <a target="mainpane" href="island.php">pirate fledges</a>');
+		}
 		// get talisman o nam from island.php
-		if(available_amount($item[Talisman o' Nam])==0)
+		if(available_amount($item[Talisman o' Nam])==0) {
 			result.append('<br>Find the <a target="mainpane" href="cove.php">Talisman o Nam</a>');
-		// have items required: photograph of God, hard rock candy, ketchup hound, hard-boiled ostrich egg 
-		if(item_amount($item[&quot;I Love Me, Vol. I&quot;]) == 0) {
+		}
+		if(get_property("questL11Palindome") == "started") {
 			result.append("<br>Obtain: ");
 			result.append(item_report($item[photograph of God]));
 			result.append(", ");
-			result.append(item_report($item[hard rock candy]));
+			result.append(item_report($item[photograph of a red nugget]));
 			result.append(", ");
-			result.append(item_report($item[hard-boiled ostrich egg]));
+			result.append(item_report($item[photograph of a dog]));
 			result.append(", ");
-			result.append(item_report($item[ketchup hound]));
+			result.append(item_report($item[photograph of an ostrich egg]));
+			result.append(", ");
+			result.append(item_report($item[&quot;I Love Me\, Vol. I&quot;]));
 			result.append(", ");
 			result.append(item_report($item[stunt nuts]));
+		}
+		if(get_property("questL11Palindome") == "step1") {
+			result.append("<br>Obtain: ");
+			result.append(item_report($item[&quot;2 Love Me\, Vol. 2&quot;]));
 		}
 		// get wet stunt nut stew, mega gem
 		if (available_amount($item[Mega Gem])==0) {
@@ -4866,8 +4914,8 @@ void bakeHeader() {
 	// Add doctype to escape quirks mode
 	result.replace_string('<html>', '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">\n<html>');
 	
-	//Add CSS to the <head> tag
-	result.replace_string('</head>', '\n<link rel="stylesheet" href="chit.css">\n</head>');
+	//Add CSS to the <head> tag -- chit_custom.css overrides the default chit.css stylesheet.
+	result.replace_string('</head>', '\n<link rel="stylesheet" href="chit.css">\n<link rel="stylesheet" href="chit_custom.css">\n</head>');
 	
 	//Add JavaScript just before the <body> tag. 
 	//Ideally this should go into the <head> tag too, but KoL adds jQuery outside of <head>, so that won't work

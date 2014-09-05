@@ -162,7 +162,7 @@ Math functions: ceil(x) floor(x) sqrt(x) min(x,y) max(x,y)
 Text functions:
   loc(text), zone(text) - 1 if the current adventure location or zone contains the specified text, 0 elsewise.
   fam(text) - 1 if the player's familiar type contains the text, else 0.
-  pref(text) - must be used on preferences with a float value ONLY - merely retrieving an integer pref will corrupt it!
+  pref(text) - fetches the specified property as a float
 Internally-used variables (upper-case letters)
   D - drunkenness
   F - fullness
@@ -569,7 +569,7 @@ boolean resist(element req, boolean reallydoit) {
    if (req == $element[none]) return true;
    if (elemental_resistance(req) >= 10) return vprint("You can already resist "+req+".",5);
   // first, try catchall buffs (more expensive but least likely to screw someone up)
-   foreach s in $skills[astral shell, elemental saucesphere] if (have_skill(s) && (
+   foreach s in $skills[astral shell, elemental saucesphere, elemental obliviousness] if (have_skill(s) && (
        (!reallydoit && my_mp() >= mp_cost(s)) ||
        (reallydoit && use_skill(1,s)))) return vprint("Resistance achieved via "+s+".",5);
   // next, try resistance from gear
@@ -640,7 +640,8 @@ int get_safemox(location wear) {
       high = max(monster_attack(m),high);
    }
    if (high == 0 || high == monster_level_adjustment()) return 0;
-   if (my_location() == $location[barrrney's barrr] && item_amount($item[the big book of pirate insults]) > 0) high += 0.3*my_defstat();
+   if (wear == $location[barrrney's barrr] && item_amount($item[the big book of pirate insults]) > 0) high += 0.3*my_defstat();
+   if (my_path() == "Heavy Rains" && wear.water_level != my_location().water_level) high += 10*(wear.water_level - my_location().water_level);
    return high + 7 - current_mcd();
 }
 

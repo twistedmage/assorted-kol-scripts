@@ -7,15 +7,26 @@ import "zlib.ash";
 
 if(check_version("newLife", "bale-new-life", "1.14.4", 2769) != "" 
   && user_confirm("The script has just been updated!\nWould you like to quit now and manually resume execution so that you can use the current version?")) {
-	vprint("New Life aborted to complete update. Please run newLife.ash to finish setting up your current ascension.", -1);
+	print("New Life aborted to complete update. Please run newLife.ash to finish setting up your current ascension.", "red");
 	exit;
 }
+
+void knife_untinker(item it)
+{
+	if(item_amount($item[loathing legion universal screwdriver])<1)
+		abort("Can't untinker without legion screwdriver");
+	//use knife
+	string catch = visit_url("inv_use.php?which=3&whichitem=&pwd="+my_hash(),false,true);
+	//unscrew item
+	catch = visit_url("inv_use.php?whichitem=4926&action=screw&dowhichitem="+to_int(it)+"&untinker=Unscrew%21&pwd="+my_hash(),false,true);
+}
+
 
 if(!($strings[None, Teetotaler, Boozetafarian, Oxygenarian, Bees Hate You, Way of the Surprising Fist, Trendy,
 Avatar of Boris, Bugbear Invasion, Zombie Slayer, Class Act, Avatar of Jarlsberg, BIG!, KOLHS, Class Act II: A Class For Pigs, 
 Avatar of Sneaky Pete, Slow and Steady, 19, Heavy Rains] contains my_path())
   && user_confirm("Your current challenge path is unknown to this script!\nUnknown and unknowable errors may take place if it is run.\nDo you want to abort?")) {
-	vprint("Your current path is unknown to this script! A new version of this script should be released very soon.", -1);
+	print("Your current path is unknown to this script! A new version of this script should be released very soon.", "red");
 	exit;
 }
 
@@ -92,6 +103,7 @@ void set_choice_adventures() {
 	set_choice("louvreDesiredGoal", 7, "Haunted Gallery: Get Lady Spookyraven's dancing shoes");
 	set_choice("lightsOutAutomation", 1, "Lights Out at Spookyraven Manor: Free adventures FTW!");
 	set_choice(451, 3, "Greater-than Sign: Get plus sign");
+	set_choice(106, 2, "Ballroom song: Non-combat");
 	set_choice(523, 4, "Defiled Cranny: Fight swarm of ghoul whelps");
 	set_choice(22, 4, "Pirate's Cove: Complete the Outfit (eyepatch or pants)");
 	set_choice(23, 4, "Pirate's Cove: Complete the Outfit (eyepatch or parrot)");
@@ -165,6 +177,7 @@ void set_choice_adventures() {
 		set_choice(148, 1, "McMillicancuddy's Farm: Back 40");
 		set_choice(149, 2, "McMillicancuddy's Farm: The Other Back 40");
 	}
+	set_choice(182, 1, "Fantasy Airship, Lack of an Encounter: Fight MechaMech for metallic A if you turn up the ML");
 	// In BIG! There is no need for leveling up
 	if(skipStatNCs) {
 		set_choice("oceanDestination", "ignore", "At the Poop Deck: Skip the wheel");
@@ -199,7 +212,6 @@ void set_choice_adventures() {
 		set_choice(402, 2, "Bathroom, Don't Hold a Grudge: Get Mysticality stats");
 		set_choice(141, 1, "Hippies on the Verge of War, Blockin' Out the Scenery: Get Mysticality stats");
 		set_choice(145, 2, "Frats on the Verge of War, Fratacombs: Get food");
-		set_choice(793, 2, "Take Mysticality vacation.");
 		break;
 	case $stat[moxie]:
 		set_choice(73, 3, "Whitey's Grove: Get wedding cake and rice");
@@ -215,7 +227,6 @@ void set_choice_adventures() {
 		set_choice(402, 3, "Bathroom, Don't Hold a Grudge: Get Moxie stats");
 		set_choice(141, 2, "Hippies on the Verge of War, Blockin' Out the Scenery: Get rations");
 		set_choice(145, 2, "Frats on the Verge of War, Fratacombs: Get food");
-		set_choice(793, 3, "Take Moxie vacation.");
 		break;
 	}
 	if(vars["newLife_SetupGuyMadeOfBees"].to_boolean())
@@ -253,7 +264,7 @@ void campground(boolean softBoo) {
 	  && vars["newLife_UseNewbieTent"].to_boolean();
 	// If the player is in Hardcore Nation it is time to send a "Please brick me" announcement!
 	// I only announce it if I am ascending hardcore. Silly, but that's me.
-	if( (in_hardcore() || !softBoo) && (tent || my_turncount() < 1) && get_clan_id() == 41543) {  // 41543 is the ID for HCN
+	if( (in_hardcore() || !softBoo) & (tent || my_turncount() < 1) && get_clan_id() == 41543) {  // 41543 is the ID for HCN
 		chat_clan(now_to_string("MM/dd/yyyy hh:mm aaa") + " - Welcome Back to the Kingdom of Loathing. Noob.");
 		// Pause for a suitable bricking window.
 		if(tent) {
@@ -281,85 +292,42 @@ void get_bugged_balaclava() {
 	}
 }
 
-void get_stuff() {
-	boolean need_accordion() {
-		// ATs come with a stolen accordion and ability to steal more
-		if(my_class() != $class[Accordion Thief] && item_amount($item[toy accordion]) == 0 && available_amount($item[antique accordion]) == 0 && good($item[toy accordion]))
-			foreach s in $skills[]
-				if(have_skill(s) && s.class == $class[Accordion Thief] && s.buff == true && s.dailylimit < 0)
-					return true; 	// Only need an accordion if the character can cast a AT skill (Unlimited skills only!)
+void buy_stuff() {
+	boolean meat4pork(int price) {
+		if(my_meat() >= price) return true;
+		if(item_amount($item[baconstone]) > 0) return autosell(1, $item[baconstone]);
+		if(item_amount($item[hamethyst])  > 0) return autosell(1, $item[hamethyst]);
+		if(item_amount($item[porquoise])  > 0) return autosell(1, $item[porquoise]);
 		return false;
 	}
-
-	boolean meat4pork(item it) {
-		// In case you want to use Thor's Pliers to smith Black Gold with a pork gem, preseve one the best for your class. Organize list to cause that.
-		boolean [item] gem_list() {
-			if(primestat == $stat[muscle]) return $items[hamethyst, porquoise, baconstone];
-			if(primestat == $stat[moxie])  return $items[baconstone, hamethyst, porquoise];
-			return $items[baconstone, porquoise, hamethyst]; // This is Myst
-		}
-		
-		if(my_meat() < npc_price(it)) {
-			item [int] pork;
-			foreach gem in gem_list()
-				if(item_amount(gem) > 0) pork [count(pork)] = gem;
-			if(count(pork) == 0) return false;
-			sort pork by - item_amount(value);
-			autosell(1, pork[0]);  // Sell the gem with the greatest quantity
-		}
-		return my_meat() >= npc_price(it);
-	}
-	
-	string trade_pork4item(item it) {
-		if(available_amount(it) == 0) {
-			if(meat4pork(it) && retrieve_item(1, it))
-				return to_string(it);
-			vprint("Failed to acquire a " + it, -3);
-		}
-		return "";
-	}
+	//SIMON: force it to sell the silly stones
+	while(meat4pork(9999999)){}
 	
 	boolean worthless() {
 		for i from 43 to 45
 			if(available_amount(i.to_item()) > 0) return true;
 		return false;
 	}
-	
-	// a is the new string, cat is the contatenated final string
-	string and_string(string a, string cat) {
-		if(cat == "")
-			return a;
-		if(a == "")
-			return cat;
-		if(cat.contains_text(" and a "))
-			return a + ", "+ cat;
-		return a + " and a "+ cat;
-	}
 
-	string garner;
-	
-	if(need_accordion())
-		garner = trade_pork4item($item[toy accordion]);
-		
-	if(knoll_available() && good($item[detuned radio]))
-		garner = trade_pork4item($item[detuned radio]).and_string(garner);
-	
-	// Need miniature life preserver in Heavy Rains
-	if(my_path() == "Heavy Rains")
-		garner = trade_pork4item($item[miniature life preserver]).and_string(garner);
-	
-	// For disco bandits, Suckerpunch is better than seal tooth
-	if(my_class() != $class[Disco Bandit] && item_amount($item[seal tooth]) == 0 && good($item[seal tooth]) && good($item[chewing gum on a string])) {
-		while(!worthless() && meat4pork($item[chewing gum on a string]))
-			use(1, $item[chewing gum on a string]);
-		if(worthless() && (available_amount($item[hermit permit]) > 0 || meat4pork($item[hermit permit]))) {
-			hermit(1, $item[seal tooth]);
-			garner = "seal tooth".and_string(garner);
+	if(good($item[chewing gum on a string])) {
+
+		boolean sealtooth = false; //item_amount($item[seal tooth]) == 0 && good($item[seal tooth]) && my_class() != $class[Disco Bandit];
+		boolean radio = item_amount($item[detuned radio]) == 0 && knoll_available() && good($item[detuned radio]);
+		int q = to_int(sealtooth) + to_int(radio);
+		string garner;
+		if(sealtooth) garner += "seal tooth"       + (radio? " and a ": "");
+		if(radio)     garner += "detuned radio";
+		if(garner != "")
+			vprint("Pork Elf stones are being autosold now to garner a "+garner+".", "blue", 3);
+		if(radio && item_amount($item[detuned radio]) == 0 && meat4pork(300))
+			buy(1, $item[detuned radio]);
+		if(sealtooth && available_amount($item[seal tooth]) == 0) {
+			while(!worthless() && meat4pork(50))
+				use(1, $item[chewing gum on a string]);
+			if(worthless() && (available_amount($item[hermit permit]) > 0 || meat4pork(100)))
+				hermit(1, $item[seal tooth]);
 		}
 	}
-
-	if(garner != "")
-		vprint("Pork Elf stones were sold to garner a "+garner+".", "blue", 3);
 }
 
 // Visit Mt. Noob to get pork gems.
@@ -371,8 +339,8 @@ void visit_toot() {
 	if(vars["newLife_SellPorkForStuff"].to_boolean()) {
 		if(item_amount($item[pork elf goodies sack]) > 0 && good($item[pork elf goodies sack]))
 			use(1, $item[pork elf goodies sack]);
-		if(item_amount($item[baconstone]) + item_amount($item[hamethyst]) + item_amount($item[porquoise]) + my_meat() > 0)
-			get_stuff();
+		if(item_amount($item[baconstone]) + item_amount($item[hamethyst]) + item_amount($item[porquoise]) > 0)
+			buy_stuff();
 	}
 }
 
@@ -385,70 +353,55 @@ boolean use_shield() {
 }
 
 familiar start_familiar() {
-	familiar f100 = vars["is_100_run"].to_familiar();	// Is this a 100% familiar run?
-	// If player has used BCCAscend, normalize familiar settings with "is_100_run"
-	if(get_property("bcasc_lastCouncilVisit") != "") {
-		if(f100 == $familiar[none]) {
-			set_property("bcasc_100familiar", ""); 
-		} else {
-			set_property("bcasc_100familiar", f100); 
-			set_property("bcasc_defaultFamiliar", f100); 
-		}
+	void set_bcca(string f) {
+		if(get_property("bcasc_lastCouncilVisit") == "") return;
+		// Only set this if BCCAscend has actually been run by this player
+		set_property("bcasc_100familiar", f); 
+		set_property("bcasc_defaultFamiliar", f); 
 	}
-	if(f100 != $familiar[none]) return f100;
+	// Check for the zlib variable "is_100_run"
+	familiar f100 = vars["is_100_run"].to_familiar();
+	if(f100 == $familiar[none]) {
+		set_bcca("");
+	} else {
+		set_bcca(vars["is_100_run"]);
+		return f100;
+	}
 	
 	if(my_path() == "Zombie Slayer" && have_familiar($familiar[Hovering Skull]))
 		return $familiar[Hovering Skull];
 	
-	foreach f in $familiars[He-Boulder, Frumious Bandersnatch, Baby Bugged Bugbear, Grim Brother, Bloovian Groose, Gluttonous Green Ghost, 
+	foreach f in $familiars[He-Boulder, galloping grill, baby sandworm, hovering sombrero, Frumious Bandersnatch, Baby Bugged Bugbear, Bloovian Groose, Gluttonous Green Ghost, 
 	  Spirit Hobo, Fancypants Scarecrow, Ancient Yuletide Troll, Cheshire Bat, Cymbal-Playing Monkey, Nervous Tick, 
 	  Hunchbacked Minion, Uniclops, Chauvinist Pig, Dramatic Hedgehog, Blood-Faced Volleyball, Reagnimated Gnome, 
-	  Jill-O-Lantern, Hovering Sombrero]
+	  Jill-O-Lantern]
 		if(have_familiar(f) && good(f)) return f;
 	
 	return $familiar[none];
 }
 
 void equip_stuff() {
-	buffer gear;
-	gear.append("mainstat, 0.2 hp, 0.2 dr, 0.1 spell damage, 4 ");
-	gear.append(my_primestat());
-	gear.append(" experience");
+	string gear = "mainstat, 0.2 hp, 0.2 dr, 0.2 familiar weight, 0.1 spell damage, -equip sugar shield, 4 ";
+	gear += my_primestat() + " experience";
 	if(my_path() != "Zombie Slayer")
-		gear.append(", mp regen");
-	if(good("familiar"))
-		gear.append(", 0.2 familiar weight");
-	if(available_amount($item[sugar shield]) > 0)
-		gear.append(" -equip sugar shield");
-	
+		gear += ", mp regen";
 	// Ensure correct type of weapon
 	if(primestat == $stat[Muscle])
-		gear.append(" +0.5 melee");
+		gear += " +melee";
 	else if(primestat == $stat[Moxie])
-		gear.append(" -0.5 melee");
-	
+		gear += " -melee";
 	// Unarmed combat or require shield?
-	if(!have_skill($skill[Summon Smithsness]) && have_skill($skill[Master of the Surprising Fist]) && have_skill($skill[Kung Fu Hustler]) && available_amount($item[Operation Patriot Shield]) < 1)
-		gear.append(" -weapon -offhand");  // Barehanded can be BEST at level 1!
+	if(have_skill($skill[Master of the Surprising Fist]) && have_skill($skill[Kung Fu Hustler]) && available_amount($item[Operation Patriot Shield]) < 1)
+		gear +=" -weapon -offhand";  // Barehanded can be BEST at level 1!
 	else if(use_shield())
-		gear.append(" +shield");
-	
-	// Things to not equip for specific path
-	switch(my_path()) {
-	case "Bees Hate You":
-		gear.append(", 0 beeosity");
-		break;
-	case "KOLHS":
-		gear.append(" -hat");
-		break;
-	case "Heavy Rains":
-		if(available_amount($item[miniature life preserver]) > 0) {
-			equip($item[miniature life preserver]);
-			lock_familiar_equipment(true);
-			gear.append(" -familiar");
-		}
-		break;
-	}
+		gear +=" +shield";
+	if(my_path() == "Bees Hate You")
+		gear += ", 0 beeosity";
+	else if(my_path() == "KOLHS" || my_path() == "15")
+		gear+= " -hat";
+	//SIMON ADDED item bonus
+	gear +=", 0.2 items";
+	print("maximize "+gear,"green");
 	maximize(gear, false);
 }
 
@@ -463,7 +416,7 @@ void handle_starting_items() {
 	foreach it in $items[astral hot dog dinner, astral six-pack, carton of astral energy drinks,
 	  box of bear arms]
 		if(item_amount(it) > 0 && good(it)) use(item_amount(it), it);
-		
+
 	// Put on the best stuff you've got.
 	vprint("Put on your best gear.", "olive", 3);
 	// First equip best familiar!
@@ -476,21 +429,23 @@ void handle_starting_items() {
 
 void recovery_settings() {
 	// Optimal restoration settings for level 1. These will need to be changed by level 4
-		set_choice("hpAutoRecovery", "0.25", "Resetting HP/MP restoration settings to minimal");
-		set_choice("hpAutoRecoveryTarget", "0.95", "");
-		set_choice("manaBurningTrigger", "-0.05", "");
-		set_choice("manaBurningThreshold", "0.80", "");
+	set_choice("hpAutoRecovery", "0.25", "Resetting HP/MP restoration settings to minimal");
+	set_choice("hpAutoRecoveryTarget", "0.95", "");
+	set_choice("manaBurningTrigger", "-0.05", "");
+	set_choice("manaBurningThreshold", "0.80", "");
 	// Zombie Slayers have an alternative to using mana
 	if(my_path() == "Zombie Slayer") {
 		if(get_property("baleUr_ZombieAuto") != "")
 			set_property("baleUr_ZombieAuto", "-0.05");
 		if(get_property("baleUr_ZombieTarget") != "")
 			set_property("baleUr_ZombieTarget", 1);
+		//simon to stop waste during moods
+		set_choice("manaBurningThreshold", "-0.05", "");
 		// Turn off mana restoration in combat. It causes problems in zombiecore
 		set_property("autoManaRestore", "false");
 	} else {
-		set_choice("mpAutoRecovery", "0.0", "");
-		set_choice("mpAutoRecoveryTarget", "0.0", "");
+		set_choice("mpAutoRecovery", "0.3", "");
+		set_choice("mpAutoRecoveryTarget", "0.6", "");
 	}
 	
 }
@@ -505,7 +460,7 @@ void path_skills(boolean always_learn) {
 			for t from 1 to 3
 				for i from 1 to 10
 					visit_url("da.php?whichtree="+t+"&action=borisskill");
-			vprint("You are filled with all of Boris' skills and are ready to use them.", "blue", 3);
+			vprint("You are filled with all of Boris' skills and ready to use them.", "blue", 3);
 		}
 		break;
 	case "Zombie Slayer":
@@ -528,8 +483,9 @@ void path_skills(boolean always_learn) {
 		}
 		break;
 	case "Avatar of Jarlsberg":
-		matcher jarlskills = create_matcher("have (\\d+) skill points", visit_url("da.php?place=gate2"));
-		if(jarlskills.find() && jarlskills.group(1).to_int() > 31) {
+		string jarl = visit_url("da.php?place=gate2");
+		matcher unassigned = create_matcher("have (\\d+) skill points", jarl);
+		if(unassigned.find() && unassigned.group(1).to_int() > 31) {
 			foreach sk in $skills[Boil, Conjure Eggs, Conjure Dough, Fry, Coffeesphere, Egg Man, Early Riser, The Most Important Meal,
 			  Conjure Vegetables, Chop, Slice, Lunch Like a King, Oilsphere, Radish Horse, Conjure Cheese, Working Lunch,
 			  Bake, Conjure Potato, Conjure Meat Product, Grill, Gristlesphere, Food Coma, Hippotatomous, Never Late for Dinner,
@@ -538,15 +494,32 @@ void path_skills(boolean always_learn) {
 			vprint("You are filled with all of Jarlsberg's skills, now get cooking!", "blue", 3);
 		}
 		break;
-	case "Avatar of Sneaky Pete":
-		matcher peteskills = create_matcher("<b>(\\d+)</b> skill points available", visit_url("da.php?place=gate3"));
-		if(peteskills.find() && peteskills.group(1).to_int() > 29) {
-			visit_url("choice.php?whichchoice=867&pwd&option=4"); // All 10 Loveable Rogue
-			visit_url("choice.php?whichchoice=867&pwd&option=5"); // All 10 Motorcycle Guy
-			visit_url("choice.php?whichchoice=867&pwd&option=6"); // All 10 Dangerous Rebel
-			vprint("You are filled with all of Sneaky Pete's skills, so hit the St.", "blue", 3);
-		}
-		break;
+	}
+}
+boolean pull_if_good(item it)
+{
+	if(good(it))
+	{
+		print("pulling "+it);
+		take_storage(1,it);
+		return true;
+	}
+	return false;
+}
+
+void pull_and_wear_if_good(item it)
+{
+	if(pull_if_good(it))
+	{
+		equip(it);
+	}
+}
+ 
+void pull_and_wear_if_good(item it, slot sl)
+{
+	if(pull_if_good(it))
+	{
+		equip(sl,it);
 	}
 }
 
@@ -565,59 +538,268 @@ void special(boolean bonus_actions) {
 	vprint("Now for a few things that "+my_name()+" wants to do.", "blue", 3);
 	if(available_amount($item[detuned radio]) > 0 || canadia_available())
 		change_mcd(10 + canadia_available().to_int());
-	
-	// In softcore I want to pull stuff
-	if(!in_hardcore()) {
-		if(my_path() == "BIG!") {  // Most pulls involve leveling up, so BIG is very different!
-			if(!knoll_available() && pull_it($item[Loathing Legion knife]))
-				cli_execute("fold Loathing Legion universal screwdriver");
-		} else {
-			if(my_path() != "KOLHS, Class Act II: A Class For Pigs" && pull_it($item[Loathing Legion knife]))
-				cli_execute("fold Loathing Legion necktie");
-			if(pull_it($item[Juju Mojo Mask])) equip($slot[acc2],$item[Juju Mojo Mask]);
-			
-			// Pull Pants!
-			(pull_it($item[Greatest American Pants]) || pull_it($item[Pantsgiving]));
-			
-			// Offhand: Use Jarlsberg's Pan if mainstat is Myst. For other mainstat or no Pan, use OPS
-			if(!have_skill($skill[Summon Smithsness]))
-				if(my_primestat() != $stat[mysticality] || !(pull_it($item[Jarlsberg's pan]) || pull_it($item[Jarlsberg's pan (Cosmic portal mode)])))
-					pull_it($item[Operation Patriot Shield]);
-			
-			// Get a weapon, only if none is in inventory already and you don't have Smithsness
-			if(!have_skill($skill[Summon Smithsness]) && my_primestat() != $stat[Moxie] && item_amount($item[astral mace]) + item_amount($item[astral bludgeon]) + item_amount($item[right bear arm]) < 1)
-				(pull_it($item[Thor's Pliers]) || pull_it($item[ice sickle]));
-			
-			// Shirt
-			if(have_skill($skill[Torso Awaregness]) && available_amount($item[astral shirt]) < 1)
-				(pull_it($item[Sneaky Pete's leather jacket]) || pull_it($item[Sneaky Pete's leather jacket (collar popped)]) || pull_it($item[cane-mail shirt]));
-			
-			// Back
-			if(have_familiar($familiar[El Vibrato Megadrone]) && good($familiar[El Vibrato Megadrone]) && pull_it($item[Buddy Bjorn]))
-				cli_execute("bjornify El Vibrato Megadrone");
-			
-			// Best Hat? Jarlsberg comes with all the hat he needs
-			if(my_path() != "Avatar of Jarlsberg") {
-				if(available_amount($item[Buddy Bjorn]) < 1 && have_familiar($familiar[El Vibrato Megadrone]) && good($familiar[El Vibrato Megadrone]) && pull_it($item[Crown of Thrones]))
-					cli_execute("enthrone El Vibrato Megadrone");
-				else if(pull_it($item[Boris's Helm]))
-					cli_execute("fold Boris's Helm (askew)");
-				else pull_it($item[Boris's Helm (askew)]);
+	//if in softcore, pull my set
+	if(!in_hardcore())
+	{
+		cli_execute("inventory refresh");
+		refresh_stash();
+		if(my_name()=="twistedmage")
+		{
+			//hat
+			if(storage_amount($item[Boris's Helm (askew)])>0)
+				pull_and_wear_if_good($item[Boris's Helm (askew)]);
+			else
+			{
+				pull_if_good($item[Boris's Helm]);
+				if(available_amount($item[boris's helm])>0)
+				{
+					cli_execute("fold boris's helm (askew)");
+					equip($item[boris's helm (askew)]);
+				}
 			}
+			if(available_amount($item[boris's helm (askew)])==0)
+			{
+				pull_and_wear_if_good($item[crown of thrones]);
+				if(available_amount($item[crown of thrones])>0)
+					if(good("el vibrato Megadrone"))
+					{
+						cli_execute("enthrone El Vibrato Megadrone");
+	//					else if(good("Li'l Xenomorph"))
+	//					cli_execute("enthrone Li'l Xenomorph");
+					}
+					else
+						abort("Don't know what familiar to enthrone for this path");
+			}
+			//myst classes want a pan offhand
+			if(my_primestat()==$stat[mysticality] && my_path()!="Bees Hate You" && my_path()!="BIG!")
+			{
+				//pull whichever
+				if(storage_amount($item[Jarlsberg's pan (Cosmic portal mode)])>0)
+				{
+					pull_if_good($item[Jarlsberg's pan (Cosmic portal mode)]);
+				}
+				else
+				{
+					pull_if_good($item[Jarlsberg's pan]);
+				}
+				//for now we will always use the portal version, might want to change it one day though
+				if(available_amount($item[Jarlsberg's pan])>0)
+				{
+					cli_execute("fold Jarlsberg's pan (Cosmic portal mode)");
+				}
+				if(available_amount($item[Jarlsberg's pan (Cosmic portal mode)])>0)
+					equip($item[Jarlsberg's pan (Cosmic portal mode)]);
+			}
+			else //others want a shield
+			{
+				pull_and_wear_if_good($item[operation patriot shield]);
+			}
+			//pull_and_wear_if_good($item[greatest american pants]);
+			if(available_amount($item[pantsgiving])==0)
+				pull_and_wear_if_good($item[pantsgiving]);
+			
+			if(my_path()!="Heavy Rains")
+				pull_if_good($item[loathing legion universal screwdriver]);
+			boolean screw=item_amount($item[loathing legion universal screwdriver])>0;
+			if(my_path()!="Avatar of Boris" && my_path()!="Avatar of Jarlsberg")
+			{
+				pull_if_good($item[moveable feast]);
+				pull_and_wear_if_good($item[snow suit]);
+			}
+			if(have_skill($skill[torso awaregness]))
+			{
+				if(available_amount($item[astral shirt]) < 1)
+				{
+					pull_and_wear_if_good($item[Sneaky Pete's leather jacket (collar popped)]);
+					if(available_amount($item[sneaky pete's leather jacket (collar popped)])<1)
+					{
+						pull_and_wear_if_good($item[Sneaky Pete's leather jacket]);
+						cli_execute("fold sneaky pete's leather jacket (collar popped)");
+						if(available_amount($item[sneaky pete's leather jacket (collar popped)])<1)
+						{
+							equip($item[Sneaky Pete's leather jacket (collar popped)]);
+						}
+						else
+						{
+							pull_and_wear_if_good($item[cane-mail shirt]);
+						}
+					}
+				}
+			}
+			
+			//back
+			if(good("buddy bjorn") && my_path()!="Avatar of Boris" && my_path()!="Avatar of Jarlsberg" && my_path()!="Avatar of Sneaky Pete")
+			{
+				pull_and_wear_if_good($item[buddy bjorn]);
+				if(good("el vibrato Megadrone"))
+				{
+					cli_execute("bjornify El Vibrato Megadrone");
+					
+					
+	//				else if(good("Li'l Xenomorph"))
+	//				cli_execute("enthrone Li'l Xenomorph");
+				}
+				else
+					abort("Don't know what familiar to enthrone for this path");
+			}
+			else
+			{
+				pull_and_wear_if_good($item[Camp Scout backpack]);
+				if(available_amount($item[Camp Scout backpack])<1)
+					pull_and_wear_if_good($item[Cloak of Dire Shadows]);
+			}
+			//now pull useful stuff
+			if(pull_if_good($item[can of rain-doh]))
+				if(available_amount($item[rain-doh blue balls])==0)
+					use(1,$item[can of rain-doh]);
+			if(available_amount($item[box of bear arms])>0)
+				use(1,$item[box of bear arms]);
+	//			pull_if_good($item[jewel-eyed wizard hat]);
+			//pull tps drink
+	//			pull_if_good($item[grogtini]);
+			//handle zombie head + maid if we have gnoll
+			if( knoll_available() && pull_if_good($item[Ninja pirate zombie robot head]))
+			{
+				if(screw)
+				{
+					knife_untinker($item[ninja pirate zombie robot head]);
+					knife_untinker($item[pirate zombie robot head]);
+					knife_untinker($item[pirate zombie head]);
+					knife_untinker($item[clockwork pirate skull]);
+					knife_untinker($item[enchanted eyepatch]);
+					if(my_path()!="Way of the Surprising Fist") //can't afford other meat maid pieces in wotsf
+					{
+						cli_execute("make clockwork maid");
+						cli_execute("use clockwork maid");
+					}
+				}
+			}
+			if(my_path()=="BIG!")
+			{
+				if(my_class()==$class[accordion thief])
+				{
+					print("creating a Shakespeare's Sister's Accordion, better than bottle rocket","purple");
+					
+					//try to craft
+					if(available_amount($item[Shakespeare's Sister's Accordion])<1 && have_skill($skill[summon smithsness]))
+					{
+						if(available_amount($item[lump of brituminous coal])==0)
+							use_skill(1,$skill[summon smithsness]);
+							
+						create(1,$item[Shakespeare's Sister's Accordion]);
+						equip($item[Shakespeare's Sister's Accordion]);
+					}
+					//pull
+					if(available_amount($item[Shakespeare's Sister's Accordion])<1)
+						pull_and_wear_if_good($item[Shakespeare's Sister's Accordion]);
+				}
+				//get somethign else instead
+				if(equipped_amount($item[Shakespeare's Sister's Accordion])==0)
+				{
+					if(my_primestat()==$stat[moxie])
+						pull_and_wear_if_good($item[bottle-rocket crossbow]);
+					else
+						pull_and_wear_if_good($item[haiku katana]);
+				}
+
+				pull_and_wear_if_good($item[v for vivala mask],$slot[acc2]);
+				pull_and_wear_if_good($item[mr. accessory jr.],$slot[acc1]);
+				if(available_amount($item[astral mask])>0)
+					equip($slot[acc3],$item[astral mask]);
+				else
+					pull_and_wear_if_good($item[mr. accessory jr.],$slot[acc3]);
+			}
+			else //not big
+			{
+				//ice sickle is TECHNICALLY better than pliers (5 stat vs 4 stat) but pliers have nice quality of life
+				if(equipped_amount($item[saucepanic])<1)
+					pull_and_wear_if_good($item[thor's pliers]);
+				//	pull_and_wear_if_good($item[ice sickle]);
+				
+				//1st acc legion necktie
+				if(screw)
+				{
+					cli_execute("fold loathing legion necktie");
+					if(good($item[loathing legion necktie]))
+						equip($slot[acc1],$item[loathing legion necktie]);
+				}
+				
+				//not trendy enough for HR
+				if(my_path()!="Heavy Rains")
+				{
+					pull_and_wear_if_good($item[juju mojo mask],$slot[acc2]);
+					//if we have no astral belt, wear fangs. Else pull fangs as superclover but dont wear 
+					if(available_amount($item[astral belt])<1)
+						pull_and_wear_if_good($item[plastic vampire fangs],$slot[acc3]);
+					else
+					{
+						pull_if_good($item[plastic vampire fangs]);
+						equip($slot[acc3],$item[astral belt]);
+					}
+				}
+				else
+				{
+					//in heavy rains our accessory choice is pretty limmited
+					//assume we got an astral, then we need 2
+					int needed_accs=3;
+					foreach it in $items[astral belt, astral mask, astral bracer, astral ring]
+					{
+						if(available_amount(it)>0)
+						{
+							equip($slot[acc1],it);
+							needed_accs-=1;
+						}
+					}
+					//get some
+					if(my_primestat()==$stat[mysticality])
+					{
+						cli_execute("pull fishbone bracers  ");
+						equip($slot[acc3],$item[fishbone bracers]);
+						needed_accs-=1;
+					}
+					else
+					{
+						cli_execute("pull fishbone belt   ");
+						equip($slot[acc3],$item[fishbone belt]);
+						needed_accs-=1;
+					}
+					//time-twitching toolbelt 15 all stats
+					//Talisman of Baio * 2 ~ +42% all stats
+					//warbear laser beacon for DBS - 6,9,12 PRISMATIC damage when building momentum
+					//Gauntlets of the Blood Moon - 75 hp and 5% stats and 5% items
+					while(needed_accs>0)
+					{
+						cli_execute("pull Mr. Accessory Jr.");
+						equip($item[Mr. Accessory Jr.]);
+						needed_accs-=1;
+					}
+							
+				}
+			}
+			if(available_amount($item[wrecked generator])<1 && can_drink() && my_path() != "KOLHS" && my_path() != "Avatar of Jarlsberg" && my_path() != "Heavy Rains")
+				pull_if_good($item[wrecked generator]);
+			pull_if_good($item[jar of psychoses (The Crackpot Mystic)]);
+					
+			//14 pulls
+	//			pull_if_good($item[v for vivala mask]);
+	//			if(storage_amount($item[stinky cheese eye])>0)
+	//				pull_if_good($item[stinky cheese eye]);
+	//			else if(storage_amount($item[stinky cheese diaper])>0)
+	//				pull_if_good($item[stinky cheese diaper]);
+	//			else
+	//				print("Couldn't find stinky cheese item","red");
+			//16 pull 
+	//could also pull miniborg destroy o bot for combat
+	//		if(get_property("tomeSummons").to_int() > 0 && my_path()!="Way of the Surprising Fist")
+	//			use_skill(3 - get_property("tomeSummons").to_int(), $skill[Summon Stickers]);
+
 		}
-		
-		// Ultimate Combat Item
-		if(available_amount($item[empty Rain-Doh can]) == 0 && pull_it($item[can of Rain-Doh]))
-			use(1, $item[can of Rain-Doh]);
-		
-		// Select best familiar item if familiars can be used
-		if(good("familiar") && available_amount($item[astral pet sweater]) < 1 && my_path() != "Heavy Rains")
-			(pull_it($item[moveable feast]) || pull_it($item[snow suit]) || pull_it($item[little box of fireworks]) || pull_it($item[plastic pumpkin bucket]));
-		
-		equip_stuff();
 	}
 	
+	set_property("_photocopyUsed","false"); //in case the game crashes during ascension and it isn't reset
 	cli_execute("mood default");
+	if(in_hardcore())
+		equip_stuff();
 }
 
 void check_breakfast() {
@@ -627,6 +809,18 @@ void check_breakfast() {
 	string loginScript = get_property("loginScript");
 	if(loginScript != "")
 		cli_execute(loginScript);
+}
+
+void start_quests()
+{
+	//visit artist and accept
+	visit_url("town_wrong.php?place=artist");
+	wait(3);
+	visit_url("town_wrong.php?place=artist&getquest=1");
+	//visit doc galaktik
+	visit_url("galaktik.php");
+	//visit guild
+	visit_url("guild.php?place=challenge");
 }
 
 void new_ascension() {
@@ -642,18 +836,23 @@ void new_ascension() {
 		special(extra_stuff);		// Only executes if true
 	}
 	check_breakfast();
+	start_quests();
 	cli_execute("outfit save Backup");  // Accidently equiping Backup after ascending cases error. No more oops.
-	vprint("Welcome to your new life as a "+myclass+"!", "green", 3);
+	cli_execute("outfit save bumcheekascend");  // Accidently equiping Backup after ascending cases error. No more oops.
+	print("Welcome to your new life as a "+myclass+"!", "green");
+	set_property("unlockedLocations",""); 
+	set_property("ready_for_ascension",false);	
+	set_property("rave_open",false);	
+	cli_execute("inventory refresh");
 }
 
 // These are default values here. To change for each character, edit their vars file in /data direcory or use the zlib commands.
 setvar("newLife_SetupGuyMadeOfBees", FALSE); // If you like to set up the guy made of bees set this TRUE. 
 setvar("newLife_FightBedstands", FALSE);	// If this is set to TRUE, you'll prefer fighting Bedstands to getting meat. (Note that mainstat is still better than fighting.)
-setvar("newLife_SmashHippyStone", FALSE);	// Smash stone if you want to break it at level 1 for some PvPing!
+setvar("newLife_SmashHippyStone", TRUE);	// Smash stone if you want to break it at level 1 for some PvPing!
 setvar("newLife_UseNewbieTent", TRUE);		// Use newbie tent if you don't want togive your clannes a fair shot at bricking you in the face!
-setvar("newLife_SellPorkForStuff", TRUE);	// Sell pork gems to purchase detuned radio, toy accordion & seal tooth
-setvar("newLife_Extras", FALSE); 			// Mixed bag of custom actions. This is personal to me, but maybe someone else will like it also
-
+setvar("newLife_SellPorkForStuff", TRUE);	// Sell pork gems to purchase detuned radio, stolen accordion & seal tooth
+setvar("newLife_Extras", TRUE); 			// Mixed bag of custom actions. This is personal to me, but maybe someone else will like it also
 void main() {
 	new_ascension();
 }

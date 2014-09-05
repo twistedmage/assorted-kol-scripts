@@ -1,3 +1,5 @@
+#version without multi round stuns, for 75 ml+
+
 icon saucegeyser
 scrollwhendone
 abort hppercentbelow 20
@@ -110,30 +112,12 @@ if hasskill intimidating bellow || hasskill steal accordion || hasskill summon m
 	endif
 endif
 
+
 #boost meat drops with rain
 if hasskill make it rain && (monstername Beefy bodyguard bat || monstername dirty thieving brigand || monstername pygmy orderlies)
 	skill make it rain
 endif
 
-
-mark stunners
-if sealclubber &&  hasskill club foot
-	#should really be only with fury
-	skill club foot
-endif
-if pastamancer && hasskill entangling noodles
-	skill entangling noodles
-endif
-if accordionthief && hasskill Accordion Bash
-	skill Accordion Bash
-endif
-if turtletamer && hasskill shell up
-	skill shell up
-endif
-
-if hascombatitem rain-doh blue balls 
-	use rain-doh blue balls
-endif
 if hasskill pocket crumbs
 	skill pocket crumbs
 endif
@@ -199,7 +183,6 @@ endif
 #		use DNA extraction syringe
 #	endif
 #endif
-
 
 #banish or copy
 if ((monstername  A.M.C. gremlin || monstername  Sabre-toothed goat || monstername  crusty pirate || monstername  tomb asp || monstername  bullet bill || monstername  senile lihc || monstername  procrastination giant) && (hasskill banishing shout || hasskill howl of the alpha || hasskill creepy grin || hasskill give your opponent the stinkeye || hascombatitem divine champagne popper || hascombatitem crystal skull || hascombatitem harold's bell)) || (hascombatitem short writ of habeas corpus && monstername pygmy) || ((monstername chatty pirate || monstername tomb servant || monstername slick lihc || monstername possibility giant) && (hasskill banishing shout || hasskill howl of the alpha)) || ((hascombatitem spooky putty sheet || hascombatitem Rain-doh black box) && (!monstername Battlie Knight Ghost && !monstername ghost miner && !monstername Claybender Sorcerer Ghost && !monstername Dusken Raider Ghost && !monstername Space Tourist Explorer Ghost && !monstername Whatsian Commando Ghost && !monstername sheet ghost && !monstername plaid ghost) && (monstername ghost || monstername lobsterfrogman || monstername gaudy pirate || monstername modern zombie || monstername dirty old lich))

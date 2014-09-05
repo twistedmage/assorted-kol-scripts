@@ -802,6 +802,7 @@ float hitchance(string id) {        // HITCH-nce
    float through = 1.0 - 0.5*to_int(have_effect($effect[cunctatitis]) > 0);
    if (id == "attack") {
       if (m == $monster[the bat in the spats]) return critchance();
+      if (have_equipped($item[thor's pliers])) return through;
       through *= 1.0 - fumble_chance();
       if (my_location() == $location[The Tower of Procedurally-Generated Skeletons] && contains_text(m,"shifty")) through *= 0.4;  // value based on tiny sample
    }
@@ -1078,7 +1079,7 @@ void build_items() {                                                // TODO: sph
 boolean is_spell(skill s) {
    if ($classes[pastamancer,sauceror] contains s.class) return true;
    if (s.to_int() > 27 && s.to_int() < 44) return true;   // hobopolis spells
-   return ($skills[noodles of fire,saucemageddon,volcanometeor showeruption,wassail,toynado,turtleini] contains s);
+   return ($skills[noodles of fire,saucemageddon,volcanometeor showeruption,wassail,toynado,turtleini,shrap] contains s);
 }
 
 void build_skillz() {
@@ -1205,7 +1206,7 @@ void build_skillz() {
                    fields.special = list_add(fields.special,"!! zombify"); break;         // set flag for +MP since all regular MP is ignored
                 case 1022: d[$element[none]] = max(0.5,0.15*get_power(equipped_item($slot[weapon])))+0.5+ceil(square_root(max(0,numeric_modifier("Weapon Damage"))));
                    foreach el in $elements[] d[el] = ceil(square_root(numeric_modifier(el+" Damage"))); break;   // clobber
-                case 1023: if (equipped_item($slot[weapon]) == $item[none]) return;                            // harpoon!
+                case 1023: if (equipped_item($slot[weapon]) == $item[none]) return;                              // harpoon!
                    d[$element[none]] = min(800.0,floor(fvars["buffedmus"]/4.0)) + 0.15*get_power(equipped_item($slot[weapon]))+0.5+1.5*max(0,numeric_modifier("Weapon Damage"));
                    foreach el in $elements[] d[el] = 1.5*numeric_modifier(el+" Damage"); break;
                 case 12010: d = merge(factor(to_spread(fullness_limit() - my_fullness()),7),regular(1)); break;  // ravenous pounce
@@ -1216,6 +1217,10 @@ void build_skillz() {
       }
       if (contains_text(fields.special,"once") && happened(thisid)) return;
       if (dmg_dealt(d) == 0) d = to_spread(fields.dmg);
+      if ((have_equipped($item[Rain-Doh green lantern]) || have_equipped($item[snow mobile])) && is_spell(to_skill(sk))) {   // account for bonus spell damage from green/blue lanterns
+         float bige; foreach k,v in d bige = max(bige,v);
+         d[have_equipped($item[Rain-Doh green lantern]) ? $element[stench] : $element[cold]] += bige;
+      }
       if (m == $monster[mother hellseal] && count(d) > 0 && (sk == 1022 || !contains_text(fields.special,"regular"))) return;
       advevent temp = to_event(thisid,d,to_spread(fields.pdmg),fields.special,1);
       if (contains_text(fields.special,"regular")) temp = merge(temp,onhit);
@@ -1583,7 +1588,7 @@ void set_monster(monster elmo) {  // should be called once per BB instance; init
       pres[el] = elemental_resistance(el)/100.0;
    }
    beatenup = beatenup_cost() + runaway_cost();
-// determine whether or not the poison of this monster is dangerous and should be removed
+  // determine whether or not the poison of this monster is dangerous and should be removed
   // a poison is dangerous if a) the monster will be able to hit you, or 2) attack_action won't be able to win
    dangerpoison = m.poison;
    reset_queue();

@@ -81,7 +81,7 @@ void eat_hot_dog(string dog,location loc)
 {
 	if(item_amount($item[clan vip lounge key])>0)
 	{
-		if(my_path()!="Avatar of Jarlsberg")
+		if(my_path()!="Avatar of Jarlsberg" && my_fullness() < fullness_limit())
 		{
 			if(!get_property("_fancyHotDogEaten").to_boolean())
 			{
@@ -144,6 +144,8 @@ boolean bcascWand(boolean force);
 boolean bumMiniAdv(int adventures, location loc);
 boolean bumMiniAdvNoAbort(int adventures, location loc);
 boolean bcascMacguffinDiary();
+void use_rain_man(monster mob);
+void use_rain_man();
 
 boolean load_current_map(string fname, lairItem[int] map) {
 	print("BCC: Trying to check " + fname + " on the Bumcheekcity servers.", "purple");
@@ -338,13 +340,35 @@ void set_combat_macro(boolean use_putty)
 	if(use_putty && using_putty!=1)
 	{
 		//putty
-		visit_url("account.php?actions[]=autoattack&autoattack=99106733&flag_aabosses=1&flag_compactmanuel=1&pwd&action=Update");
+		if(monster_level_adjustment() > 151)
+		{
+			visit_url("account.php?actions[]=autoattack&autoattack=99126415&flag_aabosses=1&flag_wowbar=1&flag_compactmanuel=1&pwd&action=Update");
+		}
+		else if(monster_level_adjustment() > 75)
+		{
+			visit_url("account.php?actions[]=autoattack&autoattack=99126413&flag_aabosses=1&flag_wowbar=1&flag_compactmanuel=1&pwd&action=Update");
+		}
+		else
+		{
+			visit_url("account.php?actions[]=autoattack&autoattack=99106733&flag_aabosses=1&flag_compactmanuel=1&pwd&action=Update");
+		}
 		using_putty=-1;
 	}
 	else if(!use_putty && using_putty!=0)
 	{
 		//noputty
-		visit_url("account.php?actions[]=autoattack&autoattack=99106734&flag_aabosses=1&flag_compactmanuel=1&pwd&action=Update");
+		if(monster_level_adjustment() > 151)
+		{
+			visit_url("account.php?actions[]=autoattack&autoattack=99126414&flag_aabosses=1&flag_wowbar=1&flag_compactmanuel=1&pwd&action=Update");
+		}
+		else if(monster_level_adjustment() > 75)
+		{
+			visit_url("account.php?actions[]=autoattack&autoattack=99126412&flag_aabosses=1&flag_wowbar=1&flag_compactmanuel=1&pwd&action=Update");
+		}
+		else
+		{
+			visit_url("account.php?actions[]=autoattack&autoattack=99106734&flag_aabosses=1&flag_compactmanuel=1&pwd&action=Update");
+		}
 		using_putty=0;
 	}
 	
@@ -762,16 +786,22 @@ void get_kolhs_buff(string bufftype)
 		{
 			if(my_primestat()==$stat[muscle])
 			{
+				if(get_property("_kolhsCutButNotDried").to_boolean())
+					return;
 				mybuff=$effect[Cut But Not Dried];
 				mychoice=4;
 			}
 			else if(my_primestat()==$stat[mysticality])
 			{
+				if(get_property("_kolhsPoeticallyLicenced").to_boolean())
+					return;
 				mybuff=$effect[Poetically Licensed];
 				mychoice=2;
 			}
 			else
 			{
+				if(get_property("_kolhsIsskayLikeAnAshtray").to_boolean())
+					return;
 				mybuff=$effect[Isskay like an Ashtray]; //mopxie
 				mychoice=5;
 			}
@@ -779,6 +809,8 @@ void get_kolhs_buff(string bufftype)
 		
 		if(bufftype=="meat" || bufftype=="items")
 		{
+			if(get_property("_kolhsSchoolSpirited").to_boolean())
+				return;
 			mybuff=$effect[school spirited];
 			mychoice=1;
 		}
@@ -1026,7 +1058,7 @@ boolean buMax(string maxme, int maxMainstat) {
 	//folding
 	if(my_name()=="twistedmage")
 	{
-		if (i_a("Loathing Legion necktie") == 0)
+		if (i_a("Loathing Legion necktie") == 0 && my_path()!="Heavy Rains") //not trendy
 			cli_execute("fold Loathing Legion necktie");
 		//if we are high level  we don't need ml
 		if(my_level()>=13)
@@ -1162,7 +1194,7 @@ boolean buMax(string maxme)
 {
 	boolean out= buMax(maxme, 999999999);
 	//SIMON added to prevent messing with bjorn
-	if(equipped_amount($item[buddy bjorn])>0)
+	if(equipped_amount($item[buddy bjorn])>0 && my_bjorned_familiar( )!=$familiar[el vibrato megadrone])
 		cli_execute("bjornify El Vibrato Megadrone");
 	return out;
 }
@@ -1248,14 +1280,26 @@ string bumRunCombat(string consult) {
 		print("BCC: This isn't actually adventuring at noob cave. Don't worry. (Can_Interact() == True)", "purple");
 		adv1($location[noob cave], -1, "consultCasual");
 	}*/
-//	if(numeric_modifier("Monster Level")>=150)
+//	if(monster_level_adjustment()>=150)
 //		abort("ML is so high, stunners don't work and we will probably get beaten up. Not running macro.");
 	print("BCC: Run_Combat() being used normally.", "purple");
 	string str;
 	switch(my_name())
 	{
 		case "twistedmage":
-			str = to_string(visit_url("fight.php?action=macro&macrotext=&whichmacro=106733&macro=Execute+Macro"));
+			//noputty
+			if(monster_level_adjustment() > 151)
+			{
+				str = to_string(visit_url("fight.php?action=macro&macrotext=&whichmacro=126414&macro=Execute+Macro"));
+			}
+			else if(monster_level_adjustment() > 75)
+			{
+				str = to_string(visit_url("fight.php?action=macro&macrotext=&whichmacro=126412&macro=Execute+Macro"));
+			}
+			else
+			{
+				str = to_string(visit_url("fight.php?action=macro&macrotext=&whichmacro=106734&macro=Execute+Macro"));
+			}
 		break;
 		case "anid":
 			str = to_string(visit_url("fight.php?action=macro&macrotext=&whichmacro=107718&macro=Execute+Macro"));
@@ -2252,7 +2296,20 @@ string consultSyringePenguin(int round, string opp, string text) {
 	string out = bumRunCombat();
 	if(contains_text(out,"Macro Aborted")) abort("Seems macro failed");
 	return get_ccs_action(round);
-}	
+}		
+
+string consultSyringeFish(int round, string opp, string text) {
+	print("called consult syringe","purple");
+	if (i_a("DNA extraction syringe")>0 && opp.to_monster().phylum==$phylum[fish])
+	{
+		print("Trying to use syringe","purple");
+		throw_item($item[DNA extraction syringe]);
+		print("Tried to use syringe","purple");
+	}
+	string out = bumRunCombat();
+	if(contains_text(out,"Macro Aborted")) abort("Seems macro failed");
+	return get_ccs_action(round);
+}
 
 string consultSyringeConstellation(int round, string opp, string text) {
 	print("called consult syringe","purple");
@@ -2690,7 +2747,8 @@ void defaultMood(boolean castMojo) {
 
 	if (my_class()==$class[accordion thief] && my_level()>=15 && have_skill($skill[Chorale of Companionship]) && my_maxmp() > mp_cost($skill[Chorale of Companionship]) * 2 && have_castitems($class[accordion thief], true)) cli_execute("trigger lose_effect, Chorale of Companionship, cast 1 Chorale of Companionship");
 
-	if(my_path()!="BIG!")
+	//stats are useful in most paths, but heavy rains has tonnes of ml, and big doesnt require levelling
+	if(my_path()!="BIG!" && my_path()!="Heavy Rains")
 	{
 		if (have_skill($skill[Ur-Kel's Aria of Annoyance]) && have_castitems($class[accordion thief], true))
 				cli_execute("trigger lose_effect, Ur-Kel's Aria of Annoyance, cast 1 Ur-Kel's Aria of Annoyance");
@@ -2700,13 +2758,15 @@ void defaultMood(boolean castMojo) {
 				cli_execute("trigger lose_effect, pride of the puffin, cast 1 pride of the puffin");
 	}
 	if(familiar_weight(my_familiar())<20)
-		if (have_skill($skill[Curiosity of Br'er Tarrypin]))
+		if (have_skill($skill[Curiosity of Br'er Tarrypin]) && my_path()!="Heavy Rains")
 			cli_execute("trigger lose_effect, Curiosity of Br'er Tarrypin, cast 1 Curiosity of Br'er Tarrypin");
-	if (have_skill($skill[astral shell]))
-		cli_execute("trigger lose_effect, astral shell, cast 1 astral shell");
-	if (have_skill($skill[Moxie of the Mariachi]) && my_path() != "BIG!") cli_execute("trigger lose_effect, Mariachi Mood, cast 1 Moxie of the Mariachi");
-	if (have_skill($skill[Disco Aerobics]) && my_path() != "BIG!") cli_execute("trigger lose_effect, Disco State of Mind, cast 1 Disco Aerobics");
-	if (have_skill($skill[Blubber Up])) cli_execute("trigger lose_effect, Blubbered Up, cast 1 Blubber Up");
+
+	//generic survivability
+//	if (have_skill($skill[astral shell]))
+//		cli_execute("trigger lose_effect, astral shell, cast 1 astral shell");
+//	if (have_skill($skill[Moxie of the Mariachi]) && my_path() != "BIG!") cli_execute("trigger lose_effect, Mariachi Mood, cast 1 Moxie of the Mariachi");
+//	if (have_skill($skill[Disco Aerobics]) && my_path() != "BIG!") cli_execute("trigger lose_effect, Disco State of Mind, cast 1 Disco Aerobics");
+//	if (have_skill($skill[Blubber Up])) cli_execute("trigger lose_effect, Blubbered Up, cast 1 Blubber Up");
 		
 	//use fire kits for pvp fights
 	if(!to_boolean(get_property("_fireStartingKitUsed")) && i_a("CSA fire starting kit")>0)
@@ -2942,7 +3002,6 @@ void defaultMood(boolean castMojo) {
 					if (have_skill($skill[Manicotti Meditation]) && my_level() < 5) cli_execute("trigger lose_effect, Pasta Oneness, cast 1 Manicotti Meditation");
 					if (have_skill($skill[Sauce Contemplation]) && my_level() < 5) cli_execute("trigger lose_effect, Saucemastery, cast 1 Sauce Contemplation");
 					if ((i_a("saucepan") + i_a("5-alarm saucepan") + i_a("17-alarm saucepan") > 0) && have_skill($skill[Jalape&ntilde;o Saucesphere]) && my_class() == $class[sauceror]) cli_execute("trigger lose_effect, Jalape&ntilde;o Saucesphere, cast 1 Jalape&ntilde;o Saucesphere");
-					if (have_skill($skill[Flavour of magic]) && have_effect($effect[Spirit of Peppermint]) == 0) use_skill(1, $skill[Spirit of Peppermint]);
 					if (have_skill($skill[Springy Fusilli]) && my_class() == $class[Pastamancer]) cli_execute("trigger lose_effect, Springy Fusilli, cast 1 Springy Fusilli");
 					if (have_skill($skill[spiky shell]) && have_castitems($class[turtle tamer], true))
 						cli_execute("trigger lose_effect, spiky shell, cast 1 spiky shell");
@@ -3685,7 +3744,7 @@ boolean innerSetFamiliar(string famtype) {
 			use_familiar($familiar[Grouper Groupie]);
 			return true;
 		}
-		if(contains_text(famtype, "meat") && have_familiar($familiar[Urchin Urchin]))
+		if(famtype=="meat" && have_familiar($familiar[Urchin Urchin]))
 		{
 			use_familiar($familiar[Urchin Urchin]);
 			return true;
@@ -3888,7 +3947,7 @@ boolean innerSetFamiliar(string famtype) {
 	//Sombrero type familiars are probably best in all zones from itznotyerzitz mine onwards (level 8 quest plus)
 	//but to simplify things since we don't know the zone, lets just prefer a sombrero at all times
 	//THIS ONLY APPLIES IF WE HAVE A LOT OF ML
-	if(numeric_modifier("monster level")>=100)
+	if(monster_level_adjustment()>=100)
 	{
 		if (have_path_familiar($familiar[galloping grill])) {
 			use_familiar($familiar[galloping grill]);
@@ -3958,6 +4017,7 @@ boolean setFamiliar(string famtype) {
 	if(my_path() == "Heavy Rains" && !boolean_modifier("Underwater Familiar"))
 	{
 		equip($item[miniature life preserver]);
+		return result;
 	}
 	
 	if(i_a("snow suit")>0)
@@ -4004,7 +4064,7 @@ boolean setFamiliar(string famtype) {
 		{
 			if(i_a("moveable feast")>0)
 				best_eq=$item[moveable feast];
-			if(i_a("snow suit")>0 && get_property("_snowSuitCount").to_int()<75)
+			if(i_a("snow suit")>0 && (get_property("_snowSuitCount").to_int()<75 || i_a("moveable feast")==0))
 				best_eq=$item[snow suit];
 			print("best fam eq is "+best_eq);
 			if(best_eq!=$item[none])
@@ -4161,6 +4221,14 @@ string tryBeerPong() {
 
 monster whatShouldIFax() {
 	if (my_adventures() == 0) return $monster[none]; // don't try and fax a monster if you have no adventures left to fight it
+	
+	//fax machine isn't trendy anyway
+	if (my_path()=="Heavy Rains")
+	{
+		use_rain_man();
+		return $monster[none];
+	}
+	
 	if (get_property("bcasc_lastFax") == today_to_string() || get_property("_photocopyUsed") != "false") return $monster[none];
 	if (get_property("bcasc_doNotFax") == true) return $monster[none];
 	if (can_interact() && !bcasc_RunSCasHC) return $monster[none];
@@ -4200,7 +4268,7 @@ monster whatShouldIFax() {
 	
 
 	print("a"+my_level() > 10 && p > monster_attack($monster[lobsterfrogman]));
-	if (my_level() > 11 && p > monster_attack($monster[lobsterfrogman]) && bcasc_doSideQuestBeach && !to_boolean(get_property("sidequestLighthouseCompleted")) && (i_a("rock band flyers")>0 || i_a("jam band flyers")>0)) {
+	if (my_level() > 11 && p > monster_attack($monster[lobsterfrogman]) && bcasc_doSideQuestBeach && !to_boolean(get_property("sidequestLighthouseCompleted"))) {
 		print("b"+(bcasc_doSideQuestBeach && i_a("barrel of gunpowder") < 5 && (get_property("sidequestLighthouseCompleted") == "none")));
 		if (bcasc_doSideQuestBeach && i_a("barrel of gunpowder") < 5 && (get_property("sidequestLighthouseCompleted") == "none")) {
 			setMood("");
@@ -4266,7 +4334,8 @@ void use_genetics_lab(string req)
 		//hybridize ourselves with penguin/dude
 		if(!get_property("_dnaHybrid").to_boolean())
 		{
-			if(my_level()>=11)	//high enough to find a penguin
+			boolean use_penguin=false;
+			if(my_level()>=11 && use_penguin)	//high enough to find a penguin
 			{
 				if(curDNA=="penguin" && have_effect($effect[Human-Penguin Hybrid])==0)
 				{
@@ -4275,9 +4344,18 @@ void use_genetics_lab(string req)
 					return;
 				}
 			}
+			else if(my_path()=="Heavy Rains")
+			{
+				if(curDNA=="fish" && have_effect($effect[Human-Fish Hybrid])==0)
+				{
+					string str = visit_url("campground.php?action=workshed");
+					str = visit_url("campground.php?action=dnainject");
+					return;
+				}
+			}
 			else //use a dude
 			{
-				if(curDNA=="dude" && have_effect($effect[Human-Penguin Hybrid])==0)
+				if(curDNA=="dude" && have_effect($effect[Human-Human Hybrid])==0)
 				{
 					string str = visit_url("campground.php?action=workshed");
 					str = visit_url("campground.php?action=dnainject");
@@ -4340,9 +4418,10 @@ void collect_dna(string req)
 	{
 		string curDNA = get_property("dnaSyringe");
 		
-		if(contains_text(req,"i") && !get_property("_dnaHybrid").to_boolean())
+		if(!get_property("_dnaHybrid").to_boolean())
 		{
-			if(my_level()>=11) //go for penguin
+			boolean go_for_penguin=false; //I changed my mind about this, the intrinsic poison is annoying and it's too late in the ascension
+			if(my_level()>=11 && go_for_penguin) //go for penguin
 			{
 				//try to get to copperhead club
 				if(!can_adv($location[the copperhead club]))
@@ -4361,7 +4440,7 @@ void collect_dna(string req)
 				while(have_effect($effect[Human-Penguin Hybrid])==0)
 				{
 					//already released gong?
-					if(get_property("")=="gong")
+					if(get_property("")!="gong")
 					{
 						//we REALLY need to get rid of the bullet storm to survive in here
 						set_property("choiceAdventure855","1");
@@ -4389,6 +4468,21 @@ void collect_dna(string req)
 						set_combat_macro();
 						return;
 					}
+				}
+			}
+			else if(my_path()=="Heavy Rains")
+			{
+				//in heavy rains, our familiars are always low weight, so lets do a fish hybrid
+				use_rain_man($monster[piranhadon]);
+				curDNA = get_property("dnaSyringe");
+				if(contains_text(get_property("lastEncounter"),"Piranhadon") && curDNA!="fish")
+					abort("We conjured a piranhadon and didn't get our dna!");
+				
+				if(curDNA=="fish")
+				{
+					use_genetics_lab("");
+					set_combat_macro();
+					return;
 				}
 			}
 			else //go for dude
@@ -4462,6 +4556,97 @@ void collect_dna(string req)
 * BEGIN FUNCTIONS THAT RELY ON OTHER FUNCTIONS *
 ***********************************************/
 
+void cast_rain_man(int mob_id)
+{
+	visit_url("skills.php?pwd&action=Skillz&whichskill=16011&skillform=Use+Skill&quantity=1");
+	visit_url("choice.php?pwd&whichchoice=970&whichmonster="+mob_id.to_string()+"&option=1&choice2=and+Fight%21");
+}
+
+
+void use_rain_man(monster mob)
+{
+	if(my_rain()<50)
+		return;
+	print("Deciding whether to use rain man","green");
+	if(mob==$monster[piranhadon])
+	{
+		clear_combat_macro();
+		cast_rain_man(1601);
+		bumRunCombat("consultSyringeFish");
+		return;
+	}
+	else if(mob==$monster[none])
+	{
+		if (my_level() > 11 && bcasc_doSideQuestBeach && !to_boolean(get_property("sidequestLighthouseCompleted"))) {
+			if (bcasc_doSideQuestBeach && i_a("barrel of gunpowder") < 5 && (get_property("sidequestLighthouseCompleted") == "none")) {
+				setMood("");
+				buMax();
+				setFamiliar("obtuseangel_simon");
+				clear_combat_macro();
+				abort("rain man code for LFM");
+				cast_rain_man(1601);
+				bumRunCombat("consultObtuse");
+				return;
+			}
+		}
+	
+	}
+	else
+	{
+		abort("Unrecognised monster requested for rain man: "+mob);
+	}
+	
+/*
+!writing desk	/w FaxBot writing_desk	Partial Spookyraven Manor unlock	Yes	None	Requires 4 copies. Allows skipping The Haunted Kitchen, The Haunted Billiards Room and The Haunted Library! <also fax, and implement skipping>
+You must read the telegram before fighting these. You need to fight 5 of these to open Spookyraven's second floor, bypassing all of the first floor zones. With the Reanimated Reanimator you can wink at the first one, Rain Man a second one, and then wait for the 3 wandering copies.
+
+sleepy mariachi	/w FaxBot sleepy_mariachi	Item drops, Moxie stats	No	Yellow ray	Saves several powerleveling turns for Moxie classes; makes the best Fairies in the game
+
+ninja snowman assassin	/w FaxBot ninja_assassin	Level 8 quest	Yes	Survival	Saves ~12 turns (or 3 pulls) when copied twice
+
+
+lobsterfrogman	/w FaxBot lobsterfrogman	Sonofa Beach quest	No	None	Saves ~4 turns (and lots of RNG swing) over finding each one manually 
+(per copy, up to a total of ~20 turns for 5 copies)
+
+Quantum Mechanic	/w FaxBot mechanic	blessed large box (The Three Gates)	No	150% items	Saves ~12 turns (or 1 pull) by letting you skip the DoD entirely
+Orcish Frat Boy Spy	/w FaxBot frat_spy	Level 12 quest and/or the Nuns trick	No	234% items	- Saves 1-2 yellow rays, depending on if you need anything from The Hippy Store
+- Saves 8 turns if it frees up resources that enable the Nuns trick
+dirty thieving brigand
+ghost <morbid skull>
+
+
+mountain man (requires Monster Manuel): With Unaccompanied Miner being type69ed, your only speedy choices for acquiring the ore you need in Hardcore are mountain men, clovers, and zapping.
+
+screambat: Its screams can't be washed away by water, like sonars can. You must open the bathole before fighting these.
+gaudy pirate: You have to fight 2 of these... but remember, you also have to unlock the Belowdecks to use the gaudy keys. If you still need insults, you can use The Big Book of Pirate Insults during these fights.
+Baa'baa'bu'ran: Good for not only unlocking The Hidden City, but with the 3rd stone wool you can use it for 3 extra Adventures or extra stats.
+alley catfish: Its whiskers (potion) help you prevent items washing away, and it's a fish, whose DNA you may want to extract.
+piranhadon: A useful source of freshwater fishbones as well as fish DNA. The large Spell Damage bonus fishbone bracers will allow you to defeat strong monsters more easily, if you're using spells.
+gremlins, assorted types: Be sure to select the correct on
+
+Semi-Rare Monsters	/w FaxBot kge
+/w FaxBot miner
+/w FaxBot baabaaburan	Knob Goblin Elite Guard Uniform
+Mining Gear
+stone wool	Varies	None
+234% items
+Up to 400% items	In case you weren't able to structure your SRs around them, or if your path blocks fortune cookies
+mountain man	/w FaxBot mountain_man	Drops ore	Yes	150% items for one of each ore, YR for two of each	Alternative to mining or clovering ores
+modern zmobie	/w FaxBot modern_zmobie	The Defiled Alcove	Yes	None	Saves several turns in the Alcove over encountering them directly
+remains of a jilted mistress	/w FaxBot jilted	antique hand mirror	No	150% items	Saves several turns hunting for One Nightstand (Wooden) for Myst classes, if powerleveling in the Haunted Bathroom is desired.
+Bad ASCII Art,
+rampaging adding machine	/w FaxBot ascii
+/w FaxBot adding_machine	A Quest, LOL	Varies	None	For players who want the Meat from this quest or want to copy the ASCII art for 31337 scrolls
+Sorceress's Quest Monsters	(varies)	The Three Gates or the Tower	No	(varies)	If you need a hard-to-find gate or tower item
+*/
+}
+
+void use_rain_man()
+{
+	use_rain_man($monster[none]);
+}
+
+
 void setMood(string combat) {
 	if (get_property("bcasc_disableMoods") == "true") {
 		cli_execute("mood apathetic"); 
@@ -4487,30 +4672,89 @@ void setMood(string combat) {
 		//init to help fighting
 		if(i_a("gourmet gourami oil")>0 && have_effect($effect[Fishy\, Oily])==0)
 			use(1,$item[gourmet gourami oil]);
-			
-		if(i_a("thunder thigh")>0)
-			abort("Use thunder thigh");
-		if(i_a("aquaconda brain")>0)
-			abort("Use aquaconda brain");
-		if(i_a("lightning milk")>0)
-			abort("Use lightning milk");
 		
-		abort("measure thunder, lightning, rain");
-		int thunder=0;
-		int lightning=0;
-		int rain=0;
+		//learning order, thunder
+		while(i_a("thunder thigh")>0)
+		{
+			if(!have_skill($skill[thundercloud]))
+				set_property("choiceAdventure967","2");
+			else if(!have_skill($skill[thunder clap]))
+				set_property("choiceAdventure967","1");
+			else if(in_hardcore() && !have_skill($skill[Thunder Down Underwear ]))
+				set_property("choiceAdventure967","6");
+			else if(!have_skill($skill[thunderheart]))
+				set_property("choiceAdventure967","4");
+			else if(!have_skill($skill[Thunderstrike]))
+				set_property("choiceAdventure967","5");
+			else if(!have_skill($skill[Thunder Thighs]))
+				set_property("choiceAdventure967","7");
+			else if(!have_skill($skill[Thunder Bird]))
+				set_property("choiceAdventure967","3");
+			else if(!have_skill($skill[Thunder Down Underwear ]))
+				set_property("choiceAdventure967","6");
+			else
+				break;
+			use(1,$item[thunder thigh]);
+		}
+
+		//learning order, rain
+		while(i_a("aquaconda brain")>0)
+		{
+			if(!have_skill($skill[rain man]))
+				set_property("choiceAdventure968","1");
+			else if(!have_skill($skill[rainy day]))
+				set_property("choiceAdventure968","2");
+			else if(!have_skill($skill[rain dance]))
+				set_property("choiceAdventure968","4");
+			else if(!have_skill($skill[rainbow]))
+				set_property("choiceAdventure968","5");
+			else if(!have_skill($skill[make it rain]))
+				set_property("choiceAdventure968","3");
+			else if(!have_skill($skill[rain delay]))
+				set_property("choiceAdventure968","7");
+			else if(!have_skill($skill[rain coat]))
+				set_property("choiceAdventure968","6");
+			else
+				break;
+			use(1,$item[Aquaconda brain]);
+			abort("use rain man faxes see http://kol.coldfront.net/thekolwiki/index.php/Heavy_Rains/Strategy");
+		}	
+
+		//learning order, lightning
+		while(i_a("lightning milk")>0)
+		{
+			if(!have_skill($skill[Lightning Strike]))
+				set_property("choiceAdventure969","1");
+			else if(!have_skill($skill[Ball Lightning]))
+				set_property("choiceAdventure969","3");
+			else if(!have_skill($skill[Riding the Lightning]))
+				set_property("choiceAdventure969","7");
+			else if(!have_skill($skill[Sheet Lightning]))
+				set_property("choiceAdventure969","4");
+			else if(!have_skill($skill[Clean-Hair Lightning]))
+				set_property("choiceAdventure969","2");
+			else if(!have_skill($skill[Lightning Rod]))
+				set_property("choiceAdventure969","6");
+			else if(!have_skill($skill[Lightning Bolt]))
+				set_property("choiceAdventure969","5");
+			else
+				break;
+			use(1,$item[lightning milk]);
+		}		
+
+	
 		//thunder skills
 		//in hardcore, prefer to make gear first
 		if(in_hardcore() && i_a("Thunder down underwear")==0)
 		{
-			if(thunder>=60)
+			if(my_thunder()>=60 && have_skill($skill[Thunder down underwear]))
 				use_skill(1,$skill[Thunder down underwear]);			
 		}
 		else
 		{
-			if(thunder>=20 && have_effect($effect[personal thundercloud])==0)
+			if(my_thunder()>=20 && have_effect($effect[personal thundercloud])==0 && have_skill($skill[thundercloud]))
 				use_skill(1, $skill[thundercloud]);
-			if(thunder>=20 && have_effect($effect[Thunderheart])==0)
+			if(my_thunder()>=20 && have_effect($effect[Thunderheart])==0 && have_skill($skill[Thunderheart]))
 				use_skill(1, $skill[Thunderheart]);
 		}
 		
@@ -4518,60 +4762,68 @@ void setMood(string combat) {
 		//in hardcore, prefer to make gear first
 		if(in_hardcore() && i_a("Famous blue raincoat")==0)
 		{
-			if(rain>=40)
+			if(my_rain()>=40 && have_skill($skill[rain coat]))
 				use_skill(1,$skill[rain coat]);			
 		}
 		else
 		{
-			if(rain>=20 && have_effect($effect[The Rain In Loathing])==0)
+			if(my_rain()>=20 && have_effect($effect[The Rain In Loathing])==0 && have_skill($skill[Rainy Day]))
 				use_skill(1,$skill[Rainy Day]);
-			if(rain>=10 && have_effect($effect[Rain Dancin'])==0)
+			if(my_rain()>=10 && have_effect($effect[Rain Dancin'])==0 && have_skill($skill[Rain Dance]))
 				use_skill(1,$skill[Rain Dance]);
+			if(my_rain()>85) //try not to waste any
+				use_rain_man();
 		}
 		
 		//lightning skills
 		//in hardcore, prefer to make gear first
 		if(in_hardcore() && i_a("Lightning rod")==0 && my_primestat()==$stat[mysticality])
 		{
-			if(lightning>=20)
+			if(my_lightning()>=20 && have_skill($skill[Lightning Rod]))
 				use_skill(1,$skill[Lightning Rod]);			
 		}
 		else
 		{
-			if(lightning>=10 && have_effect($effect[Stormswaddled])==0)
+			if(my_lightning()>=10 && have_effect($effect[Stormswaddled])==0 && have_skill($skill[Sheet Lightning]))
 				use_skill(1,$skill[Sheet Lightning]);
+			if(my_lightning()>=10 && have_effect($effect[Charged Hair])==0 && have_skill($skill[Clean-Hair Lightning]))
+				use_skill(1,$skill[Clean-Hair Lightning]);
 		}
 		
 		//fishbones
 		int bones = i_a("freshwater fishbone");
 		if(bones>=5)
 		{
-			abort("are freshwater fishbone items worth making in softcore?");
-			if(in_hardcore())
+			//combat helper accessory
+			if(my_primestat()==$stat[mysticality])
 			{
-				//combat helper accessory
-				if(my_primestat()==$stat[mysticality])
+				if(bones>=5 && i_a("fishbone bracers")==0)
 				{
-					if(bones>=5 && i_a("fishbone bracers")==0)
-					{
-						create(1,$item[fishbone bracers]);
-						bones = i_a("freshwater fishbone");
-					}
-				}
-				else
-				{
-					if(bones>=5 && i_a("fishbone belt")==0)
-					{
-						create(1,$item[fishbone belt]);
-						bones = i_a("freshwater fishbone");
-					}
-				}
-				//items helper
-				if(bones>=30 && i_a("Fishbone catcher's mitt")==0)
-				{
-					create(1,$item[Fishbone catcher's mitt]);
+					create(1,$item[fishbone bracers]);
+					cli_execute("outfit bumcheekascend");
+					equip($slot[acc1],$item[fishbone bracers]);
+					cli_execute("outfit save bumcheekascend");
+					
 					bones = i_a("freshwater fishbone");
 				}
+			}
+			else
+			{
+				if(bones>=5 && i_a("fishbone belt")==0)
+				{
+					create(1,$item[fishbone belt]);
+					cli_execute("outfit bumcheekascend");
+					equip($slot[acc1],$item[fishbone belt]);
+					cli_execute("outfit save bumcheekascend");
+					
+					bones = i_a("freshwater fishbone");
+				}
+			}
+			//items helper
+			if(bones>=30 && i_a("Fishbone catcher's mitt")==0)
+			{
+				create(1,$item[Fishbone catcher's mitt]);
+				bones = i_a("freshwater fishbone");
 			}
 			
 		}
@@ -5408,7 +5660,9 @@ void use_putty()
 					setMood("");
 					buMax();
 					setFamiliar("");
-					reputty = i_a("barrel of gunpowder")<4 && bcasc_doSideQuestBeach && !to_boolean(get_property("sidequestLighthouseCompleted"));
+					//we need to reputty up to the penultimate barrel
+					int putty_barrels=4;
+					reputty = i_a("barrel of gunpowder")<putty_barrels && bcasc_doSideQuestBeach && !to_boolean(get_property("sidequestLighthouseCompleted"));
 					break;
 				case $monster[morbid skull]:
 					setMood("i");
@@ -5705,6 +5959,36 @@ boolean bumAdv(location loc, string maxme, string famtype, string goals, string 
 	//If we set some given quantity of adventures, set this. 
 	if (maxAdvs > 0) {
 		adventureThis = maxAdvs;
+	}
+	
+	//set relevant flavour of magic for zone
+	if(have_skill($skill[Flavour of magic]))
+	{
+		//cold mobs
+		if(loc==$location[The Icy Peak] || loc==$location[Lair of the Ninja Snowmen] || loc==$location[exposure esplanade] || loc==$location[McMillicancuddy's Pond])
+		{
+			if (have_effect($effect[Spirit of wormwood]) == 0) use_skill(1, $skill[Spirit of wormwood]);
+		}
+		//hot mobs
+		else if(loc==$location[Burnbarrel Blvd.] || loc==$location[mcmillicancuddy's back 40] || loc==$location[The Dark neck of the woods] || loc==$location[The Dark heart of the woods] || loc==$location[The Dark elbow of the woods] || loc==$location[Infernal Rackets Backstage] || loc==$location[The Laugh Floor] || loc==$location[pandamonium slums] || loc==$location[cobb's knob kitchens] || loc==$location[The Haunted pantry] || loc==$location[The Outskirts of Cobb's Knob] || loc==$location[The Arid\, Extra-Dry Desert])
+		{
+			if (have_effect($effect[Spirit of bacon grease]) == 0) use_skill(1, $skill[Spirit of bacon grease]);
+		}
+		//sleaze mobs
+		else if(loc==$location[The Battlefield (Hippy uniform)] || loc==$location[The Orcish Frat House (Bombed Back to the Stone Age)] || loc==$location[Frat House] || loc==$location[The Hole in the sky] || loc==$location[mcmillicancuddy's other back 40] || loc==$location[The Purple Light District] || loc==$location[The eXtreme Slope] || loc==$location[the \"fun\" house] || loc==$location[Tower Ruins] || loc==$location[The Obligatory Pirate's Cove] || loc==$location[The Road to White Citadel]&& loc==$location[The Degrassi Knoll Gym]&& loc==$location[Anemone Mine]&& loc==$location[Cobb's Knob Harem])
+		{
+			if (have_effect($effect[Spirit of Peppermint]) == 0) use_skill(1, $skill[Spirit of Peppermint]);
+		}
+		//stench mobs
+		else if(loc==$location[The Heap] || loc==$location[mcmillicancuddy's bog] || loc==$location[hippy camp] || loc==$location[The Hippy Camp (Bombed Back to the Stone Age)] || loc==$location[ The Battlefield (frat uniform)] || loc==$location[The Road to White Citadel] || loc==$location[The F'c'le] || loc==$location[The eXtreme Slope] || loc==$location[The Haunted Pantry] || loc==$location[The Sleazy Back Alley] || loc==$location[the bugbear pen] || loc==$location[post-quest bugbear pens] || loc==$location[The hatching chamber] || loc==$location[The Feeding Chamber] || loc==$location[The Royal Guard Chamber] || loc==$location[The Filthworm Queen's Chamber])
+		{
+			if (have_effect($effect[Spirit of Peppermint]) == 0) use_skill(1, $skill[Spirit of Peppermint]);
+		}
+		//spooky mobs
+		else if(loc==$location[The Ancient Hobo Burial Ground] || loc==$location[McMillicancuddy's Family Plot] || loc==$location[post-cyrpt cemetary] || loc==$location[pre-cyrpt cemetary] || loc==$location[The Spooky Gravy Burrow] || loc==$location[the bugbear pen] || loc==$location[post-quest bugbear pens] || loc==$location[The Haunted library] || loc==$location[The Haunted billiards room] || loc==$location[the \"fun\" house] || loc==$location[The Marinara Trench] || loc==$location[The Wreck of the Edgar Fitzsimmons] || loc==$location[The Haunted gallery] || loc==$location[The Haunted ballroom] || loc==$location[Spectral Pickle Factory] || loc==$location[the knob shaft] || loc==$location[The Haunted bathroom] || loc==$location[The Haunted bedroom] || loc==$location[The Haunted conservatory] || loc==$location[The Haunted kitchen] || loc==$location[The Spooky Forest] || loc==$location[The Haunted pantry] || loc==$location[The Oasis] || loc==$location[The Middle Chamber] || loc==$location[The Upper Chamber] || loc==$location[The Defiled nook] || loc==$location[The Defiled niche] || loc==$location[The Defiled cranny] || loc==$location[The Defiled alcove])
+		{
+			if (have_effect($effect[Spirit of garlic]) == 0) use_skill(1, $skill[Spirit of garlic]);
+		}
 	}
 	
 	//SIMON CHANGED TO SINGLE ADV LOOPING WITH PUTTIES
@@ -6038,6 +6322,8 @@ boolean bcascBats2() {
 		}
 		
 		if (canMCD()) cli_execute("mcd 4");
+		if(my_path()=="Heavy Rains")
+			abort("Fight aquabat yourself, hard damage cap of 12");
 		bumAdv($location[The Boss Bat's Lair], "", "meatbossbat", "1 batskin belt", "WTFPWNing the Boss Bat", "m");
 		visit_url("council.php");
 		set_property("lastCouncilVisit", my_level());
@@ -6531,8 +6817,7 @@ boolean bcascCastle() {
 	
 			//place florist friar plants
 			choose_all_plants("", $location[The Castle in the Clouds in the Sky (ground floor)]);
-				
-			bumMiniAdv(1, $location[The Castle in the Clouds in the Sky (Ground Floor)]);
+			bumAdv($location[The Castle in the Clouds in the Sky (Ground floor)], "items", "itemsnc", "", "opening top floor", "-i");
 		}
 		level = 2;
 	}
@@ -6541,7 +6826,7 @@ boolean bcascCastle() {
 			setCastleChoices();
 	
 			//place florist friar plants
-			choose_all_plants("", $location[The Castle in the Clouds in the Sky (ground floor)]);
+			choose_all_plants("", $location[The Castle in the Clouds in the Sky (top floor)]);
 				
 			bumAdv($location[The Castle in the Clouds in the Sky (top floor)], "", "itemsnc", "1 choiceadv", "Finishing the quest (any way we can)", "-");
 		}
@@ -7865,6 +8150,8 @@ boolean bcascKnobKing() {
 		while (is_not_yet(get_property("questL05Goblin"), "finished")) {
 			cli_execute("outfit Knob Goblin Harem Girl disguise");
 			cli_execute("use knob goblin perfume");
+			if(my_path()=="Heavy Rains")
+				abort("Fight aquagoblin yourself");
 			bumAdv($location[Throne Room], "+outfit Knob Goblin Harem Girl disguise", "meatboss", "", "Killing the Knob King");
 		}
 		if(get_property("questL05Goblin")=="finished")
@@ -8021,25 +8308,105 @@ void bcascLairFightNS() {
 	string maxstr;
 	if(my_primestat()==$stat[moxie])
 	{
-		maxstr="maximize mox, -0.1 ML, +weapon dmg, elemental dmg -1 tie";
+		maxstr="maximize mox, -0.1 ML, +weapon damage, elemental damage -1 tie";
 		if(my_path()!="Way of the Surprising Fist")
 			maxstr+=", -melee";
 	}
 	else
 	{
-		maxstr="maximize mus, -0.1 ML, +weapon dmg, elemental dmg -1 tie";
+		maxstr="maximize mus, -0.1 ML, +5 weapon damage, +5 elemental damage, -1 tie";
 		if(my_path()!="Way of the Surprising Fist")
 			maxstr+=", +melee";
 	}
-	if(my_path()!="Avatar of Boris" && my_path()!="Way of the Surprising Fist")
-		maxstr+=", +shield";
 	print("running maximizer with stirng "+maxstr);
 	cli_execute(maxstr);
+	if(my_path()!="Avatar of Boris" && my_path()!="Way of the Surprising Fist")
+	{
+		print("now maximizing \"maximize -tie, +shield\"");
+		cli_execute("maximize -tie, +shield");
+	}
 	print("heal","lime");
 	cli_execute("uneffect beaten up; restore hp; restore mp");
 	
 	setFamiliar("");
 	if (bcasc_fightNS && my_path() != "Bugbear Invasion") {
+		if(my_path()=="Heavy Rains")
+		{
+			if(have_familiar($familiar[Cuddlefish]))
+				use_familiar($familiar[Cuddlefish]);
+			//	<green lantern>;
+			//dummy buffs
+			if(have_effect($effect[Go Get \'Em\, Tiger!])==0)
+				use(1,$item[Ben-Gal&trade; Balm]);
+			if(have_effect($effect[Glittering Eyelashes])==0)
+				use(1,$item[glittery mascara]);
+			if(have_effect($effect[Butt-Rock Hair])==0)
+				use(1,$item[hair spray]);
+			if(have_effect($effect[Radiating Black Body&trade;])==0)
+				use(1,$item[black body&trade; spray]);
+			if(have_effect($effect[Black Face])==0)
+				use(1,$item[black facepaint]);
+			if(have_effect($effect[Erudite])==0)
+				use(1,$item[black sheepskin diploma]);
+			if(have_effect($effect[Pasta Oneness])==0)
+				use_skill(1,$skill[manicotti meditation]);
+			if(have_effect($effect[Seal Clubbing Frenzy])==0)
+				use_skill(1,$skill[seal clubbing frenzy]);
+			if(have_effect($effect[Patience of the Tortoise])==0)
+				use_skill(1,$skill[patience of the tortoise]);
+			if(have_effect($effect[Saucemastery])==0)
+				use_skill(1,$skill[sauce contemplation]);
+			if(have_effect($effect[Disco State of Mind])==0)
+				use_skill(1,$skill[disco aerobics]);
+			if(have_effect($effect[Mariachi Mood])==0)
+				use_skill(1,$skill[moxie of the mariachi]);
+			if(have_effect($effect[walberg's dim bulb])==0)
+				use_skill(1,$skill[walberg's dim bulb]);
+			if(have_effect($effect[springy fusilli])==0)
+				use_skill(1,$skill[springy fusilli]);
+			if(have_effect($effect[disco fever])==0)
+				use_skill(1,$skill[disco fever]);
+			if(have_effect($effect[jalape&ntilde;o saucesphere])==0)
+				use_skill(1,$skill[jalape&ntilde;o saucesphere]);
+
+			//suvivability
+			if(have_effect($effect[Shield of the Pastalord])==0)
+				use_skill(1,$skill[Shield of the Pastalord]);
+			if(have_effect($effect[astral shell])==0)
+				use_skill(1,$skill[astral shell]);
+			if(have_effect($effect[ghostly shell])==0)
+				use_skill(1,$skill[ghostly shell]);
+			if(have_effect($effect[leash of linguini])==0)
+				use_skill(1,$skill[leash of linguini]);
+			if(have_effect($effect[Blubbered Up])==0)
+				use_skill(1,$skill[blubber up]);
+			if(have_effect($effect[sauce monocle])==0)
+				use_skill(1,$skill[sauce monocle]);
+			if(have_effect($effect[song of sauce])==0)
+				use_skill(1,$skill[song of sauce]);
+			if(have_effect($effect[frigidalmatian])==0)
+				use_skill(1,$skill[frigidalmatian]);
+			if(have_effect($effect[tenacity of the snapper])==0)
+				use_skill(1,$skill[tenacity of the snapper]);
+			if(have_effect($effect[reptilian fortitude])==0)
+				use_skill(1,$skill[reptilian fortitude]);
+			if(have_effect($effect[elemental saucesphere])==0)
+				use_skill(1,$skill[elemental saucesphere]);
+			if(have_effect($effect[scarysauce])==0)
+				use_skill(1,$skill[scarysauce]);
+			if(have_effect($effect[empathy])==0)
+				use_skill(1,$skill[empathy of the newt]);
+			if(have_effect($effect[stevedave's shanty of superiority])==0)
+				use_skill(1,$skill[stevedave's shanty of superiority]);
+			if(have_skill($skill[Jackasses' Symphony of Destruction]) && have_effect($effect[Jackasses' Symphony of Destruction])==0)
+				use_skill(1,$skill[Jackasses' Symphony of Destruction]);
+
+				
+			//remove rain ml
+			cli_execute("uneffect the rain in loathing; uneffect Personal Thundercloud; uneffect ashen burps");
+			clear_combat_macro();
+			abort("Kill the sorceress yourself (try to stunlock");
+		}
 		visit_url("lair6.php?place=5");
 //abort("fight the sorceress yourself, remove this abort from line 4850 when you have better combat skills");
 		for i from 1 to 3 {
@@ -9133,11 +9500,14 @@ boolean bcascMacguffinPalindome() {
 	setFamiliar("meatboss");
 	
 	//Enter the fight
-	palindome = visit_url("place.php?whichplace=palindome&action=pal_drlabel");
-	palindome = visit_url("choice.php?pwd&whichchoice=131&option=1&choiceform1=War%2C+sir%2C+is+raw%21");
-	bumRunCombat();
+	if (item_amount($item[Staff of Fats])== 0) {
+		abort("Kill dr awkward yourself, spells reduced to 1 damage");
+		palindome = visit_url("place.php?whichplace=palindome&action=pal_drlabel");
+		palindome = visit_url("choice.php?pwd&whichchoice=131&option=1&choiceform1=War%2C+sir%2C+is+raw%21");
+		bumRunCombat();
 
-	if (item_amount($item[Staff of Fats]) == 0) abort("Looks like Dr. Awkward opened a can of whoop-ass on you. Try fighting him manually.");
+		if (item_amount($item[Staff of Fats]) == 0) abort("Looks like Dr. Awkward opened a can of whoop-ass on you. Try fighting him manually.");
+	}
 	
 	if (item_amount($item[Staff of Fats]) > 0) {
 		checkStage("macguffinpalin", true);
@@ -9150,7 +9520,7 @@ boolean bcascMacguffinPalindome() {
 boolean bcascMacguffinDiary()
 {
 	if (checkStage("macguffindiary")) return true;
-
+	council();
 	while (!contains_text(visit_url("woods.php"), "blackmarket.gif")) {	
 		set_property("choiceAdventure923", "1");
 		set_property("choiceAdventure924", "1");
@@ -9229,12 +9599,15 @@ boolean bcascMacguffinDiary()
 }
 
 boolean bcascMacguffinPrelim() {
-	if (checkStage("macguffinprelim")) return true;
 	bcascMacguffinDiary();
+	if (checkStage("macguffinprelim")) return true;
 	
-	buMax("items");
-	setFamiliar("itemsnc");
-	setMood("-i");
+	if (!contains_text(visit_url("woods.php"),"hiddencitylink.gif") && my_adventures() > 3)
+	{
+		buMax("items");
+		setFamiliar("itemsnc");
+		setMood("-i");
+	}
 	while (!contains_text(visit_url("woods.php"),"hiddencitylink.gif") && my_adventures() > 3) {
 		if (to_int(get_property("lastTempleUnlock")) != my_ascensions())
 	 	    bcascOpenTemple();
@@ -9389,6 +9762,8 @@ boolean bcascMacguffinSpooky() {
 			}
 			
 			setFamiliar("meatboss");
+			if(my_path()=="Heavy Rains")
+				abort("Fight lord spookyraven yoursself (damage cap and damaging spells");
 			visit_url("place.php?whichplace=manor4&action=manor4_chamberboss");
 			bumRunCombat();
 			if (item_amount($item[eye of ed]) == 0) abort("The Spooky man pwned you with his evil. Fight him yourself.");
@@ -9415,7 +9790,7 @@ boolean bcascMacguffinPyramid() {
 		else if(my_primestat()==$stat[muscle])
 			maxstr += "+melee";
 		if (canEquipCompass()) {
-			maxstr += ", +equip UV-resistant compass";
+			maxstr += " +equip UV-resistant compass";
 		}
 		return maxstr;
 	}
@@ -10766,7 +11141,6 @@ boolean bcascTrapper() {
 			print("BCC: Getting some climbing gear.", "purple");
 
 			setMood("+n");
-			if(my_class() == $class[Pastamancer] && have_skill($skill[flavour of magic])) use_skill(1, $skill[spirit of cayenne]);
 			 if (have_castitems($class[sauceror], true) && have_skill($skill[Jalape&ntilde;o Saucesphere]) && my_class() == $class[sauceror]) cli_execute("trigger lose_effect, Jalape&ntilde;o Saucesphere, cast 1 Jalape&ntilde;o Saucesphere");
 			buMax("initiative");
 			
@@ -10828,6 +11202,8 @@ boolean bcascTrapper() {
 			while(i_a("Groar's fur")<1)
 			{
 				print("Finding and fighting Groar!","green");
+				if(my_path()=="Heavy Rains")
+					abort("Fight groar yourself (he reflects spells)");
 				bumMiniAdv(1,$location[Mist-Shrouded Peak]);
 			}
 		}
@@ -11110,6 +11486,30 @@ boolean bcascWand(boolean force) {
 }
 boolean bcascWand() {return bcascWand(false);}
 
+void fix_clockwork_maid()
+{
+	if(!knoll_available())
+		return;
+	
+	if (is_not_yet(get_property("questM01Untinker"), "finished"))
+		cli_execute("untinker");
+	
+	if(i_a("ninja pirate zombie robot head")>0)
+		knife_untinker($item[ninja pirate zombie robot head]);
+	if(i_a("pirate zombie robot head")>0)
+		knife_untinker($item[pirate zombie robot head]);
+	if(i_a("pirate zombie head")>0)
+		knife_untinker($item[pirate zombie head]);
+	if(i_a("clockwork pirate skull")>0)
+		knife_untinker($item[clockwork pirate skull]);
+	if(i_a("enchanted eyepatch")>0)
+		knife_untinker($item[enchanted eyepatch]);
+	if(my_path()!="Way of the Surprising Fist" && i_a("clockwork sphere")>0) //can't afford other meat maid pieces in wotsf
+	{
+		cli_execute("make clockwork maid");
+		cli_execute("use clockwork maid");
+	}
+}
 /********************************************************
 * START THE FUNCTIONS CALLING THE ADVENTURING FUNCTIONS *
 ********************************************************/
@@ -11143,6 +11543,7 @@ if(my_level()>=4 && my_level()<=5 && my_basestat($stat[mysticality])>=20)
 
 void bcs2() {
 	bcCouncil();
+	fix_clockwork_maid();
 	bcascSpookyForest();
 	if(my_level()>5)
 	{
@@ -11455,31 +11856,37 @@ void bcs12() {
 				while (!contains_text(visit_url("bigisland.php?place=farm"), "snarfblat=143")) {
 					if (i_a("chaos butterfly") > 0 && my_path() != "Bees hate You") {
 						string url;
-						boolean altered = false;
-						repeat {
+						boolean used_butterfly = get_property("SIMON_last_butterfly")==my_ascensions();
+						if(!used_butterfly)
+						{
+							//try to pull one
+							if(i_a("chaos butterfly")==0 && !in_hardcore())
+								cli_execute("pull chaos butterfly");
+							//farm one
+							while(i_a("chaos butterfly")==0)
+								bumAdv($location[The Castle in the Clouds in the Sky (Ground floor)], "items", "itemsnc", "chaos butterfly", "getting chaos butterfly for dooks trick", "-i");
+							
+							//now we have one... use it
+							clear_combat_macro();
 							url = visit_url("adventure.php?snarfblat=137");
 							if (contains_text(url, "Combat")) {
 								throw_item($item[chaos butterfly]);
-								altered = true;
+								set_property("SIMON_last_butterfly",my_ascensions());
 								bumRunCombat();
-							} else  {
-	
-								//place florist friar plants
-								choose_all_plants("", $location[McMillicancuddy's Barn]);
-								
-								bumMiniAdv(1,$location[McMillicancuddy's Barn]);
-							}
-						} until (altered || contains_text(url,"no more ducks here."));
-						
-						if (altered)
-							while(contains_text(visit_url("bigisland.php?place=farm"), "farm5d.gif"))
-							{
-	
-								//place florist friar plants
-								choose_all_plants("", $location[McMillicancuddy's Barn]);
-								
-								bumAdv($location[McMillicancuddy's Barn]);
-							}
+							} else 
+								abort("Failed to enter combat at the barn for some reason");
+							set_combat_macro();
+							
+						}
+						//now clear barn
+						while(contains_text(visit_url("bigisland.php?place=farm"), "farm5d.gif"))
+						{
+
+							//place florist friar plants
+							choose_all_plants("", $location[McMillicancuddy's Barn]);
+							
+							bumAdv($location[McMillicancuddy's Barn]);
+						}
 					} else {
 						while(contains_text(visit_url("bigisland.php?place=farm"), "farm5d.gif"))
 						{
@@ -11491,7 +11898,6 @@ void bcs12() {
 						}
 					}
 				}
-				if(my_class() == $class[Pastamancer] && have_skill($skill[flavour of magic])) use_skill(1, $skill[spirit of wormwood]);
 				while(contains_text(visit_url("bigisland.php?place=farm"), "farm1d.gif"))
 				{
 		

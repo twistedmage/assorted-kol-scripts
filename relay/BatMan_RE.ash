@@ -357,9 +357,9 @@ void batman_enhance() {
       actbox.append("\n   <div class='onemenu'><a href='"+to_url(my_location())+(my_location() == $location[the boss bat's lair] ? "&confirm2=on" : "")+"'>"+
         "<img src='../images/itemimages/hourglass.gif' height=22 width=22 border=0></a></div><div class='popout' id='again'></div>");
      // semirare helper!
-      if (get_counters("Semirare window begin",0,10) != "" || get_counters("Fortune Cookie",0,10) != "" ||    // if either window/counter is nigh
-          get_counters("Semirare window end",0,my_path() == "Oxygenarian" ? 20 : 40) != "") {                 // or we're IN the window, show
-         actbox.append("\n   <div class='onemenu'><img src='images/itemimages/fortune.gif'  height=22 width=22 border=0 title='Semirare helper'></div>"+
+      if (get_counters("Semirare window begin",0,6) != "" || get_counters("Fortune Cookie",0,6) != "" ||     // if either window/counter is nigh
+          get_counters("Semirare window end",0,my_path() == "Oxygenarian" ? 20 : 40) != "") {                // or we're IN the window, show
+         actbox.append("\n   <div class='onemenu'><a href='relay_Sera.ash'><img src='images/itemimages/fortune.gif' height=22 width=22 border=0 title='Semirare helper'></a></div>"+
             "\n<div class='popout' id='srhelper'></div>");
       }
    }
@@ -384,7 +384,8 @@ void batman_enhance() {
       actbox.append("<table id='battable' width='100%'>\n"+
         "<thead><tr><th>Action</th><th>Damage</th>"+
         "<th><img src='images/itemimages/nicesword.gif' title='Delevel Attack' height=26 width=26 border=0></th>"+
-        "<th><img src='images/itemimages/whiteshield.gif' title='Delevel Defense' height=26 width=26 border=0></th><th>Stun</th>"+
+        "<th><img src='images/itemimages/whiteshield.gif' title='Delevel Defense' height=26 width=26 border=0></th>"+
+        "<th><img src='images/itemimages/bananapeel.gif' title='Stun/Stagger' height=26 width=26 border=0></th>"+
         "<th><img src='images/itemimages/hp.gif' title='1 HP = "+rnum(meatperhp,3)+"&mu;' border=0></th>"+
         "<th><img src='images/itemimages/mp.gif' title='1 MP = "+rnum(meatpermp,3)+"&mu;' border=0></th>"+
         "<th><img src='images/itemimages/meatstack.gif' title='Profit' border=0></th>"+

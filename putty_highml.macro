@@ -1,3 +1,5 @@
+#version without staggers, for 151 ml+
+
 icon saucegeyser
 scrollwhendone
 abort hppercentbelow 20
@@ -43,6 +45,15 @@ if monstername gremlin || monstername guy made of bees || monstername The Big Wi
 		#first gunk scientists
 		if hascombatitem quantum nanopolymer spider web && monstername bugbear scientist
 			use quantum nanopolymer spider web
+		endif
+		if hascombatitem spooky putty sheet && !hascombatitem Rain-doh black box && !hascombatitem crayon shavings
+			use spooky putty sheet
+		endif
+		if hascombatitem Rain-doh Black box && !hascombatitem crayon shavings
+			use Rain-doh Black box
+		endif
+		if hascombatitem crayon shavings
+			use crayon shavings
 		endif
 	endif
 	
@@ -116,34 +127,6 @@ if hasskill make it rain && (monstername Beefy bodyguard bat || monstername dirt
 endif
 
 
-mark stunners
-if sealclubber &&  hasskill club foot
-	#should really be only with fury
-	skill club foot
-endif
-if pastamancer && hasskill entangling noodles
-	skill entangling noodles
-endif
-if accordionthief && hasskill Accordion Bash
-	skill Accordion Bash
-endif
-if turtletamer && hasskill shell up
-	skill shell up
-endif
-
-if hascombatitem rain-doh blue balls 
-	use rain-doh blue balls
-endif
-if hasskill pocket crumbs
-	skill pocket crumbs
-endif
-if hasskill ply reality
-	skill ply reality
-endif
-if hascombatitem rain-doh indigo cup && !monstername *Naughty Sorceress* && !monstername Bonerdagon
-	use rain-doh indigo cup
-endif
-
 if (hasskill transcendent olfaction && !haseffect on the trail && (monstername writing desk || monstername dairy goat || monstername tomb rat || monstername blooper || monstername Hellion || monstername Bob Racecar || monstername racecar bob|| monstername Quiet Healer || monstername Goth Giant || monstername Blur || monstername Green Ops Soldier || monstername Zombie waltzers || monstername Shaky Clown || monstername Knott Yeti || monstername Hellion || monstername Violent Fungus || monstername Endless Conference Call || monstername * survivor || monstername pygmy bowler || monstername morbid skull)) || (!monstername Battlie Knight Ghost && !monstername ghost miner && !monstername Claybender Sorcerer Ghost && !monstername Dusken Raider Ghost && !monstername Space Tourist Explorer Ghost && !monstername Whatsian Commando Ghost  && !monstername sheet ghost && !monstername plaid ghost && (monstername lobsterfrogman || monstername ghost || monstername bricko bat || monstername angry bassist || monstername blue-haired girl || monstername evil ex-girlfriend || monstername peeved roommate || monstername random scenester || monstername black crayon * || monstername smut orc pervert)) || ((hascombatitem rock band flyers || hascombatitem jam band flyers) || monstername * pirate)
 	if (hasskill transcendent olfaction && !haseffect on the trail && (monstername writing desk || monstername dairy goat || monstername tomb rat || monstername blooper || monstername Hellion || monstername Bob Racecar || monstername racecar bob|| monstername Quiet Healer || monstername Goth Giant || monstername Blur || monstername Green Ops Soldier || monstername Zombie waltzers || monstername Shaky Clown || monstername Knott Yeti || monstername Hellion || monstername Violent Fungus || monstername Endless Conference Call || monstername * survivor || monstername pygmy bowler || monstername morbid skull))
 		skill transcendent olfaction
@@ -200,7 +183,6 @@ endif
 #	endif
 #endif
 
-
 #banish or copy
 if ((monstername  A.M.C. gremlin || monstername  Sabre-toothed goat || monstername  crusty pirate || monstername  tomb asp || monstername  bullet bill || monstername  senile lihc || monstername  procrastination giant) && (hasskill banishing shout || hasskill howl of the alpha || hasskill creepy grin || hasskill give your opponent the stinkeye || hascombatitem divine champagne popper || hascombatitem crystal skull || hascombatitem harold's bell)) || (hascombatitem short writ of habeas corpus && monstername pygmy) || ((monstername chatty pirate || monstername tomb servant || monstername slick lihc || monstername possibility giant) && (hasskill banishing shout || hasskill howl of the alpha)) || ((hascombatitem spooky putty sheet || hascombatitem Rain-doh black box) && (!monstername Battlie Knight Ghost && !monstername ghost miner && !monstername Claybender Sorcerer Ghost && !monstername Dusken Raider Ghost && !monstername Space Tourist Explorer Ghost && !monstername Whatsian Commando Ghost && !monstername sheet ghost && !monstername plaid ghost) && (monstername ghost || monstername lobsterfrogman || monstername gaudy pirate || monstername modern zombie || monstername dirty old lich))
 	#banish
@@ -252,6 +234,15 @@ if ((monstername  A.M.C. gremlin || monstername  Sabre-toothed goat || monsterna
 			if hasskill howl of the alpha
 				skill howl of the alpha
 			endif
+		endif
+	endif
+
+	if (hascombatitem spooky putty sheet || hascombatitem Rain-doh black box) && (!monstername Battlie Knight Ghost && !monstername ghost miner && !monstername Claybender Sorcerer Ghost && !monstername Dusken Raider Ghost && !monstername Space Tourist Explorer Ghost && !monstername Whatsian Commando Ghost && !monstername sheet ghost && !monstername plaid ghost) && (monstername ghost || monstername lobsterfrogman || monstername gaudy pirate || monstername modern zombie || monstername dirty old lich)
+		if hascombatitem spooky putty sheet && !hascombatitem Rain-doh black box
+			use spooky putty sheet
+		endif
+		if hascombatitem Rain-doh Black box
+			use Rain-doh Black box
 		endif
 	endif
 endif

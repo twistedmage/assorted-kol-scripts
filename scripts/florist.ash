@@ -70,6 +70,8 @@ location mafia_style_zone(string loc)
 		loc="Hidden City (Automatic)";
 	else if(loc=="The Orcish Frat House")
 		loc="wartime Frat House";
+	else if(loc=="[DungeonFAQ - Level 1]")
+		loc="Video Game Level 1";
 	
 		
 		
@@ -254,7 +256,7 @@ void choose_all_plants(string type, location loc)
 	
 	//are we in the location we think we are?
 	//<td>Ah, <b>The Battlefield (Hippy Uniform)</b>! I have a numbe
-	matcher cur_locm = create_matcher("Ah, <b>([,\\.0-9a-zA-Z \\(\\)\\'\\-\\!]*)</b>\\!",friar_str);
+	matcher cur_locm = create_matcher("Ah, <b>([,\\.0-9a-zA-Z \\(\\)\\'\\-\\!\\[\\]]*)</b>\\!",friar_str);
 	if(!cur_locm.find())
 	{
 		print("Couldn't detect location from string ","red");

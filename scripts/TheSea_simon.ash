@@ -48,6 +48,7 @@ void set_combat_macro_name(string macro)
 
 //simons functions which use bumcheekascend to set up gear, familiar, mood
 //inputs should be combinations of +/- and i
+string old_prepared="";
 void prepare_for(string type,location loc)
 {
 	if(have_effect($effect[fishy])<1)
@@ -91,7 +92,60 @@ void prepare_for(string type,location loc)
 
 	//--------------------flowers--------------------
 	choose_all_plants(type, loc);
-				
+	
+	//lasso / seahorse
+	if(loc==$location[The Coral Corral])
+	{
+		if(i_a("sea lasso")<1)
+			buy(1,$item[sea lasso]);
+		if(i_a("sea cowbell")<3)
+			buy(3,$item[sea cowbell]);
+		if(i_a("pulled indigo taffy")<3)
+			buy(3,$item[pulled indigo taffy]);
+		set_combat_macro_name("seahorse");
+	}
+	else if(loc==$location[Mer-kin Colosseum])
+	{
+		if(i_a("pulled blue taffy")<15)
+			buy(15,$item[pulled blue taffy]);
+		set_combat_macro_name("gladiator");
+	}
+	else if(get_property("lassoTraining")!= "expertly")
+	{
+		if(i_a("sea lasso")<1)
+			buy(6,$item[sea lasso]);
+		set_combat_macro_name("lasso");
+	}
+	else if(loc==$location[mer-kin library])
+	{
+		if(i_a("pulled yellow taffy")<1)
+			buy(1,$item[pulled yellow taffy]);
+		if(get_property("dreadScroll2")=="0") //confirmed as 2
+		{
+			if(i_a("mer-kin healscroll")<1)
+				buy(1,$item[mer-kin healscroll]);
+			set_combat_macro_name("library3");
+		}
+		else if(get_property("dreadScroll5")=="0") //confirmed as 5
+		{
+			if(i_a("mer-kin killscroll")<1)
+				buy(1,$item[mer-kin killscroll]);
+			set_combat_macro_name("library2");
+		}
+		else
+		{
+			set_combat_macro_name("library1");
+		}
+	}
+	else
+		set_combat_macro_name(false);
+	
+	//should we maximize etc?
+	string new_prepared = type+"_"+loc.to_string();
+	if(new_prepared==old_prepared)
+		return;
+	old_prepared=new_prepared;
+	
 	//--------------------familiar------------------
 	//fam types accepted: items, itemsnc, ""
 	if(contains_text(type,"i"))
@@ -100,10 +154,12 @@ void prepare_for(string type,location loc)
 	}
 	else
 		setFamiliar("");
+	if(my_familiar()==$familiar[Frumious Bandersnatch])
+		equip($item[das boot]);
 	
 	//---------------------gear-----------------------
 	//input for maximizer
-	string max_str="maximize +"+my_primestat()+" +sea";
+	string max_str="maximize +"+my_primestat()+", +sea";
 	
 	if(loc==$location[mer-kin library])
 		max_str+=", +outfit mer-kin scholar";
@@ -153,53 +209,7 @@ void prepare_for(string type,location loc)
 		cli_execute("trigger lose_effect, Chalky Hand, use 1 handful of hand chalk");
 		cli_execute("trigger lose_effect, Gr8tness, use 1 potion of temporary gr8tness ");
 	}
-	
-	//lasso / seahorse
-	if(loc==$location[The Coral Corral])
-	{
-		if(i_a("sea lasso")<1)
-			buy(1,$item[sea lasso]);
-		if(i_a("sea cowbell")<3)
-			buy(3,$item[sea cowbell]);
-		if(i_a("pulled indigo taffy")<3)
-			buy(3,$item[pulled indigo taffy]);
-		set_combat_macro_name("seahorse");
-	}
-	else if(loc==$location[Mer-kin Colosseum])
-	{
-		if(i_a("pulled blue taffy")<15)
-			buy(15,$item[pulled blue taffy]);
-		set_combat_macro_name("gladiator");
-	}
-	else if(get_property("lassoTraining")!= "expertly")
-	{
-		if(i_a("sea lasso")<1)
-			buy(6,$item[sea lasso]);
-		set_combat_macro_name("lasso");
-	}
-	else if(loc==$location[mer-kin library])
-	{
-		if(i_a("pulled yellow taffy")<1)
-			buy(1,$item[pulled yellow taffy]);
-		if(get_property("dreadScroll2")=="0") //confirmed as 2
-		{
-			if(i_a("mer-kin healscroll")<1)
-				buy(1,$item[mer-kin healscroll]);
-			set_combat_macro_name("library3");
-		}
-		else if(get_property("dreadScroll5")=="0") //confirmed as 5
-		{
-			if(i_a("mer-kin killscroll")<1)
-				buy(1,$item[mer-kin killscroll]);
-			set_combat_macro_name("library2");
-		}
-		else
-		{
-			set_combat_macro_name("library1");
-		}
-	}
-	else
-		set_combat_macro_name(false);
+	old_prepared=new_prepared;
 }
 
 string thisver = "1.6.3";
@@ -369,7 +379,10 @@ boolean solveHatred(boolean scrolling)
 		else
 		{
 			print("Not this time... let's burn off "+have_effect($effect[deep-tainted mind])+" adventures fast.");
-			adventure(have_effect($effect[deep-tainted mind]), $location[Cobb's Knob Menagerie\, Level 1]);
+			if(can_adv($location[Cobb's Knob Menagerie\, Level 1]))
+				adventure(have_effect($effect[deep-tainted mind]), $location[Cobb's Knob Menagerie\, Level 1]);
+			else
+				adventure(have_effect($effect[deep-tainted mind]), $location[guano junction]);
 		}
 	}
 	print("Looks like epic failure. Not sure why exactly, but... aww.");

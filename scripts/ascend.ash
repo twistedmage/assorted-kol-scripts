@@ -263,6 +263,8 @@ void main()
 {
 	if(get_clan_name()!="PAIN")
 		abort("change clan back to PAIN");
+
+	cli_execute("set postAscensionScript = newLife_simon.ash");
 		
 	//pull all
 	string catch=visit_url("storage.php?action=pullall&pwd");
