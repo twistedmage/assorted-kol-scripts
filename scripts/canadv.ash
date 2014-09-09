@@ -170,8 +170,13 @@ boolean can_adv(location where, boolean prep) {
       case "Pandamonium": return qprop("questL06Friar","finished");
       case "Pyramid": return itemcheck($item[staff of ed]);
       case "Rift": return levelcheck(4) && my_level() < 6 && my_ascensions() > 0 && itemcheck($item[fernswarthy's letter]);
+	  case "Rumpelstiltskin's Home For Children": return get_property("grimstoneMaskPath") == "gnome";
+	  case "Skid Row": return get_property("grimstoneMaskPath") == "wolf";
       case "Spaaace": return effectcheck($effect[transpondent]) || (!prep && itemcheck($item[transporter transponder])) || (prep && use(1,$item[transporter transponder]));
+	  case "Spring Break Beach": return get_property("sleazeAirportAlways") == "true" || get_property("_sleazeAirportToday") == "true";
       case "Suburbs": return effectcheck($effect[dis abled]) || (!prep && itemcheck($item[devilish folio])) || (prep && use(1,$item[devilish folio]));
+	  case "The Candy Witch and the Relentless Child Thieves": return get_property("grimstoneMaskPath") == "witch";
+	  case "The Prince's Ball": return get_property("grimstoneMaskPath") == "stepmother";
       case "The Red Zeppelin's Mooring": return qprop("questL11Ron", "started");
       case "The Sea": if (!levelcheck(11) || !itemcheck($item[makeshift SCUBA gear])) return false;
          if (!boolean_modifier("Underwater Familiar")) {
@@ -187,6 +192,7 @@ boolean can_adv(location where, boolean prep) {
          if (boolean_modifier("Adventure Underwater")) return true;
          return (equipcheck($item[aerated diving helmet]) || equipcheck($item[makeshift SCUBA gear],$slot[acc3]));
       case "Tower": return primecheck(11) && qprop("questG03Ego","step1");
+      case "Twitch": return get_property("timeTowerAvailable") == "true";
       case "Vanya's Castle": return itemcheck($item[map to vanya's castle]) && equipcheck($item[continuum transfunctioner]);
       case "Volcano": return primecheck(90) && qprop("questG04Nemesis","step3");  // actual step is probably higher!
       case "Woods": return levelcheck(2) && qprop("questL02Larva","started");
@@ -228,6 +234,20 @@ boolean can_adv(location where, boolean prep) {
    case $location[The Dark Neck of the Woods]:          // friars
    case $location[The Dark Heart of the Woods]:
    case $location[The Dark Elbow of the Woods]:
+   case $location[Ye Olde Medievale Villagee]:          // grimstone
+   case $location[Portal to Terrible Parents]:
+   case $location[Rumpelstiltskin's Workshop]:
+   case $location[The Prince's Restroom]:
+   case $location[The Prince's Dance Floor]:
+   case $location[The Prince's Kitchen]:
+   case $location[The Prince's Balcony]:
+   case $location[The Prince's Lounge]:
+   case $location[The Prince's Canapes Table]:
+   case $location[Sweet-Ade Lake]:
+   case $location[Eager Rice Burrows]:
+   case $location[Gumdrop Forest]:
+   case $location[The Inner Wolf Gym]:
+   case $location[Unleash Your Inner Wolf]:
    case $location[A Massive Ziggurat]:                  // hiddencity
    case $location[The Hidden Park]:
    case $location[An Overgrown Shrine (Northwest)]:
@@ -296,6 +316,9 @@ boolean can_adv(location where, boolean prep) {
    case $location[Hamburglaris Shield Generator]:       // spaaaace
    case $location[Domed City of Grimacia]:
    case $location[Domed City of Ronaldus]:
+   case $location[The Fun-Guy Mansion]:                 // spring break
+   case $location[Sloppy Seconds Diner]:
+   case $location[The Sunken Party Yacht]:
    case $location[The Clumsiness Grove]:                // suburbs
    case $location[The Glacier of Jerks]:
    case $location[The Maelstrom of Lovers]:
@@ -304,6 +327,10 @@ boolean can_adv(location where, boolean prep) {
    case $location[The Briniest Deepests]:
    case $location[An Octopus's Garden]:
    case $location[The Sleazy Back Alley]:               // town
+   case $location[An Illicit Bohemian Party]:           // twitch
+   case $location[Moonshiners' Woods]:
+   case $location[The Cave Before Time]:
+   case $location[The Roman Forum]:
    case $location[Vanya's Castle Foyer]:                // vanya's castle
    case $location[Vanya's Castle Chapel]:
    case $location[The Spooky Forest]:                   // woods
@@ -363,6 +390,8 @@ boolean can_adv(location where, boolean prep) {
    case $location[Video Game Level 1]:
    case $location[Video Game Level 2]:
    case $location[Video Game Level 3]: return (itemcheck($item[GameInformPowerDailyPro Walkthru]) || itemcheck($item[GameInformPowerDailyPro magazine]));
+  // grimstone
+   case $location[A Deserted Stretch of I-911]: return get_property("grimstoneMaskPath") == "hare";
   // gyms
    case $location[Pump Up Moxie]: return gnomads_available();
    case $location[Pump Up Muscle]: return (knoll_available() && (checkguild() || get_property("questM01Untinker") != "unstarted") && perm_urlcheck("place.php?whichplace=plains","Degrassi Gnoll"));
@@ -433,6 +462,7 @@ boolean can_adv(location where, boolean prep) {
    case $location[Mt. Molehill]: return effectcheck($effect[shape of...mole!]) || (!prep && itemcheck($item[llama lama gong]));
    case $location[Nemesis Cave]: return primecheck(25) && perm_urlcheck("mountains.php","cave.gif");
    case $location[The Smut Orc Logging Camp]: return levelcheck(9) && qprop("questL09Topping","started");
+   case $location[The Thinknerd Warehouse]: return get_property("questM22Shirt") != "unstarted";
    case $location[The Valley of Rof L'm Fao]: return levelcheck(9) && qprop("questM15Lol","started");
   // orchard
    case $location[The Feeding Chamber]: return effectcheck($effect[filthworm larva stench]);
@@ -467,6 +497,8 @@ boolean can_adv(location where, boolean prep) {
   // pyramid
    case $location[The Lower Chambers]: return get_property("lowerChamberUnlock") == "true" && get_property("questL11Pyramid") != "finished";
    case $location[The Middle Chamber]: return perm_propcheck("middleChamberUnlock", "true");
+  // red zeppelin's mooring
+   case $location[The Red Zeppelin]: return get_property("zeppelinProtestors") >= 80;
   // rift
    case $location[Battlefield (Cloaca Uniform)]: return outfitcheck("cloaca-cola uniform");
    case $location[Battlefield (Dyspepsi Uniform)]: return outfitcheck("dyspepsi-cola uniform");

@@ -305,28 +305,30 @@ void main()
 		print("not high enough for every skill!","red");
 	}
 	//fill up empty capacity with pvp food/drink
-	while(my_inebriety() <= inebriety_limit())
+	if(my_name()=="twistedmage")
 	{
-		if(item_amount($item[used beer])==0)
-			buy(1,$item[used beer]);
-		drink(1,$item[used beer]);
+		while(my_inebriety() <= inebriety_limit())
+		{
+			if(item_amount($item[used beer])==0)
+				buy(1,$item[used beer]);
+			drink(1,$item[used beer]);
+		}
+		while(fullness_limit() - my_fullness() > 1)
+		{
+			if(item_amount($item[nailswurst])==0)
+				buy(1,$item[nailswurst]);
+			eat(1,$item[nailswurst]);
+		}
+		while(spleen_limit() - my_spleen_use() > 2)
+		{
+			if(spleen_limit() - my_spleen_use() > 5)
+				use(1,$item[Hatorade]);
+			else if(spleen_limit() - my_spleen_use() > 2)
+				use(1,$item[watered-down red minotaur]);
+		}
+		//do pvp
+		do_fights();
 	}
-	while(fullness_limit() - my_fullness() > 1)
-	{
-		if(item_amount($item[nailswurst])==0)
-			buy(1,$item[nailswurst]);
-		eat(1,$item[nailswurst]);
-	}
-	while(spleen_limit() - my_spleen_use() > 2)
-	{
-		if(spleen_limit() - my_spleen_use() > 5)
-			use(1,$item[Hatorade]);
-		else if(spleen_limit() - my_spleen_use() > 2)
-			use(1,$item[watered-down red minotaur]);
-	}
-	//do pvp
-	do_fights();
-	
 	visit_url("lair2.php?preaction=key&whichkey=436"); //get easter egg balloon
 //	return_gear();
 	cli_execute("train.ash");

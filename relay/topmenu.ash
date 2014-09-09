@@ -43,7 +43,7 @@ if (get_property("bumrats_changeTopmenu") != "false") {
 			break;
 		case $class[Seal Clubber]:
 		case $class[Turtle Tamer]:
-			guild = "guild.php?guild=m";
+			guild = "guild.php?guild=f";
 			break;
 		case $class[Disco Bandit]:
 		case $class[Accordion Thief]:
@@ -51,7 +51,7 @@ if (get_property("bumrats_changeTopmenu") != "false") {
 			break;
 		case $class[Pastamancer]:
 		case $class[Sauceror]:
-			guild = "guild.php?guild=f";
+			guild = "guild.php?guild=m";
 			break;
 	}
 

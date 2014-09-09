@@ -846,7 +846,7 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 			add_drink(con_map,"- Paint A Vulgar Pitcher (smithereens) ",11,0,2);
 			
 		if(available_amount($item[Snow berries])>0 && available_amount($item[ice harvest])>2)
-			add_drink(con_map,"- Ice Island Long Tea ",6,0,1);
+			add_drink(con_map,"- Ice Island Long Tea ",6,0,4);
 			
 		if(available_amount($item[Unnamed cocktail])>0)
 			add_drink(con_map,"- unnamed cocktail ",5,0,2);

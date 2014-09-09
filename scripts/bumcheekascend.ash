@@ -4473,8 +4473,12 @@ void collect_dna(string req)
 			else if(my_path()=="Heavy Rains")
 			{
 				//in heavy rains, our familiars are always low weight, so lets do a fish hybrid
-				use_rain_man($monster[piranhadon]);
 				curDNA = get_property("dnaSyringe");
+				if(curDNA!="fish")
+				{
+					use_rain_man($monster[piranhadon]);
+					curDNA = get_property("dnaSyringe");
+				}
 				if(contains_text(get_property("lastEncounter"),"Piranhadon") && curDNA!="fish")
 					abort("We conjured a piranhadon and didn't get our dna!");
 				
@@ -4570,6 +4574,7 @@ void use_rain_man(monster mob)
 	print("Deciding whether to use rain man","green");
 	if(mob==$monster[piranhadon])
 	{
+		print("rain man'ing a piranhadon","green");
 		clear_combat_macro();
 		cast_rain_man(1601);
 		bumRunCombat("consultSyringeFish");
@@ -4579,12 +4584,16 @@ void use_rain_man(monster mob)
 	{
 		if (my_level() > 11 && bcasc_doSideQuestBeach && !to_boolean(get_property("sidequestLighthouseCompleted"))) {
 			if (bcasc_doSideQuestBeach && i_a("barrel of gunpowder") < 5 && (get_property("sidequestLighthouseCompleted") == "none")) {
-				setMood("");
+				//if we have already copied this, don't rain man it
+				if($monster[lobsterfrogman] == to_monster(get_property("spookyPuttyMonster")) || $monster[lobsterfrogman] == to_monster(get_property("rainDohMonster")))
+					return;
+			
+				print("rain man'ing a LFM","green");
+				cli_execute("mood execute");
 				buMax();
 				setFamiliar("obtuseangel_simon");
 				clear_combat_macro();
-				abort("rain man code for LFM");
-				cast_rain_man(1601);
+				cast_rain_man(970);
 				bumRunCombat("consultObtuse");
 				return;
 			}
@@ -4756,6 +4765,15 @@ void setMood(string combat) {
 				use_skill(1, $skill[thundercloud]);
 			if(my_thunder()>=20 && have_effect($effect[Thunderheart])==0 && have_skill($skill[Thunderheart]))
 				use_skill(1, $skill[Thunderheart]);
+				
+			//if we are full, might as well burn some
+			if(my_thunder()>90)
+			{
+				if(have_skill($skill[thundercloud]))
+					use_skill(1, $skill[thundercloud]);
+				if(have_skill($skill[Thunderheart]))
+					use_skill(1, $skill[Thunderheart]);
+			}
 		}
 		
 		//rain skills
@@ -6898,7 +6916,7 @@ boolean bcascChasm() {
 		//Prepare for adventuring
 		if(!in_hardcore() && i_a("loadstone")==0)
 			cli_execute("pull loadstone");
-		if(!in_hardcore() && my_primestat()!=$stat[moxie] && i_a("logging hatchet")>0)
+		if(!in_hardcore() && my_primestat()!=$stat[moxie] && i_a("logging hatchet")==0)
 			cli_execute("pull logging hatchet");
 
 		string max_str="items";
@@ -8202,7 +8220,9 @@ boolean bcascKnobKing() {
 				if (item_amount($item[Knob cake]) > 0) {
 					if(my_buffedstat(my_primestat()) < 75)
 						return false;
-					buMax();
+					buMax("+outfit knob goblin elite guard uniform");
+					if(my_path()=="Heavy Rains")
+						abort("Fight aquagoblin yourself");
 					while (!contains_text(visit_url("questlog.php?which=2"), "slain the Goblin King")) {
 						bumAdv($location[Throne Room], "+outfit knob goblin elite guard uniform", "meatboss", "", "Killing the Knob King");
 					}
@@ -8241,6 +8261,9 @@ boolean bcascKnobKing() {
 				else
 					use(1, $item[Knob Goblin perfume]);
 
+				buMax("+outfit Knob Goblin Harem Girl Disguise");
+				if(my_path()=="Heavy Rains")
+					abort("Fight aquagoblin yourself");
 				bumAdv($location[Throne Room], "+outfit Knob Goblin Harem Girl Disguise", "meatboss", "", "Killing the Knob King");
 				checkStage("knobking", true);
 				return true;
@@ -9282,10 +9305,14 @@ boolean bcascMacguffinHiddenCity() {
 				else
 				{
 					//need binder clip so raid supplies
+					print("Looking for a binder clip","green");
 					set_property("choiceAdventure786", "2");
 				}
 			}
 			bumAdv($location[The Hidden Office Building], "5 elemental damage", "", "1 choiceadv", "Getting the crackling stone sphere.", "-");
+			
+			if(item_amount($item[boring binder clip])<=0 && get_property("choiceAdventure786")!="2" && item_amount($item[McClusky file (complete)])<=0)
+				abort("BBB is fucking up the choiceadv for getting binder clip again");
 		}
 		while (item_amount($item[crackling stone sphere]) == 1) {
 			bumMiniAdv(1, $location[An Overgrown Shrine (Northeast)], "");
@@ -9501,7 +9528,8 @@ boolean bcascMacguffinPalindome() {
 	
 	//Enter the fight
 	if (item_amount($item[Staff of Fats])== 0) {
-		abort("Kill dr awkward yourself, spells reduced to 1 damage");
+		if(my_path()=="Heavy Rains")
+			abort("Kill dr awkward yourself, spells reduced to 1 damage");
 		palindome = visit_url("place.php?whichplace=palindome&action=pal_drlabel");
 		palindome = visit_url("choice.php?pwd&whichchoice=131&option=1&choiceform1=War%2C+sir%2C+is+raw%21");
 		bumRunCombat();
@@ -11495,15 +11523,15 @@ void fix_clockwork_maid()
 		cli_execute("untinker");
 	
 	if(i_a("ninja pirate zombie robot head")>0)
-		knife_untinker($item[ninja pirate zombie robot head]);
+		cli_execute("untinker ninja pirate zombie robot head");
 	if(i_a("pirate zombie robot head")>0)
-		knife_untinker($item[pirate zombie robot head]);
+		cli_execute("untinker pirate zombie robot head");
 	if(i_a("pirate zombie head")>0)
-		knife_untinker($item[pirate zombie head]);
+		cli_execute("untinker pirate zombie head");
 	if(i_a("clockwork pirate skull")>0)
-		knife_untinker($item[clockwork pirate skull]);
+		cli_execute("untinker clockwork pirate skull");
 	if(i_a("enchanted eyepatch")>0)
-		knife_untinker($item[enchanted eyepatch]);
+		cli_execute("untinker enchanted eyepatch");
 	if(my_path()!="Way of the Surprising Fist" && i_a("clockwork sphere")>0) //can't afford other meat maid pieces in wotsf
 	{
 		cli_execute("make clockwork maid");

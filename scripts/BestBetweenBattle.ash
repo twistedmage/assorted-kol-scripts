@@ -321,7 +321,7 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
       case $location[the hidden office building]:
          if (item_amount($item[boring binder clip]) > 0 && get_property("hiddenOfficeProgress") == "5") use(1,$item[boring binder clip]);
          if (item_amount($item[mcclusky file (complete)]) > 0) friendlyset(786,"1","Fight protector spirit.");
-          else if (item_amount($item[boring binder clip]) == 0 && get_property("hiddenOfficeProgress").to_int() < 6) friendlyset(786,"2","Get boring binder clip.");
+          else if (item_amount($item[boring binder clip]) == 0) friendlyset(786,"2","Get boring binder clip.");
           else if (get_property("hiddenOfficeProgress").to_int() < 5 || has_goal($monster[pygmy witch accountant]) > 0) friendlyset(786,"3","Fight pygmy witch accountants.");
           else friendlyset(786,"6","Skip Working Holiday.");
          return;
