@@ -357,6 +357,16 @@ void set_happened(string occurrence, boolean q) {    // if q, adds the action to
       case "use 2404":
       case "use 2405": if (!q) vprint("Flyering completed: "+get_property("flyeredML"),5); break;
       case "use 4603": nomiss = vprint("You are now handcuffed to this monster: its attacks will always hit.",8); break;
+      case "factoid": 
+         if (svn_exists("batman-re")) {   // track factoids using BatMan RE's mechanism
+            matcher imgm = create_matcher("adventureimages\\/([^ ]+\\.gif)",page);
+            if (imgm.find() && image_to_monster(imgm.group(1)) != m) vprint("Warning: image '"+imgm.group(1)+"' does not match monster '"+m+"'.","#8585FF",3);
+            int[string] fs;
+            file_to_map("factoids_"+replace_string(my_name()," ","_")+".txt",fs);
+            if (fs contains m.to_string() && vprint("Factoid saved: you now have found "+(fs[m.to_string()]+1)+" factoids for "+m+".","#8585FF",5)) fs[m.to_string()] += 1;  // save factoid
+             else if (vprint("You got a factoid (monster unknown, will force refresh)!","#8585FF",5)) remove fs["lastchecked"];  // force refresh
+            map_to_file(fs,"factoids_"+replace_string(my_name()," ","_")+".txt");
+         } else vprint("You got a factoid!","#8585FF",5); break;
    }
    matcher splitfunk = create_matcher("use (\\d+), ?(\\d+)",occurrence);   // record funkslinging individually
    if (splitfunk.find()) { for i from 1 to 2 set_happened("use "+splitfunk.group(i),q); return; }
@@ -798,15 +808,13 @@ float critchance() {         // CRITCH-nce
 float hitchance(string id) {        // HITCH-nce
    if (id == "jiggle") return 1.0;
    if (have_equipped($item[operation patriot shield]) && happened($skill[throw shield]) && !happened("shieldcrit")) return 1.0;
-  // cunctatitis blocks 50% of everything, black cat blocks 50% of items
-   float through = 1.0 - 0.5*to_int(have_effect($effect[cunctatitis]) > 0);
+   float through = 1.0 - 0.5*to_int(have_effect($effect[cunctatitis]) > 0);    // cunctatitis blocks 50% of everything
    if (id == "attack") {
       if (m == $monster[the bat in the spats]) return critchance();
-      if (have_equipped($item[thor's pliers])) return through;
       through *= 1.0 - fumble_chance();
       if (my_location() == $location[The Tower of Procedurally-Generated Skeletons] && contains_text(m,"shifty")) through *= 0.4;  // value based on tiny sample
    }
-   if (have_effect($effect[song of battle]) > 0 || happened("use 4603")) return through;
+   if (boolean_modifier("Attacks Can't Miss") || happened("use 4603")) return through;
    float attack = my_stat(to_string(current_hit_stat())) + (have_skill($skill[sick pythons]) ||
       (have_skill($skill[master of the surprising fist]) && unarmed()) ? 20 : 0);
    if (have_equipped($item[operation patriot shield]) && my_class() == $class[Disco Bandit] &&
@@ -1221,8 +1229,11 @@ void build_skillz() {
          float bige; foreach k,v in d bige = max(bige,v);
          d[have_equipped($item[Rain-Doh green lantern]) ? $element[stench] : $element[cold]] += bige;
       }
-      if (m == $monster[mother hellseal] && count(d) > 0 && (sk == 1022 || !contains_text(fields.special,"regular"))) return;
       advevent temp = to_event(thisid,d,to_spread(fields.pdmg),fields.special,1);
+      switch (m) {
+         case $monster[mother hellseal]: if (dmg_dealt(d) > 0 && (sk == 1022 || !contains_text(fields.special,"regular"))) return; break;
+         case $monster[gurgle]: if (is_spell(to_skill(sk))) foreach e,a in temp.dmg if (a > 0) temp.pdmg[e] += a; break;
+      }
       if (contains_text(fields.special,"regular")) temp = merge(temp,onhit);
        else if (isseal) foreach el,amt in temp.dmg if (temp.dmg[el] > 0) temp.dmg[el] = min(1.0,amt);
       advevent bander(int which) {
@@ -1235,7 +1246,7 @@ void build_skillz() {
          case $familiar[frumious bandersnatch]: if (factors["bander"] contains sk) temp = merge(temp,bander(sk)); break;
         // OAF and Black cat skill blocks -- convert to regular attack! arbitrarily assume 30%
          case $familiar[o.a.f.]:
-         case $familiar[black cat]: temp = merge(factor(temp,0.70),factor(opts[0],0.30));   // either opts[0] contains regular attack at this point,
+         case $familiar[black cat]: temp = merge(factor(temp,0.70),factor(opts[0],0.30));   // opts[0] contains regular attack at this point, except vs. shadow
             temp.id = thisid;                                                               // we don't actually want "attack" in the ID
             temp.rounds = 1;
             addopt(temp,0,0.7*mp_cost(to_skill(sk)));                                       // or you are in Jarlsberg and can't use familiars
@@ -1648,7 +1659,7 @@ string act(string action) {
    }
    if (contains_text(action,"CRITICAL")) set_happened("crit");
    if (contains_text(action,"FUMBLE")) set_happened("fumble");
-   if (contains_text(action,"monstermanuel.gif") && vprint("You got a factoid!","#8585FF",5)) set_happened("factoid");
+   if (contains_text(action,"monstermanuel.gif")) set_happened("factoid");
    if (!nomultistun && contains_text(action,"Unfazed, your opponent attacks you anyway!") && 
       vprint("This monster is stun immune!  That information should be added to batfactors.","red",2)) nomultistun = true;
    if (have_equipped($item[operation patriot shield]) && happened($skill[throw shield]) && happened("crit")) set_happened("shieldcrit");

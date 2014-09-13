@@ -402,7 +402,7 @@ void advise_food()
 			
 			if(my_level()>9)
 			{
-				if(available_amount($item[Gnatloaf casserole])>0 || (available_amount($item[Gnatloaf casserole])>0 && available_amount($item[Gnatloaf casserole])>0))
+				if(available_amount($item[Gnatloaf casserole])>0 || (available_amount($item[ancient spice])>0 && available_amount($item[filet of tangy gnat (&quot;fotelif&quot;)])>0))
 					add_food(con_map,"-    Gnatloaf casserole ",11.5,0,3);
 				if(available_amount($item[Long pork casserole])>0 || (available_amount($item[long pork])>0 && available_amount($item[black pepper])>0))
 					add_food(con_map,"-    Long pork casserole ",11.5,0,3);
@@ -501,7 +501,7 @@ void advise_food()
 		
 		if((available_amount($item[filet of tangy gnat (&quot;fotelif&quot;)])!=0 && available_amount($item[ancient spice])!=0) || available_amount($item[gnatloaf])!=0 )
 		{
-			add_food(con_map,"-    gnatload (from filet of gnat + ancient spice) ",6,0,2);
+			add_food(con_map,"-    gnatloaf (from filet of gnat + ancient spice) ",6,0,2);
 		}
 		
 		if((available_amount($item[long pork])!=0 && available_amount($item[black pepper])!=0) || available_amount($item[long pork chop sandwiches])!=0 )
@@ -619,7 +619,7 @@ void advise_food()
 			add_food(con_map,"- Hot Dog (Ghost Dog) ",12,0,3); //-combat
 			add_food(con_map,"- Hot Dog (Junkyard Dog) ",12,0,3); //+combat
 			add_food(con_map,"- Hot Dog (Wet Dog) ",12,0,3); //init
-			add_food(con_map,"- Hot Dog (Optimal Dog) - forces semirare",4.5,0,1); //semirare
+			add_food(con_map,"- Hot Dog (Optimal Dog) - forces semirare (last was in "+get_property("semirareLocation")+")",4.5,0,1); //semirare
 			add_food(con_map,"- Hot Dog (Sleeping Dog) ",9.5,0,2); //free rests
 			add_food(con_map,"- Hot Dog (Video Games Hot Dog) ",13,0,3); //pixels items meat
 		}
@@ -692,7 +692,10 @@ void advise_food()
 			add_food(con_map,"- Sogg-Os ",5,0,1);
 			
 		if(available_amount($item[Filet of The Fish])>0)
-			add_food(con_map,"- Filet of The Fish ",99999,0,3);
+			add_food(con_map,"- Filet of The Fish ",16,0,3);
+			
+		if(available_amount($item[Mornington crescent roll])>0)
+			add_food(con_map,"- Mornington crescent roll ",8.5,0,3);
 
 
 		if(available_amount($item[magicberry tablets])>0)
@@ -841,7 +844,10 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 			
 		
 		if(available_amount($item[cold one])>0 || (have_skill($skill[grab a cold one]) && !get_property("_coldOne").to_boolean()))
-			add_drink(con_map,"- cold one (prefer to drink at higher levels)",6,0,1);
+		{
+			int advs = 0.5 * my_level() + 0.5;
+			add_drink(con_map,"- cold one (prefer to drink at higher levels)",advs,0,1);
+		}
 		if(i_a("handful of smithereens")>0  || i_a("Paint A Vulgar Pitcher")>0 || get_property("tomeSummons").to_int()<3)
 			add_drink(con_map,"- Paint A Vulgar Pitcher (smithereens) ",11,0,2);
 			

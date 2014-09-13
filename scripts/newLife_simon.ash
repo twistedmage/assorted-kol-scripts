@@ -592,7 +592,21 @@ void special(boolean bonus_actions) {
 			}
 			else //others want a shield
 			{
-				pull_and_wear_if_good($item[operation patriot shield]);
+				//not trendy
+				if(my_path()!="Heavy Rains")
+					pull_and_wear_if_good($item[operation patriot shield]);
+				else
+				{
+					if(my_class()==$class[seal clubber])
+						pull_and_wear_if_good($item[Meat Tenderizer is Murder], $slot[off-hand]);
+					else if(my_class()==$class[disco bandit])
+						pull_and_wear_if_good($item[Frankly Mr. Shank], $slot[off-hand]);
+					else if(my_class()==$class[pastamancer])
+						pull_and_wear_if_good($item[Hand that Rocks the Ladle], $slot[off-hand]);
+					else if(my_primestat()==$stat[mysticality])
+						pull_and_wear_if_good($item[Sword of Dark Omens], $slot[off-hand]);
+						
+				}
 			}
 			//pull_and_wear_if_good($item[greatest american pants]);
 			if(available_amount($item[pantsgiving])==0)

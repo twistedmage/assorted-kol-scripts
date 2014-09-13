@@ -1461,7 +1461,8 @@ save [$item[tassel]] = 0;
 save [$item[royal jelly]] = 0;
 save [$item[whip kit]] = 0;
 save [$item[pile of jumping beans]] = 0;
-save [$item[ninja pirate zombie robot head]] = 0;
+save [$item[ninja pirate zombie robot head]] = -1;
+save [$item[clockwork pirate skull]] = 0;
 save [$item[googly eye]] = 0;
 save [$item[wooden block]] = 0;
 save [$item[ball]] = 0;
@@ -4447,6 +4448,10 @@ save [$item[dumb mud]] = 0;
 save [$item[Lord Soggyraven's Slippers]] = 1;
 save [$item[Ancient Protector Soda]] = 0;
 save [$item[filet of The Fish]] = 0;
+save [$item[transmission from planet Xi]] = 1;
+save [$item[frost flower]] = 0;
+save     [$item[Ice Island Long Tea]] = 0;
+save [$item[liver popsicle]] = 0;
 
 
 

@@ -26,6 +26,8 @@ boolean bcasc_bartender = get_property("bcasc_bartender").to_boolean(), bcasc_be
 		bcasc_getLEW = get_property("bcasc_getLEW").to_boolean(), bcasc_RunSCasHC = get_property("bcasc_RunSCasHC").to_boolean(),
 		bcasc_unlockHiddenTavern = get_property("bcasc_unlockHiddenTavern").to_boolean(), bcasc_castEmpathy = get_property("bcasc_castEmpathy").to_boolean(),
 		bcasc_cellarWineBomb = get_property("bcasc_cellarWineBomb").to_boolean();
+//don't do lighthouse if it will be a waste
+if(!have_skill($skill[musk of the moose]) || !have_skill($skill[Carlweather's Cantata of Confrontation])) bcasc_doSideQuestBeach=false;
  
 /***************************************
 * DO NOT EDIT ANYTHING BELOW THIS LINE *
@@ -3723,7 +3725,8 @@ boolean innerSetFamiliar(string famtype) {
 		return true;
 	}
 
-	if (famtype == "blackforest" && i_a("reassembled blackbird") == 0 && i_a("reconstituted crow") == 0) {
+	if (famtype == "blackforest") {
+		print("trying to use some kind of blackbird","purple");
 		if (have_path_familiar($familiar[Reassembled Blackbird])) {
 			use_familiar($familiar[Reassembled Blackbird]);
 			return true;
@@ -4474,7 +4477,7 @@ void collect_dna(string req)
 			{
 				//in heavy rains, our familiars are always low weight, so lets do a fish hybrid
 				curDNA = get_property("dnaSyringe");
-				if(curDNA!="fish")
+				if(curDNA!="fish" && have_effect($effect[human-fish hybrid])==0)
 				{
 					use_rain_man($monster[piranhadon]);
 					curDNA = get_property("dnaSyringe");
@@ -8393,7 +8396,7 @@ void bcascLairFightNS() {
 				use_skill(1,$skill[jalape&ntilde;o saucesphere]);
 
 			//suvivability
-			if(have_effect($effect[Shield of the Pastalord])==0)
+			if(have_effect($effect[Shield of the Pastalord])==0 && have_skill($skill[shield of the pastalord]))
 				use_skill(1,$skill[Shield of the Pastalord]);
 			if(have_effect($effect[astral shell])==0)
 				use_skill(1,$skill[astral shell]);
@@ -11971,7 +11974,7 @@ void bcs12() {
 					visit_yossarian(true);
 				visit_yossarian(false);
 				while (get_property("currentJunkyardTool") != "" && available_amount(to_item(get_property("currentJunkyardTool")))<1) {
-					cli_execute("maximize "+my_primestat()+", +DA, +10DR, " //-ml, "
+					cli_execute("maximize "+my_primestat()+", +DA, +10DR, "
 							+(my_primestat() == $stat[moxie] ? " -melee " : "+melee ")
 							+(available_amount($item[greatest american pants])==0 ? "" : " +equip greatest american pants "));
 						//Force to 0 in Junkyard
