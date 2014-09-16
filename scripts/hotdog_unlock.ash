@@ -184,7 +184,7 @@ void unlock_hotdogs()
 	unlock_sly(); //4 more
 	unlock_wet(); //2 more
 	unlock_chilly(); //1 more
-	unlock_junkyard(); //1 extra
+//	unlock_junkyard(); //1 extra
 	unlock_ghost(); //3 more
 	unlock_optimal(); //1 more
 //	unlock_savage(); //0 more

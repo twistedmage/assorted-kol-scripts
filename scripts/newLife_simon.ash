@@ -570,44 +570,6 @@ void special(boolean bonus_actions) {
 					else
 						abort("Don't know what familiar to enthrone for this path");
 			}
-			//myst classes want a pan offhand
-			if(my_primestat()==$stat[mysticality] && my_path()!="Bees Hate You" && my_path()!="BIG!")
-			{
-				//pull whichever
-				if(storage_amount($item[Jarlsberg's pan (Cosmic portal mode)])>0)
-				{
-					pull_if_good($item[Jarlsberg's pan (Cosmic portal mode)]);
-				}
-				else
-				{
-					pull_if_good($item[Jarlsberg's pan]);
-				}
-				//for now we will always use the portal version, might want to change it one day though
-				if(available_amount($item[Jarlsberg's pan])>0)
-				{
-					cli_execute("fold Jarlsberg's pan (Cosmic portal mode)");
-				}
-				if(available_amount($item[Jarlsberg's pan (Cosmic portal mode)])>0)
-					equip($item[Jarlsberg's pan (Cosmic portal mode)]);
-			}
-			else //others want a shield
-			{
-				//not trendy
-				if(my_path()!="Heavy Rains")
-					pull_and_wear_if_good($item[operation patriot shield]);
-				else
-				{
-					if(my_class()==$class[seal clubber])
-						pull_and_wear_if_good($item[Meat Tenderizer is Murder], $slot[off-hand]);
-					else if(my_class()==$class[disco bandit])
-						pull_and_wear_if_good($item[Frankly Mr. Shank], $slot[off-hand]);
-					else if(my_class()==$class[pastamancer])
-						pull_and_wear_if_good($item[Hand that Rocks the Ladle], $slot[off-hand]);
-					else if(my_primestat()==$stat[mysticality])
-						pull_and_wear_if_good($item[Sword of Dark Omens], $slot[off-hand]);
-						
-				}
-			}
 			//pull_and_wear_if_good($item[greatest american pants]);
 			if(available_amount($item[pantsgiving])==0)
 				pull_and_wear_if_good($item[pantsgiving]);
@@ -730,6 +692,45 @@ void special(boolean bonus_actions) {
 					pull_and_wear_if_good($item[thor's pliers]);
 				//	pull_and_wear_if_good($item[ice sickle]);
 				
+				//myst classes want a pan offhand
+				if(my_primestat()==$stat[mysticality] && my_path()!="Bees Hate You" && my_path()!="BIG!")
+				{
+					//pull whichever
+					if(storage_amount($item[Jarlsberg's pan (Cosmic portal mode)])>0)
+					{
+						pull_if_good($item[Jarlsberg's pan (Cosmic portal mode)]);
+					}
+					else
+					{
+						pull_if_good($item[Jarlsberg's pan]);
+					}
+					//for now we will always use the portal version, might want to change it one day though
+					if(available_amount($item[Jarlsberg's pan])>0)
+					{
+						cli_execute("fold Jarlsberg's pan (Cosmic portal mode)");
+					}
+					if(available_amount($item[Jarlsberg's pan (Cosmic portal mode)])>0)
+						equip($item[Jarlsberg's pan (Cosmic portal mode)]);
+				}
+				else //others want a shield
+				{
+					//not trendy
+					if(my_path()!="Heavy Rains")
+						pull_and_wear_if_good($item[operation patriot shield]);
+					else
+					{
+						if(my_class()==$class[seal clubber])
+							pull_and_wear_if_good($item[Meat Tenderizer is Murder], $slot[off-hand]);
+						else if(my_class()==$class[disco bandit])
+							pull_and_wear_if_good($item[Frankly Mr. Shank], $slot[off-hand]);
+						else if(my_class()==$class[pastamancer])
+							pull_and_wear_if_good($item[Hand that Rocks the Ladle], $slot[off-hand]);
+						else if(my_primestat()==$stat[mysticality])
+							pull_and_wear_if_good($item[Sword of Dark Omens], $slot[off-hand]);
+							
+					}
+				}
+				
 				//1st acc legion necktie
 				if(screw)
 				{
@@ -755,13 +756,15 @@ void special(boolean bonus_actions) {
 				{
 					//in heavy rains our accessory choice is pretty limmited
 					//assume we got an astral, then we need 2
-					int needed_accs=3;
+					boolean acc1=false;
+					boolean acc2=false;
+					boolean acc3=false;
 					foreach it in $items[astral belt, astral mask, astral bracer, astral ring]
 					{
 						if(available_amount(it)>0)
 						{
 							equip($slot[acc1],it);
-							needed_accs-=1;
+							acc1=true;
 						}
 					}
 					//get some
@@ -769,23 +772,32 @@ void special(boolean bonus_actions) {
 					{
 						cli_execute("pull fishbone bracers  ");
 						equip($slot[acc3],$item[fishbone bracers]);
-						needed_accs-=1;
+						acc3=true;
 					}
 					else
 					{
 						cli_execute("pull fishbone belt   ");
 						equip($slot[acc3],$item[fishbone belt]);
-						needed_accs-=1;
+						acc3=true;
 					}
 					//time-twitching toolbelt 15 all stats
 					//Talisman of Baio * 2 ~ +42% all stats
 					//warbear laser beacon for DBS - 6,9,12 PRISMATIC damage when building momentum
 					//Gauntlets of the Blood Moon - 75 hp and 5% stats and 5% items
-					while(needed_accs>0)
+					if(!acc1)
 					{
 						cli_execute("pull Mr. Accessory Jr.");
-						equip($item[Mr. Accessory Jr.]);
-						needed_accs-=1;
+						equip($slot[acc1],$item[Mr. Accessory Jr.]);
+					}
+					if(!acc2)
+					{
+						cli_execute("pull Mr. Accessory Jr.");
+						equip($slot[acc2],$item[Mr. Accessory Jr.]);
+					}
+					if(!acc3)
+					{
+						cli_execute("pull Mr. Accessory Jr.");
+						equip($slot[acc3],$item[Mr. Accessory Jr.]);
 					}
 							
 				}

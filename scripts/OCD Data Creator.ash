@@ -4452,6 +4452,48 @@ save [$item[transmission from planet Xi]] = 1;
 save [$item[frost flower]] = 0;
 save     [$item[Ice Island Long Tea]] = 0;
 save [$item[liver popsicle]] = 0;
+save [$item[Steam Card: Dungeon Fist (#1)]] = 0;
+save [$item[Steam Card: Jackass Plumber (#2)]]     = 0;
+save [$item[Steam Card: Space Trip (#1)]] = 0;
+save [$item[Steam Card: Space Trip (#2)]] = 0;
+save [$item[Steam Card: Meteoid (#3)]] = 0;
+save [$item[Steam Card: Jackass Plumber (#3)]] = 0;
+save [$item[Steam Card: Meteoid (#2)]] = 0;
+save [$item[Steam Card: Jackass Plumber (#1)]] = 0;
+save [$item[Steam Card: Dungeon Fist (#2)]] = 0;
+save [$item[Steam Card: Space Trip (#3)]] = 0;
+save [$item[water wings for babies]] = 3;
+save [$item[heavy duty umbrella]] = 1;
+save [$item[fishbone belt]] = 1;
+save [$item[Beefy Crunch Pastaco]] = 0;
+save [$item[Brain Food Pastaco]] = 0;
+save [$item[Cool Brunch Pastaco]] = 0;
+save [$item[Energy Buzz Pastaco]] = 0;
+save [$item[complex mushroom wine]] = 0;
+save [$item[smooth mushroom wine]] = 0;
+save [$item[blood-red mushroom wine]] = 0;
+save [$item[buzzing mushroom wine]] = 0;
+save [$item[hot ashes]] = 0;
+save [$item[tiny plastic Professor What]] = 3;
+save [$item[tiny plastic Jared the Duskwalker]] = 3;
+save [$item[tiny plastic Duke Starkiller]] = 3;
+save [$item[tiny plastic Gary Claybender]] = 3;
+save [$item[tiny plastic Captain Kerkard]] = 3;
+save [$item[painting of a glass of wine]] = 0;
+save [$item[ghost key]] = 0;
+save [$item[R&uuml;mpelstiltz]] = 0;
+save [$item[Omphalotus Omphaloskepsis mushroom]] = 0;
+save [$item[Gyromitra Dynomita mushroom]] = 0;
+save [$item[Xiblaxian direct marketing simcode]] = 0;
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4478,19 +4520,9 @@ save [$item[candied pecan]] = -1;
 save [$item[candy mountain oyster]] = --1;
 save [$item[chocolate rabbit's foot]] = -1;
 save [$item[candy carrot]] = -1;
-save [$item[Steam Card: Dungeon Fist (#1)]] = -1;
-save [$item[Steam Card: Jackass Plumber (#2)]]     = -1;
-save [$item[Steam Card: Space Trip (#1)]] = -1;
-save [$item[Steam Card: Space Trip (#2)]] = -1;
-save [$item[Steam Card: Meteoid (#3)]] = -1;
-save [$item[Steam Card: Jackass Plumber (#3)]] = -1;
-save [$item[Steam Card: Meteoid (#2)]] = -1;
-save [$item[Steam Card: Jackass Plumber (#1)]] = -1;
-save [$item[bottle of Bloodweiser]] = -1;
-save [$item[Steam Card: Dungeon Fist (#2)]] = -1;
+save [$item[bottle of Bloodweiser]] = 0;
 save     [$item[chunk of hot iron]] = -1;
 save [$item[hot coal]] = -1;
-save [$item[Steam Card: Space Trip (#3)]] = -1;
 save [$item[warbear gyrocopter]] = -1;
 save [$item[warbear gyro]] = -1;
 save [$item[LCD game: Food Eater]] = -1;

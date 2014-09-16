@@ -29,15 +29,16 @@ boolean checkguild() {                            // guild quest-unlocking
    return true;
 }
 
-boolean can_adv(location where, boolean prep) {
+boolean can_adv(location where, boolean prep, int verb) {
   // prepare yourself!
    if (where == $location[none]) return vprint("Not a known location!",-6);
+   verb = max(verb,2);  // disallow negative verbs since return value depends on it
    if (prep) {
-      if (my_adventures() == 0) return vprint("An adventurer without adventures is you!",-6);
-      if (my_hp() == 0) { restore_hp(0); if (my_hp() == 0) return vprint("You need at least _a_ HP.",-6); }
+      if (my_adventures() == 0) return vprint("An adventurer without adventures is you!",-verb);
+      if (my_hp() == 0) { restore_hp(0); if (my_hp() == 0) return vprint("You need at least _a_ HP.",-verb); }
       if (my_inebriety() > inebriety_limit() && !($locations[Drunken Stupor, St. Sneaky Pete's Day Stupor] contains where))
-         return vprint("You sheriushly shouldn't be advenshuring like thish.",-6);
-      if (my_path() == "KOLHS" && where.zone != "KOL High School" && get_property("_kolhsAdventures").to_int() < 40) return vprint("You gotta stay in school, kid.",-6);
+         return vprint("You sheriushly shouldn't be advenshuring like thish.",-verb);
+      if (my_path() == "KOLHS" && where.zone != "KOL High School" && get_property("_kolhsAdventures").to_int() < 40) return vprint("You gotta stay in school, kid.",-verb);
    }
    if (where == $location[St. Sneaky Pete's Day Stupor]) return (my_inebriety() > 25 && contains_text(visit_url("main.php"),"St. Sneaky Pete's Day"));
    if (where == $location[Drunken Stupor]) return (my_inebriety() > inebriety_limit());
@@ -51,25 +52,25 @@ boolean can_adv(location where, boolean prep) {
    boolean primecheck(int req, boolean softhard) {
       if (my_buffedstat(my_primestat()) < req)
          return vprint((softhard ? "KoL suggests you have " : "You need ")+"at least "+req+" "+to_string(my_primestat())+" to adventure at "+where+"."+
-            (softhard ? " (You can disable this warning in your KoL account menu)" : ""),-6);
+            (softhard ? " (You can disable this warning in your KoL account menu)" : ""),-verb);
       return true;
    }
    boolean primecheck(int req) { return primecheck(req,false); }
    boolean levelcheck(int req) {
-      if (my_level() < req) return vprint("You need to be level "+req+" or higher to adventure at "+where+".",-6);
+      if (my_level() < req) return vprint("You need to be level "+req+" or higher to adventure at "+where+".",-verb);
       return true;
    }
    boolean itemcheck(item req) {
       if (available_amount(req) == 0 && (!prep || !retrieve_item(1,req)))
-         return vprint("You need a '"+req+"' to adventure here.",-6);
+         return vprint("You need a '"+req+"' to adventure here.",-verb);
       return true;
    }
    boolean effectcheck(effect req) {
-      if (have_effect(req) == 0) return vprint("You need '"+req+"' to be active to adventure at "+where+".",-6);
+      if (have_effect(req) == 0) return vprint("You need '"+req+"' to be active to adventure at "+where+".",-verb);
       return true;
    }
    boolean equipcheck(item req, slot bodzone) {
-      if (!can_equip(req)) return vprint("You need to equip a "+req+", which you currently can't.",-6);
+      if (!can_equip(req)) return vprint("You need to equip a "+req+", which you currently can't.",-verb);
       if (have_equipped(req)) return true;
       if (prep && retrieve_item(1,req) && equip(bodzone,req)) ;
       return (item_amount(req) > 0 || have_equipped(req));
@@ -78,13 +79,14 @@ boolean can_adv(location where, boolean prep) {
       return equipcheck(req,to_slot(req));
    }
    boolean famcheck(familiar req) {
-      if (to_familiar(vars["is_100_run"]) != $familiar[none] && req != to_familiar(vars["is_100_run"])) return vprint("You need to equip a "+req+", which you currently can't due to being on a 100% run with a "+to_familiar(vars["is_100_run"])+".",-6);
+      if (to_familiar(vars["is_100_run"]) != $familiar[none] && req != to_familiar(vars["is_100_run"])) 
+         return vprint("You need to equip a "+req+", which you currently can't due to being on a 100% run with a "+to_familiar(vars["is_100_run"])+".",-verb);
       if (my_familiar() == req) return true;
       if (have_familiar(req) && prep) return use_familiar(req);
       return have_familiar(req);
    }
    boolean outfitcheck(string req) {
-      if (!have_outfit(req)) return vprint("You don't have the '"+req+"' outfit.",-6);
+      if (!have_outfit(req)) return vprint("You don't have the '"+req+"' outfit.",-verb);
       if (prep) outfit(req);
       return true;
    }
@@ -155,7 +157,7 @@ boolean can_adv(location where, boolean prep) {
       case "Lab": return levelcheck(5) && itemcheck($item[Cobb's Knob lab key]);
       case "Le Marais D&egrave;gueulasse":
       case "Little Canadia": return canadia_available();
-      case "Manor0": return itemcheck($item[recipe: mortar-dissolving solution]) || (levelcheck(11) && itemcheck($item[your father's macguffin diary]) && qprop("questL11Manor","step2"));
+      case "Manor0": return levelcheck(11) && itemcheck($item[your father's macguffin diary]) && qprop("questL11Manor","step2");
       case "Manor1": if (where == $location[the haunted pantry]) return true; return qprop("questM20Necklace","started");
       case "Manor2": return qprop("questM21Dance","step1");
       case "Manor3": return qprop("questM17Babies","started");
@@ -185,7 +187,7 @@ boolean can_adv(location where, boolean prep) {
                if (available_amount($item[little bitty bathysphere]) == 0) visit_url("oldman.php?action=talk");
                if (available_amount($item[little bitty bathysphere]) > 0) fgear = $item[little bitty bathysphere];
             }
-            if (fgear == $item[none]) return vprint("Unable to equip your familiar for underwater adventuring.",-6);
+            if (fgear == $item[none]) return vprint("Unable to equip your familiar for underwater adventuring.",-verb);
             if (prep) equip(fgear);
          }
          if (boolean_modifier("Adventure Underwater")) return true;
@@ -354,20 +356,20 @@ boolean can_adv(location where, boolean prep) {
   // beach
    case $location[The Arid, Extra-Dry Desert]: return itemcheck($item[your father's macguffin diary]);
    case $location[The Oasis]: return itemcheck($item[your father's macguffin diary]) && qprop("questL11Desert","started") && perm_urlcheck("place.php?whichplace=desertbeach","oasis.gif");
-   case $location[The Shore, Inc. Travel Agency]: if (my_adventures() < 3) return vprint("Not enough adventures to take a vacation.",-6);
-      if (my_meat() < 500) return vprint("Not enough meat to take a vacation.",-6); return (perm_urlcheck("main.php","map7beach.gif"));
+   case $location[The Shore, Inc. Travel Agency]: if (my_adventures() < 3) return vprint("Not enough adventures to take a vacation.",-verb);
+      if (my_meat() < 500) return vprint("Not enough meat to take a vacation.",-verb); return (perm_urlcheck("main.php","map7beach.gif"));
   // beanstalk
    case $location[The Castle in the Clouds in the Sky \(Top Floor\)]: if (get_property("questL10Garbage") != "finished" && get_property("lastCastleTopUnlock").to_int() < my_ascensions()) return false;
    case $location[The Castle in the Clouds in the Sky \(Ground Floor\)]: if (get_property("questL10Garbage") != "finished" && get_property("lastCastleGroundUnlock").to_int() < my_ascensions()) return false;
    case $location[The Castle in the Clouds in the Sky \(Basement\)]: return itemcheck($item[S.O.C.K.]);
    case $location[The Hole in the Sky]: return itemcheck($item[steam-powered model rocketship]);
-   case $location[The Penultimate Fantasy Airship]: return (perm_urlcheck("place.php?whichplace=plains","climb_beanstalk.gif") || use(1,$item[enchanted bean]));
+   case $location[The Penultimate Fantasy Airship]: return perm_urlcheck("place.php?whichplace=plains&action=garbage_grounds","climb_beanstalk.gif");
   // casino
-   case $location[The Poker Room]: if (my_meat() < 30) return vprint("You need 30 meat to play the "+where+".",-6);
+   case $location[The Poker Room]: if (my_meat() < 30) return vprint("You need 30 meat to play the "+where+".",-verb);
    case $location[Pirate Party]:
    case $location[Lemon Party]:
-   case $location[The Roulette Tables]: if (my_meat() < 10) return vprint("You need 10 meat to play the "+where+".",-6);
-   case $location[Goat Party]: if (my_meat() < 5) return vprint("You need 5 meat to play the Goat Party.",-6); return itemcheck($item[casino pass]);
+   case $location[The Roulette Tables]: if (my_meat() < 10) return vprint("You need 10 meat to play the "+where+".",-verb);
+   case $location[Goat Party]: if (my_meat() < 5) return vprint("You need 5 meat to play the Goat Party.",-verb); return itemcheck($item[casino pass]);
   // clan basement
    case $location[Richard's Hobo Moxie]:
    case $location[Richard's Hobo Muscle]:
@@ -572,16 +574,17 @@ boolean can_adv(location where, boolean prep) {
    }
 }
 
-boolean can_adv(location where) {
-   return can_adv(where, false);
-}
+boolean can_adv(location where, boolean p) { return can_adv(where, p, 6); }
+boolean can_adv(location where, int verb)  { return can_adv(where, false, verb); }
+boolean can_adv(location where) {            return can_adv(where, false, 6); }
 
 string[string] post;  // provide hook for relay scripts to Ajax zone availability
 post = form_fields();
 if (post contains "where") {
    location w = to_location(post["where"]);
-   if (w == $location[none] || !can_adv(w)) write("unavailable");
-    else write("available");
+   int postverb = (post contains "verb" && is_integer(post["verb"])) ? post["verb"].to_int() : 9;
+   if (w == $location[none] || !can_adv(w, postverb)) write("unavailable");
+   else write("available");
    exit;
 }
 

@@ -5,7 +5,7 @@ script "bumcheekascend.ash";
 import "florist.ash";
 
 //simons global which remembers current combat macro choice
-int using_putty=-1;
+int using_putty=0;
 
 //simon preset some prefs
 set_property("bcasc_castEmpathy","true");
@@ -311,7 +311,7 @@ void clear_combat_macro()
 {
 	print("Clearing combat macro","lime");
 	visit_url("account.php?actions[]=autoattack&autoattack=0&flag_aabosses=1&pwd&action=Update");
-	using_putty=-1;
+	using_putty=0;
 }
 
 void set_combat_macro(boolean use_putty)
@@ -339,39 +339,43 @@ void set_combat_macro(boolean use_putty)
 		default:
 			abort("Unrecognised mainstat in set_combat_macro()");
 	}*/
-	if(use_putty && using_putty!=1)
+	if(use_putty)
 	{
 		//putty
-		if(monster_level_adjustment() > 151)
+		if(monster_level_adjustment() > 151 && using_putty!=-3)
 		{
 			visit_url("account.php?actions[]=autoattack&autoattack=99126415&flag_aabosses=1&flag_wowbar=1&flag_compactmanuel=1&pwd&action=Update");
+			using_putty=-3;
 		}
-		else if(monster_level_adjustment() > 75)
+		else if(monster_level_adjustment() > 75 && using_putty!=-2)
 		{
 			visit_url("account.php?actions[]=autoattack&autoattack=99126413&flag_aabosses=1&flag_wowbar=1&flag_compactmanuel=1&pwd&action=Update");
+			using_putty=-2;
 		}
-		else
+		else if(using_putty!=-1)
 		{
 			visit_url("account.php?actions[]=autoattack&autoattack=99106733&flag_aabosses=1&flag_compactmanuel=1&pwd&action=Update");
+			using_putty=-1;
 		}
-		using_putty=-1;
 	}
-	else if(!use_putty && using_putty!=0)
+	else if(!use_putty)
 	{
 		//noputty
-		if(monster_level_adjustment() > 151)
+		if(monster_level_adjustment() > 151 && using_putty!=3)
 		{
 			visit_url("account.php?actions[]=autoattack&autoattack=99126414&flag_aabosses=1&flag_wowbar=1&flag_compactmanuel=1&pwd&action=Update");
+			using_putty=3;
 		}
-		else if(monster_level_adjustment() > 75)
+		else if(monster_level_adjustment() > 75 && using_putty!=2)
 		{
 			visit_url("account.php?actions[]=autoattack&autoattack=99126412&flag_aabosses=1&flag_wowbar=1&flag_compactmanuel=1&pwd&action=Update");
+			using_putty=2;
 		}
-		else
+		else if(using_putty!=1)
 		{
 			visit_url("account.php?actions[]=autoattack&autoattack=99106734&flag_aabosses=1&flag_compactmanuel=1&pwd&action=Update");
+			using_putty=1;
 		}
-		using_putty=0;
 	}
 	
 	//find and write out chosen macro
@@ -845,7 +849,7 @@ void get_kolhs_buff(string bufftype)
 //version of bcCouncil which can force a visit
 void bcCouncil(boolean force) {
 	//if we have shower buff, use stat shit
-	if((have_effect($effect[muscle unbound]) + have_effect($effect[thaumodynamic]) + have_effect($effect[so fresh and so clean]))>0)
+	if( my_path()=="Heavy Rains" || (have_effect($effect[muscle unbound]) + have_effect($effect[thaumodynamic]) + have_effect($effect[so fresh and so clean]))>0)
 	{
 		cli_execute("use * 31337 scroll");
 		cli_execute("use * stat script");
@@ -2523,7 +2527,7 @@ string consultHeBo(int round, string opp, string text) {
 		|| (thingToGet == $item[Black No. 2] && contains_text(text, "black panther"))
 		|| (thingToGet == $item[handsomeness potion] && contains_text(text, "handsome mariachi"))
 		|| (thingToGet == $item[marzipan skull] && contains_text(text, "mariachi calavera"));
-	boolean isMariachiMonster = contains_text(text, "grungy pirate") || contains_text(text, "scary clown") || contains_text(text, "creepy clown");
+	boolean isMariachiMonster = contains_text(text, "grungy pirate") || contains_text(text, "scary clown") || contains_text(text, "creepy clown") || contains_text(text, "pygmy assault squad");
 	boolean isTowerItemMonster =  (thingToGet == $item[baseball] && contains_text(text, "baseball bat"))
 		|| ((thingToGet == $item[plot hole] || thingToGet == $item[chaos butterfly]) && contains_text(text, "Possibility Giant"))
 		|| (thingToGet == $item[meat vortex] && contains_text(text, "me4t begZ0r")) 
@@ -2601,8 +2605,7 @@ string consultHeBo(int round, string opp, string text) {
 				}
 				roundnum=roundnum+1;
 			}
-		} else if (have_skill($skill[Ball Lightning])) {
-			abort("Check for 5 bolts of lightning");
+		} else if (my_lightning()>=5 && have_skill($skill[Ball Lightning])) {
 			print("BCC: We are trying to use the HeBoulder, but you don't have one (or perhaps are on a 100% run), so I'm using a ball lightning.", "purple");
 			return "skill ball lightning";
 		} else if (have_effect($effect[nanoballsy])>=40) {
@@ -6848,8 +6851,17 @@ boolean bcascCastle() {
 	
 			//place florist friar plants
 			choose_all_plants("", $location[The Castle in the Clouds in the Sky (top floor)]);
-				
-			bumAdv($location[The Castle in the Clouds in the Sky (top floor)], "", "itemsnc", "1 choiceadv", "Finishing the quest (any way we can)", "-");
+			setFamiliar("itemsnc");
+			setMood("-i");
+			if(i_a("mohawk wig")==0 && !in_hardcore())
+				cli_execute("pull mohawk wig");
+			if(i_a("mohawk wig")!=0)
+			{
+				set_property("choiceAdventure678", 1); //get punk rock giant to help us
+				bumax("+equip mohawk wig");
+			}
+			print("Finishing the quest (any way we can)","purple");
+			bumMiniAdv(1,$location[The Castle in the Clouds in the Sky (top floor)]);
 		}
 		visit_url("council.php");
 		set_property("lastCouncilVisit", my_level());
@@ -8845,7 +8857,14 @@ boolean bcascLairMariachis() {
 				use(1, $item[chewing gum on a string]);
 				
 			while (!haveAny(drums))
-				bumAdv($location[the \"fun\" house], "items", "hebo", "1 big bass drum", "Getting a big bass drum", "i", "consultHeBo");
+			{
+				if(can_adv($location[the \"fun\" house]))
+					bumAdv($location[the \"fun\" house], "items", "hebo", "1 big bass drum", "Getting a big bass drum", "i", "consultHeBo");
+				else
+				{
+					bumAdv($location[The Hidden Park], "items", "hebo", "1 Jungle drum", "Getting a Jungle drum", "i", "consultHeBo");
+				}
+			}
 			
 			if (entryway()) {}
 		}
@@ -9314,7 +9333,7 @@ boolean bcascMacguffinHiddenCity() {
 			}
 			bumAdv($location[The Hidden Office Building], "5 elemental damage", "", "1 choiceadv", "Getting the crackling stone sphere.", "-");
 			
-			if(item_amount($item[boring binder clip])<=0 && get_property("choiceAdventure786")!="2" && item_amount($item[McClusky file (complete)])<=0)
+			if(item_amount($item[boring binder clip])<=0 && get_property("choiceAdventure786")!="2" && item_amount($item[McClusky file (complete)])<=0 && item_amount($item[crackling stone sphere]) != 1)
 				abort("BBB is fucking up the choiceadv for getting binder clip again");
 		}
 		while (item_amount($item[crackling stone sphere]) == 1) {

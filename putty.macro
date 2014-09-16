@@ -514,7 +514,10 @@ mark gremlinfight
 	if !hascombatitem  spectre scepter && hascombatitem  spices
 		use spices
 	endif
-	if !hascombatitem  spectre scepter && !hascombatitem  spices
+	if !hascombatitem  spectre scepter && !hascombatitem  spices && hasskill suckerpunch
+		skill suckerpunch
+	endif
+	if !hascombatitem  spectre scepter && !hascombatitem  spices && !hasskill suckerpunch
 		abort not sure how to stasis gremlin
 	endif
 goto gremlinfight
