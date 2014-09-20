@@ -4485,10 +4485,14 @@ save [$item[R&uuml;mpelstiltz]] = 0;
 save [$item[Omphalotus Omphaloskepsis mushroom]] = 0;
 save [$item[Gyromitra Dynomita mushroom]] = 0;
 save [$item[Xiblaxian direct marketing simcode]] = 0;
-
-
-
-
+save [$item[Xiblaxian cache locator simcode]] = 0;
+save [$item[Stemonitis Staticus mushroom]] = 0;
+save [$item[Tremella Tarantella mushroom]] = 0;
+save [$item[Ludovico Pastaco]] = 0;
+save [$item[overpowering mushroom wine]] = 0;
+save [$item[swirling mushroom wine]] = 0;
+save [$item[autocalliope]] = 1;
+save [$item[Skullery Maid's Knee]] = 0;
 
 
 
@@ -4499,6 +4503,8 @@ save [$item[Xiblaxian direct marketing simcode]] = 0;
 
 
 //stuff to sell later;s
+save [$item[holo-bomber]] = -1;
+save [$item[holo-platoon]] = -1;
 save [$item[freshwater fishbone]] = -1;
 save     [$item[yabba dabba doo rag]] = 2;
 save     [$item[flapper floppers]] = 1;

@@ -246,7 +246,7 @@ int TS_MONKEE_QUEST = to_int(vars["seafloor_monkeeQuest"]);
 
 // Do you want to fax for the Neptune Flytrap, to increase the item drop rate and avoid underwater penalties?
 // This will abort if set to true and you are unable to access faxbot for some reason.
-setvar("seafloor_faxNeptune", true);
+setvar("seafloor_faxNeptune", false);
 boolean TS_FAX_NEPTUNE = to_boolean(vars["seafloor_faxNeptune"]);
 
 // Which version of the grandpa chat series have you done? This skips unnecessary server hits.

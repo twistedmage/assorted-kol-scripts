@@ -223,7 +223,7 @@ advevent to_event(string id, spread dmg, spread pdmg, string special, int howman
       case "meat": res.meat = eval(bittles.group(2),fvars); break;
       case "item": string[int] its = split_string(bittles.group(2),"; "); float v;
          foreach n,it in its {
-            if (contains_text(id,"enthroned") && $ints[3450,4469,1445,1446,1447,1448] contains to_int(to_item(it)) && stolen contains to_item(it)) { v=0; break; }
+            if (contains_text(id,"companion") && $ints[3450,4469,1445,1446,1447,1448] contains to_int(to_item(it)) && stolen contains to_item(it)) { v=0; break; }
             v += item_val(to_item(it));
          } res.meat += v/count(its); break;
       case "monster": boolean[monster] mlist; foreach n,mst in split_string(bittles.group(2),"\\|") 
@@ -363,8 +363,9 @@ void set_happened(string occurrence, boolean q) {    // if q, adds the action to
             if (imgm.find() && image_to_monster(imgm.group(1)) != m) vprint("Warning: image '"+imgm.group(1)+"' does not match monster '"+m+"'.","#8585FF",3);
             int[string] fs;
             file_to_map("factoids_"+replace_string(my_name()," ","_")+".txt",fs);
-            if (fs contains m.to_string() && vprint("Factoid saved: you now have found "+(fs[m.to_string()]+1)+" factoids for "+m+".","#8585FF",5)) fs[m.to_string()] += 1;  // save factoid
-             else if (vprint("You got a factoid (monster unknown, will force refresh)!","#8585FF",5)) remove fs["lastchecked"];  // force refresh
+            if (!(fs contains m.to_string())) remove fs["lastchecked"];  // force refresh
+            fs[m.to_string()] += 1;  // save factoid
+            vprint("Factoid saved: you now have found "+fs[m.to_string()]+" factoids for "+m+".","#8585FF",5);
             map_to_file(fs,"factoids_"+replace_string(my_name()," ","_")+".txt");
          } else vprint("You got a factoid!","#8585FF",5); break;
    }

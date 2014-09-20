@@ -108,9 +108,11 @@ void unlock_ghost()
 		return;
 	}
 	use_familiar($familiar[nosy nose]);
-	abort("line 111 Set combat macro to skeletal_cat");
+	string str=visit_url("account.php?actions[]=autoattack&autoattack=99105465&flag_aabosses=1&flag_wowbar=1&flag_compactmanuel=1&pwd&action=Update");
 	while(my_adventures()>0 && i_a("gnawed-up dog bone")<desired_bones)
 	{
+		if(have_effect($effect[mush mouth])==0 && i_a("fun guy spore")>0)
+			use(1,$item[fun guy spore]);
 		print("Hunting for dog bone","blue");
 		adventure(1,$location[haunted conservatory]);
 	}
@@ -145,7 +147,12 @@ void unlock_wet()
 		while(my_adventures()>0 && !get_property("_wet_checked_today").to_boolean())
 		{
 			bumAdv($location[the haunted bedroom], "", "", "", "looking for engorged sausages (wet dog)", "");
-			run_combat();
+			
+			print("finished adv, using adv1 to do choice","green");
+			adv1($location[noob cave],-1,"");
+			if(get_property("lastAdventure")=="Noob Cave")
+				abort("We accidentally went to noob cave instead of finishing the choiceadv");
+			print("did choice, continuing","green");
 
 //			cli_execute("mood execute");
 			if(get_property("lastEncounter")=="One Rustic Nightstand")

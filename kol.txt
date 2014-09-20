@@ -1,89 +1,83 @@
+Dina told me I have mental problems, and i'm an idiot who doesn't understand people. And that everyone is right about me.
+
 ----------aftercore--------------
 108 gyros = 27 copters = 10,800,000 (22 days to eat if 5 per day)
 
-<fax government agents for maneul + shades  + night vision + cheese for meatpasting (make government, make stealth bomber, make grilled cheese sandwich, make buffed alien drugs) + use 5 manual fragments for alien language skill, and use weird space book>
-<fax illegal aliens for factoids + weird space book>
-<fax perimeter defense sphere>
+<fax illegal aliens for factoids>
+<fax perimeter defense sphere for factoids (and building ingredients)>
 <make space invader, make space bar, make space needle*3, make space heater*3>
 <recipe discoveries>
 
-<SPEAKEASY CODE AT BOHEMIAN PARTY NONCOM>
-<fax droll - get factoids + monocle>
-<fax pterodactly - get factoids + 3*silent pea shooter>
-<fax kiwi - get factoids + 3*kiwi beak, >
 <fax adventurer echo - get factoids + chroner>
-<in twitching tower, try to enter cave, then get password (play chance, teach paper, teach scissors, play chance)>
-<fax mob penguin entrepeneur for factoids>
-<fax hep cat - get factoids>
-<fax cigarette girl - get factoids>
-<solid shifting weirdness from capsules with mr item>
-<use chroners to buy helix fossil, 2 wooly loincloths 2 yabba dabba doo rag>
-<get team from booth>
-<use chroners to buy gumshoes, flapper floppers, sneakeasies>
-<adv in woods with loads of cocktail onions>
-<This Morse code was "-.. --- - -.. .- ... .... -.. --- - --. .- .--. -.. .- ... .... -.. --- - --. .- .--. -.. --- - --. .- .--. -.. --- - -.. --- - -.. .- ... .... --. .- .--. -.. .- ... .... -.. --- - -.. --- - -.. --- - --. .- .--. -.. --- - --. .- .--. -.. --- - -.. .- ... ....", which is interpreted as "DOTDASHDOTGAPDASHDOTGAPDOTGAPDOTDOTDASHGAPDASHDOTDOTDOTGAPDOTGAPDOTDASH". Interpreted again as Morse code, this is "RNEUBEA". Decoded with ROT13, this is "EARHORN".>
+
+
+***********************FIX disposable instant camera*********************************
 
 sea stuff?
 	//make
-	1 stick knifes of loathing
 	//gladiator
-	3 (4) pigsticker of violence (DB)
 	2 jodhpurs of violence (AT)
 	//scholar
 	2 lens of hatred (AT)
 	1 fuzzy slippers of hatred (DB)
 	1 pantaloons of hatred (SA)
-	1 (2) staff of simmering hatred (P)
 warbear dress gear?
-thinknerd warhouse - deactivated putty buddy, tiny plastics
 permanently get 10 pool skill with semirares (25 visits)
-	6 times
+	15-19 times (ccurently have 7 passive skill, implies 11-15 when i thought it was 9)
+	now have 8 skill, meaning 16-20 visits
+	this happened after 4 trainings, meaning x-4 <= 15 && x<=20 && x-4>=11 && x>=16    simplifies to    x <= 19 && x>=16
+	now have 18-21 visits
 unlock speakeasy
+	The brown password to unlock the Ish Kabibble can be found by equipping Lord Spookyraven's ear trumpet and adventuring in The Cola Wars Battlefield (undisguised).
+	The purple, clan-specific 55-character password to unlock the Sloppy Jalopy can be found by piecing together many 5-character purple strings from 64735 scrolls.
 unlock hotdogs
 additional hot dog unlock  (especially defective token, use token in ascension (pool skill, resistance, smithsness))
-spring break outfit, tattoo, skills (last mind destroyer 16/08/2014 next (on/after?) 23rd)
-ghast iron gear USE INIGOS
-*girls gone wild*rl
-*wet t shirt*rl
-unlock avatars from steam elemental
+spring break outfit, tattoo, resist skill (last mind destroyer 14/09/2014 next (on/after?) 21th)
 trophies - 
-	KOLHS (x fingered shop teacher 11 times, commit to each clique, fully upgrade year book calendar)
-		8 fingered shop teacher next
+	KOLHS (commit to each clique, fully upgrade year book calendar)
+		FAX TEACHERS FOR FACTOIDS + TROPHY
 		commited to greasers
 	killl 1000 mbs with bone abacus)
 	eat warbear gyros
 	make bowl of petunias (need orange lint)
-	FANTASY - master rumplestiltskin
-rumplestiltskin etc
 win + misc items from grimstone mask stuff
 	tortoise + hare
 		need "honey" dippers*??
-	wolf
-	rumplestiltskin practice - parchment 59, glass 19
-dreadsylv gear (skele sword)
+	rumplestiltskin top daily prize
+dreadsylv gear (skele sword, non boss gear (grandfather watch))
 discoveries
-items and skills from heavy rains?
-	buy non quest items from general store (3 water wings, life preserver, umbrella) skills?
+skills from heavy rains?
 finish avatar of jarlsberg, finish avatar of sneaky pete, fully upgrade kolhs camera
-use fun guy spores
-items from new mansion
-	make doll eye amulet (inigo)
-	make deluxe layer cake
-	make picture of you
-	make staff of the electric range
+get protest items
+	3 the nuges favorite crossbow (UR)
+	1 red fox glove
+Giant rubber spider factoids
+11 heavy rains runs, eat 11 rainbows
+factoids from xiblaxian political prisoner (1 done)
+factoids for holographic army (1 done)
+Xiblaxian 5D printer schematics
+Xiblaxian Holo-Companion familiar
+Xiblaxian xeno-detection goggles
+Xiblaxian gear
+Xiblaxian Tattoo
 
 
 
 ------------bca-------------------
 *change mana burning, summon divines until 1-2 rares for the day, then summon resolutions*
+ice house used to save mob over ascension?
+badass pie from cyrpt sub bosses
+in heavy rains, use rain man skill (multiple times per day) to fight mobs like a fax
+in heavy rains, does Ancient Protector Soda get used when res is needed (spookyraven?)
+in heavy rains, we can use dumb mud to remove 1 tower monster
 kolhs specific items by after school crafting with intrinsics
 	Superwater
 	Miniature suspension bridge
 	Universal key
 	Modeling claymore
 	Quasireligious sculpture
+get snakehead medallion the other way (maybe)?
 put call to get_kolhs_buff("xxxx") into setMood
-Little Geneticist DNA-Splicing Lab
 red zeppelin
 is chaos butterfly used for ducks trick?
 yearbook camera worth using in kolhs? <blinding flash in combat macro>;
@@ -98,14 +92,15 @@ manor quest better, resistance in kitchen etc
 using banish gear? cheese eye, vivala
 am i wasting fury and not getting passives + batter up
 use nanorhino
+holo-companion is init familiar
 gelatinous cubeling
 maybe platinum card is worth a pull for mp + daily dungeon?
 
 
 ---skills---
 grease up
-deft hands - db
 utensil twist + hand that rocks the ladle - p
+frantic gyrations -db ?
 icy glare
 wry smile - s
 patient smile - tt
@@ -115,7 +110,6 @@ Master Accordion Master Thief - at
 Subtle and Quick to Anger - p
 The Long View - tt
 Five Finger Discount - at
-Thrall Unit Tactics - p
 disco greed - db
 disco bravado - db
 Unoffendable
@@ -125,7 +119,6 @@ shield of the pastalord - p
 disco shank - db
 Knife in the Dark - db
 Fortitude of the Muskox - sc
-Bringing Up the Rear - p
 
 
 In this paper we answer this question and propose solutions.
@@ -134,31 +127,52 @@ In this paper we answer this question and propose solutions.
 2 = r7jnF : index 47-51 (S5NHT in kola)
 3 = UmW3x : index 7-11 (8DmTC in bafh)
 4 = oA1zr : index 20-24 (AKS1U in bafh)
-5 = <> : index - (<> in bafh)
+5 = PpuPU : index 3-7 (GT9j8 in bafh)
+6 = 8Qou9 : index 36-40 (2r6qr in bafh)
+7 = mW3xj : index - ( in bafh) <redundant>
+8 = en9Nf : index 52-56 ( in bafh)
+9 = jBF2u : index - ( in bafh)
+10 = u9xen : index - ( in bafh)
+11 =  : index - ( in bafh)
 --------------------------------------------------------------------------------------
 
 -----------------------asica------------------------------------------------------
 1 = 9xen9 : index 40-44 (GMDtX in kola)
 2 = F35uR : index 51-55 (T2CYW in kola)
 3 = jH9jB : index 12-16 (P5cFH in bafh)
-4 =  : index - ( in bafh)
+4 = uoA1z : index - (3AKS1 in bafh)
+5 = UmW3x : index - ( in bafh) <redundant>
+6 = BF2uo : index - ( in bafh) <redundant>
+7 = PpuPU : index - ( in bafh)
+8 =  : index - ( in bafh)
 --------------------------------------------------------------------------------------
 
 -----------------------anid------------------------------------------------------
 1 = regK1 : index 24-28 (LFb2m)
 2 = F35uR : index 51-55 (T2CYW in kola)
 3 = xen9N : index 41-45 (7et1E in bafh)
-4 =  : index - ( in bafh)
+4 = 9xen9 : index - ( in bafh)
+5 = puPUm : index - ( in bafh) <redundant>
+6 = zregK : index - ( in bafh)
+7 = W3xjH : index - ( in bafh) <redundant>
+8 = BF5c7 : index - ( in bafh)
+9 =  : index - ( in bafh)
 --------------------------------------------------------------------------------------
 
 -----------------------dinala------------------------------------------------------
 1 =  F2uoA: index 17-21 (yuzRV)
 2 = 1RBF5 : index 28-32 (mLnwx in kola)
-3 = <> : index - (<> in bafh)
+3 = jnF35 : index - (<> in bafh) <redundant>
+4 = jnF35 : index - ( in bafh) <redundant>
+5 = 1RBF5 : index - ( in bafh) <redundant>
+6 = n9Nfr : index - ( in bafh) <redundant>
+7 = fr7jn : index - ( in bafh)
+8 = uoA1z : index - ( in bafh)
+9 =  : index - ( in bafh)
 --------------------------------------------------------------------------------------
 kol addicts = Jc1DKGM7es KfuWedyuzR VD2LFb2mLn wxArVXmYEG MDtXvmS5NH T2CYW
 bafh 		= t1GT9j8DmT CP5cFHB53A KS1Um9io6y im9r82r6qr 7et1Eb57aP nQYQt
-me 			= ______UmW3 xjH9jBF2uo A1zregK1RB F5_______9 xen9N_r7jn F35uR     +3xjH9?
+me 			= __PpuPUmW3 xjH9jBF2uo A1zregK1RB F5c7_8Qou9 xen9Nfr7jn F35uR
 
 
 -BRACHYDOMES
@@ -173,6 +187,7 @@ TRIBESWOMAN
 ULSTERWOMAN
 VESTRYWOMAN
 
+SPEAKEASY from bohemia - unshut focaccia
 
 ---skeleton garden---
 open island - 7 (saves 1900 meat and 9 advs)

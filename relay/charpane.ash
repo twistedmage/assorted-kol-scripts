@@ -534,12 +534,12 @@ string helperSemiRare() {
 	if(get_property("kingLiberated") == "true") {
 		rewards[$location[An Octopus's Garden]] = "bigpearl.gif|Fight a moister oyster|148";
 	} else {
-		if(available_amount($item[stone wool]) < 2 && get_property("lastTempleUnlock").to_int() == my_ascensions() && get_property("questL11Worship") != "finished")
+		if(available_amount($item[stone wool]) < 2 && get_property("lastTempleUnlock").to_int() == my_ascensions() && !($strings[step3, finished] contains get_property("questL11Worship")))
 			rewards[$location[The Hidden Temple]] = "stonewool.gif|Fight Baa'baa'bu'ran|5";
 		if(!have_outfit("Knob Goblin Elite Guard Uniform") && get_property("lastDispensaryOpen").to_int() != my_ascensions()
 		  && my_path() != "Way of the Surprising Fist" && my_path() != "Way of the Surprising Fist")
 			rewards[$location[Cobb's Knob Kitchens]] = "elitehelm.gif|Fight KGE Guard Captain|20";
-		if(!have_outfit("Mining Gear") && my_path() != "Way of the Surprising Fist")
+		if(!have_outfit("Mining Gear") && my_path() != "Way of the Surprising Fist" && ($strings[unstarted, started, step1] contains get_property("questL08Trapper")))
 			rewards[$location[Itznotyerzitz Mine]] = "mattock.gif|Fight Dwarf Foreman|53";
 		if(get_property("questL11Palindome") != "finished" && item_amount($item[Talisman o' Nam]) == 0) {
 			rewards[$location[The Copperhead Club]] = "rocks_f.gif|Flamin' Whatshisname (3)|104";
@@ -967,6 +967,10 @@ buff parseBuff(string source) {
 	// Fix for blank "On the Trail" problem.
 	if(length(effectAlias) == 0)
 		effectAlias = myBuff.effectName;
+	
+	// Add spoiler info that mafia doesn't provide
+	if(myBuff.effectName.contains_text("Romantic Monster window"))
+		effectAlias = effectAlias.replace_string("Romantic Monster", get_property("romanticTarget"));
 	
 	//Replace effect icons, if enabled
 	string [string] classmap;
@@ -3630,21 +3634,29 @@ void pickOutfit() {
 		special.addGear($items[UV-resistant compass, ornate dowsing rod]);
 	if(get_property("questL11Manor") == "step1" || get_property("questL11Manor") == "step2" || get_property("questL11Manor") == "step2") {
 		if(available_amount($item[bottle of Chateau de Vinegar]) == 1 && available_amount($item[blasting soda]) == 1)
-			special.addGear("create unstable fulminate; equip unstable fulminate", "Create & Equip unstable fulminate");
+			special.addGear("create unstable fulminate; equip unstable fulminate", "Cook & Equip unstable fulminate");
 		else
 			special.addGear($item[unstable fulminate]);
 	}
 	if($strings[started,step1] contains get_property("questL11Manor"))
 		special.addGear($item[Lord Spookyraven's spectacles], "Spookyraven's spectacles");
 		
-	if(my_path() == "Heavy Rains")
-		special.addGear($item[pool skimmer]);
-	
 	if(length(special) > 0) {
 		picker.append('<tr class="pickitem"><td style="color:white;background-color:blue;font-weight:bold;">Equip for Quest</td></tr>');
 		picker.append(special);
 	}
 	
+	// Some gear just makes stuff easier
+	if(get_property("kingLiberated") == "false") {
+		special.set_length(0);
+		if(my_path() == "Heavy Rains")
+			special.addGear($item[pool skimmer]);
+		special.addGear($item[Bram's choker]);
+		if(length(special) > 0) {
+			picker.append('<tr class="pickitem"><td style="color:white;background-color:blue;font-weight:bold;">Helpful Equipment</td></tr>');
+			picker.append(special);
+		}
+	}
 	
 	// Special Smithsness section. Sometimes it is helpful to switch them around, like A Light that Never Goes Out or Half a Purse. Or sometimes put mainstat in offhand.
 	if(have_effect($effect[Merry Smithsness]) > 0) {
@@ -3774,7 +3786,7 @@ void bakeCharacter() {
 
 	// LifeStyle suitable for charpane
 	string myLifeStyle() {
-		if(get_property("kingLiberated") == true)
+		if(get_property("kingLiberated") == "true")
 			return "Aftercore";
 		else if(in_bad_moon())
 			return "Bad Moon";
@@ -3787,7 +3799,7 @@ void bakeCharacter() {
 
 	// Path title suitable for charpane
 	string myPath() {
-		if(get_property("kingLiberated") == true)
+		if(get_property("kingLiberated") == "true")
 			return "No Restrictions";
 		switch(my_path()) {
 		case "None": return "No Path";
@@ -4122,13 +4134,17 @@ void bakeTracker() {
 	
 	buffer highlands() {
 		buffer high;
-		high.append("<br>A-boo Peak: ");
+		high.append("<br>A-boo: ");
 		high.append(item_report(get_property("booPeakProgress") == "0", get_property("booPeakProgress")+'% haunted'));
+		if (get_property("booPeakProgress")!="0") {
+			high.append(", "+item_report($item[A-Boo clue]));
+			high.append(" ("+item_amount($item[A-Boo clue])+")");
+		}
 		//L9: twin peak
-		high.append("<br>Twin Peak: "+twinPeak());
+		high.append("<br>Twin: "+twinPeak());
 		//check 4 stench res, 50% items (no familiars), jar of oil, 40% init
 		//L9: oil peak
-		high.append("<br>Oil Peak: ");
+		high.append("<br>Oil: ");
 		high.append(item_report(get_property("oilPeakProgress").to_float() == 0, get_property("oilPeakProgress")+' &mu;B/Hg'));
 		if(high.contains_text(">0% haunt") && high.contains_text("Solved!") && high.contains_text("0.00")) {
 			high.set_length(0);
@@ -4374,7 +4390,7 @@ void bakeTracker() {
 		result.append('Cross the <a target="mainpane" href="place.php?whichplace=orc_chasm">Orc Chasm</a>');
 			result.append("<br>Bridge Progress: "+(get_property("lastChasmReset") == my_ascensions()? get_property("chasmBridgeProgress"): "0")+"/30");
 		} else {
-			result.append('Explore the <a target="mainpane" href="place.php?whichplace=highlands">Highlands</a>');
+			result.append('Explore the <a target="mainpane" href="place.php?whichplace=highlands">Highland</a> Peaks');
 			result.append(highlands());
 		}
 		result.append("</td></tr>");
@@ -4387,6 +4403,12 @@ void bakeTracker() {
 			result.append('Climb the <a target="mainpane" href="place.php?whichplace=beanstalk">Beanstalk</a>');
 			int numina = item_amount($item[Tissue Paper Immateria])+item_amount($item[Tin Foil Immateria])+item_amount($item[Gauze Immateria])+item_amount($item[Plastic Wrap Immateria]);
 			result.append('<br>Immateria found: '+item_report(numina == 4, to_string(numina)+'/4'));
+			result.append("<br>");
+			result.append(item_report($item[amulet of extreme plot significance], "amulet")+", ");
+			result.append(item_report($item[mohawk wig], "mohawk")+", ");
+			result.append(item_report($item[titanium assault umbrella], "umbrella")+", ");
+			result.append("<br>");
+			result.append(item_report($item[soft green echo eyedrop antidote], "SGEEA")+": "+item_amount($item[soft green echo eyedrop antidote]));
 		} else {
 			result.append('Conquer the <a target="mainpane" href="place.php?whichplace=giantcastle">Giant\'s Castle</a>');
 		}
@@ -4438,15 +4460,15 @@ void bakeTracker() {
 		}
 		if(get_property("questL11Palindome") == "started") {
 			result.append("<br>Obtain: ");
-			result.append(item_report($item[photograph of God]));
+			result.append(item_report($item[photograph of God],"photo of God"));
 			result.append(", ");
-			result.append(item_report($item[photograph of a red nugget]));
+			result.append(item_report($item[photograph of a red nugget],"photo of red nugget"));
 			result.append(", ");
-			result.append(item_report($item[photograph of a dog]));
+			result.append(item_report($item[photograph of a dog],"photo of dog"));
 			result.append(", ");
-			result.append(item_report($item[photograph of an ostrich egg]));
+			result.append(item_report($item[photograph of an ostrich egg],"photo of ostrich egg"));
 			result.append(", ");
-			result.append(item_report($item[&quot;I Love Me\, Vol. I&quot;]));
+			result.append(item_report($item[&quot;I Love Me\, Vol. I&quot;],"I Love Me"));
 			result.append(", ");
 			result.append(item_report($item[stunt nuts]));
 		}
@@ -4480,10 +4502,10 @@ void bakeTracker() {
 		result.append("<tr><td>");
 			switch(get_property("questL11Manor")) {
 			case "started":
-				result.append('Open the cellar of Spookyraven <a target="mainpane" href="manor2.php">Manor</a> (Ballroom)');
+				result.append('Open Spookyraven <a target="mainpane" href="manor2.php">Manor</a> cellar (Ballroom)');
 				break;
 			case "step1": case "step2":
-				result.append('Find Spookyraven in the <a target="mainpane" href="manor3.php">Manor Cellar</a>: ');
+				result.append('Find Spookyraven in the <a target="mainpane" href="manor3.php">Cellar</a>: ');
 				if (available_amount($item[Lord Spookyraven's spectacles])==0) {
 					result.append("<br>Find "+item_report($item[Lord Spookyraven's spectacles]));
 				} else if (get_property("spookyravenRecipeUsed")!="with_glasses") {
@@ -4542,21 +4564,25 @@ void bakeTracker() {
 							result.append(item_report(false, "Surgeonosity ("+to_string(numeric_modifier("surgeonosity"), "%.0f")+"/5)<br>"));
 							break;
 						case "BowlingAlley":
-							result.append(item_report($item[bowling ball]));
-							result.append(", ");
+							//result.append(item_report($item[bowling ball]));
+							//result.append(", ");
 							result.append(item_report(false, "Bowled ("+(prog - 1)+"/5)<br>"));
 							break;
 						case "Apartment":
-							result.append(item_report(get_property("relocatePygmyLawyer").to_int() == my_ascensions(), "relocate Lawyers, "));
-							result.append(item_report(false, "Search for Boss<br>"));
+							//result.append(item_report(get_property("relocatePygmyLawyer").to_int() == my_ascensions(), "relocate Lawyers, "));
+							//result.append(item_report(false, "Search for Boss<br>"));
+							result.append(item_report((have_effect($effect[Thrice-Cursed])>0), "Thrice-Cursed<br>"));
 							break;
 						case "Office":
 							if(available_amount($item[McClusky file (complete)]) > 0)
 								result.append(item_report(false, "Kill Boss!"));
 							else {
 								int f = files();
-								result.append(item_report(f >=5, "McClusky files (" + f + "/5), "));
-								result.append(item_report($item[boring binder clip], "binder clip"));
+								if (f<5) {
+									result.append(item_report(f >=5, "McClusky files (" + f + "/5)"));
+								} else {
+									result.append(item_report($item[boring binder clip], "binder clip"));
+								}
 							}
 							result.append("<br>");
 							break;
@@ -4938,10 +4964,6 @@ void bakeHeader() {
 	//Remove KoL's javascript familiar picker so that it can use our modified version in chit.js
 	result.replace_string('<script type="text/javascript" src="/images/scripts/familiarfaves.20120307.js"></script>', '');
 	
-	// Dunno... I'm not sure why KoLmafia adds these... Removing them is probably a mistake...
-	#result = result.replace_string('<script language="Javascript" src="/basics.js"></script><link rel="stylesheet" href="/basics.css" />', '');
-	result.replace_string('onload="updateSafetyText();" ', '');
-	
 	chitBricks["header"] = result.to_string();
 		
 }
@@ -4978,7 +5000,7 @@ boolean parsePage(buffer original) {
 		chitSource["header"] = parse.group(1);
 		//Rollover: Edited because I want the pop-up to fit the text
 		chitSource["rollover"] = parse.group(2).replace_string('doc("maintenance")', 'poop("doc.php?topic=maintenance", "documentation", 560, 518, "scrollbars=yes,resizable=no")');
-		#matcher test=create_matcher("rollover \= (\\d+).*?rightnow \= (\\d+)",chitSource["header"]);if(test.find())chitSource["header"]=chitSource["header"].replace_string(test.group(1),to_string(to_int(test.group(2))+30));
+		# matcher test = create_matcher("rollover \= (\\d+).*?rightnow \= (\\d+)",chitSource["header"]); if(test.find())chitSource["header"]=chitSource["header"].replace_string(test.group(1),to_string(to_int(test.group(2))+120));
 		//Character: Name/Class/Level etc
 		chitSource["character"] = parse.group(3);
 		// Stats: Muscle/Mysticality/Moxie/Fullness/Drunkenness & Fury

@@ -3033,6 +3033,7 @@ void defaultMood(boolean castMojo) {
 		}
 		
 	}
+	print("finished default mood","purple");
 }
 void defaultMood() { defaultMood(true); }
 
@@ -3629,7 +3630,7 @@ boolean can_adv(location where) {
 										 have_skill($skill[stomach of steel]) || perm_urlcheck("questlog.php?which=2","cleansed the taint")));
 	case $location[The Valley of Rof L'm Fao]: return (levelcheck(9) && perm_urlcheck("mountains.php","valley2.gif"));
 	case $location[The Penultimate Fantasy Airship]: return (levelcheck(10) && primecheck(90) && (perm_urlcheck("place.php?whichplace=plains","beanstalk.gif") || use(1,$item[enchanted bean])));
-	case $location[The Road to White Citadel]: return (!white_citadel_available() && guild_store_available( ) && visit_url("woods.php").contains_text("wcroad.gif"));
+	case $location[The Road to the White Citadel]: return (!white_citadel_available() && guild_store_available( ) && visit_url("woods.php").contains_text("wcroad.gif"));
 	case $location[The Haunted Kitchen]: return (primecheck(5) && (itemcheck($item[Spookyraven library key]) || perm_urlcheck("place.php?whichplace=town_right","manor.gif")));
 	case $location[The Haunted Conservatory]: return (primecheck(6) && perm_urlcheck("place.php?whichplace=town_right","manor.gif"));
 	case $location[The Haunted Billiards Room]: return (primecheck(10) && perm_urlcheck("place.php?whichplace=town_right","manor.gif"));
@@ -4414,6 +4415,7 @@ void use_genetics_lab(string req)
 		}
 		//could also use weird - 4 stats (posessed toy chest, barrel mimic, )
 	}
+	print("finished use_genetics_lab","lime");
 }
 
 void collect_dna(string req)
@@ -4667,6 +4669,11 @@ void setMood(string combat) {
 		cli_execute("mood apathetic"); 
 		return;
 	}
+	
+	if(have_effect($effect[temporary amnesia])>0)
+		cli_execute("uneffect temporary amnesia");
+	if(have_effect($effect[temporary amnesia])>0)
+		abort("failed to remove temporary amnesia. Mood will probably go crazy until you can cast spells again");
 
 	if(my_path()=="KOLHS" && get_property("_kolhsAdventures").to_int()>=40 && (get_property("yearbookCameraPending")!="true" || get_property("yearbookCameraTarget")==""))
 		abort("Need to do the yearbook thing!");
@@ -4681,6 +4688,7 @@ void setMood(string combat) {
 	//use heavy rains buff items
 	if(my_path()=="Heavy Rains")
 	{
+		
 		//stop items washing away
 		if(contains_text(combat,"i") && i_a("catfish whiskers")>0 && have_effect($effect[Fishy Whiskers])==0)
 			use(1,$item[catfish whiskers]);
@@ -5294,7 +5302,7 @@ location level_location(int value) {
 			The Haunted Ballroom, Inside the Palindome, Tower Ruins, The Oasis, The Upper Chamber, The Middle Chamber, Thugnderdome, 
 			Outskirts of Camp Logging Camp, Camp Logging Camp, Post-Quest Bugbear Pens, The Bugbear Pen, The Degrassi Knoll Garage, The \"Fun\" House, 
 			Pre-Cyrpt Cemetary, Post-Cyrpt Cemetary, The Goatlet, Lair of the Ninja Snowmen, The eXtreme Slope, Whitey's Grove, The Laugh Floor, 
-			Infernal Rackets Backstage, Pandamonium Slums, The Valley of Rof L'm Fao, The Penultimate Fantasy Airship, The Road to White Citadel, The Haunted Kitchen, The Haunted Conservatory, 
+			Infernal Rackets Backstage, Pandamonium Slums, The Valley of Rof L'm Fao, The Penultimate Fantasy Airship, The Road to the White Citadel, The Haunted Kitchen, The Haunted Conservatory, 
 			The Haunted Billiards Room, The Haunted Bathroom, The Haunted Bedroom, The Icy Peak, Barrrney's Barrr, The F'c'le, The Poop Deck, Belowdecks]
 		{
 			print("checking "+loc,"blue");
@@ -5999,12 +6007,12 @@ boolean bumAdv(location loc, string maxme, string famtype, string goals, string 
 			if (have_effect($effect[Spirit of bacon grease]) == 0) use_skill(1, $skill[Spirit of bacon grease]);
 		}
 		//sleaze mobs
-		else if(loc==$location[The Battlefield (Hippy uniform)] || loc==$location[The Orcish Frat House (Bombed Back to the Stone Age)] || loc==$location[Frat House] || loc==$location[The Hole in the sky] || loc==$location[mcmillicancuddy's other back 40] || loc==$location[The Purple Light District] || loc==$location[The eXtreme Slope] || loc==$location[the \"fun\" house] || loc==$location[Tower Ruins] || loc==$location[The Obligatory Pirate's Cove] || loc==$location[The Road to White Citadel]&& loc==$location[The Degrassi Knoll Gym]&& loc==$location[Anemone Mine]&& loc==$location[Cobb's Knob Harem])
+		else if(loc==$location[The Battlefield (Hippy uniform)] || loc==$location[The Orcish Frat House (Bombed Back to the Stone Age)] || loc==$location[Frat House] || loc==$location[The Hole in the sky] || loc==$location[mcmillicancuddy's other back 40] || loc==$location[The Purple Light District] || loc==$location[The eXtreme Slope] || loc==$location[the \"fun\" house] || loc==$location[Tower Ruins] || loc==$location[The Obligatory Pirate's Cove] || loc==$location[The Road to the White Citadel]&& loc==$location[The Degrassi Knoll Gym]&& loc==$location[Anemone Mine]&& loc==$location[Cobb's Knob Harem])
 		{
 			if (have_effect($effect[Spirit of Peppermint]) == 0) use_skill(1, $skill[Spirit of Peppermint]);
 		}
 		//stench mobs
-		else if(loc==$location[The Heap] || loc==$location[mcmillicancuddy's bog] || loc==$location[hippy camp] || loc==$location[The Hippy Camp (Bombed Back to the Stone Age)] || loc==$location[ The Battlefield (frat uniform)] || loc==$location[The Road to White Citadel] || loc==$location[The F'c'le] || loc==$location[The eXtreme Slope] || loc==$location[The Haunted Pantry] || loc==$location[The Sleazy Back Alley] || loc==$location[the bugbear pen] || loc==$location[post-quest bugbear pens] || loc==$location[The hatching chamber] || loc==$location[The Feeding Chamber] || loc==$location[The Royal Guard Chamber] || loc==$location[The Filthworm Queen's Chamber])
+		else if(loc==$location[The Heap] || loc==$location[mcmillicancuddy's bog] || loc==$location[hippy camp] || loc==$location[The Hippy Camp (Bombed Back to the Stone Age)] || loc==$location[ The Battlefield (frat uniform)] || loc==$location[The Road to the White Citadel] || loc==$location[The F'c'le] || loc==$location[The eXtreme Slope] || loc==$location[The Haunted Pantry] || loc==$location[The Sleazy Back Alley] || loc==$location[the bugbear pen] || loc==$location[post-quest bugbear pens] || loc==$location[The hatching chamber] || loc==$location[The Feeding Chamber] || loc==$location[The Royal Guard Chamber] || loc==$location[The Filthworm Queen's Chamber])
 		{
 			if (have_effect($effect[Spirit of Peppermint]) == 0) use_skill(1, $skill[Spirit of Peppermint]);
 		}
@@ -9602,12 +9610,15 @@ boolean bcascMacguffinDiary()
 		setFamiliar("blackforest");
 		string max = "";
 		if (i_a("reassembled blackbird") == 0 && i_a("reconstituted crow") == 0) {
-			max = "item ";
+			max = "item, ";
 		}
 		if (i_a("blackberry galoshes")>0) {
-			max = max + ", +equip blackberry galoshes";
+			print("trying to put on galoshes ","purple");
+			max = max + " +equip blackberry galoshes, ";
 		}
 		buMax(max + "+combat");
+		if(equipped_amount($item[blackberry galoshes])==0 && i_a("blackberry galoshes")>0)
+			abort("failed to equip galosh");
 		setMood((my_path() == "Avatar of Boris" || my_path() == "Avatar of Jarlsberg" || my_path() == "Avatar of Sneaky Pete" ? max : max + "+"));
 		cli_execute("mood execute");
 		bumMiniAdv(1, $location[The Black Forest]);
@@ -9727,7 +9738,12 @@ boolean bcascMacguffinSpooky() {
 				//Correctly set Ornate Nightstand
 				set_property("choiceAdventure878", 3);
 				bumAdv($location[The Haunted Bedroom], "", "", "Lord Spookyraven's spectacles", "Getting the Spectacles");
-				run_combat();
+				
+				print("finished adv, using adv1 to do choice","green");
+				adv1($location[noob cave],-1,"");
+				if(get_property("lastAdventure")=="Noob Cave")
+					abort("We accidentally went to noob cave instead of finishing the choiceadv");
+				print("did choice, continuing","green");
 			}
 		}
 
@@ -10123,9 +10139,12 @@ boolean bcascManorBedroom() {
 			}
 			print("adventuring for gown","green");
 			bumminiAdv(1,$location[The Haunted Bedroom]);
-			print("finished adv, running combat","green");
-			run_combat();
-			print("ran combat, continuing","green");
+			
+			print("finished adv, using adv1 to do choice","green");
+			adv1($location[noob cave],-1,"");
+			if(get_property("lastAdventure")=="Noob Cave")
+				abort("We accidentally went to noob cave instead of finishing the choiceadv");
+			print("did choice, continuing","green");
 		}
 		//if we still haven't got a camera, try to pull
 		if(i_a("disposable instant camera") == 0)
@@ -10134,9 +10153,12 @@ boolean bcascManorBedroom() {
 		while (i_a("disposable instant camera") == 0) {
 			print("adventuring for instant camera","green");
 			bumminiAdv(1,$location[The Haunted Bedroom]);
-			print("finished adv, running combat","green");
-			run_combat();
-			print("ran combat, continuing","green");
+			
+			print("finished adv, using adv1 to do choice","green");
+			adv1($location[noob cave],-1,"");
+			if(get_property("lastAdventure")=="Noob Cave")
+				abort("We accidentally went to noob cave instead of finishing the choiceadv");
+			print("did choice, continuing","green");
 		}
 
 		if (i_a("Lady Spookyraven's finest gown") > 0) {
@@ -10575,7 +10597,12 @@ boolean bcascMirror() {
 	set_property("choiceAdventure85", 5); //hotdog / key / combat
 	while(i_a("antique hand mirror") == 0) {
 		bumAdv($location[The Haunted Bedroom], "", "itemsnc", "antique hand mirror", "Getting an anqique hand mirror to tackle the end boss.", "-i");
-		run_combat();
+		
+		print("finished adv, using adv1 to do choice","green");
+		adv1($location[noob cave],-1,"");
+		if(get_property("lastAdventure")=="Noob Cave")
+			abort("We accidentally went to noob cave instead of finishing the choiceadv");
+		print("did choice, continuing","green");
 	}
 	
 	checkStage("mirror", true);

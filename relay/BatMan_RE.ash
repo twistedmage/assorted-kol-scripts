@@ -121,7 +121,7 @@ string quote() {
       case $phylum[undead]:
       case $phylum[demon]: bw[count(bw)] = "\"Good, even though it's sometimes sidetracked, always, repeat: always triumphs over evil.\""; break;
       case $phylum[weird]: bw[count(bw)] = "Lila: \"I have some other very rare lilacs in the rear room, if you'd like to see them.\"<br>Batman: \"I'm always interested in the unusual of any species.\""; break;
-      case $phylum[fish]: bw[count(bw)] = "Robin: \"<i>Ghoti</i> is fish?\"<br>Batman: \"See here. English phonetics. GH becomes F, as in tough or laugh. O becomes I as in women. TI becomes SH as in ration or the word nation.\"<br>"+
+      case $phylum[fish]: bw[count(bw)] = "Robin: \"<i>Ghoti</i> is fish?\"<br>Batman: \"See here. English phonetics. GH becomes F, as in tough or laugh. O becomes I as <br>in women. TI becomes SH as in ration or the word nation.\"<br>"+
          "Robin: \"Holy semantics, Batman. You never cease to amaze me!\"<br>Batman: \"No time for compliments, Robin. We must thwart some criminals. To the Batmobile!\""; break;
       case $phylum[plant]: bw[count(bw)] = "\"Man-eating lilacs have no teeth, Robin. It's a process of ingestion through their tentacles.\""; break;
       case $phylum[hippy]: bw[count(bw)] = "\"You're far from mod, Robin. And many hippies are older than you are.\"";
@@ -379,7 +379,7 @@ void batman_enhance() {
       actbox.append("<div id='undermon'><form name='changeml' action=fight.php method=post>Unknown monster stats treated as "+
       "<input name=setml type=text size=4 value='"+vars["unknown_ml"]+"'>.</form></div>");
   // Actions table
-   if (!finished()) {
+   if (!finished() && my_location() != $location[unleash your inner wolf]) {
       reset_queue();
       actbox.append("<table id='battable' width='100%'>\n"+
         "<thead><tr><th>Action</th><th>Damage</th>"+
@@ -394,23 +394,43 @@ void batman_enhance() {
       foreach i,ev in opts actbox.append(to_html(ev,i));
       actbox.append("\n</tbody></table>\n   ");
   // enhanced Manuel box
-      actbox.append("<div id='manuelbox'><table><tr><td width=22><img src=/images/itemimages/nicesword.gif width=22 height=22 "+
-         "title='This monster has a "+rnum(m_hit_chance()*100.0,2)+"% chance of hitting you for "+rnum(dmg_taken(m_regular()))+" damage, death in "+rnum(die_rounds())+
+      actbox.append("<div id='manuelbox'><table><tr><td width=22><img src=images/itemimages/nicesword.gif title='This monster has a "+  // attack
+         rnum(m_hit_chance()*100.0,2)+"% chance of hitting you for "+rnum(dmg_taken(m_regular()))+" damage, death in "+rnum(die_rounds())+
          " rounds.'></td><td width=50 valign=center align=left><b><span style='font-size: 1.2em; color: "+to_htmlcolor(1.0-m_hit_chance())+";'>"+
-         rnum(monster_stat("att"))+"</span></b></td></tr>");
-      actbox.append("<tr><td width=22><img src=/images/itemimages/whiteshield.gif width=22 height=22 "+
-         "title='You have a "+rnum(hitchance("attack")*100.0)+"% chance of hitting for "+rnum(dmg_dealt(regular(1)))+" damage.'></td>"+
+         rnum(monster_stat("att"))+"</span></b></td>");
+      actbox.append("<td><img src='images/itemimages/"+m.phylum.image+"' title='Phylum: "+m.phylum+"'></td></tr>");  // phylum
+      if (havemanuel && m.phylum == $phylum[none]) vprint_html(m+"'s phylum is unknown to mafia!  Please make a bug report <a href='http://kolmafia.us/forumdisplay.php?24'>here</a>.",-2);
+      actbox.append("<tr><td width=22><img src=images/itemimages/whiteshield.gif title='You have a "+   // defense
+         rnum(hitchance("attack")*100.0)+"% chance of hitting for "+rnum(dmg_dealt(regular(1)))+" damage.'></td>"+
          "<td width=50 valign=center align=left><b><span style='font-size: 1.2em; color: "+to_htmlcolor(hitchance("attack"))+";'>"+
-         rnum(monster_stat("def"))+"</span></b></td></tr>");
-      actbox.append("<tr><td width=22><img src=/images/itemimages/hp.gif width=22 height=22 "+
-         "title='This monster typically starts with "+monster_hp(m)+" hit points.'></td>"+
-         "<td width=50 valign=center align=left><b><span style='font-size: 1.2em; color: "+
-         to_htmlcolor(monster_stat("hp")/max(1.0,to_float(monster_hp(m))))+";'>"+rnum(monster_stat("hp"))+"</span></b></td></tr>");
-      actbox.append("<tr><td width=22><img src=/images/itemimages/meatstack.gif width=22 height=22 "+
-         "title='Monster value: "+
+         rnum(monster_stat("def"))+"</span></b></td>");
+      actbox.append("<td><img src='images/itemimages/"+monster_element(m).image+"' title='Monster resistances: ");  // element
+      string[int] resses;
+      foreach e,v in mres if (v != 0) resses[count(resses)] = e+": "+rnum(v);
+      actbox.append(count(resses) == 0 ? "none" : join(resses,", "));
+      actbox.append("'></td></tr>");
+      actbox.append("<tr><td width=22><img src=images/itemimages/hp.gif title='This monster typically starts with "+  // hp
+         monster_hp(m)+" hit points.'></td><td width=50 valign=center align=left><b><span style='font-size: 1.2em; color: "+
+         to_htmlcolor(monster_stat("hp")/max(1.0,to_float(monster_hp(m))))+";'>"+rnum(monster_stat("hp"))+"</span></b></td>");
+      actbox.append("<td><img src='images/itemimages/");  // initiative
+         switch (monster_initiative(m)) {
+            case -1: actbox.append("obnoxious.gif' title='Initiative unknown"); break;
+            case -10000: actbox.append("snail.gif' title='Never wins initiative"); break;
+            case 10000: actbox.append("lightningbolt.gif' title='Always wins initiative"); break;
+            default: actbox.append("watch.gif' title='Initiative +"+monster_initiative(m)+"%"); break;
+         }
+      actbox.append("'></td></tr>");
+      actbox.append("<tr><td width=22><img src=images/itemimages/meatstack.gif title='Monster value: "+
          rnum(to_float(my_path() == "Way of the Surprising Fist" ? max(meat_drop(m),12) : meat_drop(m)) * (max(0,meat_drop_modifier()+100))/100.0)
          +" meat + "+rnum(stat_value(m_stats()))+" in substats + item drops'></td>"+
-         "<td width=50 valign=center align=left><b><span style='font-size: 1.2em; color: green;'>"+rnum(monstervalue())+"&mu;</span></b></td></tr>");
+         "<td width=50 valign=center align=left colspan=2><b><span style='font-size: 1.2em; color: green;'>"+rnum(monstervalue())+"&mu;</span></b></td></tr>");
+      if (havemanuel) {
+         int[string] fs;
+         file_to_map("factoids_"+replace_string(my_name()," ","_")+".txt",fs);
+         actbox.append("<tr><td colspan=3 align=center>");
+         for i from 1 to 3 actbox.append(i > fs[m.to_string()] ? " <span class='dimmed'>&bull;</span> " : " <big>&bull;</big> ");
+         actbox.append("</td></tr>");
+      }
       actbox.append("</table></div>\n");
    }
    actbox.write();

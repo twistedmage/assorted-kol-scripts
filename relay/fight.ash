@@ -24,7 +24,7 @@ float turns_till_goals(boolean usespec) {
    return totalgoalitems / max(has_goal(my_location(),usespec),0.0001);
 }
 boolean been_banished(monster m) {
-   if (m == $monster[none] || m.boss) return false;
+//   if (m == $monster[none] || m.boss) return false;
    if (is_banished(m) || get_counters(m+" banished",0,20) != "") return true;
    return false;
 }
@@ -115,8 +115,8 @@ void handle_post() {
       string[int] ms = split_string($location[mer-kin colosseum].combat_queue,"; ");
       switch (to_monster(ms[ms.count()-1])) {
          case $monster[mer-kin balldodger]: case $monster[Georgepaul, the Balldodger]: return $item[mer-kin switchblade];
-         case $monster[mer-kin bladeswitcher]: case $monster[Ringogeorge, the Bladeswitcher]: return $item[mer-kin dragnet];
          case $monster[mer-kin netdragger]: case $monster[Johnringo, the Netdragger]: return $item[mer-kin dodgeball];
+         case $monster[mer-kin bladeswitcher]: case $monster[Ringogeorge, the Bladeswitcher]: return $item[mer-kin dragnet];
       } return $item[none];
    }
    float foodDrop() {
@@ -166,7 +166,7 @@ void handle_post() {
                abox.append("<p><a href=# class='clilink'>equip uv-resistant compass</a>"); break;
          case $location[The Battlefield (Frat Uniform)]: abox.append("<p>Just <b>"+(1000-to_int(get_property("hippiesDefeated")))+"</b> hippies left."); break;
          case $location[The Battlefield (Hippy Uniform)]: abox.append("<p>Just <b>"+(1000-to_int(get_property("fratboysDefeated")))+"</b> fratboys left."); break;
-         case $location[a-boo peak]: if (item_amount($item[a-boo clue]) > 0) abox.append("<p><a href=# class='cliimglink' title='use a-boo clue'><img src='/images/itemimages/map.gif' class=hand></a> "+
+         case $location[a-boo peak]: if (item_amount($item[a-boo clue]) > 0) abox.append("<p><a href=adventure.php?snarfblat=296 class='cliimglink through' title='use a-boo clue'><img src='/images/itemimages/map.gif' class=hand></a> "+
            (item_amount($item[a-boo clue]) > 1 ? "("+rnum(item_amount($item[a-boo clue]))+") " : "")+"<a href=# class='clilink'>maximize spooky res, cold res, 0.01 hp</a>"); 
             abox.append("<p>Hauntedness remaining: <b>"+get_property("booPeakProgress")+"</b>"); break;
          case $location[twin peak]: int tpprog = to_int(get_property("twinPeakProgress")); if (tpprog < 8) abox.append("<br>");
@@ -198,7 +198,9 @@ void handle_post() {
          case $location[the smut orc logging camp]: if (to_int(get_property("chasmBridgeProgress")) >= 30) break; 
             int planktot; for i from 5782 to 5784 planktot += item_amount(to_item(i));
             abox.append("<p>You have <b>"+planktot+"</b> of <b>"+rnum(30 - to_int(get_property("chasmBridgeProgress")))+"</b> needed planks. "+
-               "<a href=# class='clilink' title='place.php?whichplace=orc_chasm&action=bridge17'>chasm</a>");
+               "<a href=# class='clilink' title='place.php?whichplace=orc_chasm&action=bridge"+get_property("chasmBridgeProgress")+"'>chasm</a>");
+            planktot = 0; for i from 5785 to 5787 planktot += item_amount(to_item(i));
+            abox.append("<br>You have <b>"+planktot+"</b> of <b>"+rnum(30 - to_int(get_property("chasmBridgeProgress")))+"</b> needed fasteners.");
             foreach i in $items[loadstone, logging hatchet] if (!have_equipped(i) && item_amount(i) > 0 && can_equip(i))
                abox.append("<p><a href=# class='cliimglink' title='equip "+i+"'><img src='/images/itemimages/"+i.image+"' class=hand></a>");
             if (item_amount($item[smut orc keepsake box]) > 0) abox.append("<p><a href=# class='cliimglink' title='use smut orc keepsake box'><img src='/images/itemimages/keepsakebox.gif' class=hand></a>"); break;
@@ -294,6 +296,7 @@ void handle_post() {
       }
       float[monster] arq = appearance_rates(my_location(),true);
       if (count(arq) > 0) {
+         int[string] fs; file_to_map("factoids_"+replace_string(my_name()," ","_")+".txt",fs);    // load factoids
          abox.append("<p><table><tr>");
          monster[int] sortm;
          foreach m in arq sortm[count(sortm)] = m;
@@ -302,7 +305,7 @@ void handle_post() {
          sort sortm by -arq[value];
          foreach i,m in sortm {
             if (arq[m] <= 0) continue;
-            abox.append("<td align=center class='queuecell"+(m == goalmon && count(get_goals()) > 0 ? " goalmon" : "")+(been_banished(m) ? " dimmed" : "")+
+            abox.append("<td align=center valign=top class='queuecell"+(m == goalmon && count(get_goals()) > 0 ? " goalmon" : "")+(been_banished(m) ? " dimmed" : "")+
                "'><a href=# class='cliimglink' title=\"wiki "+(m == $monster[none] ? to_string(my_location()) : m)+
                "\"><img src='/images/adventureimages/"+(m == $monster[none] ? "3doors.gif" : m.image == "" ? "question.gif" : m.image)+
                "' title='"+(m == $monster[none] ? "Noncombat" : entity_encode(m)+(been_banished(m) ? " (banished)" : "")+
@@ -318,7 +321,12 @@ void handle_post() {
                   "'><img src='/images/itemimages/downarrow.gif' height='16' width='16' title='Click to "+
                   (is_set_to(m,"banish") ? "stop banishing "+m+" (remove from BatMan_banish)." : "banish "+m+" (add to BatMan_banish).")+"'></a>");
             }
-            abox.append("<br>"+rnum(arq[m],1)+"%</td>");
+            abox.append("<br>"+rnum(arq[m],1)+"%");
+            if (count(fs) > 0 && fs[m.to_string()] > 0) {     // display factoids known
+               abox.append("<br>");
+               for i from 1 upto fs[m.to_string()] abox.append(" &bull; "); 
+            }
+            abox.append("</td>");
          }
          abox.append(clover_string(my_location()));
          abox.append("</tr></table>");

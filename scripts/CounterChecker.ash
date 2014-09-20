@@ -245,8 +245,9 @@ boolean canadv(location loc) {
 		return unlocked("lastIslandUnlock") && (get_property("questL12War") == "unstarted" || get_property("sideDefeated") == "hippies");
 	case $location[The Obligatory Pirate's Cove]:
 		return unlocked("lastIslandUnlock") && ($strings[unstarted, finished] contains get_property("questL12War"));
-	case $location[A-Boo Peak]:
 	case $location[Twin Peak]:
+		if(get_property("twinPeakProgress") == "15") return false;
+	case $location[A-Boo Peak]:
 	case $location[Oil Peak]:
 		return unlocked("lastChasmReset") && get_property("chasmBridgeProgress") == "30";
 	case $location[The Copperhead Club]:
@@ -268,7 +269,7 @@ boolean canadv(location loc) {
 location expensive_semi() {
 	location last_rare = get_property("semirareLocation").to_location();
 	// If ImprovePoolSkills, then play a game of pool at every opportunity!
-	if(vars["BaleCC_ImprovePoolSkills"].to_boolean() && last_rare != $location[The Haunted Billiards Room])
+	if(get_property("poolSharkCount").to_int() < 25 && vars["BaleCC_ImprovePoolSkills"].to_boolean() && last_rare != $location[The Haunted Billiards Room])
 		return $location[The Haunted Billiards Room];
 
 	if(!canadv($location[Pandamonium Slums])) {  // Let's make sure the choice is ascension helpful

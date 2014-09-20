@@ -215,12 +215,12 @@ int choose_best_plant(string type, location loc, plant[int] plants)
 			}
 			else if(contains_text(plants[pli].bonus_type,"sleaze"))
 			{
-				if(loc!=$location[The Battlefield (Hippy uniform)] && loc!=$location[The Orcish Frat House (Bombed Back to the Stone Age)] && loc!=$location[Frat House] && loc!=$location[The Hole in the sky] && loc!=$location[mcmillicancuddy's other back 40] && loc!=$location[The Purple Light District] && loc!=$location[The eXtreme Slope] && loc!=$location[the \"fun\" house] && loc!=$location[Tower Ruins] && loc!=$location[The Obligatory Pirate's Cove] && loc!=$location[The Road to White Citadel]&& loc!=$location[The Degrassi Knoll Gym]&& loc!=$location[Anemone Mine]&& loc!=$location[Cobb's Knob Harem])
+				if(loc!=$location[The Battlefield (Hippy uniform)] && loc!=$location[The Orcish Frat House (Bombed Back to the Stone Age)] && loc!=$location[Frat House] && loc!=$location[The Hole in the sky] && loc!=$location[mcmillicancuddy's other back 40] && loc!=$location[The Purple Light District] && loc!=$location[The eXtreme Slope] && loc!=$location[the \"fun\" house] && loc!=$location[Tower Ruins] && loc!=$location[The Obligatory Pirate's Cove] && loc!=$location[The Road to the White Citadel]&& loc!=$location[The Degrassi Knoll Gym]&& loc!=$location[Anemone Mine]&& loc!=$location[Cobb's Knob Harem])
 					return pli;
 			}
 			else if(contains_text(plants[pli].bonus_type,"stench"))
 			{
-				if(loc!=$location[The Heap] && loc!=$location[mcmillicancuddy's bog] && loc!=$location[hippy camp] && loc!=$location[The Hippy Camp (Bombed Back to the Stone Age)] && loc!=$location[ The Battlefield (frat uniform)] && loc!=$location[The Road to White Citadel] && loc!=$location[The F'c'le] && loc!=$location[The eXtreme Slope] && loc!=$location[The Haunted Pantry] && loc!=$location[The Sleazy Back Alley] && loc!=$location[the bugbear pen] && loc!=$location[post-quest bugbear pens] && loc!=$location[The hatching chamber] && loc!=$location[The Feeding Chamber] && loc!=$location[The Royal Guard Chamber] && loc!=$location[The Filthworm Queen's Chamber])
+				if(loc!=$location[The Heap] && loc!=$location[mcmillicancuddy's bog] && loc!=$location[hippy camp] && loc!=$location[The Hippy Camp (Bombed Back to the Stone Age)] && loc!=$location[ The Battlefield (frat uniform)] && loc!=$location[The Road to the White Citadel] && loc!=$location[The F'c'le] && loc!=$location[The eXtreme Slope] && loc!=$location[The Haunted Pantry] && loc!=$location[The Sleazy Back Alley] && loc!=$location[the bugbear pen] && loc!=$location[post-quest bugbear pens] && loc!=$location[The hatching chamber] && loc!=$location[The Feeding Chamber] && loc!=$location[The Royal Guard Chamber] && loc!=$location[The Filthworm Queen's Chamber])
 					return pli;
 			}
 			else if(contains_text(plants[pli].bonus_type,"spooky"))
