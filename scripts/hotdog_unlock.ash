@@ -111,10 +111,10 @@ void unlock_ghost()
 	string str=visit_url("account.php?actions[]=autoattack&autoattack=99105465&flag_aabosses=1&flag_wowbar=1&flag_compactmanuel=1&pwd&action=Update");
 	while(my_adventures()>0 && i_a("gnawed-up dog bone")<desired_bones)
 	{
-		if(have_effect($effect[mush mouth])==0 && i_a("fun guy spore")>0)
-			use(1,$item[fun guy spore]);
+		if(have_effect($effect[mush-mouth])==0 && i_a("fun guy spore")>0)
+			use(1,$item[fun-guy spore]);
 		print("Hunting for dog bone","blue");
-		adventure(1,$location[haunted conservatory]);
+		adventure(1,$location[the haunted conservatory]);
 	}
 }
 void unlock_junkyard()
@@ -150,8 +150,8 @@ void unlock_wet()
 			
 			print("finished adv, using adv1 to do choice","green");
 			adv1($location[noob cave],-1,"");
-			if(get_property("lastAdventure")=="Noob Cave")
-				abort("We accidentally went to noob cave instead of finishing the choiceadv");
+			if(!contains_text(get_property("lastEncounter"),"Nightstand"))
+				abort("Looks like, we accidentally went to noob cave instead of finishing the choiceadv. lastEncounter was "+get_property("lastEncounter"));
 			print("did choice, continuing","green");
 
 //			cli_execute("mood execute");
