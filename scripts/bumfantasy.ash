@@ -574,6 +574,319 @@ void wolf()
 //hp regen doesn't trigger... nor does campfire
 //should only fight brick houses, huff others
 
+void gnome_farm()
+{
+	int adv_left=6;
+	while(adv_left>0)
+	{
+		if(have_effect($effect[mush-mouth])==0)
+			use(1,$item[fun-guy spore]);
+		adventure(1,$location[Ye olde Medievale Villagee]);
+		adv_left-=1;
+	}
+}
+
+void gnome_craft()
+{
+	int straw   = i_a("straw");
+	int leather = i_a("leather");
+	int clay    = i_a("clay");
+	int filling   = i_a("filling");
+	int parchment = i_a("parchment");
+	int glass    = i_a("glass");
+	
+	string st = visit_url("place.php?whichplace=ioty2014_rumple&action=workshop");
+	st = visit_url("choice.php?pwd&whichchoice=845&option=2&choiceform2=Craft+Things+for+Barter");
+	int min_basic = min(straw,min(leather,clay));
+	while(straw>4 && filling<min_basic)
+	{
+		st = visit_url("choice.php?pwd&whichchoice=850&option=1&choiceform1=Turn+Straw+into+Filling+%283+Straw%29");
+		straw-=3;
+		filling+=1;
+		min_basic = min(straw,min(leather,clay));
+	}
+	while(leather>4 && parchment<min_basic)
+	{
+		st = visit_url("choice.php?pwd&whichchoice=850&option=2&choiceform2=Turn+Leather+into+Parchment+%283+Leather%29");
+		leather-=3;
+		parchment+=1;
+		min_basic = min(straw,min(leather,clay));
+	}
+	while(clay>4 && glass<min_basic)
+	{
+		st = visit_url("choice.php?pwd&whichchoice=850&option=3&choiceform3=Turn+Clay+into+Glass+%283+Clay%29");
+		clay-=3;
+		glass+=1;
+		min_basic = min(straw,min(leather,clay));
+	}
+	st = visit_url("choice.php?pwd&whichchoice=850&option=4&choiceform4=Do+Something+Else");
+	st = visit_url("choice.php?pwd&whichchoice=845&option=4&choiceform4=Go+Home");
+	
+	print("Straw: "+straw, "purple");
+	print("Leather: "+leather, "purple");
+	print("Clay: "+clay, "purple");
+	print("Filling: "+filling, "purple");
+	print("Parchment: "+parchment, "purple");
+	print("Glass: "+glass, "purple");
+}
+
+//mother violent, father violent
+
+void gnome_portal()
+{
+	//look through portal
+	string st = visit_url("adventure.php?snarfblat=381");
+	st = visit_url("choice.php?pwd&whichchoice=844&option=1&choiceform1=Look+into+the+Portal");
+	
+	//output recommendations
+	string father="";
+	string mother="";
+	
+	if(contains_text(st,"counting his possessions."))
+		father+=" greed";
+	if(contains_text(st,"counting her possessions."))
+		mother+=" greed";
+	if(contains_text(st,"father gold-plating a lily."))
+		father+=" greed";
+	if(contains_text(st,"mother gold-plating a lily."))
+		mother+=" greed";
+	if(contains_text(st,"father studying a treasure map."))
+		father+=" greed";
+	if(contains_text(st,"mother studying a treasure map."))
+		mother+=" greed";
+	if(contains_text(st,"mother writing a contract to make a high-interest loan."))
+		mother+=" greed";
+	if(contains_text(st,"father writing a contract to make a high-interest loan."))
+		father+=" greed";
+	if(contains_text(st,"mother chowing down on a fistful of bacon."))
+		mother+=" gluttony";
+	if(contains_text(st,"father chowing down on a fistful of bacon."))
+		father+=" gluttony";
+	if(contains_text(st,"father eating a chocolate rabbit."))
+		father+=" gluttony";
+	if(contains_text(st,"mother eating a chocolate rabbit."))
+		mother+=" gluttony";
+	if(contains_text(st,"father putting a fried egg on top of a cheeseburger."))
+		father+=" gluttony";
+	if(contains_text(st,"mother putting a fried egg on top of a cheeseburger."))
+		mother+=" gluttony";
+	if(contains_text(st,"father sprinkling extra cheese on a pizza already dripping with the stuff."))
+		father+=" gluttony";
+	if(contains_text(st,"mother sprinkling extra cheese on a pizza already dripping with the stuff."))
+		mother+=" gluttony";
+	if(contains_text(st,"checking his reflection in a spoon."))
+		father+=" vanity";
+	if(contains_text(st,"checking her reflection in a spoon."))
+		mother+=" vanity";
+	if(contains_text(st,"plucking his eyebrows."))
+		father+=" vanity";
+	if(contains_text(st,"plucking her eyebrows."))
+		mother+=" vanity";
+	if(contains_text(st,"father putting in a teeth-whitening tray."))
+		father+=" vanity";
+	if(contains_text(st,"mother putting in a teeth-whitening tray."))
+		mother+=" vanity";
+	if(contains_text(st,"telling everyone that the song on the radio is his."))
+		father+=" vanity";
+	if(contains_text(st,"telling everyone that the song on the radio is her."))
+		mother+=" vanity";
+	if(contains_text(st,"father asking one of the kids to find the remote control."))
+		father+=" laziness";
+	if(contains_text(st,"mother asking one of the kids to find the remote control."))
+		mother+=" laziness";
+	if(contains_text(st,"father collapsed deep in an easy chair, stifling a yawn."))
+		father+=" laziness";
+	if(contains_text(st,"mother collapsed deep in an easy chair, stifling a yawn."))
+		mother+=" laziness";
+	if(contains_text(st,"father lying on the floor"))
+		father+=" laziness";
+	if(contains_text(st,"mother lying on the floor"))
+		mother+=" laziness";
+	if(contains_text(st,"father sleeping soundly."))
+		father+=" laziness";
+	if(contains_text(st,"mother sleeping soundly."))
+		mother+=" laziness";
+	if(contains_text(st,"eyeing his spouse lasciviously."))
+		father+=" lust";
+	if(contains_text(st,"eyeing her spouse lasciviously."))
+		mother+=" lust";
+	if(contains_text(st,"father flipping through a lingerie catalog."))
+		father+=" lust";
+	if(contains_text(st,"mother flipping through a lingerie catalog."))
+		mother+=" lust";
+	if(contains_text(st,"father moaning softly."))
+		father+=" lust";
+	if(contains_text(st,"mother moaning softly."))
+		mother+=" lust";
+	if(contains_text(st,"father peeking through the blinds at the attractive neighbors."))
+		father+=" lust";
+	if(contains_text(st,"mother peeking through the blinds at the attractive neighbors."))
+		mother+=" lust";
+	if(contains_text(st,"father kicking a dog."))
+		father+=" violence";
+	if(contains_text(st,"mother kicking a dog."))
+		mother+=" violence";
+	if(contains_text(st,"father punching a hole in the wall of the house."))
+		father+=" violence";
+	if(contains_text(st,"mother punching a hole in the wall of the house."))
+		mother+=" violence";
+	if(contains_text(st,"father screaming at the television."))
+		father+=" violence";
+	if(contains_text(st,"mother screaming at the television."))
+		mother+=" violence";
+	if(contains_text(st,"stubbing his toe on an ottoman then kicking it across the room."))
+		father+=" violence";
+	if(contains_text(st,"stubbing her toe on an ottoman then kicking it across the room."))
+		mother+=" violence";
+		
+	if(contains_text(st,"father cutting a huge piece of cake to eat alone."))
+		father+=" greed/gluttony";
+	if(contains_text(st,"mother cutting a huge piece of cake to eat alone."))
+		mother+=" greed/gluttony";
+	if(contains_text(st,"father opening a family-size bag of Cheat-Os, not planning on sharing them."))
+		father+=" greed/gluttony";
+	if(contains_text(st,"mother opening a family-size bag of Cheat-Os, not planning on sharing them."))
+		mother+=" greed/gluttony";
+	if(contains_text(st,"father putting a golden ring on each finger."))
+		father+=" greed/vanity";
+	if(contains_text(st,"mother putting a golden ring on each finger."))
+		mother+=" greed/vanity";
+	if(contains_text(st,"father shining a golden chalice to a reflective finish."))
+		father+=" greed/vanity";
+	if(contains_text(st,"mother shining a golden chalice to a reflective finish."))
+		mother+=" greed/vanity";
+	if(contains_text(st,"father reclined in a chair, ordering stuff from the Home Shopping Network."))
+		father+=" greed/laziness";
+	if(contains_text(st,"mother reclined in a chair, ordering stuff from the Home Shopping Network."))
+		mother+=" greed/laziness";
+	if(contains_text(st,"father trying to shortchange the maid who is washing the dishes."))
+		father+=" greed/laziness";
+	if(contains_text(st,"mother trying to shortchange the maid who is washing the dishes."))
+		mother+=" greed/laziness";
+	if(contains_text(st,"father admiring a solid marble nude statue."))
+		father+=" greed/lust";
+	if(contains_text(st,"mother admiring a solid marble nude statue."))
+		mother+=" greed/lust";
+	if(contains_text(st,"father admiring a valuable collection of artistic nudes."))
+		father+=" greed/lust";
+	if(contains_text(st,"mother admiring a valuable collection of artistic nudes."))
+		mother+=" greed/lust";
+	if(contains_text(st,"father polishing a collection of solid silver daggers."))
+		father+=" greed/violence";
+	if(contains_text(st,"mother polishing a collection of solid silver daggers."))
+		mother+=" greed/violence";
+	if(contains_text(st,"father loading a jewel-encrusted pistol with golden bullets."))
+		father+=" greed/violence";
+	if(contains_text(st,"mother loading a jewel-encrusted pistol with golden bullets."))
+		mother+=" greed/violence";
+		
+	if(contains_text(st,"father checking for stretch marks while downing a huge chocolate shake."))
+		father+=" gluttony/vanity";
+	if(contains_text(st,"mother checking for stretch marks while downing a huge chocolate shake."))
+		mother+=" gluttony/vanity";
+	if(contains_text(st,"father trying to squeeze into a girdle."))
+		father+=" gluttony/vanity";
+	if(contains_text(st,"mother trying to squeeze into a girdle."))
+		mother+=" gluttony/vanity";
+	if(contains_text(st,"calling the dog over to lick french-fry grease off of his shirt."))
+		father+=" gluttony/laziness";
+	if(contains_text(st,"calling the dog over to lick french-fry grease off of her shirt."))
+		mother+=" gluttony/laziness";
+	if(contains_text(st,"father reclined in an overstuffed chair eating a bag of bacon-flavored onion rings."))
+		father+=" gluttony/laziness";
+	if(contains_text(st,"mother reclined in an overstuffed chair eating a bag of bacon-flavored onion rings."))
+		mother+=" gluttony/laziness";
+	if(contains_text(st,"father licking an all-day sucker."))
+		father+=" gluttony/lust";
+	if(contains_text(st,"mother licking an all-day sucker."))
+		mother+=" gluttony/lust";
+	if(contains_text(st,"licking his lips sensually over a rack of ribs."))
+		father+=" gluttony/lust";
+	if(contains_text(st,"licking her lips sensually over a rack of ribs."))
+		mother+=" gluttony/lust";
+	if(contains_text(st,"father tearing apart an entire roasted chicken so hard the bones snap."))
+		father+=" gluttony/violence";
+	if(contains_text(st,"mother tearing apart an entire roasted chicken so hard the bones snap."))
+		mother+=" gluttony/violence";
+	if(contains_text(st,"father throwing a bag of chips on the ground and stomping on it to open it."))
+		father+=" gluttony/violence";
+	if(contains_text(st,"mother throwing a bag of chips on the ground and stomping on it to open it."))
+		mother+=" gluttony/violence";
+		
+	if(contains_text(st,"collapsed in an overstuffed chair, curling his eyelashes."))
+		father+=" vanity/laziness";
+	if(contains_text(st,"collapsed in an overstuffed chair, curling her eyelashes."))
+		mother+=" vanity/laziness";
+	if(contains_text(st,"father using the remote control to turn the TV to the Beauty Channel."))
+		father+=" vanity/laziness";
+	if(contains_text(st,"mother using the remote control to turn the TV to the Beauty Channel."))
+		mother+=" vanity/laziness";
+	if(contains_text(st,"checking out own his body and licking his lips seductively."))
+		father+=" vanity/lust";
+	if(contains_text(st,"checking out own her body and licking her lips seductively."))
+		mother+=" vanity/lust";
+	if(contains_text(st,"practicing pick-up lines on his own reflection in a window."))
+		father+=" vanity/lust";
+	if(contains_text(st,"practicing pick-up lines on her own reflection in a window."))
+		mother+=" vanity/lust";
+	if(contains_text(st,"father angrily plucking stray eyebrow hairs."))
+		father+=" vanity/violence";
+	if(contains_text(st,"mother angrily plucking stray eyebrow hairs."))
+		mother+=" vanity/violence";
+	if(contains_text(st,"father kicking the dog, then making sure the kick didn't scuff her shoes."))
+		father+=" vanity/violence";
+	if(contains_text(st,"mother kicking the dog, then making sure the kick didn't scuff her shoes."))
+		mother+=" vanity/violence";
+		
+	if(contains_text(st,"lying on the floor, calling his spouse to come give a kiss."))
+		father+=" laziness/lust";
+	if(contains_text(st,"lying on the floor, calling her spouse to come give a kiss."))
+		mother+=" laziness/lust";
+	if(contains_text(st,"father reclined on the bed, idly peeping through the window to the neighbor's house."))
+		father+=" laziness/lust";
+	if(contains_text(st,"mother reclined on the bed, idly peeping through the window to the neighbor's house."))
+		mother+=" laziness/lust";
+	if(contains_text(st,"father half-heartedly kicking at the cat when it comes too close."))
+		father+=" laziness/violence";
+	if(contains_text(st,"mother half-heartedly kicking at the cat when it comes too close."))
+		mother+=" laziness/violence";
+	if(contains_text(st,"father sleepily swiping at a whining kid."))
+		father+=" laziness/violence";
+	if(contains_text(st,"mother sleepily swiping at a whining kid."))
+		mother+=" laziness/violence";
+		
+	if(contains_text(st,"aggressively kissing his spouse."))
+		father+=" lust/violence";
+	if(contains_text(st,"aggressively kissing her spouse."))
+		mother+=" lust/violence";
+	if(contains_text(st,"father tearing down the blinds to peep out of the window."))
+		father+=" lust/violence";
+	if(contains_text(st,"mother tearing down the blinds to peep out of the window."))
+		mother+=" lust/violence";
+		
+	print("Father: "+father, "purple");
+	print("Mother: "+mother, "purple");
+}
+
+void gnome()
+{
+	//get ready to farm items
+	setFamiliar("items");
+	setMood("i");
+	cli_execute("maximize items");
+	
+	//farm ingredients
+	gnome_farm();
+	
+	//make materials
+	gnome_craft();
+	
+	//look in portal
+	gnome_portal();
+
+}
+
+
 
 void main(string option) {
 	cli_execute("clear mood");
@@ -625,6 +938,15 @@ void main(string option) {
 				set_property("choiceAdventure829", 0);
 			}
 			wolf();
+		break;
+		case "gnome" :
+			if(!contains_text(visit_url("woods.php"),"rumplehome.gif"))
+			{
+				set_property("choiceAdventure829", 4);
+				use(1, $item[grimstone mask]);
+				set_property("choiceAdventure829", 0);
+			}
+			gnome();
 		break;
 	}
 }

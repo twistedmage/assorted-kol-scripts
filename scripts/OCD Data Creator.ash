@@ -4493,9 +4493,9 @@ save [$item[overpowering mushroom wine]] = 0;
 save [$item[swirling mushroom wine]] = 0;
 save [$item[autocalliope]] = 1;
 save [$item[Skullery Maid's Knee]] = 0;
-
-
-
+save [$item[Red Fox glove]] = 1;
+save [$item[Boletus Broletus mushroom]] = 0;
+save [$item[Engorged Sausages and You]] = 1;
 
 
 
@@ -4503,6 +4503,7 @@ save [$item[Skullery Maid's Knee]] = 0;
 
 
 //stuff to sell later;s
+save [$item[holo-tank]] = -1;
 save [$item[holo-bomber]] = -1;
 save [$item[holo-platoon]] = -1;
 save [$item[freshwater fishbone]] = -1;

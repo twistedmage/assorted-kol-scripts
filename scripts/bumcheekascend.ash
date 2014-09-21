@@ -4697,72 +4697,75 @@ void setMood(string combat) {
 			use(1,$item[gourmet gourami oil]);
 		
 		//learning order, thunder
+		if(i_a("thunder thigh")>0)
+			visit_url("inv_use.php?pwd&which=3&whichitem=7648");	
 		while(i_a("thunder thigh")>0)
 		{
 			if(!have_skill($skill[thundercloud]))
-				set_property("choiceAdventure967","2");
+				visit_url("choice.php?pwd&whichchoice=967&option=2");
 			else if(!have_skill($skill[thunder clap]))
-				set_property("choiceAdventure967","1");
+				visit_url("choice.php?pwd&whichchoice=967&option=1");
 			else if(in_hardcore() && !have_skill($skill[Thunder Down Underwear ]))
-				set_property("choiceAdventure967","6");
+				visit_url("choice.php?pwd&whichchoice=967&option=6");
 			else if(!have_skill($skill[thunderheart]))
-				set_property("choiceAdventure967","4");
+				visit_url("choice.php?pwd&whichchoice=967&option=4");
 			else if(!have_skill($skill[Thunderstrike]))
-				set_property("choiceAdventure967","5");
+				visit_url("choice.php?pwd&whichchoice=967&option=5");
 			else if(!have_skill($skill[Thunder Thighs]))
-				set_property("choiceAdventure967","7");
+				visit_url("choice.php?pwd&whichchoice=967&option=7");
 			else if(!have_skill($skill[Thunder Bird]))
-				set_property("choiceAdventure967","3");
+				visit_url("choice.php?pwd&whichchoice=967&option=3");
 			else if(!have_skill($skill[Thunder Down Underwear ]))
-				set_property("choiceAdventure967","6");
+				visit_url("choice.php?pwd&whichchoice=967&option=6");
 			else
 				break;
-			use(1,$item[thunder thigh]);
 		}
 
 		//learning order, rain
+		if(i_a("aquaconda brain")>0)
+			visit_url("inv_use.php?pwd&which=3&whichitem=7647");		
 		while(i_a("aquaconda brain")>0)
 		{
 			if(!have_skill($skill[rain man]))
-				set_property("choiceAdventure968","1");
+				visit_url("choice.php?pwd&whichchoice=968&option=1&choiceform1=Rain+Man");
 			else if(!have_skill($skill[rainy day]))
-				set_property("choiceAdventure968","2");
+				visit_url("choice.php?pwd&whichchoice=968&option=2");
 			else if(!have_skill($skill[rain dance]))
-				set_property("choiceAdventure968","4");
+				visit_url("choice.php?pwd&whichchoice=968&option=4");
 			else if(!have_skill($skill[rainbow]))
-				set_property("choiceAdventure968","5");
+				visit_url("choice.php?pwd&whichchoice=968&option=5");
 			else if(!have_skill($skill[make it rain]))
-				set_property("choiceAdventure968","3");
+				visit_url("choice.php?pwd&whichchoice=968&option=3");
 			else if(!have_skill($skill[rain delay]))
-				set_property("choiceAdventure968","7");
+				visit_url("choice.php?pwd&whichchoice=968&option=7");
 			else if(!have_skill($skill[rain coat]))
-				set_property("choiceAdventure968","6");
+				visit_url("choice.php?pwd&whichchoice=968&option=6");
 			else
 				break;
-			use(1,$item[Aquaconda brain]);
 			abort("use rain man faxes see http://kol.coldfront.net/thekolwiki/index.php/Heavy_Rains/Strategy");
 		}	
 
 		//learning order, lightning
+		if(i_a("lightning milk")>0)
+			visit_url("inv_use.php?pwd&which=3&whichitem=7646");
 		while(i_a("lightning milk")>0)
 		{
 			if(!have_skill($skill[Lightning Strike]))
-				set_property("choiceAdventure969","1");
+				visit_url("choice.php?pwd&whichchoice=969&option=1");
 			else if(!have_skill($skill[Ball Lightning]))
-				set_property("choiceAdventure969","3");
+				visit_url("choice.php?pwd&whichchoice=969&option=3");
 			else if(!have_skill($skill[Riding the Lightning]))
-				set_property("choiceAdventure969","7");
+				visit_url("choice.php?pwd&whichchoice=969&option=7");
 			else if(!have_skill($skill[Sheet Lightning]))
-				set_property("choiceAdventure969","4");
+				visit_url("choice.php?pwd&whichchoice=969&option=4");
 			else if(!have_skill($skill[Clean-Hair Lightning]))
-				set_property("choiceAdventure969","2");
+				visit_url("choice.php?pwd&whichchoice=969&option=2");
 			else if(!have_skill($skill[Lightning Rod]))
-				set_property("choiceAdventure969","6");
+				visit_url("choice.php?pwd&whichchoice=969&option=6");
 			else if(!have_skill($skill[Lightning Bolt]))
-				set_property("choiceAdventure969","5");
+				visit_url("choice.php?pwd&whichchoice=969&option=5");
 			else
 				break;
-			use(1,$item[lightning milk]);
 		}		
 
 	
@@ -9583,7 +9586,7 @@ boolean bcascMacguffinDiary()
 		set_property("choiceAdventure923", "1");
 		set_property("choiceAdventure924", "1");
 		//get shoes if possible
-		if(i_a("blackberry galoshes")==0)
+		if(i_a("blackberry galoshes")==0 && my_basestat($stat[moxie]) >=60)
 		{
 			cli_execute("pull blackberry galoshes");
 			//make shoes if possible
@@ -9612,12 +9615,12 @@ boolean bcascMacguffinDiary()
 		if (i_a("reassembled blackbird") == 0 && i_a("reconstituted crow") == 0) {
 			max = "item, ";
 		}
-		if (i_a("blackberry galoshes")>0) {
+		if (i_a("blackberry galoshes")>0 && my_basestat($stat[moxie]) >=60) {
 			print("trying to put on galoshes ","purple");
 			max = max + " +equip blackberry galoshes, ";
 		}
 		buMax(max + "+combat");
-		if(equipped_amount($item[blackberry galoshes])==0 && i_a("blackberry galoshes")>0)
+		if(equipped_amount($item[blackberry galoshes])==0 && i_a("blackberry galoshes")>0 && my_basestat($stat[moxie]) >=60)
 			abort("failed to equip galosh");
 		setMood((my_path() == "Avatar of Boris" || my_path() == "Avatar of Jarlsberg" || my_path() == "Avatar of Sneaky Pete" ? max : max + "+"));
 		cli_execute("mood execute");
@@ -9741,7 +9744,7 @@ boolean bcascMacguffinSpooky() {
 				
 				print("finished adv, using adv1 to do choice","green");
 				adv1($location[noob cave],-1,"");
-				if(get_property("lastAdventure")=="Noob Cave")
+				if(!contains_text(get_property("lastEncounter"),"Nightstand"))
 					abort("We accidentally went to noob cave instead of finishing the choiceadv");
 				print("did choice, continuing","green");
 			}
@@ -10142,7 +10145,7 @@ boolean bcascManorBedroom() {
 			
 			print("finished adv, using adv1 to do choice","green");
 			adv1($location[noob cave],-1,"");
-			if(get_property("lastAdventure")=="Noob Cave")
+			if(!contains_text(get_property("lastEncounter"),"Nightstand"))
 				abort("We accidentally went to noob cave instead of finishing the choiceadv");
 			print("did choice, continuing","green");
 		}
@@ -10156,7 +10159,7 @@ boolean bcascManorBedroom() {
 			
 			print("finished adv, using adv1 to do choice","green");
 			adv1($location[noob cave],-1,"");
-			if(get_property("lastAdventure")=="Noob Cave")
+			if(!contains_text(get_property("lastEncounter"),"Nightstand"))
 				abort("We accidentally went to noob cave instead of finishing the choiceadv");
 			print("did choice, continuing","green");
 		}
@@ -10600,7 +10603,7 @@ boolean bcascMirror() {
 		
 		print("finished adv, using adv1 to do choice","green");
 		adv1($location[noob cave],-1,"");
-		if(get_property("lastAdventure")=="Noob Cave")
+		if(!contains_text(get_property("lastEncounter"),"Nightstand"))
 			abort("We accidentally went to noob cave instead of finishing the choiceadv");
 		print("did choice, continuing","green");
 	}

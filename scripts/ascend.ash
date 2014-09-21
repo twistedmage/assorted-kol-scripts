@@ -331,7 +331,7 @@ void main()
 	}
 	visit_url("lair2.php?preaction=key&whichkey=436"); //get easter egg balloon
 //	return_gear();
-	cli_execute("train.ash");
+//	cli_execute("train.ash");
 //check we can ascend============================================
 	if(!contains_text(visit_url("lair6.php"),"gash.gif") || 
 			(my_path()=="Bugbear Invasion" && !contains_text(visit_url("place.php?whichplace=bugbearship&action=bb_bridge"),"gash.gif")))

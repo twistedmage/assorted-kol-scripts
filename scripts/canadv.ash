@@ -546,7 +546,7 @@ boolean can_adv(location where, boolean prep, int verb) {
    case $location[The Black Forest]: return levelcheck(11) && qprop("questL11MacGuffin","started");
    case $location[The Hidden Temple]: return get_property("lastTempleUnlock").to_int() == my_ascensions();
    case $location[The Old Landfill]: return perm_urlcheck("woods.php","oldlandfill.gif");
-   case $location[The Road to White Citadel]: return (!white_citadel_available() && qprop("questG02Whitecastle","step1"));
+   case $location[The Road to the White Citadel]: return (!white_citadel_available() && qprop("questG02Whitecastle","step1"));
    case $location[Whitey's Grove]: return (levelcheck(7) && primecheck(34) && (qprop("questL11Palindome","step3") || (checkguild() && qprop("questG02Whitecastle","started"))) && perm_urlcheck("woods.php","grove.gif"));
   // unique locations
    case $location[Friar Ceremony Location]: return (itemcheck($item[dodecagram]) && itemcheck($item[box of birthday candles]) && itemcheck($item[eldritch butterknife]));

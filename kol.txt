@@ -19,14 +19,15 @@ sea stuff?
 	2 jodhpurs of violence (AT)
 	//scholar
 	2 lens of hatred (AT)
-	1 fuzzy slippers of hatred (DB)
 	1 pantaloons of hatred (SA)
 warbear dress gear?
 permanently get 10 pool skill with semirares (25 visits)
 	15-19 times (ccurently have 7 passive skill, implies 11-15 when i thought it was 9)
 	now have 8 skill, meaning 16-20 visits
 	this happened after 4 trainings, meaning x-4 <= 15 && x<=20 && x-4>=11 && x>=16    simplifies to    x <= 19 && x>=16
-	now have 18-21 visits
+	now have 18-21 visits (i may have missed one or two)
+	now have 9 skill, meaning 21-25 visits, combined with the above line, probably have 21-22 visits now
+	~22-23 visits out of 25
 unlock speakeasy
 	The brown password to unlock the Ish Kabibble can be found by equipping Lord Spookyraven's ear trumpet and adventuring in The Cola Wars Battlefield (undisguised).
 	The purple, clan-specific 55-character password to unlock the Sloppy Jalopy can be found by piecing together many 5-character purple strings from 64735 scrolls.
@@ -37,24 +38,21 @@ trophies -
 	KOLHS (commit to each clique, fully upgrade year book calendar)
 		FAX TEACHERS FOR FACTOIDS + TROPHY
 		commited to greasers
-	killl 1000 mbs with bone abacus)
 	eat warbear gyros
 	make bowl of petunias (need orange lint)
 win + misc items from grimstone mask stuff
 	tortoise + hare
 		need "honey" dippers*??
-	rumplestiltskin top daily prize
 dreadsylv gear (skele sword, non boss gear (grandfather watch))
 discoveries
 skills from heavy rains?
 finish avatar of jarlsberg, finish avatar of sneaky pete, fully upgrade kolhs camera
 get protest items
 	3 the nuges favorite crossbow (UR)
-	1 red fox glove
 Giant rubber spider factoids
 11 heavy rains runs, eat 11 rainbows
 factoids from xiblaxian political prisoner (1 done)
-factoids for holographic army (1 done)
+factoids for holographic army (2 done)
 Xiblaxian 5D printer schematics
 Xiblaxian Holo-Companion familiar
 Xiblaxian xeno-detection goggles
@@ -100,17 +98,14 @@ maybe platinum card is worth a pull for mp + daily dungeon?
 ---skills---
 grease up
 utensil twist + hand that rocks the ladle - p
-frantic gyrations -db ?
 icy glare
 wry smile - s
 patient smile - tt
 knowing smile - at
-sensitive fingers - db
 Master Accordion Master Thief - at
 Subtle and Quick to Anger - p
 The Long View - tt
 Five Finger Discount - at
-disco greed - db
 disco bravado - db
 Unoffendable
 Ire of the Orca - sc
