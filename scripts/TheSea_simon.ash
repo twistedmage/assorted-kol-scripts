@@ -518,6 +518,7 @@ void MonkeeQuest()
 				cli_execute("use legendary beat");
 				if (TS_FAX_NEPTUNE && !get_property("_photocopyUsed").to_boolean() && item_amount($item[wriggling flytrap pellet]) < 1)
 				{
+					abort("Warning, we are about to waste a fax!");
 					if(!is_online("faxbot"))
 					{
 						print("Faxbot is offline! Try the script again later.");

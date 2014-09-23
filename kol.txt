@@ -3,10 +3,7 @@ Dina told me I have mental problems, and i'm an idiot who doesn't understand peo
 ----------aftercore--------------
 108 gyros = 27 copters = 10,800,000 (22 days to eat if 5 per day)
 
-<fax illegal aliens for factoids>
-<fax perimeter defense sphere for factoids (and building ingredients)>
-<make space invader, make space bar, make space needle*3, make space heater*3>
-<recipe discoveries>
+<fax illegal aliens for factoids (2 done)>
 
 <fax adventurer echo - get factoids + chroner>
 
@@ -16,18 +13,20 @@ Dina told me I have mental problems, and i'm an idiot who doesn't understand peo
 sea stuff?
 	//make
 	//gladiator
-	2 jodhpurs of violence (AT)
+	1 jodhpurs of violence (AT)
 	//scholar
 	2 lens of hatred (AT)
 	1 pantaloons of hatred (SA)
 warbear dress gear?
+moister oyster factoids (optimal dog)
+other factoids
 permanently get 10 pool skill with semirares (25 visits)
 	15-19 times (ccurently have 7 passive skill, implies 11-15 when i thought it was 9)
 	now have 8 skill, meaning 16-20 visits
 	this happened after 4 trainings, meaning x-4 <= 15 && x<=20 && x-4>=11 && x>=16    simplifies to    x <= 19 && x>=16
 	now have 18-21 visits (i may have missed one or two)
 	now have 9 skill, meaning 21-25 visits, combined with the above line, probably have 21-22 visits now
-	~22-23 visits out of 25
+	~23-24 visits out of 25
 unlock speakeasy
 	The brown password to unlock the Ish Kabibble can be found by equipping Lord Spookyraven's ear trumpet and adventuring in The Cola Wars Battlefield (undisguised).
 	The purple, clan-specific 55-character password to unlock the Sloppy Jalopy can be found by piecing together many 5-character purple strings from 64735 scrolls.
@@ -40,9 +39,15 @@ trophies -
 		commited to greasers
 	eat warbear gyros
 	make bowl of petunias (need orange lint)
-win + misc items from grimstone mask stuff
-	tortoise + hare
-		need "honey" dippers*??
+white citadel factoids and items
+	biclops factoids (1 done)
+	sticky mummy factoids (1 done)
+	Giant mob of baby spiders factoids (1 done)
+	Spider-legged witch's hut factoids
+	Extremely annoyed witch factoids
+	 Surprised and annoyed witch factoids (1 done)
+	Elpízo &amp; Crosybdis factoids (1 done)
+	pig factoids (1 done)
 dreadsylv gear (skele sword, non boss gear (grandfather watch))
 discoveries
 skills from heavy rains?
@@ -51,7 +56,17 @@ get protest items
 	3 the nuges favorite crossbow (UR)
 Giant rubber spider factoids
 11 heavy rains runs, eat 11 rainbows
-factoids from xiblaxian political prisoner (1 done)
+credit for all summons in quest log other accomplishments
+	Buul'gar'gam - Demonic Taint - stench damage
+	Red'dthzuul - Big Flaming Whip - hot dmg + dr
+	Gog Tywaitgol - pie demon
+	Ak'gyxoth = 3 drinks
+	Kel'baalvek=burning man
+	Tatter = pet
+	Nya-zuul-red = revenge
+	Funabanya - strange box
+	<cola battlefield>
+factoids from xiblaxian political prisoner (2 done)
 factoids for holographic army (2 done)
 Xiblaxian 5D printer schematics
 Xiblaxian Holo-Companion familiar
@@ -96,13 +111,10 @@ maybe platinum card is worth a pull for mp + daily dungeon?
 
 
 ---skills---
-grease up
 utensil twist + hand that rocks the ladle - p
 icy glare
 wry smile - s
 patient smile - tt
-knowing smile - at
-Master Accordion Master Thief - at
 Subtle and Quick to Anger - p
 The Long View - tt
 Five Finger Discount - at
@@ -128,7 +140,7 @@ In this paper we answer this question and propose solutions.
 8 = en9Nf : index 52-56 ( in bafh)
 9 = jBF2u : index - ( in bafh)
 10 = u9xen : index - ( in bafh)
-11 =  : index - ( in bafh)
+11 = 2sPpu : index - ( in bafh)
 --------------------------------------------------------------------------------------
 
 -----------------------asica------------------------------------------------------
@@ -163,11 +175,77 @@ In this paper we answer this question and propose solutions.
 6 = n9Nfr : index - ( in bafh) <redundant>
 7 = fr7jn : index - ( in bafh)
 8 = uoA1z : index - ( in bafh)
-9 =  : index - ( in bafh)
+9 = BF5c7 : index - ( in bafh)
+10 =  : index - ( in bafh)
 --------------------------------------------------------------------------------------
 kol addicts = Jc1DKGM7es KfuWedyuzR VD2LFb2mLn wxArVXmYEG MDtXvmS5NH T2CYW
 bafh 		= t1GT9j8DmT CP5cFHB53A KS1Um9io6y im9r82r6qr 7et1Eb57aP nQYQt
-me 			= __PpuPUmW3 xjH9jBF2uo A1zregK1RB F5c7_8Qou9 xen9Nfr7jn F35uR
+me 			= 2sPpuPUmW3 xjH9jBF2uo A1zregK1RB F5c7_8Qou9 xen9Nfr7jn F35uR
+
+***********versions to try*************
+-2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7a8Qou9xen9Nfr7jnF35uR
+-2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7b8Qou9xen9Nfr7jnF35uR
+-2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7c8Qou9xen9Nfr7jnF35uR
+-2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7d8Qou9xen9Nfr7jnF35uR
+-2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7e8Qou9xen9Nfr7jnF35uR
+-2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7f8Qou9xen9Nfr7jnF35uR
+-2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7g8Qou9xen9Nfr7jnF35uR
+-2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7h8Qou9xen9Nfr7jnF35uR
+<set up auto system now>
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7i8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7j8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7k8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7l8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7m8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7n8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7o8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7p8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7q8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7r8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7s8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7t8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7u8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7v8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7w8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7x8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7y8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7z8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c718Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c728Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c738Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c748Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c758Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c768Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c778Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c788Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c798Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c708Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7A8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7B8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7C8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7D8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7E8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7F8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7G8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7H8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7I8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7J8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7K8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7L8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7M8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7N8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7O8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7P8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7Q8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7R8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7S8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7T8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7U8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7V8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7W8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7X8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7Y8Qou9xen9Nfr7jnF35uR
+2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7Z8Qou9xen9Nfr7jnF35uR
 
 
 -BRACHYDOMES

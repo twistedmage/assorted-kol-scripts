@@ -4496,6 +4496,28 @@ save [$item[Skullery Maid's Knee]] = 0;
 save [$item[Red Fox glove]] = 1;
 save [$item[Boletus Broletus mushroom]] = 0;
 save [$item[Engorged Sausages and You]] = 1;
+save [$item[residual zeal]] = 0;
+save [$item[neoprene skullcap]] = 2;
+save [$item[ice cream sandwich]] = 0;
+save [$item["honey" dipper]] = 3;
+save [$item[plumber's lunch]] = 0;
+save [$item[nachos of the night]] = 0;
+save [$item[poppy]] = 0;
+save [$item[opium grenade]] = 0;
+save [$item[duonoculars]] = 1;
+save [$item[glass of bourbon]] = 0;
+save [$item[ham steak]] = 0;
+save [$item[baritone accordion]] = 1;
+save [$item[bone bandoneon]] = 1;
+save [$item[non-Euclidean non-accordion]] = 1;
+save [$item[ancient cursed foot locker]] = 0;
+save [$item[space junk]] = 0;
+save [$item[space invader]] = 0;
+save [$item[space bar]] = 0;
+save [$item[space needle]] = 3;
+save [$item[space heater]] = 3;
+save [$item[offensive moustache]] = 1;
+
 
 
 

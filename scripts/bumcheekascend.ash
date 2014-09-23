@@ -4663,8 +4663,95 @@ void use_rain_man()
 	use_rain_man($monster[none]);
 }
 
+void pass_check()
+{
+	if(i_a("Clan VIP Lounge key")>0)
+	{
+		print("trying to test new speakeasy password","purple");
+		//is vip waiting for a password
+		if(contains_text(visit_url("clan_viplounge.php?action=speakeasy"),"Tell the bartender a drink password"))
+		{
+			int idx = get_property("speakesy_purple_idx").to_int();
+			string[int] alph;
+			alph[0]="a";
+			alph[1]="b";
+			alph[2]="c";
+			alph[3]="d";
+			alph[4]="e";
+			alph[5]="f";
+			alph[6]="g";
+			alph[7]="h";
+			alph[8]="i";
+			alph[9]="j";
+			alph[10]="k";
+			alph[11]="l";
+			alph[12]="m";
+			alph[13]="n";
+			alph[14]="o";
+			alph[15]="p";
+			alph[16]="q";
+			alph[17]="r";
+			alph[18]="s";
+			alph[19]="t";
+			alph[20]="u";
+			alph[21]="v";
+			alph[22]="w";
+			alph[23]="x";
+			alph[24]="y";
+			alph[25]="z";
+			alph[26]="0";
+			alph[27]="1";
+			alph[28]="2";
+			alph[29]="3";
+			alph[30]="4";
+			alph[31]="5";
+			alph[32]="6";
+			alph[33]="7";
+			alph[34]="8";
+			alph[35]="9";
+			alph[36]="A";
+			alph[37]="B";
+			alph[38]="C";
+			alph[39]="D";
+			alph[40]="E";
+			alph[41]="F";
+			alph[42]="G";
+			alph[43]="H";
+			alph[44]="I";
+			alph[45]="J";
+			alph[46]="K";
+			alph[47]="L";
+			alph[48]="N";
+			alph[49]="O";
+			alph[50]="P";
+			alph[51]="Q";
+			alph[52]="R";
+			alph[53]="S";
+			alph[54]="T";
+			alph[55]="U";
+			alph[56]="V";
+			alph[57]="W";
+			alph[58]="X";
+			alph[59]="Y";
+			alph[60]="Z";
+			alph[61]="M";
+			
+			string pw="2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7"+alph[idx]+"8Qou9xen9Nfr7jnF35uR";
+			print("tryingg url: clan_viplounge.php?preaction=speakeasypw&drink=12&pwd&pw="+pw, "purple");
+			string res = visit_url("clan_viplounge.php?preaction=speakeasypw&drink=12&pwd&pw="+pw);
+			set_property("speakesy_purple_idx", idx+1);
+			if(!contains_text(res,"fancy dissappointment"))
+				abort("We may have just found the password! result="+res);
+		}
+		else
+			print("not allowed to try again yet","purple");
+	}
+}
 
 void setMood(string combat) {
+	//temporarily try to guess the speakeasy password
+	pass_check();
+
 	if (get_property("bcasc_disableMoods") == "true") {
 		cli_execute("mood apathetic"); 
 		return;
