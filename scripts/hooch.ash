@@ -225,9 +225,82 @@ void roman_farm()
 }
 
 
+void apocalypse()
+{
+//	clear_combat_macro();
+	if(have_familiar($familiar[warbear drone]))
+		use_familiar($familiar[warbear drone]);
+	else
+		use_familiar($familiar[mosquito]);
+	//outfit
+	if(have_outfit("twitch"))
+	{
+		cli_execute("outfit twitch");
+	}
+	else
+	{
+		string max_str = "0.01 "+to_string(my_primestat())+", +equip time-twitching toolbelt";
+		if(my_primestat()==$stat[muscle])
+			max_str += ", +melee";
+		if(my_primestat()==$stat[moxie])
+			max_str += ", +ranged";
+		
+		if(my_primestat()==$stat[mysticality])
+			max_str += ", 100 spell damage percent, spell damage";	
+		else
+			max_str += ", 100 weapon damage percent, weapon damage, elemental damage";
+		if(i_a("mayfly bait")>0)
+			max_str += "+equip mayfly bait";	
+		cli_execute("maximize "+max_str);
+		cli_execute("outfit save twitch");
+	}
+	setMood("");
+	
+	//
+	while(my_adventures()>0)
+	{
+		if(my_primestat()==$stat[muscle])
+		{
+			if(have_effect($effect[Incredibly Hulking])==0)
+			{
+				use(1,$item[Ferrigno's Elixir of Power]);
+			}
+			if(have_effect($effect[Phorcefullness])==0)
+			{
+				use(1,$item[philter of phorce]);
+			}
+/*			if(have_effect($effect[ham-fisted])==0)
+			{
+				use(1,$item[jug of hamethyst juice]);
+			}*/
+		}
+		else if(my_primestat()==$stat[moxie])
+		{
+			if(have_effect($effect[superhuman sarcasm])==0)
+			{
+				use(1,$item[serum of sarcasm]);
+			}
+			if(have_effect($effect[cock of the walk])==0)
+			{
+				use(1,$item[Connery's Elixir of Audacity]);
+			}
+/*			if(have_effect($effect[je ne sais porquoise])==0)
+			{
+				use(1,$item[jug of porquoise juice]);
+			}*/
+		}
+		cli_execute("mood execute; restore hp; restore mp");
+		string str = visit_url("adventure.php?snarfblat=418");
+		str=bumRunCombat();
+	}
+	
+}
+
 //ash set_property("SIMON_CAVVEDONE","true");
 void main()
 {
+	cli_execute("inventory refresh");
+	
 	pull_gear();
 	set_combat_macro();
 //	set_property("valueOfAdventure","2000");
@@ -237,10 +310,14 @@ void main()
 	}
 	else
 	{
-		roman_farm();
+		apocalypse();
+		//roman_farm();
 		//capsule_farm();
 	}
 //		farm_hooch();
 }
 
-//mars blessing - musc
+//seared dino steak
+//drinking gas
+//handful of napalm
+//factoids (virus done, ape done, z rex done)
