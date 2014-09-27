@@ -259,7 +259,7 @@ void apocalypse()
 	//
 	while(my_adventures()>0)
 	{
-		if(my_primestat()==$stat[muscle])
+/*		if(my_primestat()==$stat[muscle])
 		{
 			if(have_effect($effect[Incredibly Hulking])==0)
 			{
@@ -269,10 +269,10 @@ void apocalypse()
 			{
 				use(1,$item[philter of phorce]);
 			}
-/*			if(have_effect($effect[ham-fisted])==0)
+			if(have_effect($effect[ham-fisted])==0)
 			{
 				use(1,$item[jug of hamethyst juice]);
-			}*/
+			}
 		}
 		else if(my_primestat()==$stat[moxie])
 		{
@@ -284,11 +284,11 @@ void apocalypse()
 			{
 				use(1,$item[Connery's Elixir of Audacity]);
 			}
-/*			if(have_effect($effect[je ne sais porquoise])==0)
+			if(have_effect($effect[je ne sais porquoise])==0)
 			{
 				use(1,$item[jug of porquoise juice]);
-			}*/
-		}
+			}
+		}*/
 		cli_execute("mood execute; restore hp; restore mp");
 		string str = visit_url("adventure.php?snarfblat=418");
 		str=bumRunCombat();
@@ -317,7 +317,5 @@ void main()
 //		farm_hooch();
 }
 
-//seared dino steak
 //drinking gas
-//handful of napalm
 //factoids (virus done, ape done, z rex done)
