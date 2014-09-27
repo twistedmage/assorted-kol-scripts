@@ -191,8 +191,12 @@ void makepage() {
    foreach l in $locations[] sortl[count(sortl)] = l;
    sort sortl by value.zone;
    foreach i,l in sortl {
-      if (count(get_monsters(l)) == 0 || $locations[Grim Grimacite Site, The Cannon Museum, CRIMBCO cubicles, Atomic Crimbo Toy Factory, 
-         Old Crimbo Town Toy Factory, Simple Tool-Making Cave, Spooky Fright Factory, Crimborg Collective Factory] contains l) continue;
+      if (count(get_monsters(l)) == 0) continue;
+      if ($locations[Grim Grimacite Site, The Cannon Museum, CRIMBCO cubicles, Atomic Crimbo Toy Factory, 
+         Old Crimbo Town Toy Factory, Simple Tool-Making Cave, Spooky Fright Factory, Crimborg Collective Factory] contains l) {
+         foreach i,m in get_monsters(l) considered[m] = true;
+         continue;
+      }
       pop = false;
       foreach m,r in appearance_rates(l) {
          considered[m] = true;

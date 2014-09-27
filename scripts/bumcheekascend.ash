@@ -4663,95 +4663,7 @@ void use_rain_man()
 	use_rain_man($monster[none]);
 }
 
-void pass_check()
-{
-	if(i_a("Clan VIP Lounge key")>0)
-	{
-		print("trying to test new speakeasy password","purple");
-		//is vip waiting for a password
-		if(contains_text(visit_url("clan_viplounge.php?action=speakeasy"),"Tell the bartender a drink password"))
-		{
-			int idx = get_property("speakesy_purple_idx").to_int();
-			string[int] alph;
-			alph[0]="a";
-			alph[1]="b";
-			alph[2]="c";
-			alph[3]="d";
-			alph[4]="e";
-			alph[5]="f";
-			alph[6]="g";
-			alph[7]="h";
-			alph[8]="i";
-			alph[9]="j";
-			alph[10]="k";
-			alph[11]="l";
-			alph[12]="m";
-			alph[13]="n";
-			alph[14]="o";
-			alph[15]="p";
-			alph[16]="q";
-			alph[17]="r";
-			alph[18]="s";
-			alph[19]="t";
-			alph[20]="u";
-			alph[21]="v";
-			alph[22]="w";
-			alph[23]="x";
-			alph[24]="y";
-			alph[25]="z";
-			alph[26]="0";
-			alph[27]="1";
-			alph[28]="2";
-			alph[29]="3";
-			alph[30]="4";
-			alph[31]="5";
-			alph[32]="6";
-			alph[33]="7";
-			alph[34]="8";
-			alph[35]="9";
-			alph[36]="A";
-			alph[37]="B";
-			alph[38]="C";
-			alph[39]="D";
-			alph[40]="E";
-			alph[41]="F";
-			alph[42]="G";
-			alph[43]="H";
-			alph[44]="I";
-			alph[45]="J";
-			alph[46]="K";
-			alph[47]="L";
-			alph[48]="N";
-			alph[49]="O";
-			alph[50]="P";
-			alph[51]="Q";
-			alph[52]="R";
-			alph[53]="S";
-			alph[54]="T";
-			alph[55]="U";
-			alph[56]="V";
-			alph[57]="W";
-			alph[58]="X";
-			alph[59]="Y";
-			alph[60]="Z";
-			alph[61]="M";
-			
-			string pw="2sPpuPUmW3xjH9jBF2uoA1zregK1RBF5c7"+alph[idx]+"8Qou9xen9Nfr7jnF35uR";
-			print("tryingg url: clan_viplounge.php?preaction=speakeasypw&drink=12&pwd&pw="+pw, "purple");
-			string res = visit_url("clan_viplounge.php?preaction=speakeasypw&drink=12&pwd&pw="+pw);
-			set_property("speakesy_purple_idx", idx+1);
-			if(!contains_text(res,"fancy dissappointment"))
-				abort("We may have just found the password! result="+res);
-		}
-		else
-			print("not allowed to try again yet","purple");
-	}
-}
-
 void setMood(string combat) {
-	//temporarily try to guess the speakeasy password
-	pass_check();
-
 	if (get_property("bcasc_disableMoods") == "true") {
 		cli_execute("mood apathetic"); 
 		return;
@@ -9445,28 +9357,35 @@ boolean bcascMacguffinHiddenCity() {
 		while (available_amount($item[dripping stone sphere]) == 0) {
 			while (available_amount($item[bloodied surgical dungarees]) == 0 && available_amount($item[surgical apron]) == 0 && (available_amount($item[half-size scalpel]) == 0 || my_buffedstat($stat[muscle]) < $monster[protector spectre].base_defense) && available_amount($item[head mirror]) == 0 && available_amount($item[surgical mask]) == 0) {
 				print("BCC: Adventuring one turn at a time to get surgeon's disguise.", "purple");
-				bumMiniAdv(1, $location[The Hidden Hospital], "");
+				bumAdv($location[The Hidden Hospital], "items", "item", "", "Getting the surgeon's disguise.", "i");
 			}
 
 			string equip = "5 elemental damage, ";
+			int surgeonosity = 0;
 			if (available_amount($item[bloodied surgical dungarees]) > 0) {
 				equip += "+equip bloodied surgical dungarees, ";
+				surgeonosity+=1;
 			}
 			if (available_amount($item[surgical apron]) > 0 && have_skill($skill[torso awaregness]) && !contains_text(to_string(equipped_item($slot[shirt])), "Sneaky Pete")) {
 				equip += "+equip surgical apron, ";
-			}
-			if (available_amount($item[half-size scalpel]) > 0 && my_buffedstat($stat[muscle]) > $monster[protector spectre].base_defense) {
-				equip += "+equip half-size scalpel, ";
+				surgeonosity+=1;
 			}
 			if (available_amount($item[head mirror]) > 0) {
 				equip += "+equip head mirror, ";
+				surgeonosity+=1;
 			}
 			if (available_amount($item[surgical mask]) > 0) {
 				equip += "+equip surgical mask, ";
+				surgeonosity+=1;
  			}
+			//only equip scalpell while moxie class, if it's our only choice
+			if (available_amount($item[half-size scalpel]) > 0 && (my_primestat()!=$stat[moxie] || surgeonosity==0)){
+				equip += "+equip half-size scalpel, ";
+				surgeonosity+=1;
+			}
 
 			set_property("choiceAdventure784", "1");
-			bumAdv($location[The Hidden Hospital], equip, "", "1 choiceadv", "Getting the dripping stone sphere.", "-");
+			bumAdv($location[The Hidden Hospital], equip, "item", "1 choiceadv", "Getting the dripping stone sphere (and perhaps some more gear to speed it up? current surgeonosity="+surgeonosity+").", "-i");
 		}
 		while (item_amount($item[dripping stone sphere]) == 1) {
 			bumMiniAdv(1, $location[An Overgrown Shrine (Southwest)], "");
@@ -12550,12 +12469,20 @@ void bumcheekcend() {
 }
 
 void mainWrapper() {
+	if(my_name()=="twistedmage" && my_level()<9)
+		abort("Check base pool skill (while not drunk and haven't practiced this ascension)");
+		
 	//use gyro if poss
 	if(!to_boolean(get_property("_warbearGyrocopterUsed")))
 	{
 		print("----------CAN USE GYROCOPTER!---------","red");
 		if(i_a("warbear gyrocopter")==0)
-			print("----------(BUT DON'T HAVE ONE!---------","red");
+		{
+			if(can_interact())
+			{
+				abort("----------BUT DON'T HAVE ONE!---------");
+			}
+		}
 		else
 		{	
 			//use gryo

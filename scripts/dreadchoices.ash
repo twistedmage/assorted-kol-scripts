@@ -211,6 +211,11 @@ void do_castle()
 	{
 		do_choice(7, "?pwd&whichchoice=745&option=3&choiceform3=Investigate+the+dining+room", "?pwd&whichchoice=748&option=3&choiceform3=Levitate+up+to+the+rafters");
 	}
+	else if(!already_done("drove some vampires out of the castle")) //reduce zombies
+	{
+		get_key();
+		do_choice(7, "?pwd&whichchoice=745&option=1", "?pwd&whichchoice=746&option=1");
+	}
 	else if(!already_done("roast"))
 	{
 		do_choice(7, "?pwd&whichchoice=745&option=3&choiceform3=Investigate+the+dining+room", "?pwd&whichchoice=748&option=1&choiceform1=Grab+the+roast");
@@ -239,7 +244,7 @@ void do_castle()
 	}
 	else
 	{*/
-		abort("skills");
+		//abort("skills");
 		do_choice(8, "?pwd&whichchoice=749&option=3&choiceform3=Go+to+the+bedroom", "?pwd&whichchoice=752&option=2&choiceform2=Check+the+dresser");
 //	}
 }

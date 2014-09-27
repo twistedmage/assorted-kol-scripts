@@ -306,7 +306,7 @@ spread get_resistance(element which) {
 
 // TODO: Frosty takes up to 3 damage from hot/spooky
 // total damage to the monster from a spread, accounting for resistance and soft damage caps
-float dmg_dealt(spread action) {
+float dmg_dealt(spread action, boolean hpcap) {
    float res;
    spread newdeal;
    foreach el,amt in action newdeal[el] = amt < 0 ? amt : max(to_int(amt > 0),amt - mres[el]*amt);  // first, apply monster resistances
@@ -315,8 +315,9 @@ float dmg_dealt(spread action) {
       return damagecap + floor((orig - damagecap)**capexp);
    }
    foreach el,amt in newdeal res += softcapped(amt);
-   return min(res,monster_stat("hp"));
+   return hpcap ? min(res,monster_stat("hp")) : res;
 }
+float dmg_dealt(spread action) { return dmg_dealt(action, true); }
 
 float dmg_taken(spread pain) {     // note: negative values for healing
    float res;
@@ -1233,7 +1234,7 @@ void build_skillz() {
       advevent temp = to_event(thisid,d,to_spread(fields.pdmg),fields.special,1);
       switch (m) {
          case $monster[mother hellseal]: if (dmg_dealt(d) > 0 && (sk == 1022 || !contains_text(fields.special,"regular"))) return; break;
-         case $monster[gurgle]: if (is_spell(to_skill(sk))) foreach e,a in temp.dmg if (a > 0) temp.pdmg[e] += a; break;
+         case $monster[gurgle]: if (is_spell(to_skill(sk))) foreach e,a in temp.dmg if (a > 0) { temp.dmg[e] = 0; temp.pdmg[e] += a; } break;
       }
       if (contains_text(fields.special,"regular")) temp = merge(temp,onhit);
        else if (isseal) foreach el,amt in temp.dmg if (temp.dmg[el] > 0) temp.dmg[el] = min(1.0,amt);
@@ -1584,7 +1585,7 @@ void set_monster(monster elmo) {  // should be called once per BB instance; init
   // account for +ML
    if (monster_level_adjustment() > 25) {
       float ml = min(monster_level_adjustment() * 0.004, 0.5);
-      foreach res,amt in mres mres[res] = ml + amt - (ml * amt);
+      foreach res,amt in mres if (res != $element[supercold]) mres[res] = ml + amt - (ml * amt);
       if (monster_level_adjustment() > 50) {
          if (nostagger < 1) setmatt("nostagger", rnum(max(nostagger, (monster_level_adjustment() - 50) * 0.01)));
          if (monster_level_adjustment() > 100) setmatt("nomultistun","");

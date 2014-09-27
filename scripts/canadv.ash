@@ -143,12 +143,12 @@ boolean can_adv(location where, boolean prep, int verb) {
       case "Beanstalk": return levelcheck(10);
       case "Cyrpt": return levelcheck(7) && itemcheck($item[evilometer]);
       case "Dreadsylvania": return levelcheck(15) && visit_url("clan_dreadsylvania.php").contains_text(">Dreadsylvania<");
-      case "Farm": return levelcheck(12) && get_property("warProgress") == "started" && get_property("sidequestFarmCompleted") == "none";
+      case "Farm": return levelcheck(12) && get_property("questL12War") == "started" && get_property("sidequestFarmCompleted") == "none";
       case "Friars": return levelcheck(6) && qprop("questL06Friar","started") && get_property("questL06Friar") != "finished";
       case "HiddenCity": return levelcheck(11) && qprop("questL11Worship","step3");
       case "Highlands": return levelcheck(9) && qprop("questL09Topping","started") && get_property("chasmBridgeProgress").to_int() >= 30;
       case "Hobopolis": return contains_text(visit_url("town_clan.php"), "clanbasement.gif") && !contains_text(visit_url("clan_basement.php?fromabove=1"), "not allowed");
-      case "Island": return (get_property("lastIslandUnlock") == my_ascensions()) && get_property("warProgress") != "started";
+      case "Island": return (get_property("lastIslandUnlock") == my_ascensions()) && get_property("questL12War") != "started";
       case "IsleWar": return levelcheck(12) && qprop("questL12War","started") && get_property("questL12War") != "finished";
       case "Jacking": return itemcheck($item[map to Professor Jacking's laboratory]);
       case "Junkyard": return levelcheck(12) && get_property("sidequestJunkyardCompleted") == "none";
