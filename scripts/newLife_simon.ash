@@ -429,8 +429,8 @@ void handle_starting_items() {
 
 void recovery_settings() {
 	// Optimal restoration settings for level 1. These will need to be changed by level 4
-	set_choice("hpAutoRecovery", "0.25", "Resetting HP/MP restoration settings to minimal");
-	set_choice("hpAutoRecoveryTarget", "0.95", "");
+	set_choice("hpAutoRecovery", "0.6", "Resetting HP/MP restoration settings to minimal");
+	set_choice("hpAutoRecoveryTarget", "0.90", "");
 	set_choice("manaBurningTrigger", "-0.05", "");
 	set_choice("manaBurningThreshold", "0.80", "");
 	// Zombie Slayers have an alternative to using mana
@@ -817,6 +817,13 @@ void special(boolean bonus_actions) {
 	//		if(get_property("tomeSummons").to_int() > 0 && my_path()!="Way of the Surprising Fist")
 	//			use_skill(3 - get_property("tomeSummons").to_int(), $skill[Summon Stickers]);
 
+	
+			if(my_name()=="twistedmage")
+			{
+				pull_if_good($item[rusty grave robbing shovel]);
+				pull_if_good($item[lord spookyravens ear trumpet]);
+				print("******** PULLING EAR TRUMPET AND GRAVE SHOVEL **********","red");
+			}
 		}
 	}
 	

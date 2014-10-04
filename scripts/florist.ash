@@ -72,6 +72,8 @@ location mafia_style_zone(string loc)
 		loc="wartime Frat House";
 	else if(loc=="[DungeonFAQ - Level 1]")
 		loc="Video Game Level 1";
+	else if(loc=="The Cola Wars Battlefield")
+		loc="battlefield (no uniform)";
 	
 		
 		

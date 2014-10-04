@@ -228,32 +228,26 @@ void roman_farm()
 void apocalypse()
 {
 //	clear_combat_macro();
+	if(to_int(get_property("_hipsterAdv"))< 7 && have_familiar($familiar[mini-hipster]))
+		use_familiar($familiar[mini-hipster]);
 	if(have_familiar($familiar[warbear drone]))
 		use_familiar($familiar[warbear drone]);
 	else
 		use_familiar($familiar[mosquito]);
 	//outfit
-	if(have_outfit("twitch"))
-	{
-		cli_execute("outfit twitch");
-	}
+	string max_str = "0.01 "+to_string(my_primestat())+", +equip time-twitching toolbelt";
+	if(my_primestat()==$stat[muscle])
+		max_str += ", +melee";
+	if(my_primestat()==$stat[moxie])
+		max_str += ", -melee";
+	
+	if(my_primestat()==$stat[mysticality])
+		max_str += ", 100 spell damage percent, spell damage";	
 	else
-	{
-		string max_str = "0.01 "+to_string(my_primestat())+", +equip time-twitching toolbelt";
-		if(my_primestat()==$stat[muscle])
-			max_str += ", +melee";
-		if(my_primestat()==$stat[moxie])
-			max_str += ", +ranged";
-		
-		if(my_primestat()==$stat[mysticality])
-			max_str += ", 100 spell damage percent, spell damage";	
-		else
-			max_str += ", 100 weapon damage percent, weapon damage, elemental damage";
-		if(i_a("mayfly bait")>0)
-			max_str += "+equip mayfly bait";	
-		cli_execute("maximize "+max_str);
-		cli_execute("outfit save twitch");
-	}
+		max_str += ", 100 weapon damage percent, weapon damage, elemental damage";
+	if(i_a("mayfly bait")>0 && get_property("_mayflySummons").to_int() <30)
+		max_str += "+equip mayfly bait";	
+	cli_execute("maximize "+max_str);
 	setMood("");
 	
 	//
@@ -302,7 +296,7 @@ void main()
 	cli_execute("inventory refresh");
 	
 	pull_gear();
-	set_combat_macro();
+//	set_combat_macro();
 //	set_property("valueOfAdventure","2000");
 	if(!get_property("SIMON_CAVVEDONE").to_boolean())
 	{
@@ -316,6 +310,7 @@ void main()
 	}
 //		farm_hooch();
 }
-
-//drinking gas
-//factoids (virus done, ape done, z rex done)
+//stuff from new store
+//anid has earbuds
+//3 iflail (asica has one, twistedmage has one)
+//ishield (twistedmage has)

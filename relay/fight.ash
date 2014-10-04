@@ -84,7 +84,7 @@ string seratable() {
    ym.reset(rec.yield);
    while (ym.find()) {
       i = to_item(ym.group(1));
-      if (i == $item[none]) { vprint("'"+ym.group(1)+"' is not an item.",-2); res.append(ym.group(1)); continue; }
+      if (i == $item[none]) { res.append(ym.group(1)); continue; }
       res.append("<a href=# class='cliimglink' title=\"wiki "+i+"\"><img src='/images/itemimages/"+i.image+
          "' title=\""+i+" (have: "+rnum(have_item(i))+")\"></a> ");
       if (is_integer(ym.group(2))) res.append(" ("+ym.group(2)+") ");
@@ -138,7 +138,7 @@ void handle_post() {
    if (post contains "dashi") switch (post["dashi"]) {     // fetch a refreshed component
      case "annae":
       buffer abox;
-      abox.append("Adventure again at "+my_location()+".");
+      abox.append("Adventure again at <a href=# class=cliimglink title=\"wiki "+my_location()+"\">"+my_location()+"</a>.");
       if (my_path() == "Heavy Rains") {  abox.append(" <img style='vertical-align: text-top' height=22 width=22 src='/images/itemimages/");
          switch (my_location().environment) {
             case "underground": abox.append("echo.gif' title='Underground: Thunder'>"); break;
@@ -216,7 +216,7 @@ void handle_post() {
          case $location[the haunted ballroom]: if (item_amount($item[dance card]) > 0 && get_counters("Dance Card",0,5) == "") 
             abox.append("<p><a href=# class='cliimglink' title='use dance card'><img src='/images/itemimages/guildapp.gif' class=hand></a>"); break;
          case $location[the haunted kitchen]: if (item_amount($item[Spookyraven billiards room key]) > 0) break;
-            abox.append("<p>You will open <b>"+rnum(max(1,floor(max(numeric_modifier("Hot Resistance"), numeric_modifier("Stench Resistance"))/3)))+"</b> drawers per fight.<p>");
+            abox.append("<p>You will open <b>"+rnum(minmax(floor(max(numeric_modifier("Hot Resistance"), numeric_modifier("Stench Resistance"))/3),1,4))+"</b> drawers per fight.<p>");
             foreach tores in $elements[hot, stench] abox.append("<b>"+tores+" res:</b> "+rnum(numeric_modifier(tores+" Resistance"))+
                " <a href=# class='clilink'>maximize "+tores+" res, -tie</a><br>"); break;
          case $location[the haunted billiards room]: if (item_amount($item[Spookyraven library key]) > 0) break;
@@ -241,6 +241,18 @@ void handle_post() {
          case $location[the black forest]: abox.append("<p>Black locations discovered: <b>"+get_property("blackForestProgress")+" / 5</b>");
             if (!have_equipped($item[blackberry galoshes]) && can_equip($item[blackberry galoshes]) && item_amount($item[blackberry galoshes]) > 0)
                abox.append("<p><a href=# class='cliimglink' title='equip acc3 blackberry galoshes'><img src='/images/itemimages/bgaloshes.gif' class=hand></a>");
+            break;
+         case $location[a mob of zeppelin protesters]: int zeptot = (have_effect($effect[musky]) == 0) ? 0 : 3;
+            abox.append("<p>You have scared away <b>"+get_property("zeppelinProtestors")+"</b> of <b>80</b> protesters.<p>");
+            foreach i in $items[lynyrdskin cap, lynyrdskin tunic, lynyrdskin breeches] if (have_equipped(i)) zeptot += 5;
+             else if (can_equip(i) && item_amount(i) > 0 && be_good(i)) abox.append("<a href=# class='cliimglink' title='equip "+to_slot(i)+" "+i+
+                "'><img src='/images/itemimages/"+i.image+"' class=hand></a> ");
+            if (item_amount($item[lynyrd musk]) > 0 && have_effect($effect[musky]) == 0) abox.append("<a href=# class='cliimglink' title='use lynyrd musk'>"+
+               "<img src='/images/itemimages/lynyrdmusk.gif' class=hand></a>");
+            abox.append("<p>Lynyrd: <b>"+zeptot+"</b> (scare "+rnum(3+zeptot)+" away)");
+            zeptot = numeric_modifier("Sleaze Damage") + numeric_modifier("Sleaze Spell Damage");
+            abox.append("<br>Sleaze: <b>"+rnum(zeptot)+"</b> (scare "+max(3,ceil(zeptot**0.5))+" away) <a href=# class=clilink>maximize sleaze damage, sleaze spell damage, -tie</a>");
+            abox.append("<br>Flaming Whatshisnames: <b>"+item_amount($item[Flamin' Whatshisname])+"</b>");
             break;
          case $location[The Filthworm Queen's Chamber]:
             if (have_outfit("Frat Warrior")) abox.append("<p><a href='bigisland.php?place=orchard&action=stand&pwd' class='clilink through' title='checkpoint; outfit frat warrior fatigues'>visit stand as frat</a>");
@@ -304,7 +316,7 @@ void handle_post() {
          monster goalmon = has_goal(sortm[0]) == 0 ? $monster[none] : sortm[0];
          sort sortm by -arq[value];
          foreach i,m in sortm {
-            if (arq[m] <= 0) continue;
+            if (arq[m] <= 0 && !is_banished(m)) continue;
             abox.append("<td align=center valign=top class='queuecell"+(m == goalmon && count(get_goals()) > 0 ? " goalmon" : "")+(been_banished(m) ? " dimmed" : "")+
                "'><a href=# class='cliimglink' title=\"wiki "+(m == $monster[none] ? to_string(my_location()) : m)+
                "\"><img src='/images/adventureimages/"+(m == $monster[none] ? "3doors.gif" : m.image == "" ? "question.gif" : m.image)+

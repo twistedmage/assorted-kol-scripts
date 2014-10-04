@@ -327,12 +327,11 @@ void setvar(string varname,stat dfault)    {  setvar(varname,to_string(dfault),"
 boolean be_good(string johnny) {
    switch (my_path()) {
       case "Bees Hate You": return johnny.to_lower_case().index_of("b") == -1;
-      case "Trendy": return is_trendy(johnny);
       case "Way of the Surprising Fist": return !($slots[weapon,off-hand] contains johnny.to_item().to_slot());
       case "Avatar of Boris": if (johnny.to_familiar() != $familiar[none]) return false;
          return !($slots[weapon,off-hand] contains johnny.to_item().to_slot()) || johnny == "Trusty";
    }
-   return true;
+   return is_unrestricted(johnny);
 }
 
 // check the mall price of an item

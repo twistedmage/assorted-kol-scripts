@@ -394,6 +394,8 @@ void prepHatred()
 	print("Preparing for the big fight!","blue");
 	set_combat_macro_name(false);
 	cli_execute("familiar squamous");
+	//remove passive damage
+	cli_execute("uneffect scarysauce; uneffect jalap; uneffect jaba; uneffect Soul Funk; familiar squamous gibberer");
 	//reduce hp
 	cli_execute("uneffect phorcefullness; uneffect incredibly hulking; uneffect reptilian fortitude; uneffect a few extra pounds; uneffect urkel");
 	getsome(1, $item[extra-strength red potion]);
@@ -1126,6 +1128,10 @@ void scholar_path()
 		{
 			print("No luck with figuring out the deepscroll. You'll probably need to figure out a few more steps yourself.");
 			return;
+		}
+		else
+		{
+			set_property("_merkin_temple_open","true");
 		}
 	}
 

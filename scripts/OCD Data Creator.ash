@@ -4517,14 +4517,31 @@ save [$item[space bar]] = 0;
 save [$item[space needle]] = 3;
 save [$item[space heater]] = 3;
 save [$item[offensive moustache]] = 1;
-
-
-
-
-
+save [$item[iShield]] = 1;
+save [$item[iFlail]] = 3;
+save [$item[alien drugs]] = 0;
+save [$item[beer-battered accordion]] = 1;
+save [$item[Accordion of Jordion]] = 1;
+save [$item[zombie hollandaise]] = 0;
+save [$item[bubble-wrap simulator]] = 0;
+save [$item[alien hologram projector]] = 0;
+save [$item[white blood cells]] = 0;
+save [$item[white wine]] = 0;
 
 
 //stuff to sell later;s
+save [$item[Xiblaxian circuitry]] = -1;
+save [$item[Xiblaxian polymer]] = -1;
+save [$item[white page]] = -1;
+save [$item[TI-9000 calculator]] = -1;
+save [$item[unused soap]] = -1;
+save [$item[impure gasoline]] = -1;
+save [$item[Z-Bone steak]] = -1;
+save [$item[viral DNA]] = -1;
+save [$item[tarnished bottlecap]] = -1;
+save [$item[bottle of drinkin' gas]] = -1;
+save [$item[handful of napalm]] = -1;
+save [$item[gelatinous meat mass]] = -1;
 save [$item[holo-tank]] = -1;
 save [$item[holo-bomber]] = -1;
 save [$item[holo-platoon]] = -1;

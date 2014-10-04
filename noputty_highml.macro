@@ -71,14 +71,8 @@ endif
 
 mark generic_spells1
 
-if hasskill intimidating bellow || hasskill steal accordion || hasskill summon mayfly swarm || (sauceror && hasskill Curse of Weaksauce) || (!sauceror && hasskill Curse of the Thousand Islands) || hasskill feed || hasskill spring raindrop attack || hasskill infectious bite || (hasskill smash & graaagh && (monstername filthworm || monstername BL imp || monstername CH imp || monstername PR imp || monstername inkubus || monstername suckubus || monstername serialbus || monstername Gnollish Gearhead || monstername irate mariachi || monstername handsome mariachi || monstername briefcase bat || monstername raver giant || monstername furry giant || monstername goth giant || monstername sassy pirate || monstername swarthy pirate || monstername dairy goat || monstername spiny skelelton || monstername toothy sklelton || monstername blur || monstername bob racecar || monstername racecar bob || monstername grungy pirate || monstername war pledge || monstername frat warrior drill sergeant || monstername baseball bat || monstername doughbat || monstername perpendicular bat || monstername skullbat || monstername vampire bat || monstername batrat || monstername ratbat || monstername beanbat) && !monstername the queen filthworm)
+if hasskill intimidating bellow || hasskill steal accordion || hasskill summon mayfly swarm || hasskill feed || hasskill spring raindrop attack || hasskill infectious bite || (hasskill smash & graaagh && (monstername filthworm || monstername BL imp || monstername CH imp || monstername PR imp || monstername inkubus || monstername suckubus || monstername serialbus || monstername Gnollish Gearhead || monstername irate mariachi || monstername handsome mariachi || monstername briefcase bat || monstername raver giant || monstername furry giant || monstername goth giant || monstername sassy pirate || monstername swarthy pirate || monstername dairy goat || monstername spiny skelelton || monstername toothy sklelton || monstername blur || monstername bob racecar || monstername racecar bob || monstername grungy pirate || monstername war pledge || monstername frat warrior drill sergeant || monstername baseball bat || monstername doughbat || monstername perpendicular bat || monstername skullbat || monstername vampire bat || monstername batrat || monstername ratbat || monstername beanbat) && !monstername the queen filthworm)
 	#insta-curse
-	if sauceror && hasskill Curse of Weaksauce
-		skill Curse of Weaksauce
-	endif
-	if !sauceror && hasskill Curse of the Thousand Islands
-		skill Curse of the Thousand Islands
-	endif
 	if hasskill intimidating bellow
 		skill intimidating bellow
 	endif

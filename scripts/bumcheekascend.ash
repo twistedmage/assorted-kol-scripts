@@ -4679,7 +4679,7 @@ void setMood(string combat) {
 
 	cli_execute("mood bumcheekascend");
 	cli_execute("mood clear");
-	defaultMood(combat == "");
+	defaultMood(combat == "" && my_level()<15);
 
 	//gene tonics
 	use_genetics_lab(combat);
@@ -7372,6 +7372,7 @@ abort("nook - get debonair deboners from choiceadv, line 6137");
 		while (!stageDone("Cranny")) {	//Kill swarms of ghuol welps (+NC, +ML) to decrease evil
 			set_property("choiceAdventure523",4);
 			eat_hot_dog("chilly dog",$location[The Defiled Cranny]);
+			set_combat_macro(); //make sure we have the right macro, because we may be running high ml
 			bumAdv($location[The Defiled Cranny], "", "ml", "", "Un-Defiling the Cranny (4/4)", "-l");
 		}
 		if (my_buffedstat(my_primestat()) > 101) {
@@ -10291,6 +10292,11 @@ boolean bcascManorBilliards() {
 	}
 
 	//Billiards Room
+	if(my_inebriety()>10)
+	{
+		print("skipping pool while too drunk","purple");
+		return false;
+	}
 	while (item_amount($item[Spookyraven library key]) == 0) {
 		while (i_a("pool cue") == 0) {
 			set_pool_choices();
@@ -11728,12 +11734,17 @@ void bcs7() {
 	bcascCyrpt();
 	bcascInnaboxen();
 	if(bcasc_bedroom) {
-		bcascManorBilliards();
-		bcascManorLibrary();
-		bcascManorBathroom();
-		bcascManorBedroom();
-		bcascManorGallery();
-		bcascManorBallroom();
+		boolean ret = bcascManorBilliards();
+		if(ret)
+			ret = bcascManorLibrary();
+		if(ret)
+			ret = bcascManorBathroom();
+		if(ret)
+			ret = bcascManorBedroom();
+		if(ret)
+			ret = bcascManorGallery();
+		if(ret)
+			ret = bcascManorBallroom();
 	}
 	else
 	{
@@ -12469,8 +12480,10 @@ void bumcheekcend() {
 }
 
 void mainWrapper() {
-	if(my_name()=="twistedmage" && my_level()<9)
-		abort("Check base pool skill (while not drunk and haven't practiced this ascension)");
+	if(my_name()=="twistedmage" && my_level()<3)
+	{
+		abort("Check base pool skill (while not drunk and haven't practiced this ascension). ALSO COLA BATTLEFIELD (DELEVEL WiTH BASIC HOT DOGS)");
+	}
 		
 	//use gyro if poss
 	if(!to_boolean(get_property("_warbearGyrocopterUsed")))

@@ -251,6 +251,8 @@ void do_castle()
 
 void main()
 {
+	if(my_hp()==0)
+		cli_execute("restore hp");
 	do_forest();
 	do_village();
 	do_castle();

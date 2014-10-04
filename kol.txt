@@ -1,24 +1,18 @@
-Dina told me I have mental problems, and i'm an idiot who doesn't understand people. And that everyone is right about me.
-
 ----------aftercore--------------
 108 gyros = 27 copters = 10,800,000 (22 days to eat if 5 per day)
-
-<fax illegal aliens for factoids (2 done)>
-
-<fax adventurer echo - get factoids + chroner>
-
-
 ***********************FIX disposable instant camera*********************************
 
+stuff from apocalyptic future store
+	anid has earbuds
+	3 iflail (asica has one, twistedmage has one)
 sea stuff?
 	//make
 	//gladiator
 	1 jodhpurs of violence (AT)
 	//scholar
 	1 lens of hatred (AT)
-	1 pantaloons of hatred (SA)
 warbear dress gear?
-moister oyster factoids (optimal dog)
+moister oyster factoids (optimal dog) (2 done)
 other factoids
 permanently get 10 pool skill with semirares (25 visits)
 	15-19 times (ccurently have 7 passive skill, implies 11-15 when i thought it was 9)
@@ -26,54 +20,43 @@ permanently get 10 pool skill with semirares (25 visits)
 	this happened after 4 trainings, meaning x-4 <= 15 && x<=20 && x-4>=11 && x>=16    simplifies to    x <= 19 && x>=16
 	now have 18-21 visits (i may have missed one or two)
 	now have 9 skill, meaning 21-25 visits, combined with the above line, probably have 21-22 visits now
-	~24-25 visits out of 25
+	~25? visits out of 25
 unlock speakeasy
 	The brown password to unlock the Ish Kabibble can be found by equipping Lord Spookyraven's ear trumpet and adventuring in The Cola Wars Battlefield (undisguised).
 unlock hotdogs
 additional hot dog unlock  (especially defective token, use token in ascension (pool skill, resistance, smithsness))
-spring break outfit, tattoo, resist skill (last mind destroyer 26/09/2014 next (on/after?) 3rd oct)
+spring break outfit, tattoo (last mind destroyer 26/09/2014 next (on/after?) 3rd oct)
 trophies - 
-	KOLHS (commit to each clique, fully upgrade year book calendar)
+	KOLHS (commit to each clique, fully upgrade year book camera)
 		FAX TEACHERS FOR FACTOIDS + TROPHY
 		commited to greasers
 	eat warbear gyros
-	make bowl of petunias (need orange lint)
 white citadel factoids and items
-	biclops factoids (2 done)
-	sticky mummy factoids (2 done)
-	Giant mob of baby spiders factoids (2 done)
 	Spider-legged witch's hut factoids
 	Extremely annoyed witch factoids
-	 Surprised and annoyed witch factoids (2 done)
-	Elpízo &amp; Crosybdis factoids (2 done)
-	pig factoids (2 done)
-dreadsylv gear (skele sword, non boss gear (grandfather watch))
+dreadsylv gear (skele sword, correct num of each boss thing? non boss gear (grandfather watch))
 	dread tattoos
+		dreadful skeleton - 250 musc
+		dreadful werewolf - 250 musc
 	dread trophies
-discoveries
-skills from heavy rains?
+		drink 50 bloodweiser
+		eat 50 kool-aid
 finish avatar of jarlsberg, finish avatar of sneaky pete, fully upgrade kolhs camera
-get protest items
 	3 the nuges favorite crossbow (UR)
 Giant rubber spider factoids
 11 heavy rains runs, eat 11 rainbows
 credit for all summons in quest log other accomplishments
-	Red'dthzuul - Big Flaming Whip - hot dmg + dr
-	Gog Tywaitgol - pie demon
-	Ak'gyxoth = 3 drinks
-	Kel'baalvek=burning man
 	Tatter = pet
 	Nya-zuul-red = revenge
 	Funabanya - strange box
 	<cola battlefield>
-factoids from xiblaxian political prisoner (2 done)
 factoids for holographic army (2 done)
 Xiblaxian 5D printer schematics
 Xiblaxian Holo-Companion familiar
-Xiblaxian xeno-detection goggles
 Xiblaxian gear
 Xiblaxian Tattoo
-
+Xiblaxian xeno-detection goggles
+they liver popsicle
 
 
 ------------bca-------------------
@@ -115,16 +98,23 @@ gelatinous cubeling
 maybe platinum card is worth a pull for mp + daily dungeon?
 
 
+
+
+
+"One of a kind magic interrupts traffic (6)
+
+If you solve it, kmail me and I'll send you a prize. (Prize not guaranteed to be valuable.) Even if you don't solve it (it's hard!), or if puzzles aren't your bag, know that I think you are a beautiful person."
+
+
+
 ---skills---
 utensil twist + hand that rocks the ladle - p
 icy glare
-wry smile - s
 patient smile - tt
 Subtle and Quick to Anger - p
 The Long View - tt
 Five Finger Discount - at
 disco bravado - db
-Unoffendable
 Ire of the Orca - sc
 Seething of the Snow Leopard - sc
 shield of the pastalord - p
