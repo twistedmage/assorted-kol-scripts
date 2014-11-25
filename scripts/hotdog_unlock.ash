@@ -45,7 +45,7 @@ void unlock_sly()
 			if (have_skill($skill[Smooth Movement])) cli_execute("trigger lose_effect, Smooth Movements, cast 1 smooth movement");
 			if (have_skill($skill[The Sonata of Sneakiness])) cli_execute("trigger lose_effect, The Sonata of Sneakiness, cast 1 sonata of sneakiness");
 			while(my_adventures()>0 && get_property("lastEncounter") != "Skull, Skull, Skull")
-				adventure(1,$location[The defiled nook]);
+				adv1($location[The defiled nook], -1, "");
 			set_property("battleAction","custom combat script");
 		}
 		set_property("_sly_checked_today","true");

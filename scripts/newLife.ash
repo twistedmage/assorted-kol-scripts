@@ -13,7 +13,7 @@ if(check_version("newLife", "bale-new-life", "1.14.4", 2769) != ""
 
 if(!($strings[None, Teetotaler, Boozetafarian, Oxygenarian, Bees Hate You, Way of the Surprising Fist, Trendy,
 Avatar of Boris, Bugbear Invasion, Zombie Slayer, Class Act, Avatar of Jarlsberg, BIG!, KOLHS, Class Act II: A Class For Pigs, 
-Avatar of Sneaky Pete, Slow and Steady, 19, Heavy Rains] contains my_path())
+Avatar of Sneaky Pete, Slow and Steady, Heavy Rains, Picky] contains my_path())
   && user_confirm("Your current challenge path is unknown to this script!\nUnknown and unknowable errors may take place if it is run.\nDo you want to abort?")) {
 	vprint("Your current path is unknown to this script! A new version of this script should be released very soon.", -1);
 	exit;
@@ -79,13 +79,14 @@ void set_choice_adventures() {
 	set_choice(875, 1, "Billiards Room: Play Pool");
 	set_choice(888, 4, "Library, Rise of the House of Spookyraven: Ignore");
 	set_choice(889, 4, "Library, Fall of the House of Spookyraven: Ignore");
-	set_choice(876, 6, "Bedroom, White Nightstand: Skip");
-	set_choice(877, 6, "Bedroom, Mahogany Nightstand: Skip");
+	set_choice(877, 1, "Bedroom, Mahogany Nightstand: old coin purse");
 	set_choice(878, 3, "Bedroom, Ornate Nightstand: Get spectacles");
 	if(my_path() == "Bees Hate You")
 		set_choice(879, 3, "Bedroom, Rustic Nightstand: Fight Mistress for Antique Mirror");
+	else if(primestat == $stat[Moxie])
+		set_choice(879, 1, "Bedroom, Rustic Nightstand: Get Moxie Stats");
 	else
-		set_choice(879, 6, "Bedroom, Rustic Nightstand: Skip");
+		set_choice(879, 2, "Bedroom, Rustic Nightstand: Get grouchy restless spirit");
 	set_choice(880, 1, "Bedroom, Elegant Nightstand: Get Lady Spookyraven's finest gown");
 	set_choice(106, 2, "Ballroom song: Non-combat");
 	set_choice(89, 6, "Haunted Gallery: Ignore 'Out in the Garden'");
@@ -187,6 +188,7 @@ void set_choice_adventures() {
 		set_choice(141, 2, "Hippies on the Verge of War, Blockin' Out the Scenery: Get rations");
 		set_choice(145, 1, "Frats on the Verge of War, Fratacombs: Get Muscle stats");
 		set_choice(793, 1, "Take Muscle vacation.");
+		set_choice(876, 2, "Bedroom, White Nightstand: Get Muscle stats");
 		break;
 	case $stat[mysticality]:
 		set_choice(73, 3, "Whitey's Grove: Get wedding cake and rice");
@@ -200,6 +202,7 @@ void set_choice_adventures() {
 		set_choice(141, 1, "Hippies on the Verge of War, Blockin' Out the Scenery: Get Mysticality stats");
 		set_choice(145, 2, "Frats on the Verge of War, Fratacombs: Get food");
 		set_choice(793, 2, "Take Mysticality vacation.");
+		set_choice(876, 1, "Bedroom, White Nightstand: old leather wallet");
 		break;
 	case $stat[moxie]:
 		set_choice(73, 3, "Whitey's Grove: Get wedding cake and rice");
@@ -216,6 +219,7 @@ void set_choice_adventures() {
 		set_choice(141, 2, "Hippies on the Verge of War, Blockin' Out the Scenery: Get rations");
 		set_choice(145, 2, "Frats on the Verge of War, Fratacombs: Get food");
 		set_choice(793, 3, "Take Moxie vacation.");
+		set_choice(876, 1, "Bedroom, White Nightstand: old leather wallet");
 		break;
 	}
 	if(vars["newLife_SetupGuyMadeOfBees"].to_boolean())
@@ -244,8 +248,10 @@ void set_choice_adventures() {
 
 void campground(boolean softBoo) {
 	// Break the hippy stone?
-	if(vars["newLife_SmashHippyStone"] == "true" && !hippy_stone_broken() && good("Hippy Stone"))
+	if(vars["newLife_SmashHippyStone"] == "true" && !hippy_stone_broken() && good("Hippy Stone")) {
+		vprint("Smashing that hippy-dippy crap so you can have some violent fun!", "olive", 3);
 		visit_url("campground.php?confirm=on&smashstone=Yep.&pwd");
+	}
 	
 	if(get_dwelling() != $item[big rock])
 		return;  // If dwelling is something other than a big rock, we're done here.
@@ -476,8 +482,8 @@ void handle_starting_items() {
 
 void recovery_settings() {
 	// Optimal restoration settings for level 1. These will need to be changed by level 4
-		set_choice("hpAutoRecovery", "0.4", "Resetting HP/MP restoration settings to minimal");
-		set_choice("hpAutoRecoveryTarget", "0.90", "");
+		set_choice("hpAutoRecovery", "0.30", "Resetting HP/MP restoration settings to minimal");
+		set_choice("hpAutoRecoveryTarget", "0.95", "");
 		set_choice("manaBurningTrigger", "-0.05", "");
 		set_choice("manaBurningThreshold", "0.80", "");
 	// Zombie Slayers have an alternative to using mana
@@ -579,13 +585,15 @@ void special(boolean bonus_actions) {
 			// Pull Pants!
 			(pull_it($item[Greatest American Pants]) || pull_it($item[Pantsgiving]));
 			
+			boolean bearArms = my_path() == "Zombie Slayer" && (available_amount($item[right bear arm]) > 0 && available_amount($item[left bear arm]) > 0 || available_amount($item[box of bear arms]) > 0);
+			
 			// Offhand: Use Jarlsberg's Pan if mainstat is Myst. For other mainstat or no Pan, use OPS
-			if(!have_skill($skill[Summon Smithsness]))
+			if(!(have_skill($skill[Summon Smithsness]) || bearArms))
 				if(my_primestat() != $stat[mysticality] || !(pull_it($item[Jarlsberg's pan]) || pull_it($item[Jarlsberg's pan (Cosmic portal mode)])))
 					pull_it($item[Operation Patriot Shield]);
 			
 			// Get a weapon, only if none is in inventory already and you don't have Smithsness
-			if(!have_skill($skill[Summon Smithsness]) && my_primestat() != $stat[Moxie] && item_amount($item[astral mace]) + item_amount($item[astral bludgeon]) + item_amount($item[right bear arm]) < 1)
+			if(!(have_skill($skill[Summon Smithsness]) || bearArms) && my_primestat() != $stat[Moxie] && item_amount($item[astral mace]) + item_amount($item[astral bludgeon]) + item_amount($item[right bear arm]) < 1)
 				(pull_it($item[Thor's Pliers]) || pull_it($item[ice sickle]));
 			
 			// Shirt
@@ -648,7 +656,6 @@ void new_ascension() {
 
 // These are default values here. To change for each character, edit their vars file in /data direcory or use the zlib commands.
 setvar("newLife_SetupGuyMadeOfBees", FALSE); // If you like to set up the guy made of bees set this TRUE. 
-setvar("newLife_FightBedstands", FALSE);	// If this is set to TRUE, you'll prefer fighting Bedstands to getting meat. (Note that mainstat is still better than fighting.)
 setvar("newLife_SmashHippyStone", FALSE);	// Smash stone if you want to break it at level 1 for some PvPing!
 setvar("newLife_UseNewbieTent", TRUE);		// Use newbie tent if you don't want togive your clannes a fair shot at bricking you in the face!
 setvar("newLife_SellPorkForStuff", TRUE);	// Sell pork gems to purchase detuned radio, toy accordion & seal tooth

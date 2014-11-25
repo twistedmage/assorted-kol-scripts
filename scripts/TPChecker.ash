@@ -35,6 +35,7 @@ boolean TP2 = true; 		// Set to true to check for Tiny Plastic Series Two.
 boolean TP3 = true; 		// Set to true to check for Tiny Plastic Series Three.
 boolean MP1 = true; 		// Set to true to check for Tiny Plastic Series Three.
 boolean DC1 = true; 		// Set to true to check for Tiny Plastic Series Three.
+boolean FF1 = true; 		// Set to true to check for Tiny Plastic Series Three.
 boolean BuyFromMall = false; 	// Set to true if you want to be able to purchase from the mall
 boolean BuyRares = false; 	// Set to true if you want to include Rares in your purchases
 boolean MoveNeeded = true; //if tp not in display case, but is in stash, move to DC
@@ -232,6 +233,16 @@ diecast_one [27] = $item[tiny die-cast Father Crimborg];
 diecast_one [28] = $item[tiny die-cast Don Crimbo];
 diecast_one [29] = $item[tiny die-cast Uncle Hobo];
 diecast_one [30] = $item[tiny die-cast Father Crimbo];
+
+
+
+item [int] five_factions1;
+five_factions1 [1] = $item[Gary Claybender];
+five_factions1 [2] = $item[Jared the Duskwalker];
+five_factions1 [3] = $item[Duke Starkiller];
+five_factions1 [4] = $item[Professor What];
+five_factions1 [5] = $item[Captain Kerkard];
+
 
 record recMissingList {
 	int price;
@@ -474,6 +485,7 @@ void main()
 	print("TP3 = " + TP3, "#33CCCC");
 	print("MP1 = " + MP1, "#33CCCC");
 	print("DC1 = " + MP1, "#33CCCC");
+	print("DC1 = " + FF1, "#33CCCC");
 	print("BuyFromMall = " + BuyFromMall, "#33CCCC");
 	print("BuyRares = " + BuyRares, "#33CCCC");
 	print("TPBudget = " + TPBudget, "#33CCCC");
@@ -502,6 +514,10 @@ void main()
 
 	if (DC1) {
 		check_series("Die-cast Series One", "DC1", "one", diecast_one, trophy_page, "Alia Iacta Est",1);
+		print("");
+	}
+	if (FF1) {
+		check_series("Five Factions Series One", "FF1", "one", five_factions1, trophy_page, "Alia Iacta Est",1);
 		print("");
 	}
 	print("Tiny Plastic processing completed.","green");

@@ -4674,8 +4674,11 @@ void setMood(string combat) {
 	if(have_effect($effect[temporary amnesia])>0)
 		abort("failed to remove temporary amnesia. Mood will probably go crazy until you can cast spells again");
 
-	if(my_path()=="KOLHS" && get_property("_kolhsAdventures").to_int()>=40 && (get_property("yearbookCameraPending")!="true" || get_property("yearbookCameraTarget")==""))
+/*	if(my_path()=="KOLHS" && get_property("_kolhsAdventures").to_int()>=40 && (get_property("yearbookCameraPending")=="false" || get_property("yearbookCameraTarget")=="" || !get_property("_yearbook_warned_today").to_boolean()) )
+	{
+		set_property("_yearbook_warned_today","true");
 		abort("Need to do the yearbook thing!");
+	}*/
 
 	cli_execute("mood bumcheekascend");
 	cli_execute("mood clear");
@@ -6040,16 +6043,16 @@ boolean bumAdv(location loc, string maxme, string famtype, string goals, string 
 		use_putty();
 		print("d","lime");
 		
-		if (can_interact()) {
-			print("adventuring with consultCasual","purple");
-			used_adv=adventure(1, loc, "consultCasual");
-		} else if (consultScript != "") {
+		if (consultScript != "") {
 			print("adventuring with consult="+consultScript,"purple");
 			clear_combat_macro();
 			used_adv=adventure(1, loc, consultScript);
 		} else if (my_primestat() == $stat[Mysticality] && in_hardcore()) {
 			print("adventuring with consultMyst","purple");
 			used_adv=adventure(1, loc, "consultMyst");
+		} else if (can_interact()) {
+			print("adventuring with consultCasual","purple");
+			used_adv=adventure(1, loc, "consultCasual");
 		} else {
 			print("adventuring without consult function handle","purple");
 			used_adv=adventure(1, loc);
@@ -11482,27 +11485,11 @@ void bcascKOLHS()
 			{
 				print("Getting intrisic: "+intrinsic,"blue");
 				setMood("i");
-//TEMP TO GET 
-clear_combat_macro();
-//NERD INTRINSIC visit_url("account.php?actions[]=autoattack&autoattack=99125693&flag_aabosses=1&flag_wowbar=1&flag_compactmanuel=1&pwd&action=Update");
-//JOCK
-visit_url("account.php?actions[]=autoattack&autoattack=99126147&flag_aabosses=1&flag_wowbar=1&flag_compactmanuel=1&pwd&action=Update");
-string skill_str =visit_url("account.php?tab=combat");
-matcher skill_mtch = create_matcher("option selected=\"selected\" value=\"(\\d*)\">([\\w \(\)]*)",skill_str);
-if(skill_mtch.find())
-{
-	print("combat macro set to \""+skill_mtch.group(2)+"\"","lime");
-}
-else
-	abort("Matcher couldn't work out what combat macro was chosen");
-//abort("get intrinsic for trophy");
 				
 				bumMiniAdv(1,$location[The Hallowed Halls]);
 			}
 			else
 			{
-//if($location[shop class] != get_property("semirareLocation").to_location())
-//abort("Eat spaghetti breakfast, then optimal dog, and fight shop teacher in shop class (last loc = "+get_property("semirareLocation")+")");
 				set_combat_macro();
 				setMood("i");
 				if(have_effect(intrinsic)==0)
@@ -11607,8 +11594,6 @@ void fix_clockwork_maid()
 ********************************************************/
 
 void bcs1() {
-if(my_level()>=4 && my_level()<=5 && my_basestat($stat[mysticality])>=20)
-	abort("Go to cola battlefield with Lord Spookyraven's ear trumpet");
 	if(my_path()=="KOLHS")
 		bcascKOLHS();
 	get_dungeon_kit();
@@ -12479,37 +12464,7 @@ void bumcheekcend() {
 	bcs13();
 }
 
-void mainWrapper() {
-	if(my_name()=="twistedmage" && my_level()<3)
-	{
-		abort("Check base pool skill (while not drunk and haven't practiced this ascension). ALSO COLA BATTLEFIELD (DELEVEL WiTH BASIC HOT DOGS)");
-	}
-		
-	//use gyro if poss
-	if(!to_boolean(get_property("_warbearGyrocopterUsed")))
-	{
-		print("----------CAN USE GYROCOPTER!---------","red");
-		if(i_a("warbear gyrocopter")==0)
-		{
-			if(can_interact())
-			{
-				abort("----------BUT DON'T HAVE ONE!---------");
-			}
-		}
-		else
-		{	
-			//use gryo
-			visit_url("curse.php?whichitem=7038");
-			if(my_name()=="dinala")
-				visit_url("curse.php?action=use&pwd&whichitem=7038&targetplayer=anid&curse=0");
-			else
-				visit_url("curse.php?action=use&pwd&whichitem=7038&targetplayer=dinala&curse=0");
-		}
-		cli_execute("inventory refresh");
-		if(can_interact() && i_a("warbear gyro")>0 && my_name()!="twistedmage")
-			cli_execute("csend * warbear gyro to twistedmage");		
-	}
-		
+void mainWrapper() {		
 //	if(my_level()==4 || my_level()==5)
 //		abort("do cola battlefield");
 	if(to_boolean(get_property("_jickJarAvailable")))

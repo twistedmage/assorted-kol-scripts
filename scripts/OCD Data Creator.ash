@@ -559,7 +559,6 @@ save [$item[Meleegra&trade; pills]] = -1;
 save [$item[vial of Gnomochloric acid]] = -1;
 save [$item[flask of Gnomochloric acid]] = -1;
 save [$item[jug of Gnomochloric acid]] = -1;
-save [$item[handsomeness potion]] = -1;
 // Little Canadia Jewelers
 save [$item[jewelry-making pliers]] = 1;
 // Black Market
@@ -591,7 +590,7 @@ save [$item[glimmering great tit feather]] = 0;
 save [$item[Digital Underground potion]] = 0;
 save [$item[cologne of contempt]] = 0;
 save [$item[perfume of prejudice]] = 0;
-save [$item[handsomeness potion]] = 0;
+save [$item[handsomeness potion]] = 1;
 save [$item[green-frosted astral cupcake]] = 0;
 save [$item[big bundle of chamoix]] = 0;
 save [$item[tattered scrap of paper]] = 0;
@@ -4527,12 +4526,89 @@ save [$item[bubble-wrap simulator]] = 0;
 save [$item[alien hologram projector]] = 0;
 save [$item[white blood cells]] = 0;
 save [$item[white wine]] = 0;
+save [$item[Xiblaxian encrypted political prisoner]] = 0;
+save [$item[the most dangerous bait]] = 0;
+save [$item["meat" stick]] = 0;
+save [$item[transdermal smoke patch]] = 0;
+save [$item[specialty ammo bandolier]] = -1;
+save [$item[experimental serum G-9]] = 0;
+save [$item[heavy-duty clipboard]] = 1;
+save [$item[limp broccoli]] = 0;
+save [$item[jangly bracelet]] = 3;
+save [$item[ice-cold Cloaca Zero]] = 0;
+save [$item[first-aid pouch]] = 3;
+save [$item[bishop cookie]] = 0;
+save [$item[Giant spider leg]] = 1;
+save [$item[fishbone catcher's mitt]] = 1;
+save [$item[catfish whiskers]] = 0;
+save [$item[Xiblaxian holo-training simcode]] = 0;
+save [$item[pickled egg]] = 0;
+save [$item[electric snakebite]] = 0;
+save [$item[rubber nubbin]] = 0;
+save [$item[They liver]] = 0;
+save [$item[They liver popsicle]] = 0;
+save [$item[white earbuds]] = 1;
+save [$item[bubblin' chemistry solution]] = 0;
+save [$item[accordionoid rocca]] = 1;
+save [$item[Xiblaxian circuitry]] = 0;
+save [$item[Xiblaxian polymer]] = 0;
+save [$item[white page]] = 0;
+save [$item[holo-tank]] = 0;
+save [$item[holo-bomber]] = 0;
+save [$item[holo-platoon]] = 0;
+save [$item[lemony scales]] = 0;
+save [$item[sour powder]] = 0;
+save [$item[anise-flavored venom]] = 0;
+save [$item[candied pecan]] = 0;
+save [$item[candy mountain oyster]] = 0;
+save [$item[chocolate rabbit's foot]] = 0;
+save [$item[candy carrot]] = 0;
+save [$item[Fun-Guy spore]] = 0;
+save [$item[disposable instant camera]] = 1;
+save [$item[warbear gyrocopter]] = 0;
+save [$item[warbear gyro]] = 0;
+save [$item[beautiful rainbow]] = 0;
+save [$item[tomato soup poster]] = 0;
+save [$item[giant yellow hat]] = 2;
+save [$item[razor-tipped yo-yo]] = 0;
+save [$item[warbear black box]] = 0;
+save [$item[warbear dress helmet]] = 2;
+save [$item[warbear dress bracers]] = 1;
+save [$item[warbear dress greaves]] = 2;
+save [$item[8-billed baseball cap]] = 2;
+save [$item[hairshirt]] = 1;
+save [$item[BOOterfinger]] = 0;
+save [$item[Moonds]] = 0;
+save [$item[Big Punk]] = 0;
+save [$item[experimental serum P-00]] = 0;
+save [$item[delicious candy]] = 0;
+save [$item[portable wall]] = 0;
+save [$item[lynyrd skin]] = 0;
+save [$item[custard pie]] = 0;
+save [$item[spooky music box mechanism]] = 0;
+save [$item[pocket lint (orange)]] = 0;
+save [$item[alien force field disruptor bean]] = 1;
+save [$item[boot knife]] = 3;
+save [$item[pygmy concertinette]] = 3;
+save [$item[shavin' razor]] = 0;
+save [$item[bottle of melodramamine]] = 0;
+save [$item[bean burrito]] = 0;
+
+
+
+
+
+
+
+
+
+
+
 
 
 //stuff to sell later;s
-save [$item[Xiblaxian circuitry]] = -1;
-save [$item[Xiblaxian polymer]] = -1;
-save [$item[white page]] = -1;
+save [$item[mimeplasm]] = -1;
+save [$item[Ultimate Mind Destroyer]] = -1;
 save [$item[TI-9000 calculator]] = -1;
 save [$item[unused soap]] = -1;
 save [$item[impure gasoline]] = -1;
@@ -4542,9 +4618,6 @@ save [$item[tarnished bottlecap]] = -1;
 save [$item[bottle of drinkin' gas]] = -1;
 save [$item[handful of napalm]] = -1;
 save [$item[gelatinous meat mass]] = -1;
-save [$item[holo-tank]] = -1;
-save [$item[holo-bomber]] = -1;
-save [$item[holo-platoon]] = -1;
 save [$item[freshwater fishbone]] = -1;
 save     [$item[yabba dabba doo rag]] = 2;
 save     [$item[flapper floppers]] = 1;
@@ -4559,23 +4632,12 @@ save     [$item[wood screw]] = -1;
 save     [$item[government cheese]] = -1;
 save     [$item[LCD game: Garbage River]] = -1;
 save [$item[mulberry]] = -1;
-save [$item[lemony scales]] = -1;
-save [$item[sour powder]] = -1;
-save [$item[anise-flavored venom]] = -1;
-save [$item[candied pecan]] = -1;
-save [$item[candy mountain oyster]] = --1;
-save [$item[chocolate rabbit's foot]] = -1;
-save [$item[candy carrot]] = -1;
-save [$item[bottle of Bloodweiser]] = 0;
 save     [$item[chunk of hot iron]] = -1;
 save [$item[hot coal]] = -1;
-save [$item[warbear gyrocopter]] = -1;
-save [$item[warbear gyro]] = -1;
 save [$item[LCD game: Food Eater]] = -1;
 save [$item[LCD game: Burger Belt]] = -1;
-save [$item[disposable instant camera]] = -1;
+save [$item[bottle of Bloodweiser]] = -1;
 save [$item[Thinknerd Blind-Packed Toy]] = -1;
-save [$item[Fun-Guy spore]] = -1;
 save [$item[string of moist beads]] = -1; //3 when done?
 
 save [$item[can of V-11]] = -1;

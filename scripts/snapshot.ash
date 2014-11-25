@@ -48,6 +48,9 @@ int i_a(string name) {
 		}
 	}
 	
+	//Thanks, Bale!
+	if (get_campground() contains i) a += 1;
+	
 	return a + d + s;
 }
 
@@ -449,6 +452,14 @@ void mainSnapshot() {
 	foreach x in mritems {
 		itemAmount = 0;
 		switch (mritems[x].itemname) {	
+			//Airports
+			case "a" :
+			  itemAmount = i_a(to_item(mritems[x].gifname));
+			  if (contains_text(visit_url("place.php?whichplace=airport"), mritems[x].a)) {
+			    itemAmount = 1;
+			  }
+			break;
+			
 			//Bind-on-use Items
 			case "b" :
 				itemAmount = i_a(to_item(mritems[x].gifname)) + i_a(to_item(mritems[x].a));

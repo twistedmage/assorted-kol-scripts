@@ -81,14 +81,16 @@ void do_fights()
 	if(fights_left()!=0)
 	{
 		//equip best, hobo and stats?
-		string max_string="maximize 0.01 "+my_primestat();
+		string max_string="maximize 0.1 "+my_primestat();
 		foreach s in $stats[]
 		{
 			if(s!=my_primestat())
-				max_string+=", 0.005 "+s;
+				max_string+=", 0.05 "+s;
 		}
 		if(my_path()!="Avatar of Jarlsberg")
 			max_string+=", switch disembodied hand";
+		//season specific
+		max_string+=", cold res, +booze drop, -combat";
 		print(max_string);
 		cli_execute(max_string);
 	}
@@ -105,6 +107,7 @@ void do_fights()
 //	}	
 	print("Done with pvp today");
 	int swagger=check_swagger();
+	print("USE HOLIDAY BOOK","red");
 	if(swagger>10000 && available_amount($item[cursed microwave])<1 && can_interact())
 		abort("buy cursed microwave");
 	if(swagger>10000 && available_amount($item[cursed pony keg])<1 && can_interact())
@@ -130,5 +133,12 @@ void do_fights()
 
 void main()
 {
+	string year_str=today_to_string();
+	int year = substring(year_str,0,4).to_int();
+	int month = substring(year_str,4,6).to_int();
+	int day = substring(year_str,6,8).to_int();
+	print("Date = "+day+" "+month+" "+year,"purple");
+	if(year>=2015)
+		abort("New pvp season, change maximizer options");
 	do_fights();
 }

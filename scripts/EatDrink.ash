@@ -1788,11 +1788,13 @@ boolean needakey = !can_interact() || get_level() < 13;
 int special_values(item it, int startvalue)
 {
   //Make these valuable so they get consumed
-  if (it == $item[steel margarita] && (item_amount(it) > 0))
+  if (it == $item[steel margarita] && item_amount(it) > 0)
     return MAXMEAT;
-  if (it == $item[steel lasagna] && (item_amount(it) > 0))
+  if (it == $item[steel lasagna] && item_amount(it) > 0)
     return MAXMEAT;
-  if (it == $item[steel-scented air freshener] && (item_amount(it) > 0))
+  if (it == $item[steel-scented air freshener] && item_amount(it) > 0)
+    return MAXMEAT;
+  if (it == $item[spaghetti breakfast] && !get_property("_spaghettiBreakfast").to_boolean())
     return MAXMEAT;
   if ((PIE_PRIORITY) && needakey)
   {

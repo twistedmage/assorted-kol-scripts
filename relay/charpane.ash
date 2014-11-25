@@ -701,7 +701,7 @@ void pickerFlavour() {
 
 //ckb: function for effect descriptions to make them short and pretty, called by chit.effects.describe
 string parseMods(string ef) {
-	# if(ef == "So Fresh and So Clean") ef = "Video... Games?";
+	# if(ef == "Polka of Plenty") ef = "Video... Games?";
 	switch(ef) {
 	case "Knob Goblin Perfume": return "";
 	case "Bored With Explosions": 
@@ -858,18 +858,38 @@ string parseMods(string ef) {
 	evm = replace_string(evm,"Meat","<span class=moditem>Meat</span>");
 	//highlight ML
 	evm = replace_string(evm,"ML","<span class=modml>ML</span>");
-	//decorate elemental tags with pretty colors
-	matcher elemental = create_matcher("(Hot|Cold|Spooky|Stench|Sleaze|Prismatic) (?:Dmg|Res)", evm);
-	if(elemental.find()) {
-		if(elemental.group(1) == "Prismatic")
-			evm = replace_string(evm,"Prismatic","<span class=modspooky>P</span><span class=modhot>ri</span><span class=modsleaze>sm</span><span class=modstench>at</span><span class=modcold>ic</span>");
+	
+	//decorate elemental effects with pretty colors
+	string prismatize(string input) {
+		string [int] prism;
+			prism[0] = "<span class=modHot>";
+			prism[2] = "<span class=modSleaze>";
+			prism[4] = "<span class=modStench>";
+			prism[6] = "<span class=modCold>";
+			prism[8] = "<span class=modSpooky>";
+		buffer output;
+		int i = 0;
+		int last = length(input) - 1;
+		while(i <= last) {
+			output.append(prism[i % 10]);
+			if(i < last)
+				output.append(substring(input, i, i+ 2));
+			else
+				output.append(char_at(input, last));
+			output.append("</span>");
+			i += 2;
+		}
+		return output;
+	}
+	matcher elemental = create_matcher("([^,]*(Hot|Cold|Spooky|Stench|Sleaze|Prismatic)[^,]*)(?:,|$)", evm);
+	while(elemental.find()) {
+		if(elemental.group(2) == "Prismatic")
+			evm = replace_string(evm, elemental.group(1), prismatize(elemental.group(1)));
 		else
-			evm = replace_string(evm, elemental.group(0), "<span class=mod"+elemental.group(1)+">"+elemental.group(0)+"</span>");
+			evm = replace_string(evm, elemental.group(1), "<span class=mod"+elemental.group(2)+">"+elemental.group(1)+"</span>");
 	}
 
-
 	return evm;
-
 }
 
 record buff {
@@ -919,6 +939,28 @@ buff parseBuff(string source) {
 		}
 	}
 	string effectAlias = myBuff.effectName;
+	
+	// Add MP or item cost to increase effect
+	matcher howUp = create_matcher("cmd\\=(cast 1 )?(.+?)&pwd", url_decode(columnArrow));
+	if(howUp.find()) {
+		string upCost;
+		if(howUp.group(1) != "") {
+			skill upSkill = howUp.group(2).to_skill();
+			if(mp_cost(upSkill) > 0)
+				upCost = mp_cost(upSkill)+' mp to cast '+upSkill;
+			else if(soulsauce_cost(upSkill) > 0)
+				upCost = soulsauce_cost(upSkill)+' sauce to cast '+upSkill;
+			else if(thunder_cost(upSkill) > 0)
+				upCost = thunder_cost(upSkill)+' dB to cast '+upSkill;
+			else if(rain_cost(upSkill) > 0)
+				upCost = rain_cost(upSkill)+' drops to cast '+upSkill;
+			else if(lightning_cost(upSkill) > 0)
+				upCost = lightning_cost(upSkill)+' bolts to cast '+upSkill;
+			else upCost = "cast 1 "+upSkill;
+		} else
+			upCost = howUp.group(2);
+		columnArrow = columnArrow.replace_string('Increase rounds of', upCost+'\nIncrease rounds of');
+	}
 	
 	//Apply any styling/renaming as specified in effects map
 	if(chitEffectsMap contains myBuff.effectName) {
@@ -1583,10 +1625,12 @@ void pickerFamiliar(familiar myfam, item famitem, boolean isFed) {
 	void pickEquipment() {
 
 		// First add a decorate link if you are using a Snow Suit
-		if(equipped_item($slot[familiar]) == $item[Snow Suit] && have_effect($effect[SOME PIGS]) == 0) {
+		if(equipped_item($slot[familiar]) == $item[Snow Suit]) {
 			string suiturl = '<a target=mainpane class="change" href="inventory.php?pwd='+my_hash()+'&action=decorate" title="Decorate your Snow Suit\'s face">';
 			int faceIndex = index_of(chitSource["familiar"], "itemimages/snow");
 			string face = substring(chitSource["familiar"], faceIndex + 11, faceIndex + 24);
+			if(have_effect($effect[SOME PIGS]) > 0)
+				face = "snowsuit.gif";
 			picker.append('<tr class="pickitem">');
 			picker.append('<td class="fold">' +suiturl+ 'Decorate Snow Suit<br /><span style="color:#707070">Choose a Face</span></a></td>');
 			picker.append('<td class="icon">'+suiturl+'<img src="/images/itemimages/' + face + '"></a></td>');
@@ -2942,6 +2986,50 @@ void addHooch(buffer result) {
 	}
 }
 
+void addCIQuest(buffer result) {
+	boolean active_quest(string prop) { return get_property(prop) == "started" ||  get_property(prop).contains_text("step"); }
+	int current, final;
+	string label;
+	if(active_quest("questESpGore")) {
+		if(!have_equipped($item[gore bucket])) return;
+		current = get_property("questESpGore") == "step2"? 100: get_property("goreCollected").to_int();
+		final = 100;
+		label = "Gore";
+	} else if(active_quest("questESpJunglePun")) {
+		if(!have_equipped($item[encrypted micro-cassette recorder])) return;
+		current = get_property("junglePuns").to_int();
+		final = 11;
+		label = "Puns";
+	} else if(active_quest("questESpSmokes")) {
+		current = item_amount($item[pack of smokes]);
+		if(current < 1) return;
+		final = 10;
+		label = "Smokes";
+	} else if(active_quest("questESpClipper")) {
+		current = get_property("fingernailsClipped").to_int();
+		if(current < 1) return;
+		final = 23;
+		label = "Clippings";
+	} else return;
+	result.append('<tr><td class="label"><a href="place.php?whichplace=airport_spooky&action=airport2_radio" target="mainpane">');
+	result.append(label);
+	result.append('</a></td><td class="info"><a href="place.php?whichplace=airport_spooky&action=airport2_radio" target="mainpane">');
+	result.append(current);
+	result.append(' / ');
+	result.append(final);
+	result.append('</a></td>');
+	if(to_boolean(vars["chit.stats.showbars"])) {
+		result.append('<td class="progress"><div class="progressbox" title="');
+		result.append(current);
+		result.append(' / ');
+		result.append(final);
+		result.append('"><a href="place.php?whichplace=airport_spooky&action=airport2_radio" target="mainpane"><div class="progressbar" style="width:');
+		result.append(to_string(100.0 * current / final));
+		result.append('%"></div></a></div></td></td>');
+	}
+	result.append('</tr>');
+}
+
 void addAud(buffer result) {
 	matcher parseAud = create_matcher("Aud:</td><td align=left>(.+?)</td>", chitSource["stats"]);
 	if(parseAud.find()) {
@@ -3426,6 +3514,8 @@ void bakeStats() {
 			
 			if(numeric_modifier("Maximum Hooch") > 0)
 				result.addHooch();
+			
+			result.addCIQuest();
 		}
 		
 		result.append("</tbody>");
@@ -3556,7 +3646,7 @@ void pickOutfit() {
 		
 	picker.append('<tr class="pickitem"><td style="color:white;background-color:blue;font-weight:bold;">Custom Outfits</td></tr>');
 	foreach i,o in get_custom_outfits()
-		if(i != 0)
+		if(o != " - No Change - ")
 			picker.append('<tr class="pickitem"><td class="info"><a class="change" href="'+ sideCommand("outfit "+o) + '">' + o + '</a></td>');
 
 	// Special equipment control section
@@ -3596,9 +3686,6 @@ void pickOutfit() {
 			result.addGear(e);
 	}
 	
-	// If using Kung Fu Fighting, you might want to empty your hands
-	if(have_effect($effect[Kung Fu Fighting]) > 0 && (equipped_item($slot[weapon]) != $item[none] || equipped_item($slot[off-hand]) != $item[none]))
-		special.addGear("unequip weapon; unequip off-hand", "Empty Hands");
 	// In KOLHS, might want to remove hat
 	if(my_path() == "KOLHS") {
 		if(equipped_item($slot[hat]) != $item[none])
@@ -3614,7 +3701,8 @@ void pickOutfit() {
 	if(available_amount($item[digital key]) + creatable_amount($item[digital key]) < 1 && get_property("questL13Final") != "finished")
 		special.addGear($item[continuum transfunctioner]);
 	
-	special.addGear($items[pirate fledges, Talisman o' Nam, black glass]);
+	special.addGear($items[pirate fledges, Talisman o' Nam, black glass, Personal Ventilation Unit, gore bucket]);
+	special.addGear($item[encrypted micro-cassette recorder], "micro-cassette recorder");
 	if(get_property("questL10Garbage") != "finished")
 		switch(loc) {
 		case $location[The Castle in the Clouds in the Sky (Basement)]:
@@ -3650,6 +3738,9 @@ void pickOutfit() {
 	// Some gear just makes stuff easier
 	if(get_property("kingLiberated") == "false") {
 		special.set_length(0);
+		// If using Kung Fu Fighting, you might want to empty your hands
+		if(have_effect($effect[Kung Fu Fighting]) > 0 && (equipped_item($slot[weapon]) != $item[none] || equipped_item($slot[off-hand]) != $item[none]))
+			special.addGear("unequip weapon; unequip off-hand", "Empty Hands");
 		if(my_path() == "Heavy Rains")
 			special.addGear($item[pool skimmer]);
 		special.addGear($item[Bram's choker]);
@@ -3747,9 +3838,9 @@ void bakeCharacter() {
 	
 	//Outfit
 	string myOutfit = "";
-	matcher outfitMatcher = create_matcher('<center class=tiny>Outfit: (.*?)</center>', source);
+	matcher outfitMatcher = create_matcher('<center class=tiny>Outfit: (.+?onClick\\=\'(outfit\\("(\\d+)"\\);).+?)</center>', source);
 	if (find(outfitMatcher)){
-		myOutfit = "("+ group(outfitMatcher, 1)+")";
+		myOutfit = "("+ outfitMatcher.group(1).replace_string( outfitMatcher.group(2), 'javascript:window.open("desc_outfit.php?whichoutfit='+ outfitMatcher.group(3) +'","","height=200,width=300")' ) +")";
 		int len = length(myName+myOutfit); // 105 is the limit to fit on a line.
 		myOutfit = (len > 103 && len < 110? "<br />": " ") + myOutfit;
 	}

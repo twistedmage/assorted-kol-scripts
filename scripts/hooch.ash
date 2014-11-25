@@ -1,5 +1,42 @@
 import bumcheekascend;
 
+void wild_west()
+{
+	string max_str="maximize items, 0.01 mainstat";
+	if(my_primestat()==$stat[muscle])
+		max_str+=" +melee";
+	if(my_primestat()==$stat[moxie])
+		max_str+=" -melee";
+	if(i_a("time-twitching toolbelt")>0)
+		max_str+=" +equip time-twitching toolbelt";
+	if(i_a("pantsgiving")>0)
+		max_str+=" +equip pantsgiving";
+	if(i_a("time cloak")>0)
+	{
+		max_str+=" +equip time cloak";
+	}
+	else if(i_a("time cape")>0)
+	{
+		max_str+=" +equip time cape";
+	}
+	cli_execute(max_str);
+	setFamiliar("items");
+	while(my_adventures()>0)
+	{
+		setMood("i");
+		if(have_effect($effect[brainworm])==0 && inebriety_limit() - my_inebriety() >= 3)
+			drink(1, $item[shot of mescal]);
+		
+		if(i_a("pocket ace")>0)
+			set_property("choiceAdventure998",5);
+		else
+			set_property("choiceAdventure998",2);
+			
+		adventure(1,$location[the rowdy saloon]);
+//		adventure(1,$location[the spooky old abandoned mine]);
+	}	
+}
+
 void cave()
 {
 	if(!get_property("_borrowedTimeUsed").to_boolean())
@@ -295,9 +332,10 @@ void main()
 {
 	cli_execute("inventory refresh");
 	
-	pull_gear();
+//	pull_gear();
 //	set_combat_macro();
 //	set_property("valueOfAdventure","2000");
+	wild_west();
 	if(!get_property("SIMON_CAVVEDONE").to_boolean())
 	{
 		cave();

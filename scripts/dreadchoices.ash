@@ -10,7 +10,7 @@ string grinder="anid";
 //ash import dreadchoices.ash; clean_choices();
 void clean_choices()
 {
-	int i=0;
+	int i=5;
 	while(i<9)
 	{
 		set_property("_dreadchoice"+i,"false");
@@ -168,12 +168,15 @@ void do_village()
 		do_choice(5, "?pwd&whichchoice=737&option=1&choiceform1=Pop+into+the+sewers", "?pwd&whichchoice=738&option=2&choiceform2=Slosh+in+the+muck");
 	}
 	
+	if(my_name()!="twistedmage")
+		cli_execute("csend * ghost thread to twistedmage");
+	cli_execute("inventory refresh");
 	//duke
-	if(my_primestat()==$stat[mysticality] && item_amount($item[dread tarragon])>0 && item_amount($item[dreadful roast])>0 && item_amount($item[stinking agaricus])>0 && item_amount($item[bone flour])>0)
+/*	if(my_primestat()==$stat[mysticality] && item_amount($item[dread tarragon])>0 && item_amount($item[dreadful roast])>0 && item_amount($item[stinking agaricus])>0 && item_amount($item[bone flour])>0)
 	{
 		do_choice(6, "?pwd&whichchoice=741&option=2&choiceform2=Investigate+the+servant%27s+quarters", "?pwd&whichchoice=743&option=2&choiceform2=Make+a+shepherd%27s+pie");
 	}
-	else if(item_amount($item[ghost thread])>9)
+	else */if(item_amount($item[ghost thread])>9)
 	{
 		get_key();
 		do_choice(6, "?pwd&whichchoice=741&option=3&choiceform3=Make+your+way+to+the+master+suite", "?pwd&whichchoice=744&option=3&choiceform3=Mess+with+the+loom");

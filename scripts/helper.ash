@@ -711,6 +711,40 @@ void advise_food()
 	}
 }
 
+boolean nash_drink(item upgraded_booze, item upgraded_fruit, item garnish)
+{
+	if(available_amount(garnish)==0)
+		return false;
+
+	int req_nash = 0;
+	if(available_amount(upgraded_booze)==0)
+	{
+		int[item] ings=get_ingredients(upgraded_booze);
+		foreach i in ings
+		{		
+			if(available_amount(i)==0)
+				return false;
+		}
+		req_nash+=1;
+	}
+	
+	if(available_amount(upgraded_fruit)==0)
+	{
+		int[item] ings=get_ingredients(upgraded_fruit);
+		foreach i in ings
+		{		
+			if(available_amount(i)==0)
+				return false;
+		}
+		req_nash+=1;
+	}
+	
+	if(req_nash> stills_available())
+		return false;
+	
+	return true;
+}
+
 void advise_drink(string woods_string, string beach_string, string manor_string)
 {
 	consumable [int] con_map;
@@ -743,8 +777,33 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 		if(my_path() != "Bees Hate You" && available_amount($item[filthy lucre])>0)
 			add_drink(con_map,"- Oreille Divisée brandy from bounty hunter ",13.5,0,3);
 		
-		if(have_skill($skill[advanced cocktailcrafting]) && have_skill($skill[superhuman cocktailcrafting]) && (my_class()==$class[disco bandit] || my_class()==$class[accordion thief]))
-			add_drink(con_map,"- use nash crosbys still to get: improved booze + improved mixer + cocktailcrafting reagent ",16,2,4);
+		if(have_skill($skill[Mixologist]) || (have_skill($skill[advanced cocktailcrafting]) && have_skill($skill[superhuman cocktailcrafting]) && (my_class()==$class[disco bandit] || my_class()==$class[accordion thief])))
+		{
+			if(i_a("Neuromancer")>0 || nash_drink($item[bottle of Calcutta Emerald], $item[cocktail onion], $item[coconut shell]))
+				add_drink(con_map,"- Make Neuromancer (muscle/moxie) ",16,2,4);
+			if(i_a("vodka stratocaster")>0 || nash_drink($item[bottle of Definit], $item[cocktail onion], $item[coconut shell]))
+				add_drink(con_map,"- Make vodka stratocaster (muscle/moxie) ",16,2,4);
+			if(i_a("Mon Tiki")>0 || nash_drink($item[bottle of Lieutenant Freeman], $item[kiwi], $item[coconut shell]))
+				add_drink(con_map,"- Make Mon Tiki (muscle) ",16,2,4);
+			if(i_a("teqiwila slammer")>0 || nash_drink($item[bottle of Jorge Sinsonte], $item[kiwi], $item[coconut shell]))
+				add_drink(con_map,"- Make teqiwila slammer (muscle) ",16,2,4);
+			if(i_a("Divine")>0 || nash_drink($item[bottle of Domesticated Turkey], $item[kumquat], $item[little paper umbrella]))
+				add_drink(con_map,"- Make Divine (myst/muscle) ",16,2,4);
+			if(i_a("Gordon Bennett")>0 || nash_drink($item[boxed Champagne], $item[kumquat], $item[little paper umbrella]))
+				add_drink(con_map,"- Make Gordon Bennett (myst/muscle) ",16,2,4);
+			if(i_a("gimlet")>0 || nash_drink($item[bottle of Calcutta Emerald], $item[tonic water], $item[little paper umbrella]))
+				add_drink(con_map,"- Make gimlet (myst) ",16,2,4);
+			if(i_a("yellow brick road")>0 || nash_drink($item[bottle of Definit], $item[tonic water], $item[little paper umbrella]))
+				add_drink(con_map,"- Make yellow brick road (myst) ",16,2,4);
+			if(i_a("mandarina colada")>0 || nash_drink($item[bottle of Lieutenant Freeman], $item[tangerine], $item[magical ice cubes]))
+				add_drink(con_map,"- Make mandarina colada (moxie/myst) ",16,2,4);
+			if(i_a("tangarita")>0 || nash_drink($item[bottle of Jorge Sinsonte], $item[tangerine], $item[magical ice cubes]))
+				add_drink(con_map,"- Make tangarita (moxie/myst) ",16,2,4);
+			if(i_a("Mae West")>0 || nash_drink($item[bottle of Domesticated Turkey], $item[raspberry], $item[magical ice cubes]))
+				add_drink(con_map,"- Make Mae West (mox) ",16,2,4);
+			if(i_a("prussian cathouse")>0 || nash_drink($item[boxed Champagne], $item[raspberry], $item[magical ice cubes]))
+				add_drink(con_map,"- Make prussian cathouse (mox) ",16,2,4);
+		}
 		
 		if(get_property("sidequestFarmCompleted")=="fratboy" && bees_ok)
 			add_drink(con_map,"- Boilermaker, using mcmillicancuddys lager from frat army FGF ",13,0,4);
@@ -868,6 +927,13 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 			
 		if(available_amount($item[Wet Russian])>0)
 			add_drink(con_map,"- Wet Russian",13,0,3);
+			
+		if(available_amount($item[Ambitious Turkey])>0)
+			add_drink(con_map,"- Ambitious Turkey",6,0,1);
+		if(available_amount($item[Agitated Turkey])>0)
+			add_drink(con_map,"- Agitated Turkey",6,0,1);
+		if(available_amount($item[Friendly Turkey])>0)
+			add_drink(con_map,"- Friendly Turkey",6,0,1);
 	}
 	//sort map
 	sort con_map by -value.efficiency;

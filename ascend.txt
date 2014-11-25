@@ -495,7 +495,7 @@ red zeppelin
 1 lynyrdskin shirt
 
 ----------Zombie homeowners association---------
-familiar magic dragonfish; maximize muscle, equip weedy skirt; uneffect jaba; uneffect scarysauce; uneffect jala; ballpit; telescope high; use silver dreadsylvanian flask; use brass dreadsylvanian flask; use ferrigno; use philter; cast dark visions
+familiar magic dragonfish; maximize muscle, equip weedy skirt; uneffect jaba; uneffect scarysauce; uneffect jala; ballpit; telescope high; use silver dreadsylvanian flask; use brass dreadsylvanian flask; use ferrigno; use philter; cast dark visions; uneffect Stormswaddled
 <need over 3k musc to do it in 30 rounds>
 -------------------------------------------------
 
@@ -523,7 +523,7 @@ cast jala;
 cast jaba;
 cast scarysauce
 
-familiar mosquito; fold loathing legion helicopter; maximize familiar weight, -0.01 hp, equip parasitic headgnawer, equip ol scratchs stove door, equip spiky turtle shoulderpads, equip groovy prism necklace, equip mer-kin gutgirdle, equip loathing legion helicopter; cast jalape&ntilde;o saucesphere; cast scarysauce; use potion of punctual companionship; cast jingle bells; cast empathy; cast leash; use cheap cigar butt; cast vent rage gland; use Stabonic scroll; use glowing syringe; cast 2 frigidalmatian; cast boner battalion; use silver dreadsylvanian flask; use brass dreadsylvanian flask
+familiar mosquito; fold loathing legion helicopter; maximize familiar weight, -0.01 hp, equip parasitic headgnawer, equip ol scratchs stove door, equip spiky turtle shoulderpads, equip groovy prism necklace, equip mer-kin gutgirdle, equip loathing legion helicopter; cast jalape&ntilde;o saucesphere; cast scarysauce; use potion of punctual companionship; cast jingle bells; cast empathy; cast leash; use cheap cigar butt; cast vent rage gland; use Stabonic scroll; use glowing syringe; cast 2 frigidalmatian; cast boner battalion; use silver dreadsylvanian flask; use brass dreadsylvanian flask; use cold seal sweat
 
 ----great wolf hard mode------
 familiar disembodied hand; maximize 100 dr, 0.01 mainstat, equip moon amber necklace, equip rain-doh green lantern; cast frigidalmatian; use connery; use serum of; use hair spray; ballpit; telescope high; use Cold seal sweat; use silver dreadsylvanian flask; use brass dreadsylvanian flask;
@@ -541,7 +541,7 @@ use glowing syringe; maximize moxie, equip cup of infinite pencils
 init
 get cursed voodoo skulls to do damage
 familiar bandersnatch; drink white lightning
-skeleton warrior; skeleton wizard; skeleton rogue; skeletal cleric; use silver dreadsylvanian flask; use brass dreadsylvanian flask
+skeleton warrior; skeleton wizard; skeleton rogue; skeleton cleric; use silver dreadsylvanian flask; use brass dreadsylvanian flask
 -----drunkula hard mode---
 familiar magic dragonfish;maximize spell damage percent, equip ghost shawl, equip rain-doh green lantern; use silver dreadsylvanian flask; use brass dreadsylvanian flask;use jackass plumber home game; pool 2; cast deep dark visions; hatter 11; use black sheepskin; use glittery mascara; ballpit; telescope high;use hawking;use concentrated cor;use 300 potion of inebriety; 
 ----------svns----------

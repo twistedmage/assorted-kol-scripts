@@ -29,8 +29,9 @@ void main()
 	
 	//now buy individual foils, or quit
 	matcher credit_mtch = create_matcher("You currently have (\\d*) store credit",visit_url("gamestore.php?place=cashier"));
-	find(credit_mtch);
-	int num_foils=group(credit_mtch,1).to_int()/100;
+	int num_foils=0;
+	if(find(credit_mtch))
+		num_foils=group(credit_mtch,1).to_int()/100;
 	if(num_foils>0)
 	{
 		visit_url("gamestore.php?action=redeem&whichitem=5008&quantity="+num_foils);
@@ -40,7 +41,7 @@ void main()
 	}
 	else
 	{
-		print("currently have "+group(credit_mtch,1)+" credits","lime");
+		print("currently have approx "+num_foils*100+" credits (rounded to 100)","lime");
 		
 		//mall prices
 		float pack_eff = get_efficiency($item[Pack of Alice's Army Cards],13.5);

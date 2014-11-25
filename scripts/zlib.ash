@@ -63,20 +63,20 @@ boolean vprint_html(string message, int level) {
 string normalized(string mixvar, string type) {
    switch (type) {
       case "boolean": return to_string(to_boolean(mixvar));
-      case "int": return to_string(to_int(mixvar));
+      case "bounty": return to_string(to_bounty(mixvar));
+      case "class": return to_string(to_class(mixvar));
+      case "coinmaster": return to_string(to_coinmaster(mixvar));
+      case "effect": return to_string(to_effect(mixvar));
+      case "element": return to_string(to_element(mixvar));
+      case "familiar": return to_string(to_familiar(mixvar));
       case "float": return to_string(to_float(mixvar));
+      case "int": return to_string(to_int(mixvar));
       case "item": return to_string(to_item(mixvar));
       case "location": return to_string(to_location(mixvar));
       case "monster": return to_string(to_monster(mixvar));
-      case "element": return to_string(to_element(mixvar));
-      case "familiar": return to_string(to_familiar(mixvar));
-      case "skill": return to_string(to_skill(mixvar));
-      case "effect": return to_string(to_effect(mixvar));
-      case "stat": return to_string(to_stat(mixvar));
-      case "class": return to_string(to_class(mixvar));
-      case "coinmaster": return to_string(to_coinmaster(mixvar));
       case "phylum": return to_string(to_phylum(mixvar));
-      case "bounty": return to_string(to_bounty(mixvar));
+      case "skill": return to_string(to_skill(mixvar));
+      case "stat": return to_string(to_stat(mixvar));
       case "list of string":
       case "string": return mixvar;
    }
@@ -305,6 +305,7 @@ void setvar(string varname,string dfault,string type) {
 
 void setvar(string varname,string dfault)  {  setvar(varname,dfault,"string");  }
 void setvar(string varname,boolean dfault) {  setvar(varname,to_string(dfault),"boolean");  }
+void setvar(string varname,bounty dfault)  {  setvar(varname,to_string(dfault),"bounty");  }
 void setvar(string varname,class dfault)   {  setvar(varname,to_string(dfault),"class");  }
 void setvar(string varname,coinmaster dfault){setvar(varname,to_string(dfault),"coinmaster");  }
 void setvar(string varname,effect dfault)  {  setvar(varname,to_string(dfault),"effect");  }
@@ -316,7 +317,6 @@ void setvar(string varname,item dfault)    {  setvar(varname,to_string(dfault),"
 void setvar(string varname,location dfault){  setvar(varname,to_string(dfault),"location");  }
 void setvar(string varname,monster dfault) {  setvar(varname,to_string(dfault),"monster");  }
 void setvar(string varname,phylum dfault)  {  setvar(varname,to_string(dfault),"phylum");  }
-void setvar(string varname,bounty dfault)  {  setvar(varname,to_string(dfault),"bounty");  }
 void setvar(string varname,skill dfault)   {  setvar(varname,to_string(dfault),"skill");  }
 void setvar(string varname,stat dfault)    {  setvar(varname,to_string(dfault),"stat");  }
 
@@ -326,10 +326,32 @@ void setvar(string varname,stat dfault)    {  setvar(varname,to_string(dfault),"
 // determine if something is path-safe
 boolean be_good(string johnny) {
    switch (my_path()) {
-      case "Bees Hate You": return johnny.to_lower_case().index_of("b") == -1;
-      case "Way of the Surprising Fist": return !($slots[weapon,off-hand] contains johnny.to_item().to_slot());
-      case "Avatar of Boris": if (johnny.to_familiar() != $familiar[none]) return false;
-         return !($slots[weapon,off-hand] contains johnny.to_item().to_slot()) || johnny == "Trusty";
+      case "Bees Hate You": if (johnny.to_lower_case().index_of("b") > -1) return false; break;
+      case "Trendy": if (!is_trendy(johnny)) return false; break;
+   }
+   return is_unrestricted(johnny);
+}
+boolean be_good(item johnny) {
+   switch (my_path()) {
+      case "Bees Hate You": if (johnny.to_lower_case().index_of("b") > -1) return false; break;
+      case "Trendy": if (!is_trendy(johnny)) return false; break;
+      case "Avatar of Boris": if (johnny == $item[trusty]) return true;
+      case "Way of the Surprising Fist": if ($slots[weapon,off-hand] contains johnny.to_slot()) return false; break;
+   }
+   return is_unrestricted(johnny);
+}
+boolean be_good(familiar johnny) {
+   switch (my_path()) {
+      case "Trendy": if (!is_trendy(johnny)) return false; break;
+      case "Avatar of Boris":
+      case "Avatar of Jarlsberg":
+      case "Avatar of Sneaky Pete": return false;
+   }
+   return is_unrestricted(johnny);
+}
+boolean be_good(skill johnny) {
+   switch (my_path()) {
+      case "Trendy": if (!is_trendy(johnny)) return false; break;
    }
    return is_unrestricted(johnny);
 }

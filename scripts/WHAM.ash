@@ -200,6 +200,7 @@
 				 Attempt to use DIsco Dances somewhat intelligently to gain Disco Momentum until BatBrain/SS has a better idea
 		14-03-11:Take a photo of Racecar Bob or Bob Racecar if we need one.
 		14-08-29:nostun is nostagger and a float
+		14-10-13:Adapt to BatBrain changes
 ***********************************************************************************************************************/
 import <SmartStasis.ash>;
 
@@ -497,7 +498,7 @@ boolean ok(advevent a) {
 				if(!no_bears())
 					return false; //Don't try multiple bear skills in one combat
 			case "skill 7135":	//Bear Hug should only be used against plural monsters if you are a zombie slayer
-				if (my_path() == "Zombie Slayer" && howmanyfoes > 1 && no_bears()) return true;
+				if (my_path() == "Zombie Slayer" && monster_stat("howmany") > 1 && no_bears()) return true;
 				else if (my_path() != "Zombie Slayer" && no_bears()) return true;
 				else return false;
 			case "jiggle":
@@ -1083,7 +1084,7 @@ void build_custom_WHAM() {
 	
 	//Disco Dances for Dicso Bandits
 	if(my_class() == $class[Disco Bandit]) {
-		if(have_skill($skill[Disco State of Mind]) && have_skill($skill[Disco Greed]) && have_skill($skill[Flashy Dancer]) && nostagger < 1) {
+		if(have_skill($skill[Disco State of Mind]) && have_skill($skill[Disco Greed]) && have_skill($skill[Flashy Dancer]) && monster_stat("nostagger") < 1) {
 			if(has_option(get_action($skill[Disco Dance of Doom])))
 				encustom(get_action($skill[Disco Dance of Doom]));
 			if(has_option(get_action($skill[Disco Dance II: Electric Boogaloo])))

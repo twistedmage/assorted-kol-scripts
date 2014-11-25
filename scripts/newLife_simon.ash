@@ -577,7 +577,7 @@ void special(boolean bonus_actions) {
 			if(my_path()!="Heavy Rains")
 				pull_if_good($item[loathing legion universal screwdriver]);
 			boolean screw=item_amount($item[loathing legion universal screwdriver])>0;
-			if(my_path()!="Avatar of Boris" && my_path()!="Avatar of Jarlsberg")
+			if(my_path()!="Avatar of Boris" && my_path()!="Avatar of Jarlsberg" && my_path()!="Avatar of Sneaky Pete")
 			{
 				pull_if_good($item[moveable feast]);
 				pull_and_wear_if_good($item[snow suit]);
@@ -816,14 +816,6 @@ void special(boolean bonus_actions) {
 	//could also pull miniborg destroy o bot for combat
 	//		if(get_property("tomeSummons").to_int() > 0 && my_path()!="Way of the Surprising Fist")
 	//			use_skill(3 - get_property("tomeSummons").to_int(), $skill[Summon Stickers]);
-
-	
-			if(my_name()=="twistedmage")
-			{
-				pull_if_good($item[rusty grave robbing shovel]);
-				pull_if_good($item[lord spookyravens ear trumpet]);
-				print("******** PULLING EAR TRUMPET AND GRAVE SHOVEL **********","red");
-			}
 		}
 	}
 	

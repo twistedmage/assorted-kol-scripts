@@ -334,8 +334,11 @@ void eat_cookie() {
 			}
 		return count_counters() < 1;
 	}
-	
-	if(my_fullness() >= fullness_limit())
+	if(my_path() == "Zombie Slayer") {
+		if(item_amount($item[Clan VIP Lounge key]) > 0 && my_inebriety() < inebriety_limit() && get_property("_speakeasyDrinksDrunk") < 3 && my_meat() >= 500)
+			cli_execute("drink lucky lindy");
+		else vprint("You can not find a brain flavored fortune cookie and you cannot drink a Lucky Lindy.", -3);
+	} else if(my_fullness() >= fullness_limit())
 		print("If I ate even a fortune cookie I'd burst! Remember to eat a fortune cookie when the tummy is emptier.", "red");
 	else while(toEat())
 		eatsilent(1, $item[fortune cookie]);
@@ -345,7 +348,7 @@ void get_semirare() {
 	int last = get_property("semirareCounter").to_int();
 	
 	location locale = expensive_semi();
-	string billiard;
+	string billiard, battleAction;
 	familiar start_fam = my_familiar();
 	int closet_clovers = 0;
 	switch(locale) {
@@ -389,6 +392,16 @@ void get_semirare() {
 		closet_clovers = item_amount($item[ten-leaf clover]);
 		put_closet(closet_clovers, $item[ten-leaf clover]);
 		break;
+	case $location[The Purple Light District]:  // Might not have high enough attack
+	case $location[Burnbarrel Blvd.]:
+	case $location[Exposure Esplanade]:
+	case $location[The Heap]:
+	case $location[The Ancient Hobo Burial Ground]:
+		battleAction = get_property("battleAction");
+		// This will allow attacking, but abort in case there is a combat
+		if(battleAction == "attack")
+			set_property("battleAction", "abort");
+		break;
 	}
 	set_property("BaleCC_next", locale);
 	(!adventure(1, locale));
@@ -416,6 +429,14 @@ void get_semirare() {
 	case $location[Vanya's Castle Chapel]:
 	case $location[The Obligatory Pirate's Cove]:
 		cli_execute("outfit checkpoint");
+		break;
+	case $location[The Purple Light District]:  // Restore original attack
+	case $location[Burnbarrel Blvd.]:
+	case $location[Exposure Esplanade]:
+	case $location[The Heap]:
+	case $location[The Ancient Hobo Burial Ground]:
+		set_property("battleAction", battleAction);
+		break;
 	}
 }
 

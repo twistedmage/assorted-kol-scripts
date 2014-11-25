@@ -181,7 +181,7 @@ void restore_values() {
 	if(buy_mmj && !guild_store_available() && !fist_safely) {
 		if(my_level() > 3 && start_type == "MP") 	// Best remind the player he should open his guild store already
 			if((my_primestat() == $stat[mysticality] && Verbosity > 0) || Verbosity > 1)
-				print("You'd be able to purchase magical mystery juice if you opened your guild store", "red");
+				{}#print("You'd be able to purchase magical mystery juice if you opened your guild store", "red");
 		buy_mmj = false;
 	}
 	if(item_amount($item[Azazel's unicorn]) > 0 || have_skill($skill[Liver of Steel]) 
@@ -332,7 +332,7 @@ boolean populate_skills(int target) {
 }
 
 boolean curse_protect() {
-	return get_property("questL11Worship") != "finished" && (have_effect($effect[Once-Cursed]) > 0 || have_effect($effect[Twice-Cursed]) > 0 || have_effect($effect[Thrice-Cursed]) > 0);
+	return get_property("hiddenApartmentProgress") != "8" && (have_effect($effect[Once-Cursed]) > 0 || have_effect($effect[Twice-Cursed]) > 0 || have_effect($effect[Thrice-Cursed]) > 0);
 }
 
 boolean mp_heal(int target);
@@ -1078,7 +1078,7 @@ boolean lure_minion(int target) {
 			if(Verbosity > 2) print("Using "+x+" brains of level "+ type);
 			if(x > 0) {
 				if(!exchanged) // Start choice adventure first time only
-					visit_url("skills.php?pwd&action=Skillz&whichskill=12002&skillform=Use+Skill&quantity=1");
+					visit_url("runskillz.php?action=Skillz&whichskill=12002&pwd&quantity=1&targetplayer="+my_id());
 				visit_url("choice.php?pwd&whichchoice=599&option="+type+"&quantity="+ x);
 				exchanged = true;
 			}
@@ -1110,7 +1110,7 @@ boolean summon_minion(int target) {
 			x = min(my_meat() / 1000, x);
 			if(Verbosity > 2) print("Summoning a horde "+ x+" times");
 			if(x > 0) {
-				visit_url("skills.php?pwd&action=Skillz&whichskill=12026&skillform=Use+Skill&quantity=1");
+				visit_url("runskillz.php?action=Skillz&whichskill=12026&pwd&quantity=1&targetplayer="+my_id());
 				for cast from 1 to x
 					visit_url("choice.php?pwd&whichchoice=601&option=1");
 				visit_url("choice.php?pwd&whichchoice=601&option=2");
@@ -1119,7 +1119,7 @@ boolean summon_minion(int target) {
 			x = min(my_meat() / 100, x);
 			if(Verbosity > 2) print("Summoning "+x+" minions");
 			if(x > 0) {
-				visit_url("skills.php?pwd&action=Skillz&whichskill=12021&skillform=Use+Skill&quantity=1");
+				visit_url("runskillz.php?action=Skillz&whichskill=12021&pwd&quantity=1&targetplayer="+my_id());
 				visit_url("choice.php?pwd&whichchoice=600&option=1&quantity=" + x);
 				visit_url("choice.php?pwd&whichchoice=600&option=2");
 			}
@@ -1723,6 +1723,12 @@ void reserve_healing() {
 		reserve_num = floor(reserve_num /100.0);
 	else if (reserve_purch == $item[Knob Goblin seltzer] && my_meat() < 80 * (reserve_num-purch_have))
 		reserve_num = floor(reserve_num /80.0);
+	
+	if(reserve_purch == $item[magical mystery juice] && !buy_mmj && purch_have < reserve_num) {
+		reserve_num = purch_have;
+		return;
+	}
+	
 	if(purch_have < reserve_num) {
 		switch (reserve_purch) {
 		case null: break;
