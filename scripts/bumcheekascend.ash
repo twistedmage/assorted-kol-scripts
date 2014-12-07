@@ -8396,7 +8396,7 @@ void bcascLairFightNS() {
 				use(1,$item[hair spray]);
 			if(have_effect($effect[Radiating Black Body&trade;])==0)
 				use(1,$item[black body&trade; spray]);
-			if(have_effect($effect[Black Face])==0)
+			if(have_effect($effect[football eyes])==0)
 				use(1,$item[black facepaint]);
 			if(have_effect($effect[Erudite])==0)
 				use(1,$item[black sheepskin diploma]);

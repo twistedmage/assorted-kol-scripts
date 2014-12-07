@@ -1372,9 +1372,7 @@ void futurella()
 		
 		item fat_stacking()
 		{
-			if (retrieve_item(1,$item[fat stacks of cash]))
-				return $item[fat stacks of cash];
-			else if (retrieve_item(1,$item[bottle of G&uuml;-Gone]))  // Gu-Gone
+			if (retrieve_item(1,$item[bottle of G&uuml;-Gone]))  // Gu-Gone
 				return $item[bottle of G&uuml;-Gone];
 			else if (retrieve_item(1,$item[facsimile dictionary]))
 				return $item[facsimile dictionary];

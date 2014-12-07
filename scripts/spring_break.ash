@@ -65,7 +65,8 @@ void diner()
 		//done with runaways
 		if(my_familiar()==$familiar[pair of stomping boots] && (get_property("_banderRunaways") >= ((familiar_weight($familiar[Pair of Stomping Boots]) + weight_adjustment())/5)))
 		{
-			use_familiar($familiar[artistic goth kid]);
+			if(my_path()!="Avatar of Sneaky Pete")
+				use_familiar($familiar[artistic goth kid]);
 			max_str = "maximize +equip paradais, +equip greatest american pants";
 			cli_execute(max_str + ", +equip mayfly bait necklace");
 		}
@@ -164,8 +165,13 @@ void conspiracy()
 	}
 	else if(i_a("gore bucket")>0)
 	{
-		use_familiar($familiar[disembodied hand]);
-		string max_str = "maximize +equip gore bucket, +equip Personal Ventilation Unit";
+		if(my_path()!="Avatar of Sneaky Pete")
+			use_familiar($familiar[disembodied hand]);
+		string max_str = "maximize mainstat, +equip gore bucket, +equip Personal Ventilation Unit";
+		if(my_primestat()==$stat[moxie])
+			max_str += ", -melee";
+		else if(my_primestat()==$stat[muscle])
+			max_str += ", +melee";
 		cli_execute(max_str + ", +equip mayfly bait necklace");
 		set_combat_macro();
 		setMood("");
@@ -282,7 +288,8 @@ void diner_farm()
 	print("Farming bucks","green");
 	setMood("");
 	
-			use_familiar($familiar[artistic goth kid]);
+	if(my_path()!="Avatar of Sneaky Pete")
+		use_familiar($familiar[artistic goth kid]);
 	string max_str = "+equip greatest american";
 	set_combat_macro("sailors"); //skip all
 	while(my_adventures()>0 && get_property("_sloppyDinerBeachBucks").to_int() < 4)
@@ -293,8 +300,20 @@ void diner_farm()
 
 void main()
 {
-	if(i_a("beach buck")>200)
-		abort("buy a brogre bucket hat, then stop farming bucks");
+	if(i_a("beach buck")>=1000)
+		abort("buy SPRING BREAK TATTOO then stop farming bucks");
+	if(i_a("coinspiracy")>=50 && i_a("mercenary rifle")<1)
+		abort("buy mercenary rifle wtih coinspiracy");
+	if(i_a("coinspiracy")>=50 && i_a("mercenary pistol")<3)
+		abort("buy mercenary pistol wtih coinspiracy");
+	if(i_a("coinspiracy")>=300 && !have_skill($skill[Intimidating Mien]))
+		abort("buy Intimidation Techniques book wtih coinspiracy");
+	if(i_a("coinspiracy")>=300 && !have_skill($skill[Hypersane]))
+		abort("buy Sanity Maintenance book wtih coinspiracy");
+	if(i_a("coinspiracy")>=1000)
+		abort("buy tattoo wtih coinspiracy THEN STOP FARMING");
+	if(i_a("Merc Core Field Manual: Sanity Maintenance")>0 || i_a("Merc Core Field Manual: Intimidation Techniques ")>0)
+		print("READ MERC BOOKS","red");
 	spring_break();
 	conspiracy();
 	diner_farm();

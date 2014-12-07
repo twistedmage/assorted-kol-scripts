@@ -54,6 +54,8 @@ Version History:
 			Don't do a lot of refresh calls as Mafia should now hopefully not do strange stuff when swapping loads of outfits any longer (as of r13518)
 			Only do outfit caching once per day to avoid having to redo that process just because the script stopped or was aborted
 2014-03-22: Attempt to rejig the elemental test in order to lower the use of phials
+2014-12-03: Squash at least one bug relating to elemental tests
+2014-12-04: DOn't consider equipment when maximizing for HP after having maximized for resistance first
 */
 
 import <zlib.ash>;
@@ -284,7 +286,7 @@ boolean ok(item it, string command, effect ef) {
 	return true;
 }
 
-boolean maximize_wrap(string max_string, int goal, int current) {
+boolean maximize_wrap(string max_string, int goal, int current, boolean equipment) {
 	float[int] sum;
 	string[int] perform;
 	int j;
@@ -292,7 +294,9 @@ boolean maximize_wrap(string max_string, int goal, int current) {
 	if(current > goal)
 		return true;
 	
-	foreach i, rec in maximize(max_string, max_potion_price, 1, true, true) {
+	//if(contains_text(max_string, "muscle")) {cli_execute("uneffect ")}
+	
+	foreach i, rec in maximize(max_string, max_potion_price, 1, true, equipment) {
 		if(!ok(rec.item, rec.command, rec.effect))
 			continue;
 	
@@ -488,7 +492,7 @@ boolean increase_stat(int goal, stat s, string check)
 		default:	if(my_buffedstat(s) >= goal) return true; break;
 	}
 
-	return maximize_wrap((check == "" ? to_string(s) : check), goal, (check == "hp" ? my_maxhp() : check == "mp" ? my_maxmp() : my_buffedstat(s)));
+	return maximize_wrap((check == "" ? to_string(s) : check), goal, (check == "hp" ? my_maxhp() : check == "mp" ? my_maxmp() : my_buffedstat(s)), true);
 }
 
 boolean increase_stat(int goal, stat s)
@@ -499,7 +503,7 @@ boolean increase_stat(int goal, stat s)
 boolean increase_stat(int goal, string command, stat s) {
 	if(my_buffedstat(s) >= goal) return true;
 
-	return maximize_wrap(command, goal, my_buffedstat(s));
+	return maximize_wrap(command, goal, my_buffedstat(s), true);
 }
 
 boolean increase_stat(int goal, string command, string check)
@@ -510,7 +514,7 @@ boolean increase_stat(int goal, string command, string check)
 		case "mp":	if(my_maxmp() > goal) return true; break;
 	}	
 	
-	return maximize_wrap(command, goal, (check == "hp" ? my_maxhp() : my_maxmp()));
+	return maximize_wrap(command, goal, (check == "hp" ? my_maxhp() : my_maxmp()), true);
 }
 
 int elemental_damage(int level, element elem)
@@ -529,20 +533,26 @@ int elemental_damage(int level, element elem)
 	
 	float base_damage = ((level ** 1.4) * 4.5 * 1.1);
 	float M = (my_class() == $class[pastamancer] || my_class() == $class[sauceror] ? 5 : 0);
-	float R = numeric_modifier("_spec", to_string(elem) + " resistance");
+	float R_spec = numeric_modifier("_spec", to_string(elem) + " resistance");
+	float R_act = numeric_modifier(to_string(elem) + " resistance");
 	
 	vprint("Element: " + elem, 7);
 	vprint("Base Damage: " + base_damage, 7);
-	vprint("CLass modifier: " + M, 7);
-	vprint("Elemental resistance:"  + R, 7);
+	vprint("Class modifier: " + M, 7);
+	vprint("Elemental resistance (current):"  + R_act, 7);
+	vprint("Elemental resistance (speculated):"  + R_spec, 7);
 	vprint("isWeak(elem): " + isWeak(elem), 7);
-	vprint("Fraction of damage resisted: " + ((90.0 - 50.0 * (5.0/6.0) ** (R -4) + M)/100.0), 7);
+	vprint("Fraction of damage resisted (current): " + ((90.0 - 50.0 * (5.0/6.0) ** (R_act -4) + M)/100.0), 7);
+	vprint("Fraction of damage resisted (speculated): " + ((90.0 - 50.0 * (5.0/6.0) ** (R_spec -4) + M)/100.0), 7);
 	vprint("---", 7);
 	
-	if(R <= 3)
-		return base_damage * (1.0 - (10 * R + M)/100.0) * (to_int(isWeak(elem)) + 1);
+	float damage_taken;
+	if(R_spec <= 3)
+		damage_taken = base_damage * (1.0 - (10 * R_spec + M)/100.0) * (to_int(isWeak(elem)) + 1);
 	else
-		return base_damage * (1.0 - (90.0 - 50.0 * (5.0/6.0) ** (R -4) + M)/100.0) * (to_int(isWeak(elem)) + 1);
+		damage_taken = base_damage * (1.0 - (90.0 - 50.0 * (5.0/6.0) ** (R_spec - 4) + M)/100.0) * (to_int(isWeak(elem)) + 1);
+	vprint("Estimated damage taken: " + damage_taken, 7);
+	return damage_taken;
 }
 
 void uneffect_form_except(element elem)
@@ -640,6 +650,8 @@ boolean elemental_test(int level, element elem1, element elem2)
 	
 	damage = elemental_damage(level, elem1) + elemental_damage(level, elem2);
 	vprint("3", "purple", 7);	
+	if(have_effect($effect[Juiced]) > 0) cli_execute("uneffect Juiced");
+	if(have_effect($effect[Juiced Newton]) > 0) cli_execute("uneffect Juiced Newton");
 	if(damage < my_maxhp()) {
 		restore_hp(my_maxhp());
 		if(damage < my_hp())
@@ -693,7 +705,7 @@ boolean elemental_test(int level, element elem1, element elem2)
 	
 	damage = elemental_damage(level, elem1) + elemental_damage(level, elem2);
 	if(damage > my_maxhp())
-		maximize_wrap("hp", ceil(damage), my_maxhp());
+		maximize_wrap("hp", ceil(damage), my_maxhp(), false);
 
 	vprint(8, "purple", 7);
 	damage = elemental_damage(level, elem1) + elemental_damage(level, elem2);
@@ -741,10 +753,11 @@ boolean elemental_test(int level, element elem1, element elem2)
 	}
 
 	vprint(11, "purple", 7);
+	cli_execute("whatif quiet;");	
 	if(elemental_damage(level, elem1) + elemental_damage(level, elem2) < my_maxhp())
 	{
 		restore_hp(my_maxhp());
-		cli_execute("whatif quiet;");
+		cli_execute("whatif quiet;");	
 		if (elemental_damage(level, elem1) + elemental_damage(level, elem2) < my_hp())
 		{
 			return true;
@@ -761,7 +774,7 @@ boolean stat_test(int goal, stat s)
 		switch_hand(s.to_string());		
 		equip_cached_outfit(s.to_string());
 	}
-	return maximize_wrap(s.to_string() + maximize_familiar + ", -tie", goal, to_int(my_buffedstat(s)));
+	return maximize_wrap(s.to_string() + maximize_familiar + ", -tie", goal, to_int(my_buffedstat(s)), true);
 }
 
 boolean mp_test(int goal)
@@ -780,10 +793,10 @@ boolean mp_test(int goal)
 			command = command + ", -equip " + it.to_string();
 		}
 	}
-	if(maximize_wrap(command, goal, my_maxmp()))
+	if(maximize_wrap(command, goal, my_maxmp(), true))
 		return true;
 	else
-		return maximize_wrap("10 mysticality, " + command, goal, my_maxmp());
+		return maximize_wrap("10 mysticality, " + command, goal, my_maxmp(), true);
 }		
 
 void maximize_mp_regen()
@@ -1056,7 +1069,7 @@ void basement(int num_turns)
 				}
 				cli_execute("whatif quiet");
 				if(damage < my_maxhp())
-					maximize_wrap("hp", ceil(damage), my_maxhp());
+					maximize_wrap("hp", ceil(damage), my_maxhp(), true);
 			}
 			
 			if (my_maxhp() > damage)
