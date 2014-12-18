@@ -2753,7 +2753,7 @@ void defaultMood(boolean castMojo) {
 	if (my_class()==$class[accordion thief] && my_level()>=15 && have_skill($skill[Chorale of Companionship]) && my_maxmp() > mp_cost($skill[Chorale of Companionship]) * 2 && have_castitems($class[accordion thief], true)) cli_execute("trigger lose_effect, Chorale of Companionship, cast 1 Chorale of Companionship");
 
 	//stats are useful in most paths, but heavy rains has tonnes of ml, and big doesnt require levelling
-	if(my_path()!="BIG!" && my_path()!="Heavy Rains")
+	if(my_path()!="BIG!" && my_path()!="Heavy Rains" && my_level()<30)
 	{
 		if (have_skill($skill[Ur-Kel's Aria of Annoyance]) && have_castitems($class[accordion thief], true))
 				cli_execute("trigger lose_effect, Ur-Kel's Aria of Annoyance, cast 1 Ur-Kel's Aria of Annoyance");
