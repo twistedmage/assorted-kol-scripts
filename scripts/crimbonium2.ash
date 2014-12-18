@@ -681,8 +681,14 @@ bot_skill floor1(bot_skill bs)
 		print("unknown thing\n"+page,"red");
 		abort("");
 	}
+	return bs;
 }
 
+bot_skill floor2(bot_skill bs)
+{
+
+	return bs;
+}
 
 void bot_explore(int floor)
 {
@@ -706,7 +712,6 @@ void bot_explore(int floor)
 	}
 	print("bot died! Moving on","purple");
 }	
-
 
 void crimbo_town()
 {
