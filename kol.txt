@@ -1,54 +1,4 @@
-if(bs.blam>=1)
-if(bs.blam>=2)
-if(bs.blam>=2)
-if(bs.blam>=2) if(bs.lube>=1)
-if(bs.blam>=1) if(bs.zap>=1)
-if(bs.blam>=1) if(bs.pow>=1)
-
-if(bs.pow>=2)
-if(bs.pow>=1)
-if(bs.pow>=2)
-if(bs.pow>=2)
-if(bs.pow>=2) if(bs.hover>=1)
-if(bs.pow>=1) if(bs.zap>=1)
-
-if(bs.zap>=1)
-if(bs.zap>=2)
-
-if(bs.run>=2)
-if(bs.run>=2)
-
-if(bs.roll>=1)
-
-if(bs.light>=1)
-
-
-
-blam - 	level 1 needed for 1 (3)
-		level 2 needed for 3 (lube)
-pow - 	level 1 needed for 1 (3)
-		level 2 needed for 4 (hover)
-zap - 	level 1 needed for 1 (2)
-		level 2 needed for 1
-pow - 	level 1 needed for 0
-		level 2 needed for 3
-
-
-
-Mega Vise	Pow, Pow
-Ball-Bearing Dispenser	Blam
-Military Chassis	3 Shields, Light, Blam
-Tripod Legs	Run, Run
-15/18
-
-
-Rivet Shocker	Pow, Zap
-Wrecking Ball	1 Shield, Pow
-Military Chassis	3 Shields, Light, Blam
-13/18
-
-
-
+use crimbot skill books
 
 in moods, include intimidating mien and other merc core skill
 
@@ -56,10 +6,6 @@ GOT 2 out of 3 iflails
 need the other time lord/bandit back
 
 6681n
-
-
-need
-1 high energy mining laser
 
 
 

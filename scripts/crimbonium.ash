@@ -231,7 +231,7 @@ void crimbonium()
 		//use the oil
 		while(i_a("Flask of mining oil")>0 && have_effect($effect[Oily Legs])==0 && have_effect($effect[loose joints])==0)
 		{
-			if(turns_since_mold_drop>40)
+			if(turns_since_mold_drop>30)
 			{
 				abort("It's been "+turns_since_mold_drop+" turns since we got a mold to drop, maybe it's time to give up");
 			}
@@ -258,6 +258,10 @@ void crimbonium()
 			crimbo_mining_camp_prep();
 			while(have_effect($effect[loose joints])>0 && my_adventures()>0)
 			{
+				if(turns_since_mold_drop>30)
+				{
+					abort("It's been "+turns_since_mold_drop+" turns since we got a mold to drop, maybe it's time to give up");
+				}
 				print("using up robo drop buff in mining camp. Have "+num_molds+" molds (turns since drop ="+turns_since_mold_drop+")","purple");
 //				cli_execute("shower "+my_primestat());
 				crimbo_mining_camp();
@@ -273,6 +277,10 @@ void crimbonium()
 	//		abort("Out of oil, maybe can share some");
 			crimbo_mining_camp_prep();
 			print("trying to get buff potion. Have "+num_molds+" molds (turns since drop ="+turns_since_mold_drop+")","purple");
+			if(turns_since_mold_drop>30)
+			{
+				abort("It's been "+turns_since_mold_drop+" turns since we got a mold to drop, maybe it's time to give up");
+			}
 			crimbo_mining_camp();
 			num_molds =  update_mold_counter(num_molds, turns_since_mold_drop);
 			turns_since_mold_drop=get_property("_turns_since_mold_drop").to_int();
