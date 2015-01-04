@@ -224,6 +224,7 @@ void stock_hagnks()
 	buy_item($item[disposable instant camera],1);
 	buy_item($item[polka pop],10);
 	buy_item($item[crappy waiter disguise],1);
+	buy_item($item[star hat],1);
 	
 	//stuff for twistedmage
 	if(my_name()=="twistedmage")

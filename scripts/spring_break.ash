@@ -172,6 +172,7 @@ void conspiracy()
 			max_str += ", -melee";
 		else if(my_primestat()==$stat[muscle])
 			max_str += ", +melee";
+		print(max_str + ", +equip mayfly bait necklace", "green");
 		cli_execute(max_str + ", +equip mayfly bait necklace");
 		set_combat_macro();
 		setMood("");

@@ -312,6 +312,45 @@ void crimbo_credits()
 		dump = visit_url("shop.php?whichshop=crimbo14&action=buyitem&quantity=1&whichrow=404");
 		cli_execute("inventory refresh");
 	}
+	
+	if(i_a("crimbo credit")>=300 && i_a("Crimbot ROM: Rapid Prototyping") +  i_a("Crimbot ROM: Rapid Prototyping (dirty)")<1)
+	{
+		print("buying Crimbot ROM: Rapid Prototyping","purple");
+		dump = visit_url("shop.php?whichshop=crimbo14&action=buyitem&quantity=1&whichrow=406");
+		cli_execute("inventory refresh");
+		cli_execute("use Crimbot ROM: Rapid Prototyping");
+	}
+	if(i_a("crimbo credit")>=300 && i_a("Crimbot ROM: Mathematical Precision") +  i_a("Crimbot ROM: Mathematical Precision (dirty)")<1)
+	{
+		print("buying Crimbot ROM: Mathematical Precision","purple");
+		dump = visit_url("shop.php?whichshop=crimbo14&action=buyitem&quantity=1&whichrow=407");
+		cli_execute("inventory refresh");
+		cli_execute("use Crimbot ROM: Mathematical Precision");
+	}
+	if(i_a("crimbo credit")>=300 && i_a("Crimbot ROM: Ruthless Efficiency") +  i_a("Crimbot ROM: Ruthless Efficiency (dirty)")<1)
+	{
+		print("buying Crimbot ROM: Ruthless Efficiency","purple");
+		dump = visit_url("shop.php?whichshop=crimbo14&action=buyitem&quantity=1&whichrow=408");
+		cli_execute("inventory refresh");
+		cli_execute("use Crimbot ROM: Ruthless Efficiency");
+	}
+	if(i_a("crimbo credit")>=500 && i_a("Mini-Crimbot crate")<1 && !have_familiar($familiar[mini-crimbot]))
+	{
+		print("buying Mini-Crimbot crate","purple");
+		dump = visit_url("shop.php?whichshop=crimbo14&action=buyitem&quantity=1&whichrow=409");
+		cli_execute("inventory refresh");
+		cli_execute("use Mini-Crimbot crate");
+	}
+	
+	if(have_familiar($familiar[mini-crimbot]))
+	{
+		print("buying batteries","purple");
+		while(i_a("crimbo credit")>=5)
+		{
+			dump = visit_url("shop.php?whichshop=crimbo14&action=buyitem&quantity=1&whichrow=405");
+			cli_execute("inventory refresh");
+		}
+	}
 		
 	print("num crimbo credits="+i_a("crimbo credit"),"orange");
 }

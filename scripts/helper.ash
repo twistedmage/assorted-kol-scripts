@@ -445,15 +445,15 @@ void advise_food()
 			add_food(con_map,"-    noodles + herb/tomato (delicious noodles/boring spaghetti) ",7.5,1,3);
 		}
 		
-		if((get_property("tomeSummons").to_int()<3 || available_amount($item[ultrafondue])>0) && my_path()!="Avatar of Boris")
+		if(((get_property("tomeSummons").to_int()<3 && have_skill($skill[summon clip art])) || available_amount($item[ultrafondue])>0) && my_path()!="Avatar of Boris")
 			add_food(con_map,"- Ultrafondue from summon clipart (cheese,cheese,cheese) increases ML ",14.5,0,3);
 			
 		
-		if((get_property("tomeSummons").to_int()<3 || available_amount($item[blunt cat claw])>0)  && my_path()!="Avatar of Boris" && my_primestat()==$stat[muscle])
+		if(((get_property("tomeSummons").to_int()<3 && have_skill($skill[summon clip art])) || available_amount($item[blunt cat claw])>0)  && my_path()!="Avatar of Boris" && my_primestat()==$stat[muscle])
 			add_food(con_map,"- blunt cat claw from summon clipart (cat,donut,hammer) gives damage buff ",4,0,1);
-		if((get_property("tomeSummons").to_int()<3 || available_amount($item[occult jelly donut])>0) && my_path()!="Avatar of Boris" && my_primestat()==$stat[mysticality])
+		if(((get_property("tomeSummons").to_int()<3 && have_skill($skill[summon clip art])) || available_amount($item[occult jelly donut])>0) && my_path()!="Avatar of Boris" && my_primestat()==$stat[mysticality])
 			add_food(con_map,"- occult jelly donut from summon clipart (wine,donut,skull) gives spell damage buff ",4,0,1);
-		if((get_property("tomeSummons").to_int()<3 || available_amount($item[frozen danish])>0) && my_path()!="Avatar of Boris" && my_primestat()==$stat[moxie])
+		if(((get_property("tomeSummons").to_int()<3 && have_skill($skill[summon clip art])) || available_amount($item[frozen danish])>0) && my_path()!="Avatar of Boris" && my_primestat()==$stat[moxie])
 			add_food(con_map,"- frozen danish from summon clipart (snow,donut,cheese) gives pickpocket buff ",4,0,1);
 			
 		if(my_path() != "Bees Hate You" && available_amount($item[filthy lucre])>0)
@@ -527,7 +527,7 @@ void advise_food()
 		if(available_amount($item[handful of honey])>4 || available_amount($item[wild honey pie])>0)
 			add_food(con_map,"- Wild Honey pie (made with 5 handful of honey) ",5,0,2);
 		
-		if((get_property("tomeSummons").to_int()<3 || available_amount($item[ur-donut])>0) && my_path()!="Avatar of Boris")
+		if(((get_property("tomeSummons").to_int()<3 && have_skill($skill[summon clip art])) || available_amount($item[ur-donut])>0) && my_path()!="Avatar of Boris")
 			add_food(con_map,"- Ur donut from summon clipart (donut,donut,donut) good stats ",2.5,0,1);
 		
 		if(my_level()>10 && available_amount($item[hot date])>0)
@@ -658,7 +658,7 @@ void advise_food()
 		if(available_amount($item[Snow berries])>2 && checkStage("bats1", false) && (to_int(get_property("chasmBridgeProgress")) >= 30) && my_level()>=8)
 			add_food(con_map,"- Snow crab ",6,0,1);
 	
-		if(i_a("handful of smithereens")>0  || i_a("this charming flan")>0 || get_property("tomeSummons").to_int()<3)
+		if(i_a("handful of smithereens")>0  || i_a("this charming flan")>0 || (get_property("tomeSummons").to_int()<3 && have_skill($skill[summon smithsness])))
 			add_food(con_map,"- this charming flan (smithereens) ",11,0,2);
 			
 		if(available_amount($item[tea for one])>0)
@@ -732,7 +732,10 @@ boolean nash_drink(item upgraded_booze, item upgraded_fruit, item garnish)
 	{
 		int[item] ings=get_ingredients(upgraded_fruit);
 		foreach i in ings
-		{		
+		{	
+			//we can buy fruit and soda water
+			if(i==$item[soda water] || have_outfit("filthy hippy"))
+				continue;
 			if(available_amount(i)==0)
 				return false;
 		}
@@ -907,7 +910,7 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 			int advs = 0.5 * my_level() + 0.5;
 			add_drink(con_map,"- cold one (prefer to drink at higher levels)",advs,0,1);
 		}
-		if(i_a("handful of smithereens")>0  || i_a("Paint A Vulgar Pitcher")>0 || get_property("tomeSummons").to_int()<3)
+		if(i_a("handful of smithereens")>0  || i_a("Paint A Vulgar Pitcher")>0 || (get_property("tomeSummons").to_int()<3 && have_skill($skill[summon smithsness])))
 			add_drink(con_map,"- Paint A Vulgar Pitcher (smithereens) ",11,0,2);
 			
 		if(available_amount($item[Snow berries])>0 && available_amount($item[ice harvest])>2)
@@ -1127,7 +1130,7 @@ void advise_banish(string mob)
 
 void advise_summon()
 {
-	if(my_path()!="Avatar of Boris" && get_property("tomeSummons").to_int()<3)
+	if(my_path()!="Avatar of Boris" && my_path()!="Avatar of Sneaky Pete" && my_path()!="Avatar of Jarlsberg" && get_property("tomeSummons").to_int()<3)
 	{
 		print("","black");
 		

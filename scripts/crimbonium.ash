@@ -229,13 +229,13 @@ void crimbonium()
 			cli_execute("eatdrink_simon false");
 	
 		//use the oil
-		while(i_a("Flask of mining oil")>0 && have_effect($effect[Oily Legs])==0 && have_effect($effect[loose joints])==0)
+		while(i_a("flask of tainted mining oil")>0 && have_effect($effect[Oily Legs])==0 && have_effect($effect[loose joints])==0)
 		{
 			if(turns_since_mold_drop>30)
 			{
 				abort("It's been "+turns_since_mold_drop+" turns since we got a mold to drop, maybe it's time to give up");
 			}
-			use(1,$item[Flask of mining oil]);
+			use(1,$item[flask of tainted mining oil]);
 		}
 		
 		//if we got a mining buff, use it

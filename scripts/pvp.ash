@@ -90,7 +90,7 @@ void do_fights()
 		if(my_path()!="Avatar of Jarlsberg")
 			max_string+=", switch disembodied hand";
 		//season specific
-		max_string+=", cold res, +booze drop, -combat";
+		max_string+=", cold res, +hot damage, +hot spell damage";
 		print(max_string);
 		cli_execute(max_string);
 	}
@@ -107,7 +107,10 @@ void do_fights()
 //	}	
 	print("Done with pvp today");
 	int swagger=check_swagger();
+	if(swagger>1193 && can_interact())
+		abort("buy Antagonistic Snowman Kit");
 	print("USE HOLIDAY BOOK","red");
+	
 	if(swagger>10000 && available_amount($item[cursed microwave])<1 && can_interact())
 		abort("buy cursed microwave");
 	if(swagger>10000 && available_amount($item[cursed pony keg])<1 && can_interact())
@@ -138,7 +141,7 @@ void main()
 	int month = substring(year_str,4,6).to_int();
 	int day = substring(year_str,6,8).to_int();
 	print("Date = "+day+" "+month+" "+year,"purple");
-	if(year>=2015)
+	if(year==2015 && month==3)
 		abort("New pvp season, change maximizer options");
 	do_fights();
 }
