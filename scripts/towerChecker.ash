@@ -477,6 +477,8 @@ void checkForKnownPath()
 
 void main()
 {
+	printColor( "The tower has been revamped.  This script is currently useless.", "red" );
+	/*
 	checkForKnownPath();
 	specialPathHandling();
 	updateScope();
@@ -488,4 +490,5 @@ void main()
 	checkKeys();
 	checkStar();
 	checkBoss();
+	*/
 }

@@ -1628,7 +1628,7 @@ void get_choc() {
     foreach key in $items[chocolate disco ball, chocolate pasta spoon, chocolate saucepan, 
       chocolate seal-clubbing club, chocolate stolen accordion, chocolate turtle totem, fancy chocolate,
       fancy but probably evil chocolate, fancy chocolate car, beet-flavored mr. mediocrebar,
-      cabbage-flavored mr. mediocrebar, sweet-corn-flavored mr. mediocrebar] {
+      cabbage-flavored mr. mediocrebar, sweet-corn-flavored mr. mediocrebar, choco-Crimbot] {
         grub[choco_counter].it = key;
         grub[choco_counter].consumptionGain.max = 1;
         grub[choco_counter].consumptionGain.min = 1;

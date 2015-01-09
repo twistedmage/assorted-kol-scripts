@@ -530,16 +530,17 @@ string helperSemiRare() {
 		rewards[$location[The Limerick Dungeon]] = "eyedrops.gif|cyclops eyedrops|0";
 		rewards[$location[The Valley of Rof L'm Fao]] = "scroll2.gif|Fight Bad ASCII Art|68";
 		rewards[$location[The Castle in the Clouds in the Sky (Top Floor)]] = "inhaler.gif|Mick's IcyVapoHotness Inhaler|85";
-		rewards[$location[The Outskirts of Cobb's Knob]] = "lunchbox.gif|Knob Goblin lunchbox|0";
+		if($strings[step4, step5, finished] contains get_property("questL10Garbage"))
+			rewards[$location[The Outskirts of Cobb's Knob]] = "lunchbox.gif|Knob Goblin lunchbox|0";
 	if(get_property("kingLiberated") == "true") {
 		rewards[$location[An Octopus's Garden]] = "bigpearl.gif|Fight a moister oyster|148";
 	} else {
 		if(available_amount($item[stone wool]) < 2 && get_property("lastTempleUnlock").to_int() == my_ascensions() && !($strings[step3, finished] contains get_property("questL11Worship")))
 			rewards[$location[The Hidden Temple]] = "stonewool.gif|Fight Baa'baa'bu'ran|5";
-		if(!have_outfit("Knob Goblin Elite Guard Uniform") && get_property("lastDispensaryOpen").to_int() != my_ascensions()
+		if(!have_outfit("Knob Goblin Elite Guard Uniform") && get_property("lastDispensaryOpen").to_int() != my_ascensions() && ($strings[step1, step2, finished] contains get_property("questL05Goblin"))
 		  && my_path() != "Way of the Surprising Fist" && my_path() != "Way of the Surprising Fist")
 			rewards[$location[Cobb's Knob Kitchens]] = "elitehelm.gif|Fight KGE Guard Captain|20";
-		if(!have_outfit("Mining Gear") && my_path() != "Way of the Surprising Fist" && ($strings[unstarted, started, step1] contains get_property("questL08Trapper")))
+		if(!have_outfit("Mining Gear") && my_path() != "Way of the Surprising Fist" && ($strings[started, step1] contains get_property("questL08Trapper")))
 			rewards[$location[Itznotyerzitz Mine]] = "mattock.gif|Fight Dwarf Foreman|53";
 		if(get_property("questL11Palindome") != "finished" && item_amount($item[Talisman o' Nam]) == 0) {
 			rewards[$location[The Copperhead Club]] = "rocks_f.gif|Flamin' Whatshisname (3)|104";
@@ -700,17 +701,7 @@ void pickerFlavour() {
 }
 
 //ckb: function for effect descriptions to make them short and pretty, called by chit.effects.describe
-string parseMods(string ef) {
-	# if(ef == "Polka of Plenty") ef = "Video... Games?";
-	switch(ef) {
-	case "Knob Goblin Perfume": return "";
-	case "Bored With Explosions": 
-		matcher wafe = create_matcher(":([^:]+):walk away from explosion:", get_property("banishedMonsters"));
-		if(wafe.find()) return wafe.group(1);
-		return "You're just over them"; 
-	}
-
-	string evm = string_modifier(ef,"Evaluated Modifiers");
+string parseMods(string evm) {
 	buffer enew;  // This is used for rebuilding evm with append_replacement()
 	
 	// Standardize capitalization
@@ -891,6 +882,18 @@ string parseMods(string ef) {
 
 	return evm;
 }
+string parseEff(string ef) {
+	# if(ef == "Polka of Plenty") ef = "Video... Games?";
+	switch(ef) {
+	case "Knob Goblin Perfume": return "";
+	case "Bored With Explosions": 
+		matcher wafe = create_matcher(":([^:]+):walk away from explosion:", get_property("banishedMonsters"));
+		if(wafe.find()) return wafe.group(1);
+		return "You're just over them"; 
+	}
+
+	return string_modifier(ef,"Evaluated Modifiers").parseMods();
+}
 
 record buff {
 	string effectName;
@@ -1044,7 +1047,7 @@ buff parseBuff(string source) {
 	
 	//ckb: Add modification details for buffs and effects
 	if(vars["chit.effects.describe"] == "true") {
-		string efMod = parseMods(myBuff.effectName);
+		string efMod = parseEff(myBuff.effectName);
 		if(length(efMod)>0) {
 			result.append('<br><span class="efmods">');
 			result.append(efMod);
@@ -1538,7 +1541,7 @@ void pickerFamiliar(familiar myfam, item famitem, boolean isFed) {
 		}
 		
 		if(famitem != $item[none]) {
-			string mod = parseMods(to_string(famitem)); # string_modifier(to_string(famitem), "Evaluated Modifiers");
+			string mod = parseMods(string_modifier(famitem,"Evaluated Modifiers"));
 			// Effects for Scarecrow and Hatrack
 			matcher m = create_matcher('Fam Effect: "(.*?), Cap ([^"]+)"', mod);
 			if(find(m))
@@ -2203,7 +2206,9 @@ void bakeFamiliar() {
 				famimage = "/images/itemimages/hatrack.gif";
 				break;
 			case $familiar[Crimbo Shrub]: // Get rid of that Gollywog look!
-				famimage = imagePath+'crimboshrub_fxx_ckb.gif';
+				if(to_boolean(vars["chit.familiar.anti-gollywog"]))
+					famimage = imagePath+'crimboshrub_fxx_ckb.gif';
+				else famimage = '/images/itemimages/'+ myfam.image;
 				break;
 			case $familiar[Happy Medium]:
 				switch(myfam.image) {
@@ -2313,8 +2318,10 @@ void bakeFamiliar() {
 		}
 	}
 
-	// Get Hatrack & Scarecrow info
-	if(myfam == $familiar[Mad Hatrack] || myfam == $familiar[Fancypants Scarecrow]) {
+	// Get familiar specific info
+	switch(myfam) {
+	case $familiar[Mad Hatrack]:
+	case $familiar[Fancypants Scarecrow]:
 		if(famitem != $item[none]) {
 			matcher m = create_matcher('Familiar Effect: \\"(.*?), cap (.*?)\\"', string_modifier(famitem, "Modifiers"));
 			if(find(m)) {
@@ -2325,10 +2332,29 @@ void bakeFamiliar() {
 				}
 			} else info = "Unknown effect";
 		} else info = "None";
-	} else if(myfam == $familiar[Reanimated Reanimator]) {
+		break;
+	case $familiar[Reanimated Reanimator]:
 		famname += ' (<a target=mainpane href="main.php?talktoreanimator=1">chat</a>)';
-	} else if(myfam == $familiar[Grim Brother] && source.contains_text("talk</a>)")) {
-		famname += ' (<a target=mainpane href="familiar.php?action=chatgrim&pwd='+my_hash()+'">talk</a>)';
+		break;
+	case $familiar[Grim Brother]:
+		if(source.contains_text(">talk</a>)"))
+			famname += ' (<a target=mainpane href="familiar.php?action=chatgrim&pwd='+my_hash()+'">talk</a>)';
+		break;
+	case $familiar[Crimbo Shrub]:
+		if(get_property("_shrubDecorated") == "false")
+			famname += ' (<a target=mainpane href="inv_use.php?pwd='+my_hash()+'&which=3&whichitem=7958">decorate</a>)';
+		string mods = parseMods( get_property("shrubTopper")  + ", "
+						+ get_property("shrubLights")  + ", "
+						+ get_property("shrubGarland") + ", "
+						+ get_property("shrubGifts")    );
+		if(info != "")
+			info = mods.replace_string("PvP", "PvP: "+info.replace_string(" charges", ""));
+		else info = mods;
+		break;
+	case $familiar[Mini-Crimbot]:
+		if(source.contains_text(">configure</a>)"))
+			famname += ' (<a target=mainpane href="main.php?action=minicrimbot">configure</a>)';
+		break;
 	}
 	
 	// Charges
@@ -5498,6 +5524,7 @@ buffer modifyPage(buffer source) {
 	setvar("chit.familiar.weapons", "time sword,batblade,Hodgman's whackin' stick,astral mace,Maxwell's Silver Hammer,goatskin umbrella,grassy cutlass,dreadful glove,Stick-Knife of Loathing,Work is a Four Letter Sword");
 	setvar("chit.familiar.protect", false);
 	setvar("chit.familiar.showlock", false);
+	setvar("chit.familiar.anti-gollywog", true);
 	setvar("chit.effects.classicons", "none");
 	setvar("chit.effects.showicons", true);
 	setvar("chit.effects.modicons", true);

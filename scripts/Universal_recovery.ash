@@ -117,16 +117,10 @@ boolean use_herb = contains_text(hpAutoRecoveryItems, "medicinal herb's medicina
 	&& !(bees || boris || zombie) && my_level() > 2
 	&& (my_primestat() == $stat[muscle] || item_amount($item[Medicinal Herb's medicinal herbs]) > 0
 	|| (my_class() == $class[accordion thief] && my_level() >= 9));
-	// Number of free Disco Rests, HP restored by resting at camp, MP restored by resting at camp.
-int disco = to_int(have_skill($skill[Disco Nap]))
-	+ 2* to_int(have_skill($skill[Adventurer of Leisure]))
-	+ to_int(have_skill($skill[Executive Narcolepsy]))
-	+ 10*to_int(have_skill($skill[Food Coma]))
-	+ 5*to_int(have_skill($skill[Dog Tired]));
-	// For the 6 basic clases, possessing an Unconscious Collective gives 3 rests.
-if(my_class().to_int() < 7 && have_familiar($familiar[Unconscious Collective])) disco += 3;
-int rest_hp = numeric_modifier("Base Resting HP") * (numeric_modifier("Resting HP Percent")+100) / 100 + numeric_modifier("Bonus Resting HP");
-int rest_mp = numeric_modifier("Base Resting MP") * (numeric_modifier("Resting MP Percent")+100) / 100 + numeric_modifier("Bonus Resting MP");
+int camp_hp = numeric_modifier("Base Resting HP") * (numeric_modifier("Resting HP Percent")+100) / 100 + numeric_modifier("Bonus Resting HP");
+int camp_mp = numeric_modifier("Base Resting MP") * (numeric_modifier("Resting MP Percent")+100) / 100 + numeric_modifier("Bonus Resting MP");
+int chateau_hp = 110; // Horrible Approximation
+int chateau_mp = 110; // Horrible Approximation
 	// If the character has properties set to not auto-purhase from mall, then always stay in hardcore mode.
 boolean mallcore = can_interact() && buy_mall && (my_ascensions() > 0 || my_level() > 4);
 	// Switch equipment to minimize casting cost of skills in ronin/hardcore? (delete end to do it in mallcore)
@@ -1060,6 +1054,28 @@ boolean purchase_mp(int target) {
 	return (my_mp() >= target);
 }
 
+int rest_hp() {
+	if(get_property("chateauAvailable") == "false")
+		return camp_hp;
+	if(my_level() < 13)
+		return chateau_hp;
+	return max(camp_hp, chateau_hp);
+}
+int rest_mp() {
+	if(get_property("chateauAvailable") == "false")
+		return camp_mp;
+	if(my_level() < 13)
+		return chateau_mp;
+	return max(camp_mp, chateau_mp);
+}
+
+boolean rest() {
+	if(get_property("chateauAvailable") == "false" || (my_level() >= 13 && camp_mp > chateau_mp) )
+		return cli_execute("rest");
+	visit_url("place.php?whichplace=chateau&action=chateau_restbox");
+	return true;
+}
+
 boolean lure_minion(int target) {
 	if(have_skill($skill[Lure Minions])) {
 		if(Verbosity > 2) print("Need to Lure Minions with Brains");
@@ -1152,9 +1168,9 @@ boolean mp_heal(int target){
   		use(inv_quant($item[Delicious shimmering moth], target- my_mp(), "MP").max(1), $item[Delicious shimmering moth]);
 	if(contains_text(mpAutoRecoveryItems, "free disco rest") 
 	  && (numeric_modifier("Base Resting MP") >= 10 || bees))
-		while(to_int(get_property("timesRested")) < disco  && my_mp()<target
-		  && my_maxmp() - my_mp() >=rest_mp && (DiscoResting != "hp" || (my_maxhp() - my_hp())/2 >= rest_hp))
-			cli_execute("rest");
+		while(to_int(get_property("timesRested")) < total_free_rests()  && my_mp()<target
+		  && my_maxmp() - my_mp() >=rest_mp() && (DiscoResting != "hp" || (my_maxhp() - my_hp())/2 >= rest_hp()))
+			rest();
 	if(my_mp() >= target) return true;
 	if(mallcore) {
 		if(mall_heal(target, "MP")) {
@@ -1167,7 +1183,7 @@ boolean mp_heal(int target){
 	}	// If in mallcore, that took care of everything.
 	if(inv_mp_restore(target)) return true;		// Are inventory items enough?
 	// Should I use the Clan Sofa? Only hit the server to look for the sofa if preferences say to rest there.
-	if(contains_text(mpAutoRecoveryItems, "sleep on your clan sofa") && my_level()*5 > rest_mp && my_adventures() > 0
+	if(contains_text(mpAutoRecoveryItems, "sleep on your clan sofa") && my_level()*5 > rest_mp() && my_adventures() > 0
 	  && contains_text(visit_url("clan_rumpus.php"), "otherimages/clanhall/rump5_3.gif")) {
 		if((my_maxmp() - my_mp()) >=my_level()*5 && (my_maxhp() - my_hp()) >= my_level()*5) {
 			int x = (target - my_mp())/ (my_level()*5);
@@ -1178,8 +1194,8 @@ boolean mp_heal(int target){
 				cli_execute("sofa "+x);  //visit_url("clan_rumpus.php?preaction=nap&numturns="+ x + "&pwd");
 		}
 	} else if(my_adventures() > 0 && contains_text(mpAutoRecoveryItems, "rest at your campground"))
-		while(my_mp() < target && my_mp() < my_maxmp() &&(my_maxmp() - my_mp() >=rest_mp && my_maxhp() - my_hp() >= rest_hp || AlwaysContinue) && my_adventures() > 0)
-			cli_execute("rest");			// This will waste adventures resting if set in HP/MP Usage.
+		while(my_mp() < target && my_mp() < my_maxmp() &&(my_maxmp() - my_mp() >=rest_mp() && my_maxhp() - my_hp() >= rest_hp() || AlwaysContinue) && my_adventures() > 0)
+			rest();			// This will waste adventures resting if set in HP/MP Usage.
 	if(my_mp() >= target) return true;
 	if(Verbosity > 1) print("Last attempt to purchase MP with meat.", "blue");
 	return purchase_mp(target);		// Restoration has failed, so lets restore mp with meat.
@@ -1309,8 +1325,8 @@ boolean cure_beatenup(int target){
 	
 	// Resting restores Beaten Up!
 	if(contains_text(mpAutoRecoveryItems, "free disco rest") && (numeric_modifier("Base Resting MP") >= 10 || bees)
-	  && to_int(get_property("timesRested")) < disco && my_maxmp() - my_mp() >= rest_mp)
-		return cli_execute("rest");
+	  && to_int(get_property("timesRested")) < total_free_rests() && my_maxmp() - my_mp() >= rest_mp())
+		return rest();
 	
 	populate_skills(1);
 	
@@ -1379,7 +1395,7 @@ boolean cure_beatenup(int target){
 	
 	// Resting restores Beaten Up! Use an action to do it if allowed
 	if(my_adventures() > 0 && contains_text(hpAutoRecoveryItems, "rest at your campground"))
-		return cli_execute("rest");
+		return rest();
 	
 	print("Unable to cure beaten up! Go adventure someplace wussier.", "red");
 	return false;
@@ -1533,9 +1549,9 @@ boolean hp_heal(int target){
 	}
 	if(contains_text(hpAutoRecoveryItems, "free disco rest") 
 	  && (numeric_modifier("Base Resting MP") >= 10 || bees))
-		while(to_int(get_property("timesRested")) < disco  && my_hp()<target
-		  && my_maxhp() - my_hp() >=rest_hp && (DiscoResting != "mp" || my_maxmp() - my_mp() >= rest_mp))
-			cli_execute("rest");
+		while(to_int(get_property("timesRested")) < total_free_rests()  && my_hp()<target
+		  && my_maxhp() - my_hp() >=rest_hp() && (DiscoResting != "mp" || my_maxmp() - my_mp() >= rest_mp()))
+			rest();
 	if(my_hp() >= target || inv_hp_restore(target, options))	// Heal with items from inventory
 		return true;
 	if(target - my_hp() < 10)			// There is so little to heal, it isn't worth casting a spell.
@@ -1543,7 +1559,7 @@ boolean hp_heal(int target){
 	if(skill_restore(target)) 			// Let's try to restore HP by casting skills.
 		return true;
 	// Should I use the Clan Sofa? Only hit the server to look for the sofa if preferences say to rest there.
-	if(contains_text(hpAutoRecoveryItems, "sleep on your clan sofa") && my_level()*5 > rest_hp && my_adventures() > 0
+	if(contains_text(hpAutoRecoveryItems, "sleep on your clan sofa") && my_level()*5 > rest_hp() && my_adventures() > 0
 	  && contains_text(visit_url("clan_rumpus.php"), "otherimages/clanhall/rump5_3.gif")) {
 		if((my_maxmp() - my_mp()) >=my_level()*5 && (my_maxhp() - my_hp()) >= my_level()*5) {
 			int x = (target - my_hp())/ (my_level()*5);
@@ -1554,8 +1570,8 @@ boolean hp_heal(int target){
 				cli_execute("sofa "+x);
 		} 
 	} else if(my_adventures() > 0 && contains_text(hpAutoRecoveryItems, "rest at your campground"))
-		while(my_hp() < target && my_hp() < my_maxhp() && (my_maxmp() - my_mp() >=rest_mp && my_maxhp() - my_hp() >= rest_hp || AlwaysContinue) && my_adventures() > 0)
-			cli_execute("rest");			// This will waste adventures resting if set in HP/MP Usage.
+		while(my_hp() < target && my_hp() < my_maxhp() && (my_maxmp() - my_mp() >=rest_mp() && my_maxhp() - my_hp() >= rest_hp() || AlwaysContinue) && my_adventures() > 0)
+			rest();			// This will waste adventures resting if set in HP/MP Usage.
 	if((objective == 0 && my_hp() >= target*.9) || (objective !=0 && my_hp() >= objective))
 		return true;
 	if(Verbosity > 1) print("Last attempt to purchase HP with meat.", "blue");

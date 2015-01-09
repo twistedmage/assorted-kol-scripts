@@ -310,7 +310,7 @@ void add_drink(consumable[int] con_map,string text,float avg_adv,int craft_turns
 	con.fullness=fullness;
 	//account for crafting
 	con.efficiency=con.avg_adv;
-	if(!have_bartender() && !(have_skill($skill[Inigo's Incantation of Inspiration]) && my_maxmp()>100))
+	if(!have_bartender() && !(have_skill($skill[Inigo's Incantation of Inspiration]) && my_maxmp()>100) && !have_skill($skill[cocktail magic]))
 		con.efficiency-=con.craft_turns;
 	con.efficiency/=fullness;
 	//then add it

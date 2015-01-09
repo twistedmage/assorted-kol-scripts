@@ -4594,6 +4594,7 @@ save [$item[shavin' razor]] = 0;
 save [$item[bottle of melodramamine]] = 0;
 save [$item[bean burrito]] = 0;
 save [$item[Moonshine Mohobo]] = 0;
+save [$item[sea grease]] = 0;
 save [$item[Crimbot schematic: Big Head]] = 0;
 save     [$item[Crimbot schematic: Security Chassis]] = 0;
 save     [$item[Crimbot schematic: Military Chassis]] = 0;
