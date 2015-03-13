@@ -28,6 +28,7 @@ boolean relevant(location l) {
       case $location[Cobb's Knob Menagerie, Level 2]: if ($strings[Avatar of Boris, Avatar of Jarlsberg, Avatar of Sneaky Pete] contains my_path()) return false; break;
       case $location[The Castle in the Clouds in the Sky (Top Floor)]: if (item_amount($item[Mick's IcyVapoHotness Inhaler]) > 1 || 
          get_property("sidequestNunsCompleted") != "none") return false; break;
+      case $location[The Copperhead Club]: if (item_amount($item[Flamin' Whatshisname]) > 0 || get_property("zeppelinProtestors").to_int() >= 80) return false; break;
       case $location[The Haunted Billiards Room]: if (get_property("poolSharkCount").to_int() > 24) return false; break;
       case $location[The Haunted Pantry]: return can_eat();
       case $location[The Hidden Temple]: if (item_amount($item[stone wool]) > 0 || !($strings[unstarted,started,step1,step2] contains get_property("questL11Worship"))) return false; break;

@@ -9,6 +9,7 @@
    http://kolmafia.us/showthread.php?t=2072
 
 ******************************************************************************/
+since r15467;
 
 // stuff that has to be at the top
 float abs(float n) { return n < 0 ? -n : n; }
@@ -75,6 +76,7 @@ string normalized(string mixvar, string type) {
       case "location": return to_string(to_location(mixvar));
       case "monster": return to_string(to_monster(mixvar));
       case "phylum": return to_string(to_phylum(mixvar));
+      case "servant": return (to_string(to_servant(mixvar)));
       case "skill": return to_string(to_skill(mixvar));
       case "stat": return to_string(to_stat(mixvar));
       case "list of string":
@@ -294,10 +296,6 @@ void setvar(string varname,string dfault,string type) {
       }
       return;
    }
-   switch (varname) {
-      case "BatMan_flyereverything": if (vars contains "flyereverything") dfault = vars["flyereverything"]; remove vars["flyereverything"]; break;
-      case "BatMan_puttybountiesupto": if (vars contains "puttybountiesupto") dfault = vars["puttybountiesupto"]; remove vars["puttybountiesupto"]; break;
-   }
    vars[varname] = dfault;
    vprint("New ZLib "+type+" setting: "+varname+" => "+dfault,"purple",4);
    updatevars();
@@ -317,6 +315,7 @@ void setvar(string varname,item dfault)    {  setvar(varname,to_string(dfault),"
 void setvar(string varname,location dfault){  setvar(varname,to_string(dfault),"location");  }
 void setvar(string varname,monster dfault) {  setvar(varname,to_string(dfault),"monster");  }
 void setvar(string varname,phylum dfault)  {  setvar(varname,to_string(dfault),"phylum");  }
+void setvar(string varname,servant dfault) {  setvar(varname,to_string(dfault),"servant");  }
 void setvar(string varname,skill dfault)   {  setvar(varname,to_string(dfault),"skill");  }
 void setvar(string varname,stat dfault)    {  setvar(varname,to_string(dfault),"stat");  }
 
@@ -377,60 +376,6 @@ int sell_val(item it, float expirydays) { return sell_val(it,expirydays,false); 
 int sell_val(item it, boolean combatsafe) { return sell_val(it,0,combatsafe); }
 int sell_val(item it) { return sell_val(it,0,false); }
 
-// return a map of tower items (true if detected by telescope, false if possibly needed)
-boolean[item] tower_items(boolean combatsafe) {
-   boolean[item] res;
-   if (to_int(get_property("lastTowerClimb")) == my_ascensions()) return res;
-   switch (my_path()) {
-      case "Bees Hate You": res[$item[tropical orchid]] = true; return res;
-      case "Bugbear Invasion": return res;
-   }
-   if (get_property("lastTelescopeReset").to_int() < my_ascensions() && !combatsafe)         // tower_items() contains X : >0% chance
-      visit_url("campground.php?action=telescopelow");                                       // tower_items(X) == true : 100% chance
-   item[string] t;
-   if (available_amount($item[makeshift scuba gear]) == 0) {
-      t["an armchair"] = $item[pygmy pygment];                                 // door
-      t["a cowardly-looking man"] = $item[wussiness potion];
-      t["a banana peel"] = $item[gremlin juice];
-      t["a coiled viper"] = $item[adder bladder];
-      t["a rose"] = $item[angry farmer candy];
-      t["a glum teenager"] = $item[thin black candle];
-      t["a hedgehog"] = $item[super-spiky hair gel];
-      t["a raven"] = $item[Black No. 2];
-      t["a smiling man smoking a pipe"] = $item[Mick's IcyVapoHotness Rub];
-   }
-   t["catch a glimpse of a flaming katana"] = $item[frigid ninja stars];    // tower proper
-   t["catch a glimpse of a translucent wing"] = $item[spider web];
-   t["see a fancy-looking tophat"] = $item[sonar-in-a-biscuit];
-   t["see a flash of albumen"] = $item[black pepper];
-   t["see a giant white ear"] = $item[pygmy blowgun];
-   t["see a huge face made of Meat"] = $item[meat vortex];
-   t["see a large cowboy hat"] = $item[chaos butterfly];
-   t["see a periscope"] = $item[photoprotoneutron torpedo];
-   t["see a slimy eyestalk"] = $item[fancy bath salts];
-   t["see a strange shadow"] = $item[inkwell];
-   t["see moonlight reflecting off of what appears to be ice"] = $item[hair spray];
-   t["see part of a tall wooden frame"] = $item[disease];
-   t["see some amber waves of grain"] = $item[bronzed locust];
-   t["see some long coattails"] = $item[Knob Goblin firecracker];
-   t["see some pipes with steam shooting out of them"] = $item[powdered organs];
-   t["see some sort of bronze figure holding a spatula"] = $item[leftovers of indeterminate origin];
-   t["see the neck of a huge bass guitar"] = $item[mariachi G-string];
-   t["see what appears to be the North Pole"] = $item[NG];
-   t["see what looks like a writing desk"] = $item[plot hole];
-   t["see the tip of a baseball bat"] = $item[baseball];
-   t["see what seems to be a giant cuticle"] = $item[razor-sharp can lid];
-   t["see a pair of horns"] = $item[barbed-wire fence];
-   t["see a formidable stinger"] = $item[tropical orchid];
-   t["see a wooden beam"] = $item[stick of dynamite];
-   for i from 0 upto get_property("telescopeUpgrades").to_int()
-      if (t contains get_property("telescope"+i)) res[t[get_property("telescope"+i)]] = true;
-   if (count(res) < 5) foreach s,it in t { if (!res[it]) res[it] = false; }
-     else if (count(res) < 6) foreach i in $items[barbed-wire fence, stick of dynamite, tropical orchid] res[i] = false;
-   return res;
-}
-boolean[item] tower_items() { return tower_items(false); }
-
 // returns how many of an item you have ONLY in inventory and equipped
 int have_item(string tolookup) {
    return item_amount(to_item(tolookup)) + equipped_amount(to_item(tolookup));
@@ -448,15 +393,15 @@ item braindrop(monster patient) {
    return $item[crappy brain];
 }
 
-// returns true if the given stat is a goal (from setting "level X" or "<stat> X" as a condition), or primestat needed for run
+// returns true if the given stat is a goal (from setting "level X" or "<stat> X" as a condition)
 boolean is_goal(stat gstat) {
    foreach i,g in get_goals() if (create_matcher("\\d+ "+to_lower_case(gstat),g).find()) return true;
-   if (my_primestat() == gstat && my_level() < 13) return true;
+//   if (my_primestat() == gstat && my_level() < 13) return true;
    return false;
 }
 
 float[item,item] pieces;
-if (numeric_modifier("_spec","Buffed Muscle") == 0) cli_execute("whatif quiet");
+if (numeric_modifier("Generated:_spec","Buffed Muscle") == 0) cli_execute("whatif quiet");
 // returns what fraction of an item (ancestor) a given ingredient (child) is
 float isxpartof(item child, item ancestor) {
    if (pieces[child] contains ancestor) return pieces[child,ancestor];
@@ -486,13 +431,16 @@ float isxpartof(item child, item ancestor) {
    return 1.0/count;
 }
 
-float [item,item] useforitems;
+static {
+   float [item,item] useforitems;
+   load_current_map("use_for_items", useforitems);
+}
 float has_goal(item whatsit) {                   // chance of getting a goal from an item
    if (!goal_exists("item")) return 0;
    float has_goal(item whatsit,int level) {
      if (whatsit == $item[none]) return 0;
      if (is_goal(whatsit)) return 1.0;
-     if (count(useforitems) == 0 && !load_current_map("use_for_items", useforitems)) {
+     if (count(useforitems) == 0) {
         vprint("Unable to load file \"use_for_items.txt\".",-3); return 0;
      }
      if (level > 5) return 0;  // avoid infinite recursion
@@ -519,20 +467,20 @@ float has_goal(monster m, boolean usespec) {                      // chance of g
       switch (rec.type) {
          case "b": res += temp; continue;
          case "p": if (my_primestat() == $stat[moxie] || have_effect($effect[Form of...Bird!]) > 0)
-            res += temp*minmax(max(rec.rate,0.001)*((usespec ? numeric_modifier("_spec","Pickpocket Chance") :
+            res += temp*minmax(max(rec.rate,0.001)*((usespec ? numeric_modifier("Generated:_spec","Pickpocket Chance") :
                    numeric_modifier("Pickpocket Chance"))+100)/100.0,0,100)/100.0; continue;
          case "c": if (item_type(rec.drop) == "shirt" && !have_skill($skill[torso awaregness])) continue;
             if (item_type(rec.drop) == "pasta guardian" && my_class() != $class[pastamancer]) continue;  // skip pasta guardians for non-PMs
             if (rec.drop == $item[bunch of square grapes] && my_level() < 11) continue;  // grapes drop at 11
          case "":                                // TODO: pp chance
-         case "n": res += temp*minmax(max(rec.rate,0.001)*((usespec ? numeric_modifier("_spec","Item Drop") :
+         case "n": res += temp*minmax(max(rec.rate,0.001)*((usespec ? numeric_modifier("Generated:_spec","Item Drop") :
                           numeric_modifier("Item Drop"))+100)/100.0,0,100)/100.0; continue;
          case "0": res += .001; continue;
       }
    }
    if (is_goal(braindrop(m))) switch (braindrop(m)) {       // include brains for Zombie Slayers
       case $item[hunter brain]: break; case $item[boss brain]: res += 1; break;
-      default: res += minmax((have_skill($skill[skullcracker]) ? 0.6 : 0.3)*((usespec ? numeric_modifier("_spec","Item Drop") :
+      default: res += minmax((have_skill($skill[skullcracker]) ? 0.6 : 0.3)*((usespec ? numeric_modifier("Generated:_spec","Item Drop") :
          numeric_modifier("Item Drop"))+100)/100.0,0,100)/100.0;
    }
    return res;
@@ -543,7 +491,7 @@ float has_goal(location l, boolean usespec) {                     // chance of g
    float[monster] rates = appearance_rates(l);
    if (rates[$monster[none]] == 100) return 0;
    float cradj = rates[$monster[none]] == -1 ? 0 :
-      minmax(usespec ? numeric_modifier("_spec","Combat Rate") : numeric_modifier("Combat Rate"), -rates[$monster[none]], rates[$monster[none]]);
+      minmax(usespec ? numeric_modifier("Generated:_spec","Combat Rate") : numeric_modifier("Combat Rate"), -rates[$monster[none]], rates[$monster[none]]);
    foreach m,r in rates if (r <= 0 || m == $monster[none]) remove rates[m];
 //   int countadj = count(rates) + 3*to_int(rates contains to_monster(get_property("olfactedMonster")));
    foreach m,r in rates
@@ -638,9 +586,9 @@ boolean resist(element req, boolean reallydoit) {
 
 // returns the value of your buffed defense stat, factoring in Hero of the Half-Shell
 int my_defstat(boolean usespec) {
-   int mox = usespec ? numeric_modifier("_spec","Buffed Moxie") : my_buffedstat($stat[moxie]);
+   int mox = usespec ? numeric_modifier("Generated:_spec","Buffed Moxie") : my_buffedstat($stat[moxie]);
    if (have_skill($skill[hero of the half-shell]) && item_type(equipped_item($slot[off-hand])) == "shield")
-      return max(usespec ? numeric_modifier("_spec","Buffed Muscle") : my_buffedstat($stat[muscle]),mox);
+      return max(usespec ? numeric_modifier("Generated:_spec","Buffed Muscle") : my_buffedstat($stat[muscle]),mox);
    return mox;
 }
 int my_defstat() { return my_defstat(false); }
@@ -738,8 +686,11 @@ record kmessage {
 kmessage[int] mail;
 void load_kmail(string calledby) { // loads all of your inbox (up to 100) into the global "mail"
    mail.clear();                   // optionally, specify your script in "calledby"
-   matcher k = create_matcher("'id' =\\> '(\\d+)',\\s+'type' =\\> '(.+?)',\\s+'fromid' =\\> '(-?\\d+)',\\s+'azunixtime' =\\> '(\\d+)',\\s+'message' =\\> '(.+?)',\\s+'fromname' =\\> '(.+?)',\\s+'localtime' =\\> '(.+?)'"
-      ,visit_url("api.php?pwd&what=kmail&format=php&count=100&for="+url_encode(calledby)));
+//   matcher k = create_matcher("'id' =\\> '(\\d+)',\\s+'type' =\\> '(.+?)',\\s+'fromid' =\\> '(-?\\d+)',\\s+'azunixtime' =\\> '(\\d+)',\\s+'message' =\\> '(.+?)',\\s+'fromname' =\\> '(.+?)',\\s+'localtime' =\\> '(.+?)'"
+//      ,visit_url("api.php?pwd&what=kmail&format=php&count=100&for="+url_encode(calledby)));
+// heeheehee's JSON matcher
+    matcher k = create_matcher('"id":"(\\d+)","type":"(.+?)","fromid":"(-?\\d+)","azunixtime":"(\\d+)","message":"(.+?)","fromname":"(.+?)","localtime":"(.+?)"'
+      ,visit_url("api.php?pwd&what=kmail&count=100&for="+url_encode(calledby)));
    int n;
    while (k.find()) {
       n = count(mail);
@@ -754,7 +705,7 @@ void load_kmail(string calledby) { // loads all of your inbox (up to 100) into t
          mail[n].message = mbits.group(to_int(mail[n].meat > 0 || count(mail[n].items) > 0));
       } else mail[n].message = k.group(5);
       mail[n].fromname = k.group(6);
-      mail[n].localtime = k.group(7);
+      mail[n].localtime = replace_string(k.group(7),"\\","");
    }
 }
 void load_kmail() { load_kmail("ZLib-powered-script"); }

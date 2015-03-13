@@ -32,6 +32,9 @@ boolean checkguild() {                            // guild quest-unlocking
 boolean can_adv(location where, boolean prep, int verb) {
   // prepare yourself!
    if (where == $location[none]) return vprint("Not a known location!",-6);
+   if (limit_mode() != "") {
+     if (limit_mode() == "Spelunky" && where.zone != "Spelunky Area") return false;
+   }
    verb = max(verb,2);  // disallow negative verbs since return value depends on it
    if (prep) {
       if (my_adventures() == 0) return vprint("An adventurer without adventures is you!",-verb);
@@ -143,13 +146,13 @@ boolean can_adv(location where, boolean prep, int verb) {
       case "Beanstalk": return levelcheck(10);
       case "Cyrpt": return levelcheck(7) && itemcheck($item[evilometer]);
       case "Dreadsylvania": return levelcheck(15) && visit_url("clan_dreadsylvania.php").contains_text(">Dreadsylvania<");
-      case "Farm": return levelcheck(12) && get_property("questL12War") == "started" && get_property("sidequestFarmCompleted") == "none";
+      case "Farm": return levelcheck(12) && qprop("questL12War","step1") && get_property("questL12War") != "finished" && get_property("sidequestFarmCompleted") == "none";
       case "Friars": return levelcheck(6) && qprop("questL06Friar","started") && get_property("questL06Friar") != "finished";
       case "HiddenCity": return levelcheck(11) && qprop("questL11Worship","step3");
       case "Highlands": return levelcheck(9) && qprop("questL09Topping","started") && get_property("chasmBridgeProgress").to_int() >= 30;
       case "Hobopolis": return contains_text(visit_url("town_clan.php"), "clanbasement.gif") && !contains_text(visit_url("clan_basement.php?fromabove=1"), "not allowed");
-      case "Island": return (get_property("lastIslandUnlock") == my_ascensions()) && get_property("questL12War") != "started";
-      case "IsleWar": return levelcheck(12) && qprop("questL12War","started") && get_property("questL12War") != "finished";
+      case "Island": return (get_property("lastIslandUnlock") == my_ascensions()) && !qprop("questL12War","step1"); 
+      case "IsleWar": return levelcheck(12) && qprop("questL12War","step1") && get_property("questL12War") != "finished";  
       case "Jacking": return itemcheck($item[map to Professor Jacking's laboratory]);
       case "Junkyard": return levelcheck(12) && get_property("sidequestJunkyardCompleted") == "none";
       case "Knob": if (where == $location[the outskirts of cobb's knob]) return true; return levelcheck(5) && qprop("questL05Goblin","started");
@@ -157,7 +160,7 @@ boolean can_adv(location where, boolean prep, int verb) {
       case "Lab": return levelcheck(5) && itemcheck($item[Cobb's Knob lab key]);
       case "Le Marais D&egrave;gueulasse":
       case "Little Canadia": return canadia_available();
-      case "Manor0": return levelcheck(11) && itemcheck($item[your father's macguffin diary]) && qprop("questL11Manor","step2");
+      case "Manor0": return levelcheck(11) && itemcheck($item[your father's macguffin diary]) && qprop("questL11Manor","step1");
       case "Manor1": if (where == $location[the haunted pantry]) return true; return qprop("questM20Necklace","started");
       case "Manor2": return qprop("questM21Dance","step1");
       case "Manor3": return qprop("questM17Babies","started");
@@ -174,6 +177,7 @@ boolean can_adv(location where, boolean prep, int verb) {
       case "Rumpelstiltskin's Home For Children": return get_property("grimstoneMaskPath") == "gnome" || itemcheck($item[grimstone mask]);
       case "Skid Row": return get_property("grimstoneMaskPath") == "wolf" || itemcheck($item[grimstone mask]);
       case "Spaaace": return effectcheck($effect[transpondent]) || (!prep && itemcheck($item[transporter transponder])) || (prep && use(1,$item[transporter transponder]));
+	  case "Spelunky Area": return limit_mode() == "Spelunky";
       case "Spring Break Beach": return get_property("sleazeAirportAlways") == "true" || get_property("_sleazeAirportToday") == "true";
       case "Suburbs": return effectcheck($effect[dis abled]) || (!prep && itemcheck($item[devilish folio])) || (prep && use(1,$item[devilish folio]));
       case "The Candy Witch and the Relentless Child Thieves": return get_property("grimstoneMaskPath") == "witch" || itemcheck($item[grimstone mask]);
@@ -206,6 +210,7 @@ boolean can_adv(location where, boolean prep, int verb) {
       case "Crimbo09":
       case "Crimbo10":
       case "Crimbo12":
+      case "Crimbo14":
       case "Events":
       case "WhiteWed": return false;
       }
@@ -374,7 +379,7 @@ boolean can_adv(location where, boolean prep, int verb) {
    case $location[Richard's Hobo Moxie]:
    case $location[Richard's Hobo Muscle]:
    case $location[Richard's Hobo Mysticality]: return zone_check("Hobopolis");  // these are in zone "Gyms"
-   case $location[A Maze of Sewer Tunnels]:
+   case $location[A Maze of Sewer Tunnels]: return my_adventures() > 9;
    case $location[Hobopolis Town Square]:
    case $location[Burnbarrel Blvd.]:
    case $location[Exposure Esplanade]:
@@ -526,6 +531,19 @@ boolean can_adv(location where, boolean prep, int verb) {
    case $location[Post-Quest Bugbear Pens]: return primecheck(13) && get_property("questM03Bugbear") == "finished" && perm_urlcheck("woods.php","pen.gif");
    case $location[The Spooky Gravy Burrow]: return (famcheck($familiar[spooky gravy fairy]) || famcheck($familiar[sleazy gravy fairy]) ||
            famcheck($familiar[frozen gravy fairy]) || famcheck($familiar[flaming gravy fairy]) || famcheck($familiar[stinky gravy fairy]));
+  // sorceress
+   case $location[Fastest Adventurer Contest]: return levelcheck(13) && get_property( "questL13Final" ) == "step1" && get_property( "nsContestants1" ) > 0;
+   case $location[Strongest Adventurer Contest]:
+   case $location[Smartest Adventurer Contest]:
+   case $location[Smoothest Adventurer Contest]:
+   case $location[A Crowd of (Stat) Adventurers]: return levelcheck(13) && get_property( "questL13Final" ) == "step1" && get_property( "nsContestants2" ) > 0;
+   case $location[Hottest Adventurer Contest]:
+   case $location[Coldest Adventurer Contest]:
+   case $location[Spookiest Adventurer Contest]:
+   case $location[Stinkiest Adventurer Contest]:
+   case $location[Sleaziest Adventurer Contest]:
+   case $location[A Crowd of (Element) Adventurers]: return levelcheck(13) && get_property( "questL13Final" ) == "step1" && get_property( "nsContestants3" ) > 0;
+   case $location[The Hedge Maze]: return levelcheck(13) && get_property( "questL13Final" ) == "step2";
   // tower
    case $location[Fernswarthy's Basement]: return qprop("questG03Ego","step4") && perm_urlcheck("fernruin.php","basement.php");
    case $location[Tower Ruins]: return (itemcheck($item[fernswarthy's letter]));
@@ -550,7 +568,6 @@ boolean can_adv(location where, boolean prep, int verb) {
    case $location[Whitey's Grove]: return (levelcheck(7) && primecheck(34) && (qprop("questL11Palindome","step3") || (checkguild() && qprop("questG02Whitecastle","started"))) && perm_urlcheck("woods.php","grove.gif"));
   // unique locations
    case $location[Friar Ceremony Location]: return (itemcheck($item[dodecagram]) && itemcheck($item[box of birthday candles]) && itemcheck($item[eldritch butterknife]));
-   case $location[Sorceress' Hedge Maze]: return levelcheck(13) && (itemcheck($item[hedge maze key]) || contains_text(visit_url("questlog.php?which=1"),"a hedge maze"));
    case $location[El Vibrato Island]: return (itemcheck($item[el vibrato trapezoid]) || contains_text(visit_url("campground.php"),"Portal1.gif"));
    case $location[The Red Queen's Garden]: return (effectcheck($effect[down the rabbit hole]) || (!prep && itemcheck($item[&quot;DRINK ME&quot; potion])) || (prep && use(1,$item[&quot;DRINK ME&quot; potion])));
    case $location[The Landscaper's Lair]: return itemcheck($item[antique painting of a landscape]);

@@ -1,7 +1,7 @@
 script "Character Info Toolbox";
 notify "Bale";
+since r15559; // KoLmafia now counts Purr of the Feline, so workaround removed.
 import "zlib.ash";
-string chitVersion = "0.8.5";
 
 /************************************************************************************
 CHaracter Info Toolbox
@@ -115,64 +115,6 @@ void bakeUpdate(string thisver, string prefix, string newver) {
 	}
 	result.append('</td></tr></tbody></table>');
 	chitBricks["update"] = result.to_string();		
-}
-
-// checks script version once daily
-// adapted from zlib's check_version() to only print update messages once per day, and only if version checking is enabled by the user
-void checkVersion(string soft, string thisver, int thread) {
-
-	vprint("Running "+soft+" version: "+thisver,"gray",8);
-
-	if (!(vars["chit.checkversion"]=="true")) {
-		return;
-	}
-
-	boolean sameornewer(string local, string server) {
-      if (equals(local,server)) return true;
-      string[int] loc = split_string(local,"\\.");
-      string[int] ser = split_string(server,"\\.");
-      for i from 0 to max(count(loc)-1,count(ser)-1) {
-         if (i+1 > count(loc)) return false; if (i+1 > count(ser)) return true;
-         if (loc[i].to_int() < ser[i].to_int()) return false;
-         if (loc[i].to_int() > ser[i].to_int()) return true;
-      }
-		return local == server;
-	}
-
-	string page; 
-	matcher findver;
-	buffer result;
-
-	record {
-	   string ver;
-	   string vdate;
-	} [string] zv;
-	file_to_map("zversions.txt", zv);
-
-	if (zv[soft].vdate != today_to_string()) {
-		vprint("Checking for updates...",1);
-		page = visit_url("http://kolmafia.us/showthread.php?t="+thread);
-		findver = create_matcher("<b>"+soft+" (.+?)</b>",page);
-		zv[soft].vdate = today_to_string();
-		if (findver.find()) {
-			zv[soft].ver = findver.group(1);
-			vprint("Latest version: " + zv[soft].ver,1);
-			if (sameornewer(thisver,zv[soft].ver)) {
-				vprint("You have a current version of "+soft+".","green",1); 
-			} else {
-				string msg = "<font color=red><b>New Version of "+soft+" Available: "+zv[soft].ver+"</b></font>";
-				msg = msg + '<br>Upgrade from '+thisver+' to '+zv[soft].ver+' with <font color=blue><u>svn update</u></font> command!<br>';
-				vprint_html(msg,1);
-			}
-		} else {
-			vprint("Unable to load current version info.","red",-1); 
-		}
-		map_to_file(zv,"zversions.txt");
-	}
-	
-	//Build update brick if required
-	if(!sameornewer(thisver,zv[soft].ver))
-		bakeUpdate(thisver, "Version ", zv[soft].ver);
 }
 
 /*****************************************************
@@ -529,9 +471,10 @@ string helperSemiRare() {
 		rewards[$location[The Haunted Pantry]] = "pie.gif|Tasty tart (3)|0";
 		rewards[$location[The Limerick Dungeon]] = "eyedrops.gif|cyclops eyedrops|0";
 		rewards[$location[The Valley of Rof L'm Fao]] = "scroll2.gif|Fight Bad ASCII Art|68";
+	if(get_property("lastCastleTopUnlock").to_int() == my_ascensions())
 		rewards[$location[The Castle in the Clouds in the Sky (Top Floor)]] = "inhaler.gif|Mick's IcyVapoHotness Inhaler|85";
-		if($strings[step4, step5, finished] contains get_property("questL10Garbage"))
-			rewards[$location[The Outskirts of Cobb's Knob]] = "lunchbox.gif|Knob Goblin lunchbox|0";
+	if($strings[step4, step5, finished] contains get_property("questL10Garbage"))
+		rewards[$location[The Outskirts of Cobb's Knob]] = "lunchbox.gif|Knob Goblin lunchbox|0";
 	if(get_property("kingLiberated") == "true") {
 		rewards[$location[An Octopus's Garden]] = "bigpearl.gif|Fight a moister oyster|148";
 	} else {
@@ -633,31 +576,77 @@ string helperSpookyraven() {
 	return result.to_string();
 }
 
-// Functions for pickers
-void pickerStart(buffer picker, string rel, string message) {
-	picker.append('<div id="chit_picker' + rel + '" class="chit_skeleton" style="display:none">');	
-	picker.append('<table class="chit_picker">');
-	picker.append('<tr><th colspan="2">' + message + '</th></tr>');
+string helperXiblaxian() {
+	
+	// turns to next drop - taken from kol wiki - 11, 16, 21...
+	int xidrops = get_property("_holoWristDrops").to_int();
+	int xiprog = get_property("_holoWristProgress").to_int() + 1;
+	int xinext = 11 + 5*xidrops;
+	int countdown = xinext - xiprog;
+
+	int circuit = 3-available_amount($item[xiblaxian circuitry]);
+	int alloy = 1-available_amount($item[xiblaxian alloy]);
+	int polymer = 1-available_amount($item[xiblaxian polymer]);
+	
+	if(countdown == 0 && get_counters("Xiblaxian Material", 0, 0) == "")
+		cli_execute("counters add 0 Xiblaxian Material holoputer.gif");
+
+	// Build a buffer that creates a bar similar to the fortune cookie
+	buffer result;
+	result.append('<table id="chit_xibalaxian" class="chit_brick nospace">');
+	result.append('<tr class="effect"');
+	if(countdown == 0)
+		result.append(' style="background-color: khaki"');
+	result.append('>');
+	// Icon
+	result.append('<td class="icon"><a ');
+	if(available_amount($item[Xiblaxian 5D printer]) > 0)
+		result.append('target=mainpane href="shop.php?whichshop=5dprinter');
+	else
+		result.append('target=_blank href="http://kol.coldfront.net/thekolwiki/index.php/Xiblaxian_5D_printer');
+	result.append('"><img src="/images/itemimages/holoputer.gif"></a></td>');
+	// Text
+	if(countdown == 0) {
+		result.append('<td class="info" style="text-align:right;">');
+		result.append('Circuit (indoor):<br />Polymer (outdoor):<br />Alloy (under): </td><td class="info">');
+		result.append( available_amount($item[xiblaxian circuitry]));
+		result.append('<br />');
+		result.append(available_amount($item[xiblaxian polymer]));
+		result.append('<br />');
+		result.append(available_amount($item[xiblaxian alloy]));
+		result.append('</td>');
+	} else {
+		result.append('<td class="info">Xiblaxian <br />Wrist-puter</td>');
+		// Counter
+		result.append('<td class="info">' + xiprog + ' /' + xinext + '</td>');
+		result.append('</tr>');
+		result.append('</table>');
+	}
+	
+	chitTools["helpers"] = "You have some expired counters|helpers.png";
+	return result.to_string();
 }
 
+// Functions for pickers
+void pickerStart(buffer picker, string rel, string message) {
+	picker.append('<div id="chit_picker');	
+	picker.append(rel);	
+	picker.append('" class="chit_skeleton" style="display:none"><table class="chit_picker"><tr><th colspan="2">');
+	picker.append(message);
+	picker.append('</th></tr>');
+}
 void pickerStart(buffer picker, string rel, string message, string image) {
-	picker.append('<div id="chit_picker' + rel + '" class="chit_skeleton" style="display:none">');	
-	picker.append('<table class="chit_picker"><tr><th colspan="2"><img src="');
-	picker.append(imagePath + image);
-	picker.append('.png">');
-	picker.append(message + '</th></tr>');
+	picker.pickerStart(picker, rel, '<img src="' + imagePath + image + '.png">' + message);
 }
 
 void addLoader(buffer picker, string message) {
-	picker.append('<tr class="pickloader" style="display:none">');
-	picker.append('<td class="info">' + message + '</td>');
-	picker.append('<td class="icon"><img src="/images/itemimages/karma.gif"></td>');
-	picker.append('</tr>');
+	picker.append('<tr class="pickloader" style="display:none"><td class="info">');
+	picker.append(message);
+	picker.append('</td><td class="icon"><img src="/images/itemimages/karma.gif"></td></tr>');
 }
 
 void addSadFace(buffer picker, string message) {
-	picker.append('<tr class="picknone">');
-	picker.append('<td class="info" colspan="2">');
+	picker.append('<tr class="picknone"><td class="info" colspan="2">');
 	picker.append(message);
 	picker.append('</td></tr>');
 }
@@ -892,7 +881,7 @@ string parseEff(string ef) {
 		return "You're just over them"; 
 	}
 
-	return string_modifier(ef,"Evaluated Modifiers").parseMods();
+	return string_modifier("Effect:" + ef,"Evaluated Modifiers").parseMods();
 }
 
 record buff {
@@ -924,7 +913,7 @@ buff parseBuff(string source) {
 		myBuff.effectImage = parse.group(3);
 		myBuff.effectName = parse.group(4);
 		spoiler = parse.group(5);		// This appears for "Form of...Bird!" and "On the Trail"
-		if(get_property("_psychoJarUsed") == "true" && get_campground() contains $item[jar of psychoses (The Crackpot Mystic)] && $strings[Consumed by Anger, Consumed by Doubt, Consumed by Fear, Consumed by Regret] contains myBuff.effectName)
+		if(get_campground() contains $item[jar of psychoses (The Crackpot Mystic)] && $strings[Consumed by Anger, Consumed by Doubt, Consumed by Fear, Consumed by Regret] contains myBuff.effectName)
 			columnTurns = '<a target="mainpane" href="/place.php?whichplace=junggate_3&action=mystic_face" title="This... This isn\'t me.">'+parse.group(7)+'</a>';
 		else
 			columnTurns = parse.group(6).replace_string('title="Use a remedy to remove', 'title="SGEEAs Left: '+ item_amount($item[soft green echo eyedrop antidote]) +'\nUse a remedy to remove');
@@ -1141,6 +1130,11 @@ void bakeEffects() {
 				helpers.append(helperSpookyraven());
 		}
 	}
+	
+	// Add helper for Xiblaxian holo-wrist-puter
+	if(vars["chit.helpers.xiblaxian"] != "false" && have_equipped($item[Xiblaxian holo-wrist-puter]))
+		helpers.append(helperXiblaxian());
+
 
 	//Intrinsic Effects
 	rowMatcher = create_matcher("<tr>(.*?)</tr>", chitSource["intrinsics"]);
@@ -1853,17 +1847,6 @@ void pickerCompanion(string famname, string famtype) {
 		return "blank";
 	}
 	
-	// Made this function because Eggman is one word. This seemed the easiest solution.
-	string to_companion(skill s) {
-		switch(s) {
-		case $skill[Egg Man]: return "the Eggman";
-		case $skill[Radish Horse]: return "the Radish Horse";
-		case $skill[Hippotatomous]: return "the Hippotatomous";
-		case $skill[Cream Puff]: return "the Cream Puff";
-		}
-		return "";
-	}
-	
 	void addCompanion(buffer result, skill s, boolean gotfood) {
 		string hover = "Play with " + s +"<br />";
 		if(gotfood)
@@ -1903,6 +1886,65 @@ void pickerCompanion(string famname, string famtype) {
 	
 	picker.append('</table></div>');
 	chitPickers["equipment"] = picker;
+}
+
+string servant_ability(servant s, int lvl) {
+	switch(lvl) {
+	case 1: return s.level1_ability;
+	case 7: return s.level7_ability;
+	case 14: return s.level14_ability;
+	case 21: return s.level21_ability;
+	}
+	return "";
+}
+
+void pickerServant() {
+	void addServant(buffer result, servant s) {
+		string url = sideCommand("servant " + s);
+		result.append('<tr class="pickitem"><td class="inventory"><a class="change" href="');
+		result.append(url);
+		result.append('"><b>');
+		result.append(s);
+		result.append('</b>');
+		foreach i in $ints[1, 7, 14] {
+			result.append('<br /><span style="color:');
+			if(s.level >= i)
+				result.append('blue');
+			else
+				result.append('gray');
+			result.append('">');
+			result.append(s.servant_ability(i));
+			result.append("</span>");
+		}
+		result.append('</span></a></td><td class="icon"><a class="change" href="');
+		result.append(url);
+		result.append('"><img src="/images/itemimages/');
+		result.append(s.image);
+		result.append('"></a></td></tr>');
+	}
+
+	buffer picker;
+	picker.pickerStart("fam", "Put thy Servant to Work");
+	picker.addLoader("Summoning Servant...");
+	boolean sad = true;
+	foreach s in $servants[]
+		if(have_servant(s) && my_servant() != s) {
+			picker.addServant(s);
+			sad = false;
+		}
+	if(sad) {
+		if(my_servant() == $servant[none])
+			picker.addSadFace("You haven't yet released any servants to obey your whims.<br /><br />How sad.");
+		else
+			picker.addSadFace("Poor " + my_servant().name + " has no other servants for company.");
+	}
+	
+	// Link to Servant's Quarters
+	picker.append('<tr class="pickitem"><td colspan=2 class="make"><a class="change" style="border-top: 1px solid gray; padding: 3px 0px 3px 0px;" onclick="javascript:location.reload();" target=mainpane href="place.php?whichplace=edbase&action=edbase_door"><b>Go to the Servant\'s Quarters</b></a></td></tr>');
+	
+	picker.append('</table></div>');
+	
+	chitPickers["servants"] = picker;
 }
 
 static { string [thrall] [int] pasta;
@@ -2167,7 +2209,81 @@ void FamPete() {
 	
 	chitBricks["familiar"] = result;
 }
+
+# <p><font size=2><b>Servant:</b><br /><a href="/place.php?whichplace=edbase&action=edbase_door" target="mainpane">Bakthenamen the 1 level Cat</a><br /><a href="/place.php?whichplace=edbase&action=edbase_door" target="mainpane"><img border=0 src="//images.kingdomofloathing.com/itemimages/edserv1.gif" /></a></font></p>
+void FamEd() {
+	buffer result;
+	void bake(int lvl, string name, servant type, string img) {
+		result.append('<table id="chit_familiar" class="chit_brick nospace">');
+		result.append('<tr><th title="Servant Level">');
+		if(type != $servant[none]) {
+			result.append('Lvl.&nbsp;');
+			result.append(lvl);
+		}
+		result.append('</th><th colspan="2" title="Servant"><a title="');
+		result.append(name);
+		result.append('" target=mainpane href="/place.php?whichplace=edbase&action=edbase_door">');
+		result.append(name);
+		if(type != $servant[none]) {
+			result.append(", the ");
+			result.append(type);
+		}
+		result.append('</a></th></tr>');
 		
+		result.append('<tr><td class="icon" title="Servant">');
+		result.append('<a class="chit_launcher" rel="chit_pickerfam" href="#">');
+		result.append('<img title="Release thy Servant" src=');
+		result.append(img);
+		result.append('></a></td>');
+		if(type != $servant[none]) {
+			result.append('<td class="info"><a class="chit_launcher" rel="chit_pickerfam" href="#"><span style="color:blue;font-weight:bold">');
+			foreach i in $ints[1, 7, 14]
+				if(lvl >= i) {
+					result.append(type.servant_ability(i));
+					result.append('<br>');
+				}
+			result.append('</span></a></td>');
+		} else {
+			result.append('<td class="info"><a target=mainpane href="/place.php?whichplace=edbase&action=edbase_door"><span style="color:blue;font-weight:bold">(Click to release<br>a Servant)</span></a></td>');
+		}
+		result.append('</tr></table>');
+	}
+	
+	matcher id = create_matcher('mainpane">.+? src="([^"]+)"', chitSource["familiar"]);
+	if(id.find())
+		bake(my_servant().level, my_servant().name, my_servant(), id.group(1));
+	else
+		bake(0, "No Servant", $servant[none], "/images/itemimages/blank.gif");
+	
+	chitBricks["familiar"] = result;
+	pickerServant();
+}
+
+// Set familiar image, including path to image. Some familiar images are purposefully changed, others need to be normalized.
+string familiar_image(familiar f) {
+	switch(f) {
+	case $familiar[Fancypants Scarecrow]: return "/images/itemimages/pantscrow2.gif";
+	case $familiar[Disembodied Hand]: return "/images/itemimages/dishand.gif";
+	case $familiar[Mad Hatrack]: return "/images/itemimages/hatrack.gif";
+	
+	case $familiar[Golden Monkey]: return imagePath + 'goldmonkey_darkcodelagsniper.gif';
+	
+	case $familiar[Crimbo Shrub]:  // Get rid of that Gollywog look!
+		if(to_boolean(vars["chit.familiar.anti-gollywog"]))
+			return imagePath + 'crimboshrub_fxx_ckb.gif';
+		break;
+	
+	case $familiar[Happy Medium]:
+		switch(f.image) {
+			case "medium_1.gif": return imagePath + 'medium_blue.gif';
+			case "medium_2.gif": return imagePath + 'medium_orange.gif';
+			case "medium_3.gif": return imagePath + 'medium_red.gif';
+		}
+		break;
+	}
+	return '/images/itemimages/' + f.image;
+}
+
 void bakeFamiliar() {
 
 	// Special Challenge Path Familiar-ish things
@@ -2175,6 +2291,7 @@ void bakeFamiliar() {
 	case "Avatar of Boris": FamBoris(); return;
 	case "Avatar of Jarlsberg": FamJarlsberg(); return;
 	case "Avatar of Sneaky Pete": FamPete(); return;
+	case "Actually Ed the Undying": FamEd(); return;
 	}
 
 	string source = chitSource["familiar"];
@@ -2193,42 +2310,9 @@ void bakeFamiliar() {
 	if(myfam != $familiar[none]) {
 		famtype = to_string(myfam);
 		actortype = famtype;
-		// Set Familiar image
-		switch(myfam) {
-			case $familiar[Fancypants Scarecrow]:
-				famimage = "/images/itemimages/pantscrow2.gif";
-				famtype = "Fancy Scarecrow"; // Name is too long when there's info added
-				break;
-			case $familiar[Disembodied Hand]:
-				famimage = "/images/itemimages/dishand.gif";
-				break;
-			case $familiar[Mad Hatrack]:
-				famimage = "/images/itemimages/hatrack.gif";
-				break;
-			case $familiar[Crimbo Shrub]: // Get rid of that Gollywog look!
-				if(to_boolean(vars["chit.familiar.anti-gollywog"]))
-					famimage = imagePath+'crimboshrub_fxx_ckb.gif';
-				else famimage = '/images/itemimages/'+ myfam.image;
-				break;
-			case $familiar[Happy Medium]:
-				switch(myfam.image) {
-				case "medium_0.gif":
-					famimage = '/images/itemimages/medium_0.gif';
-					break;
-				case "medium_1.gif":
-					famimage = imagePath+'medium_blue.gif';
-					break;
-				case "medium_2.gif":
-					famimage = imagePath+'medium_orange.gif';
-					break;
-				case "medium_3.gif":
-					famimage = imagePath+'medium_red.gif';
-					break;
-				}
-				break;
-			default:
-				famimage = '/images/itemimages/'+ myfam.image;
-		}
+		if(myfam == $familiar[Fancypants Scarecrow])
+			famtype = "Fancy Scarecrow"; // Name is too long when there's info added
+		famimage =  familiar_image(myfam);
 	}
 	
 	//Get Familiar Name
@@ -2343,13 +2427,22 @@ void bakeFamiliar() {
 	case $familiar[Crimbo Shrub]:
 		if(get_property("_shrubDecorated") == "false")
 			famname += ' (<a target=mainpane href="inv_use.php?pwd='+my_hash()+'&which=3&whichitem=7958">decorate</a>)';
-		string mods = parseMods( get_property("shrubTopper")  + ", "
-						+ get_property("shrubLights")  + ", "
-						+ get_property("shrubGarland") + ", "
-						+ get_property("shrubGifts")    );
+		buffer mods;
+		foreach shrub in $strings[shrubTopper, shrubLights, shrubGarland, shrubGifts] {
+			string decoration = get_property(shrub);
+			if(length(decoration) > 0) {
+				if(length(mods) > 0)
+					mods.append(", ");
+				mods.append(decoration);
+			}
+		}
 		if(info != "")
-			info = mods.replace_string("PvP", "PvP: "+info.replace_string(" charges", ""));
-		else info = mods;
+			mods = mods.replace_string("PvP", "PvP: "+info.replace_string(" charges", ""));
+		info = parseMods(mods);
+		if(get_property("shrubGifts") == "yellow")
+			info = info.replace_string(", Yellow", ", <span style='color:#999933'>Yellow</span>");
+		else if(get_property("shrubGifts") == "red")
+			info = info.replace_string(", Red", ", <span style='color:#FE2E2E'>Red</span>");
 		break;
 	case $familiar[Mini-Crimbot]:
 		if(source.contains_text(">configure</a>)"))
@@ -2481,7 +2574,7 @@ void bakeThrall() {
 		if(lvl != "")
 			result.append('Lvl.&nbsp;');
 		result.append(lvl);
-		result.append('</th><th colspan="2" title="Pasta Thrall"><a title="');
+		result.append('</th><th title="Pasta Thrall"><a title="');
 		result.append(name);
 		result.append('" class="hand" onClick=\'javascript:window.open("desc_guardian.php","","height=200,width=300")\'>');
 		result.append(type);
@@ -3083,6 +3176,15 @@ void addAud(buffer result) {
 	}
 }
 
+void addKa(buffer result) {
+	result.append('<tr><td class="label">Ka</td><td class="info">');
+	result.append(formatInt(item_amount($item[Ka Coin])));
+	if(to_boolean(vars["chit.stats.showbars"]))
+		result.append('</td><td><div title="Ka Coins" style="float:left"><img style="max-width:14px;padding-left:3px;" onClick="descitem(826932303,0, event);" src="/images/itemimages/kacoin.gif"></td></tr>');
+	else
+		result.append('<img title="Ka Coins" style="max-width:14px;padding-left:3px;" src="/images/itemimages/kacoin.gif"></td></tr>');
+}
+
 void addOrgan(buffer result, string organ, boolean showBars, int current, int limit, boolean eff) {
 	int sev = severity(organ, current, limit);
 	result.append('<tr><td class="label">'+organ+'</td>');
@@ -3533,14 +3635,22 @@ void bakeStats() {
 		
 		// Add special stats to the section that contains mainstat
 		if(section.contains_stat()) {
-			if(my_fury() > 0)
+			switch(my_class()) {
+			case $class[Seal Clubber]:
 				result.addFury();
-			else if(my_soulsauce() > 0)
+				break;
+			case $class[Sauceror]:
 				result.addSauce();
-			else if(my_path() == "Avatar of Sneaky Pete")
+				break;
+			case $class[Avatar of Sneaky Pete]:
 				result.addAud();
+				break;
+			case $class[Ed]:
+				result.addKa();
+				break;
+			}
 			
-			if(my_path() == "Heavy Rains" || my_path() == "19")
+			if(my_path() == "Heavy Rains")
 				result.addHeavyRains();
 			
 			if(numeric_modifier("Maximum Hooch") > 0)
@@ -3839,23 +3949,24 @@ void bakeCharacter() {
 	}
 
 	//Title
-	string myTitle = my_class();
-	if (vars["chit.character.title"] == "true") {
-		matcher titleMatcher = create_matcher("<br>(.*?)<br>(.*?)<", source);
-		if (find(titleMatcher)) {
-			myTitle = group(titleMatcher, 2);
-			if (index_of(myTitle, "(Level ") == 0) {
-				myTitle = group(titleMatcher, 1);
+	string myTitle() {
+		string myTitle = my_class();
+		if(vars["chit.character.title"] == "true" && my_path() != "Actually Ed the Undying") {
+			matcher titleMatcher = create_matcher("<br>(.*?)<br>(.*?)<", source);
+			if(find(titleMatcher)) {
+				myTitle = group(titleMatcher, 2);
+				if(index_of(myTitle, "(Level ") == 0)
+					myTitle = group(titleMatcher, 1);
+			} else {
+				titleMatcher = create_matcher("(?i)<br>(?:level\\s*"+my_level()+"|"+my_level()+".{2}?\\s*level\\s*)?([^<]*)", source); // Snip level out of custom title if it is at the beginning. Simple cases only.
+				if(find(titleMatcher))
+					return group(titleMatcher, 1);
 			}
 		} else {
-			titleMatcher = create_matcher("(?i)<br>(?:level\\s*"+my_level()+"|"+my_level()+".{2}?\\s*level\\s*)?([^<]*)", source); // Snip level out of custom title if it is at the beginning. Simple cases only.
-			if (find(titleMatcher)) {
-				myTitle = group(titleMatcher, 1);
-			}
+			if(myTitle == "Avatar of Jarlsberg" || myTitle == "Avatar of Sneaky Pete" || myTitle == "Unknown")  // Too long!
+				return "Avatar";
 		}
-	} else {
-		if(myTitle == "Avatar of Jarlsberg" || myTitle == "Avatar of Sneaky Pete" || myTitle == "Unknown")  // Too long!
-			myTitle = "Avatar";
+		return myTitle;
 	}
 
 	//Avatar
@@ -3876,36 +3987,42 @@ void bakeCharacter() {
 		myOutfit = (len > 103 && len < 110? "<br />": " ") + myOutfit;
 	}
 
-	//Class-spesific stuff
-	string myGuild = "guild.php?guild=";
-	int myMainStats = 0;
-	int mySubStats = 0;
-	switch (my_primestat()) {
+	// SubStats
+	int mySubStats() {
+		switch (my_primestat()) {
 		case $stat[mysticality]:
-			myGuild += "m";
-			myMainStats = my_basestat($stat[mysticality]);
-			mySubStats = my_basestat($stat[submysticality]);
-			break;
+			return my_basestat($stat[submysticality]);
 		case $stat[moxie]:
-			myGuild += "t";
-			myMainStats = my_basestat($stat[moxie]);
-			mySubStats = my_basestat($stat[submoxie]);
-			break;
+			return my_basestat($stat[submoxie]);
 		case $stat[muscle]:
-			myGuild += "f";
-			myMainStats = my_basestat($stat[muscle]);
-			mySubStats = my_basestat($stat[submuscle]);
-			break;
+			return my_basestat($stat[submuscle]);
+		}
+		return 0;
 	}
 	
-	if(my_path() == "Avatar of Boris")
-		myGuild = "da.php?place=gate1";
-	else if(my_path() == "Zombie Slayer")
-		myGuild = "campground.php?action=grave";
-	else if(my_path() == "Avatar of Jarlsberg")
-		myGuild = "da.php?place=gate2";
-	else if(my_path() == "Avatar of Sneaky Pete")
-		myGuild = "da.php?place=gate3";
+	string myGuild() {
+		switch(my_path()) {
+		case "Avatar of Boris":
+			return "da.php?place=gate1";
+		case "Zombie Slayer":
+			return "campground.php?action=grave";
+		case "Avatar of Jarlsberg":
+			return "da.php?place=gate2";
+		case "Avatar of Sneaky Pete":
+			return "da.php?place=gate3";
+		case "Actually Ed the Undying":
+			return "place.php?whichplace=edbase&action=edbase_book";
+		}
+		switch (my_primestat()) {
+			case $stat[mysticality]:
+				return "guild.php?guild=m";
+			case $stat[moxie]:
+				return "guild.php?guild=t";
+			case $stat[muscle]:
+				return "guild.php?guild=f";
+		}
+		return "";
+	}
 
 	// LifeStyle suitable for charpane
 	string myLifeStyle() {
@@ -3946,6 +4063,7 @@ void bakeCharacter() {
 		case "KOLHS": return "<a target='mainpane' style='font-weight:normal;' href='place.php?whichplace=KOLHS'>KOLHS</a>";
 		case "Class Act II: A Class For Pigs": return "Class Act <span style='font-family:Times New Roman,times,serif'>II</span>"; // Shorten. Also II looks a LOT better in serif
 		case "Avatar of Sneaky Pete": return "Sneaky Pete";
+		case "Actually Ed the Undying": return "The Undying";
 		}
 		return my_path();
 	}
@@ -3957,7 +4075,7 @@ void bakeCharacter() {
 	if (x==1) lower=9;
 	int upper = (y**4)-(4*y**3)+(14*y**2)-(20*y)+25;
 	int range = upper - lower;
-	int current = mySubStats - lower;
+	int current = mySubStats() - lower;
 	int needed = range - current;
 	float progress = (current * 100.0) / range;
 	
@@ -3987,7 +4105,7 @@ void bakeCharacter() {
 	if(myAvatar != "")
 		result.append('<td rowspan="4" class="avatar"><a href="#" class="chit_launcher" rel="chit_pickeroutfit" title="Select Outfit"><img src="' + myAvatar + '"></a></td>');
 	pickOutfit();
-	result.append('<td class="label"><a target="mainpane" href="' + myGuild +'" title="Visit your guild">' + myTitle + '</a></td>');
+	result.append('<td class="label"><a target="mainpane" href="' + myGuild() +'" title="Visit your guild">' + myTitle() + '</a></td>');
 	result.append('<td class="level" rowspan="2" style="width:30px;' + councilStyle + '"><a target="mainpane" href="council.php" title="' + councilText + '">' + my_level() + '</a></td>');
 	result.append('</tr>');
 
@@ -4217,6 +4335,22 @@ void bakeTracker() {
 		return item_report(it, to_plural(it), num);
 	}
 
+	string decomods(string ss) {
+		//cap first letter
+		ss = to_upper_case(substring(ss,0,1)) + substring(ss,1);
+		//shorten various text
+		ss = replace_string(ss,"Moxie","Mox");
+		ss = replace_string(ss,"Muscle","Mus");
+		ss = replace_string(ss,"Mysticality","Myst");
+		//decorate elemental tags with pretty colors
+		ss = replace_string(ss,"Hot","<span class=modHot>Hot</span>");
+		ss = replace_string(ss,"Cold","<span class=modCold>Cold</span>");
+		ss = replace_string(ss,"Spooky","<span class=modSpooky>Spooky</span>");
+		ss = replace_string(ss,"Stench","<span class=modStench>Stench</span>");
+		ss = replace_string(ss,"Sleaze","<span class=modSleaze>Sleaze</span>");
+		return (ss);
+	}
+	
 	boolean started(string pref) {
 		return get_property(pref) != "unstarted" && get_property(pref) != "finished";
 	}
@@ -4322,6 +4456,10 @@ void bakeTracker() {
 		result.append("Find ");
 		result.append(item_report($item[Lady Spookyraven's necklace]));
 		result.append(" at the <a target=\"mainpane\" href=\"manor.php\">Manor</a>");
+		if (available_amount($item[Spookyraven billiards room key])==0) {
+			result.append("<br>Kitchen Drawers: "+get_property("manorDrawerCount")+"/21");
+		}
+		result.append("<br>Writing Desks: "+get_property("writingDesksDefeated")+"/5");
 		result.append("</td></tr>");
 	}
 	
@@ -4332,6 +4470,30 @@ void bakeTracker() {
 		result.append(item_report($item[Lady Spookyraven's dancing shoes], "dancing shoes")+" (Gallery)<br>");
 		result.append(item_report($item[Lady Spookyraven's powder puff], "powder puff")+" (Bathroom)<br>");
 		result.append(item_report($item[Lady Spookyraven's finest gown], "finest gown")+" (Bedroom)");
+		result.append("</td></tr>");
+	}
+
+	//Gorgonzola wants you to exorcise a poltersandwich in the Haunted Pantry.
+	//Take the poltersandwich back to Gorgonzola at the League of Chef-Magi.
+	if(started("questG07Myst")) {
+		result.append("<tr><td>");
+		result.append('Find a poltersandwich in the <a target="mainpane" href="place.php?whichplace=manor1">Pantry</a>');
+		result.append("</td></tr>");
+	}
+	
+	//Shifty wants you to lure yourself into the Sleazy Back Alley and steal your own pants.
+	//Take your pants back to Shifty at the Department of Shadowy Arts and Crafts.
+	if(started("questG08Moxie")) {
+		result.append("<tr><td>");
+		result.append('Steal you pants in the <a target="mainpane" href="place.php?whichplace=town_wrong">Alley</a>');
+		result.append("</td></tr>");
+	}
+	
+	//Gunther wants you to get the biggest sausage you can find in Cobb's Knob.
+	//Take the huge sausage back to Gunther at the Brotherhood of the Smackdown.
+	if(started("questG09Muscle")) {
+		result.append("<tr><td>");
+		result.append('Find a big sausage in the <a target="mainpane" href="plains.php">Outskirts</a>');
 		result.append("</td></tr>");
 	}
 
@@ -4367,6 +4529,20 @@ void bakeTracker() {
 	if(started("questL05Goblin")) { 
 		result.append("<tr><td>");
 		result.append('Find and defeat the <a target="mainpane" href="cobbsknob.php">Goblin King</a>');
+		result.append("<br>KGE: ");
+		result.append(item_report($item[Knob Goblin elite polearm], "polearm"));
+		result.append(", ");
+		result.append(item_report($item[Knob Goblin elite pants], "pants"));
+		result.append(", ");
+		result.append(item_report($item[Knob Goblin elite helm], "helm"));
+		result.append(", ");
+		result.append(item_report($item[Knob cake], "cake"));
+		result.append("<br>Harem: ");
+		result.append(item_report($item[Knob Goblin harem veil], "veil"));
+		result.append(", ");
+		result.append(item_report($item[Knob Goblin harem pants], "pants"));
+		result.append(", ");
+		result.append(item_report($item[Knob Goblin perfume], "perfume"));
 		result.append("</td></tr>");
 	}
 	
@@ -4439,10 +4615,9 @@ void bakeTracker() {
 	}
 
 	//L7.5ish: pirates, questM12Pirate
-	//if (get_property("questM12Pirate")!="unstarted" && get_property("questM12Pirate")!="finished") { 
 	//step1, step2, step3, step4 = insults
 	//step5 = fcle
-	if(have_outfit("Swashbuckling Getup") && available_amount($item[Pirate Fledges]) == 0) {
+	if(have_outfit("Swashbuckling Getup") && available_amount($item[Pirate Fledges])==0) {
 		result.append("<tr><td>");
 		//fcle items mizzenmast mop, ball polish, rigging shampoo
 		if (get_property("questM12Pirate")=="step5") {
@@ -4542,7 +4717,7 @@ void bakeTracker() {
 	if (started("questL11MacGuffin")) {
 		result.append("<tr><td>");
 		result.append("Quest for the Holy MacGuffin");
-		result.append("</td></tr>");		
+		result.append("</td></tr>");
 	}
 	
 	//L11: questL11Black
@@ -4551,6 +4726,7 @@ void bakeTracker() {
 			switch(get_property("questL11Black")) {
 			case "started": case "step1": case "step2":
 				result.append('Find the <a target="mainpane" href="woods.php">Black Market</a>');
+				result.append(" ("+get_property("blackForestProgress")+"/5)");
 				break;
 			case "step3":
 				result.append('<br>Get your Father\'s <a target="mainpane" href="shore.php">Diary</a>');
@@ -4646,10 +4822,9 @@ void bakeTracker() {
 				result.append('<a target="mainpane" href="manor3.php">Manor Cellar</a>: Kill Spookyraven');
 				break;
 			}
-
 		result.append("</td></tr>");
 	}
-		
+	
 	
 	if(started("questL11Worship")) {
 		// How many McClusky file pages are present?
@@ -4659,6 +4834,7 @@ void bakeTracker() {
 					return f - 6688;
 			return 0;
 		}
+		int nts = 0;
 		result.append("<tr><td>");
 		switch(get_property("questL11Worship")) {
 		case "started": case "step1": case "step2":
@@ -4676,27 +4852,32 @@ void bakeTracker() {
 					result.append("<br>");
 				} else 
 					result.append(item_report(true, "Done!<br>"));
-				foreach loc in $strings[Hospital, BowlingAlley, Apartment, Office] {
+				foreach loc in $strings[Apartment, Office, Hospital, BowlingAlley] {
 					result.append(loc+": ");
 					int prog = get_property("hidden"+loc+"Progress").to_int();
 					if(prog == 0)
 						result.append(item_report(false, "Explore Shrine<br>"));
 					else if(prog < 7) {
 						switch(loc) {
-						case "Hospital":
-							result.append(item_report(false, "Surgeonosity ("+to_string(numeric_modifier("surgeonosity"), "%.0f")+"/5)<br>"));
-							break;
-						case "BowlingAlley":
-							//result.append(item_report($item[bowling ball]));
-							//result.append(", ");
-							result.append(item_report(false, "Bowled ("+(prog - 1)+"/5)<br>"));
-							break;
 						case "Apartment":
 							//result.append(item_report(get_property("relocatePygmyLawyer").to_int() == my_ascensions(), "relocate Lawyers, "));
 							//result.append(item_report(false, "Search for Boss<br>"));
-							result.append(item_report((have_effect($effect[Thrice-Cursed])>0), "Thrice-Cursed<br>"));
+							nts = $location[The Hidden Apartment Building].turns_spent;
+							if (nts<=9) {
+								result.append(" ["+(nts%9)+"/9], ");
+							} else {
+								result.append(" ["+((nts-9)%8)+"/8], ");
+							}
+							result.append(item_report((have_effect($effect[Thrice-Cursed])>0), "Thrice-Cursed"));
+							result.append("<br>");
 							break;
 						case "Office":
+							nts = $location[The Hidden Office Building].turns_spent;
+							if (nts<=6) {
+								result.append(" ["+(nts%6)+"/6], ");
+							} else {
+								result.append(" ["+((nts-6)%5)+"/5], ");
+							}
 							if(available_amount($item[McClusky file (complete)]) > 0)
 								result.append(item_report(false, "Kill Boss!"));
 							else {
@@ -4708,6 +4889,14 @@ void bakeTracker() {
 								}
 							}
 							result.append("<br>");
+							break;
+						case "Hospital":
+							result.append(item_report(false, "Surgeonosity ("+to_string(numeric_modifier("surgeonosity"), "%.0f")+"/5)<br>"));
+							break;
+						case "BowlingAlley":
+							//result.append(item_report($item[bowling ball]));
+							//result.append(", ");
+							result.append(item_report(false, "Bowled ("+(prog - 1)+"/5)<br>"));
 							break;
 						}
 					} else if(prog == 7)
@@ -4729,9 +4918,8 @@ void bakeTracker() {
 	
 
 
-
 	//L11: questL11Desert
-	if(started("questL11Desert")) {
+	if(started("questL11Desert") && my_path()!="Actually Ed the Undying") {
 		result.append("<tr><td>");
 			result.append('Find the pyramid at the <a target="mainpane" href="beach.php">Beach</a><br>');
 			int desertExploration = get_property("desertExploration").to_int();
@@ -4765,7 +4953,7 @@ void bakeTracker() {
 	//L11: questL11Desert
 	if(get_property("questL11Desert")=="finished" && get_property("questL11Pyramid")=="unstarted") {
 		result.append("<tr><td>");
-		result.append('Open the <a target="mainpane" href="beach.php?action=woodencity">Pyramid</a>:<br>');
+		result.append('Open the <a target="mainpane" href="beach.php">Pyramid</a>:<br>');
 				result.append(item_report($item[Staff of Fats], "Staff of Fats, "));
 				result.append(item_report($item[ancient amulet], "amulet, "));
 				result.append(item_report($item[Eye of Ed], "Eye of Ed"));
@@ -4819,9 +5007,6 @@ void bakeTracker() {
 
 		result.append("</td></tr>");
 	}
-
-	
-	
 	
 	
 	//L12: War, questL12War
@@ -4859,7 +5044,7 @@ void bakeTracker() {
 		
 		result.append("</td></tr>");
 	}
-
+	
 	
 	//L13: NS, questL13Final
 	// check for lair items, tower items, wand
@@ -4867,47 +5052,8 @@ void bakeTracker() {
 		result.append("<tr><td>");
 		result.append('Go defeat the <a target="mainpane" href="lair.php">Naughty Sorceress</a>');
 
-		// telescope data
-		item [string] tscope;
-		//gate items
-		tscope["an armchair"] = $item[pygmy pygment];
-		tscope["a cowardly-looking man"] = $item[wussiness potion];
-		tscope["a banana peel"] = $item[gremlin juice];
-		tscope["a coiled viper"] = $item[adder bladder];
-		tscope["a rose"] = $item[Angry Farmer candy];
-		tscope["a glum teenager"] = $item[thin black candle];
-		tscope["a hedgehog"] = $item[super-spiky hair gel];
-		tscope["a raven"] = $item[Black No. 2];
-		tscope["a smiling man smoking a pipe"] = $item[Mick's IcyVapoHotness Rub];
-		tscope["a mass of bees"] = $item[honeypot];
-		//tower monetsr items
-		tscope["catch a glimpse of a flaming katana"] = $item[frigid ninja stars];
-		tscope["catch a glimpse of a translucent wing"] = $item[spider web];
-		tscope["see a fancy-looking tophat"] = $item[sonar-in-a-biscuit];
-		tscope["see a flash of albumen"] = $item[black pepper];
-		tscope["see a giant white ear"] = $item[pygmy blowgun];
-		tscope["see a huge face made of Meat"] = $item[meat vortex];
-		tscope["see a large cowboy hat"] = $item[chaos butterfly];
-		tscope["see a periscope"] = $item[photoprotoneutron torpedo];
-		tscope["see a slimy eyestalk"] = $item[fancy bath salts];
-		tscope["see a strange shadow"] = $item[inkwell];
-		tscope["see moonlight reflecting off of what appears to be ice"] = $item[hair spray];
-		tscope["see part of a tall wooden frame"] = $item[disease];
-		tscope["see some amber waves of grain"] = $item[bronzed locust];
-		tscope["see some long coattails"] = $item[Knob Goblin firecracker];
-		tscope["see some pipes with steam shooting out of them"] = $item[powdered organs];
-		tscope["see some sort of bronze figure holding a spatula"] = $item[leftovers of indeterminate origin];
-		tscope["see the neck of a huge bass guitar"] = $item[mariachi G-string];
-		tscope["see what appears to be the North Pole"] = $item[NG];
-		tscope["see what looks like a writing desk"] = $item[plot hole];
-		tscope["see the tip of a baseball bat"] = $item[baseball];
-		tscope["see what seems to be a giant cuticle"] = $item[razor-sharp can lid];
-		tscope["see a pair of horns"] = $item[barbed-wire fence];
-		tscope["see a formidable stinger"] = $item[tropical orchid];
-		tscope["see a wooden beam"] = $item[stick of dynamite];
-
 		//Gate item
-		if ( $strings[started, step1] contains get_property("questL13Final")) {
+		if ( $strings[started, step1, step2, step3] contains get_property("questL13Final")) {
 			result.append("<br>");
 			if ( get_property("telescopeUpgrades")=="0" || in_bad_moon()) {
 				result.append("no telescope");
@@ -4916,60 +5062,40 @@ void bakeTracker() {
 				result.append("no current telescope info");
 			}
 			else {
-				result.append("Gate: ");
-				result.append(item_report(tscope[get_property("telescope1")]));
-			}
-		}
-
-		//Entryway items
-		if ( $strings[started, step1] contains get_property("questL13Final") ) {
-			result.append("<br>Entryway: ");
-			result.append(item_report($item[Boris's key]));
-			result.append(", ");
-			result.append(item_report($item[Jarlsberg's key]));
-			result.append(", ");
-			result.append(item_report($item[Sneaky Pete's key]));
-			result.append(", ");
-			result.append(item_report($item[digital key]));
-			result.append(", ");
-			result.append(item_report($item[skeleton key]));
-			if ( !($strings[Avatar of Boris, Way of the Surprising Fist] contains my_path()) ) {
+				result.append("Contests: Init, ");
+				result.append(decomods(get_property("nsChallenge1")));
 				result.append(", ");
-				result.append(item_report($items[star sword, star staff, star crossbow],"star weapon"));
+				result.append(decomods(get_property("nsChallenge2")));
+				result.append("<br>");
+				result.append("Hedges: ");
+				result.append(decomods(get_property("nsChallenge3")));
+				result.append(", ");
+				result.append(decomods(get_property("nsChallenge4")));
+				result.append(", ");
+				result.append(decomods(get_property("nsChallenge5")));
 			}
-			result.append(", ");
-			result.append(item_report($item[star hat]));
-			result.append(", ");
-			result.append(item_report($item[Richard's star key]));
-			result.append(", ");
-			//check for instruments
-			result.append(item_report($items[acoustic guitarrr, heavy metal thunderrr guitarrr, stone banjo, Disco Banjo, Shagadelic Disco Banjo, Seeger's Unstoppable Banjo, Crimbo ukulele, Massive sitar, 4-dimensional guitar, plastic guitar, half-sized guitar, out-of-tune biwa, Zim Merman's guitar, dueling banjo],"stringed instrument"));
-			result.append(", ");
-			result.append(item_report($items[stolen accordion, calavera concertina, Rock and Roll Legend, Squeezebox of the Ages, The Trickster's Trikitixa],"accordion"));
-			result.append(", ");
-			result.append(item_report($items[tambourine, big bass drum, black kettle drum, bone rattle, hippy bongo, jungle drum],"percussion instrument"));
-
 		}
-
-		//telescope items
-		if($strings[started, step1, step2, step3, step4] contains get_property("questL13Final") ) {
+		
+		//Entryway items, "nsTowerDoorKeysUsed"
+		if ( $strings[started, step1, step2, step3, step4, step5, step6, step7, step8] contains get_property("questL13Final") ) {
+			boolean key_used(item it) {
+				return contains_text(get_property("nsTowerDoorKeysUsed"),to_string(it));
+			}
+			result.append("<br>Door Keys: ");
+			foreach kk in $items[Boris's key, Jarlsberg's key, Sneaky Pete's key, digital key, skeleton key, Richard's star key] {
+				if (!key_used(kk)) { result.append(item_report(kk)+", "); }
+			}
+		}
+		
+		if($strings[started, step1, step2, step3, step4, step5, step6, step7, step8] contains get_property("questL13Final") ) {
 			result.append("<br>Tower: ");
-			if ( get_property("telescopeUpgrades")=="0" || in_bad_moon()) {
-				result.append("no telescope");
-			}
-			else if (get_property("lastTelescopeReset") != my_ascensions()) {
-				result.append("no current telescope info");
-			}
-			else if ( get_property("telescopeUpgrades").to_int()>=2 ) {
-				for ii from 2 to get_property("telescopeUpgrades").to_int() {
-					result.append(item_report( tscope[get_property("telescope"+ii)] ));
-					if (ii!=1 && ii!=get_property("telescopeUpgrades").to_int()) {
-						result.append(", ");
-					}
-				}
-			}
+			result.append(item_report($item[beehive]));
+			result.append(", ");
+			result.append("Meat: +"+to_string(to_int(meat_drop_modifier()))+"%");
+			result.append(", ");
+			result.append(item_report($item[electric boning knife], "boning knife"));
 		}
-
+		
 		boolean NSfight = !($strings[Avatar of Boris, Bugbear Invasion, Zombie Slayer, Avatar of Jarlsberg, Heavy Rains] contains my_path());
 		if ( NSfight && $strings[started, step1, step2, step3, step4, step5, step6, step7, step8, step9] contains get_property("questL13Final")) {
 			if( my_path()=="Bees Hate You" ) {
@@ -4982,12 +5108,38 @@ void bakeTracker() {
 			result.append("</td></tr>");
 		}
 	}
-
-
 	
-
+	//HITS: stars and lines and charts
+	if ( item_amount($item[steam-powered model rocketship])>0 && item_amount($item[Richard's star key])==0 && !contains_text(get_property("nsTowerDoorKeysUsed"),"Richard's star key") ) {
+		result.append("<tr><td>");
+		result.append('<a target="mainpane" href="place.php?whichplace=beanstalk">HITS</a>: ');
+		result.append(item_report($item[star], 8));
+		result.append(", ");
+		result.append(item_report($item[line], 7));
+		result.append(", ");
+		result.append(item_report($item[star chart],"chart"));
+		result.append("</td></tr>");
+	}
+	
+	//Daily Dungeon
+	if (!to_boolean(get_property("dailyDungeonDone"))&& get_property("questL13Final")!="finished" ) {
+		int havekeys = available_amount($item[fat loot token]);
+		int needkeys = 3;
+		foreach kk in $items[Boris's key, Jarlsberg's key, Sneaky Pete's key] {
+			havekeys = havekeys + available_amount(kk);
+			needkeys = needkeys - to_int(contains_text(get_property("nsTowerDoorKeysUsed"),to_string(kk)));
+		}
+		if (havekeys<needkeys) {
+			result.append("<tr><td>");
+			result.append("Get ");
+			result.append('<a target="mainpane" href="da.php">Daily Dungeon</a>');
+			result.append(" keys ("+havekeys+"/"+needkeys+")");
+			result.append("</td></tr>");
+		}
+	}
+	
 	//questM13Escape, Subject 37
-	if (started("questM13Escape")) {
+	if (started("questM13Escape") && can_interact()) {
 	//if (contains_text(source,"Subject 37")) {
 		result.append("<tr><td>");
 		result.append('Help <a target="mainpane" href="cobbsknob.php?level=3">Subject 37</a> escape');	
@@ -4996,17 +5148,39 @@ void bakeTracker() {
 	
 	
 	//L99: questM15Lol (facsimile dictionary)
-	if (started("questM15Lol") && my_level()>=9) {
+	if (started("questM15Lol") && my_level()>=9 && can_interact()) {
 		result.append("<tr><td>");
 		result.append('Find the 64735 of <a target="mainpane" href="mountains.php">Rof Lm Fao</a>');	
 		result.append("</td></tr>");
 	}
 	
 	
+	//Xiblaxian holo-wrist-puter
+	/*
+	if (have_equipped($item[Xiblaxian holo-wrist-puter])) {
+		int xidrops = get_property("_holoWristDrops").to_int();
+		int xiprog = get_property("_holoWristProgress").to_int() + 1;
+		int xinext = 11 + 5*xidrops;
+		result.append("<tr><td>");
+		result.append("<b>Xiblaxian</b> drop: "+xiprog+"/"+xinext);
+		if (xiprog>=xinext) {
+			result.append("<br><span style=color:fuchsia>");
+			result.append("circuitry ("+available_amount($item[Xiblaxian circuitry])+") ");
+			result.append("[indoors]");
+			result.append("<br>");
+			result.append("polymer ("+available_amount($item[Xiblaxian polymer])+") ");
+			result.append("[outdoors]");
+			result.append("<br>");
+			result.append("alloy ("+available_amount($item[Xiblaxian alloy])+") ");
+			result.append("[underground]");
+			result.append("</span>");
+		}
+		result.append("</td></tr>");
+	}
+	*/
+	
+	
 	//L99: Nemesis stuff ?
-
-
-
 	//Sea quests
 	
 	
@@ -5087,6 +5261,26 @@ void bakeHeader() {
 	//Remove KoL's javascript familiar picker so that it can use our modified version in chit.js
 	result.replace_string('<script type="text/javascript" src="/images/scripts/familiarfaves.20120307.js"></script>', '');
 	
+	// remove restricted familiars for KoL's familiar picker
+	matcher famfavmatch = create_matcher("(var FAMILIARFAVES = .+?\\];)",result);
+	if(famfavmatch.find()) {
+		string replacefamfavs = "var FAMILIARFAVES = [";
+		matcher singlefamfavmatch = create_matcher('\\[".+?","(.+?)","(.+?)",\\d+\\]',famfavmatch.group(1)); // ["Onegai Marie","Angry Jung Man","jungman",165]
+		while(singlefamfavmatch.find()) {
+			familiar fam = to_familiar(replace_string(singlefamfavmatch.group(1),"\\",""));
+			if(is_unrestricted(fam)) {
+				string singlefamfav = singlefamfavmatch.group(0);
+				singlefamfav = singlefamfav.replace_string("[[", "[");
+				// Attend to familiar images also. (This uses mdofied familiar images!)
+				singlefamfav = singlefamfav.replace_string(singlefamfavmatch.group(2), familiar_image(fam));
+				replacefamfavs += singlefamfav + ",";
+			}
+		}
+		replacefamfavs+="];";
+		replacefamfavs .replace_string("= [[[","= [[");
+		result.replace_string(famfavmatch.group(0),replacefamfavs);
+	}
+	
 	chitBricks["header"] = result.to_string();
 		
 }
@@ -5108,8 +5302,9 @@ boolean parsePage(buffer original) {
 	parse = create_matcher("(<p><span class=small><b>Familiar:.+?>none</a>\\)</span>"  // familiar (none)
 		+ "|<table width\\=90%.+?Familiar:.+?</table></center>"  // regular familiar
 		+ "|<b>Clancy</b>.*?</font></center>"  // Clancy (Avatar of Boris)
-		+ "|<font size=2><b>Companion:</b>.*?(?:</b></font>|none\\))"  // (Avatar of Jarlsberg)
-		+ "|<a target=mainpane href=main.php\\?action=motorcycle>.*?</b>"  // (Avatar of Sneaky Pete)
+		+ "|<font size=2><b>Companion:</b>.*?(?:</b></font>|none\\))"  // Avatar of Jarlsberg
+		+ "|<a target=mainpane href=main.php\\?action=motorcycle>.*?</b>"  // Avatar of Sneaky Pete
+		+ "|<p><font size=2><b>Servant:</b>.*?</p>"  // Ed the Undying
 		+ ")", source);
 	if(find(parse)) {
 		chitSource["familiar"] = parse.group(1);
@@ -5508,6 +5703,37 @@ buffer buildHouse() {
 	return house;
 }
 
+buffer spelunky(buffer source) {
+	int index = source.index_of("<center><p><b><font size=2>Effects");
+	if(index < 0) // Try compact charpane
+		index = source.index_of("<hr width=50%><font size=2 color=black>");
+	if(index <0) return source;
+	
+	// Add combat phase information
+	buffer spelunk;
+	spelunk.append("<div class=small><br><b>Non-combat Phase: ");
+	spelunk.append(get_property("spelunkyNextNoncombat"));
+	if(get_property("spelunkyWinCount").to_int() < 3) { // This can legitimately go over 3
+		spelunk.append("</b><br>Encounter in ");
+		spelunk.append(get_property("spelunkyWinCount"));
+		spelunk.append(" /3 wins</div>");
+	} else
+		spelunk.append("</b><br><i>- NOW -</i></div>");
+	source.insert(index, spelunk);
+	
+	// Add Buddy tooltip info
+	if(source.contains_text("title='A Helpful Guy'"))
+		source = source.replace_string("title='A Helpful Guy'", "title='A Helpful Guy\nDelevels by 5-10 at start of all combats'");
+	else if(source.contains_text("title='A Skeleton'"))
+		source = source.replace_string("title='A Skeleton'", "title='A Skeleton\nDeals 9-10 damage every round of combat'");
+	else if(source.contains_text("title='A Damselfly'"))
+		source = source.replace_string("title='A Damselfly'", "title='A Damselfly\nHeals 8-10 HP at the end of all successful combats'");
+	else if(source.contains_text("title='A Resourceful Kid'"))
+		source = source.replace_string("title='A Resourceful Kid'", "title='A Resourceful Kid\n Gives 7 gold at the end of all successful combats\nUnlocks that one Idol NC choice'");
+	
+	return source;
+}
+
 buffer modifyPage(buffer source) {
 	if(source.length() < 6)
 		return source.append('<center><a href="charpane.php" title="Reload"><img src="' + imagePath + 'refresh.png"></a> &nbsp;Reload after cutscene...</center>');
@@ -5535,6 +5761,7 @@ buffer modifyPage(buffer source) {
 	setvar("chit.helpers.dancecard", true);
 	setvar("chit.helpers.semirare", true);
 	setvar("chit.helpers.spookyraven", true);
+	setvar("chit.helpers.xiblaxian", true);
 	setvar("chit.roof.layout","character,stats");
 	setvar("chit.walls.layout","helpers,thrall,effects");
 	setvar("chit.floor.layout","update,familiar");
@@ -5558,18 +5785,29 @@ buffer modifyPage(buffer source) {
 	}
 	
 	//Check for updates (once a day)
-	if(svn_exists("mafiachit")) {
+	if(vars["chit.checkversion"]=="true" && svn_exists("mafiachit")) {
 		if(get_property("_svnUpdated") == "false" && !svn_at_head("mafiachit")) {
 			if(get_property("_chitChecked") != "true")
 				print("Character Info Toolbox has become outdated. It is recommended that you update it from SVN...", "red");
 			bakeUpdate(svn_info("mafiachit").revision, "Revision ", svn_info("mafiachit").last_changed_rev);
 			set_property("_chitChecked", "true");
 		}
-	} else checkVersion("Character Info Toolbox", chitVersion, 7594);
-	
-	if( index_of(source, 'alt="Karma" title="Karma"><br>') > 0 ) {
-		inValhalla = true;
 	}
+	
+	// handle limit modes
+	switch(limit_mode()) {
+	case "":			// Mode is not limited
+	case "edunder":		// Ed's Underworld
+		break;
+	case "spelunky":	// Needs special handling for the Spelunkin' minigame
+		return source.spelunky();
+	default:			// Unknown limit mode could be dangerous
+		return source;
+	}
+	
+	if( index_of(source, 'alt="Karma" title="Karma"><br>') > 0 )
+		inValhalla = true;
+	
 	if( contains_text(source, "<hr width=50%>") ) {
 		isCompact = true;
 		vprint("CHIT: Compact Character Pane not supported", "blue", 1);

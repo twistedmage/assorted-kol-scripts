@@ -33,7 +33,7 @@ function bjilgt(doug) {
   // functions for (re)loading various sections of the page: Adventure Again box, Blacklist tab, and Wiki tab, respectively
    function refresh_again() {
       $('#again').load('fight.ash', {dashi: 'annae'});
-      $('#srhelper').load('fight.ash', {dashi: 'sera'});           // also reload semirare helper here
+      $('#srhelper').load('fight.ash', {turnflag: turncount, dashi: 'sera'});     // also reload semirare helper here
    }
    function refresh_blacklist(data) {
       if (!data) data = {black: 'get'};
@@ -107,7 +107,7 @@ jQuery(function($){
    }
    if ($('#actbox').length != 0) {
       slide_actbox();
-   } else $('#bat-enhance').load('BatMan_RE.ash', {page: $('html').html()}, function() {
+   } else $('#bat-enhance').load('BatMan_RE.ash', {turnflag: turncount, page: $('html').html()}, function() {
       slide_actbox();
      // define our ridiculously awesome Actions Table
       var bt = $('#battable').dataTable( {

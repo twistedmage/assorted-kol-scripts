@@ -14,7 +14,7 @@ boolean[string] notmonsters = $strings[Ancient Protector Spirit (crackling), Anc
 boolean blocked(monster mon) {  // mafia monsters that KoL doesn't distinguish
    if ($monsters[Cyrus the Virus, The Whole Kingdom,
       Don Crimbo, Edwing Abbidriel, Crys-Rock, Trollipop, The Colollilossus, The Fudge Wizard, The Abominable Fudgeman, Uncle Hobo, Underworld Tree,
-      Arc-welding Elfborg, Ribbon-cutting Elfborg, Decal-applying Elfborg, Weapons-assembly Elfborg,
+      Arc-welding Elfborg, Ribbon-cutting Elfborg, Decal-applying Elfborg, Weapons-assembly Elfborg, Crimbomega,
       Gnollish Sorceress, Giant Pair of Tweezers, 7-Foot Dwarf,
       Hammered Yam Golem, Soused Stuffing Golem, Plastered Can of Cranberry Sauce, Inebriated Tofurkey,
       Striking Stocking-Stuffer Elf, Striking Pencil-Pusher Elf, Striking Middle-Management Elf, Striking Gift-Wrapper Elf, Striking Factory-Worker Elf,

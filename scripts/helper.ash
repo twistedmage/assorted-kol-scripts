@@ -345,6 +345,10 @@ void advise_food()
 		{
 			add_food(con_map,"- knob pasty ",5.5,0,1);
 		}
+		if(available_amount($item[extra-flat panini])!=0)
+		{
+			add_food(con_map,"- extra-flat panini ",7.5,0,2);
+		}
 		if(available_amount($item[grue egg])!=0 || available_amount($item[grue egg omelette])!=0)
 		{
 			if(available_amount($item[crown of thrones])>0)
@@ -696,6 +700,9 @@ void advise_food()
 			
 		if(available_amount($item[Mornington crescent roll])>0)
 			add_food(con_map,"- Mornington crescent roll ",8.5,0,3);
+			
+		if(available_amount($item[Choco-Mint patty])>0)
+			add_food(con_map,"- Choco-Mint patty",3,0,1);
 
 
 		if(available_amount($item[magicberry tablets])>0)
@@ -743,6 +750,19 @@ boolean nash_drink(item upgraded_booze, item upgraded_fruit, item garnish)
 	}
 	
 	if(req_nash> stills_available())
+		return false;
+	
+	return true;
+}
+
+boolean non_nash_drink(item booze, item fruit, item garnish)
+{
+	if(available_amount(garnish)==0)
+		return false;
+	if(available_amount(booze)==0)
+		return false;
+		
+	if(available_amount(fruit)==0 && fruit!=$item[soda water] && !have_outfit("filthy hippy"))
 		return false;
 	
 	return true;
@@ -808,6 +828,44 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 				add_drink(con_map,"- Make prussian cathouse (mox) ",16,2,4);
 		}
 		
+		
+		if(have_skill($skill[Mixologist]) || have_skill($skill[advanced cocktailcrafting]))
+		{
+			if(i_a("tropical swill")>0 || (i_a("coconut shell")>0 && i_a("typical tavern swill")>0))
+				add_drink(con_map,"- Make tropical swill (Mus/Myst/Mox) ",12,1,4);
+			if(i_a("fruity girl swill")>0 || (i_a("little paper umbrella")>0 && i_a("typical tavern swill")>0))
+				add_drink(con_map,"- Make fruity girl swill (Mus/Myst/Mox) ",12,1,4);
+			if(i_a("blended frozen swill")>0 || (i_a($item[magical ice cubes])>0 && i_a("typical tavern swill")>0))
+				add_drink(con_map,"- Make blended frozen swill (Mus/Myst/Mox) ",12,1,4);
+				
+			if(i_a("pink pony")>0 || non_nash_drink($item[boxed wine], $item[strawberry], $item[coconut shell]))
+				add_drink(con_map,"- Make pink pony (Mus/Mox) ",12,1,4);
+			if(i_a("slip 'n' slide")>0 || non_nash_drink($item[bottle of vodka], $item[orange], $item[coconut shell]))
+				add_drink(con_map,"- Make slip 'n' slide (Mus) ",12,1,4);
+			if(i_a("fuzzbump")>0 || non_nash_drink($item[bottle of whiskey], $item[lemon], $item[coconut shell]))
+				add_drink(con_map,"- Make fuzzbump (Mus) ",12,1,4);
+			if(i_a("ocean motion")>0 || non_nash_drink($item[bottle of rum], $item[grapefruit], $item[coconut shell]))
+				add_drink(con_map,"- Make ocean motion (Mus/Myst) ",12,1,4);
+				
+			if(i_a("ducha de oro")>0 || non_nash_drink($item[bottle of tequila], $item[orange], $item[little paper umbrella]))
+				add_drink(con_map,"- Make ducha de oro (Myst/mus) ",12,1,4);
+			if(i_a("horizontal tango")>0 || non_nash_drink($item[boxed wine], $item[soda water], $item[little paper umbrella]))
+				add_drink(con_map,"- Make horizontal tango (Myst) ",12,1,4);
+			if(i_a("roll in the hay")>0 || non_nash_drink($item[bottle of whiskey], $item[soda water], $item[little paper umbrella]))
+				add_drink(con_map,"- Make roll in the hay (Myst) ",12,1,4);
+			if(i_a("a little sump'm sump'm")>0 || non_nash_drink($item[bottle of gin], $item[olive], $item[little paper umbrella]))
+				add_drink(con_map,"- Make a little sump'm sump'm (Myst/mox) ",12,1,4);
+				
+			if(i_a("slap and tickle")>0 || non_nash_drink($item[bottle of gin], $item[grapefruit], $item[magical ice cubes]))
+				add_drink(con_map,"- Make slap and tickle (Mox/myst) ",12,1,4);
+			if(i_a("rockin' wagon")>0 || non_nash_drink($item[bottle of vodka], $item[olive], $item[magical ice cubes]))
+				add_drink(con_map,"- Make rockin' wagon (Mox) ",12,1,4);
+			if(i_a("perpendicular hula")>0 || non_nash_drink($item[bottle of rum], $item[strawberry], $item[magical ice cubes]))
+				add_drink(con_map,"- Make perpendicular hula (Mox) ",12,1,4);
+			if(i_a("calle de miel")>0 || non_nash_drink($item[bottle of tequila], $item[lemon], $item[magical ice cubes]))
+				add_drink(con_map,"- Make calle de miel (Mox/mus) ",12,1,4);
+		}
+		
 		if(get_property("sidequestFarmCompleted")=="fratboy" && bees_ok)
 			add_drink(con_map,"- Boilermaker, using mcmillicancuddys lager from frat army FGF ",13,0,4);
 			
@@ -844,8 +902,8 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 		if(available_amount($item[handful of honey])>4 || available_amount($item[honey mead])>0)
 			add_drink(con_map,"- Honey mead  (made with 4 handful of honey) ",5,0,2);
 		
-		if(have_skill($skill[advanced cocktailcrafting]))
-			add_drink(con_map,"- make russian ice from vodka + ice cube reagent ",2.5,0,1);
+		if(have_skill($skill[advanced cocktailcrafting]) && i_a("bottle of vodka")>0 && i_a("magical ice cube")>0)
+			add_drink(con_map,"- make russian ice ",2.5,0,1);
 		
 		if(available_amount($item[cherry])>0 || available_amount($item[lime])>0 || available_amount($item[jumbo olive])>0)
 			add_drink(con_map,"- fruit golem fruits (cherry/lime/jumbo olive) + spirits ",7.5,0,3);
@@ -931,6 +989,9 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 		if(available_amount($item[Wet Russian])>0)
 			add_drink(con_map,"- Wet Russian",13,0,3);
 			
+		if(available_amount($item[hot mint schnocolate])>0)
+			add_drink(con_map,"- hot mint schnocolate",3,0,1);
+			
 		if(available_amount($item[Ambitious Turkey])>0)
 			add_drink(con_map,"- Ambitious Turkey",6,0,1);
 		if(available_amount($item[Agitated Turkey])>0)
@@ -976,6 +1037,8 @@ void advise_spleen()
 		}
 		if(i_a("handful of smithereens")>0  || get_property("tomeSummons").to_int()<3)
 			print("- handfuls of smithereens (1.5)","gray");
+		if(i_a("Homeopathic mint tea")>0)
+			print("- Homeopathic mint tea (1.5)","gray");
 	}
 }
 

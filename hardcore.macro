@@ -27,29 +27,12 @@ if monstername gremlin || monstername guy made of bees || monstername The Big Wi
 			endif
 		endif
 	endif
-
-	#meat shield bosses
-	while (monstername The Big Wisniewski || monstername The Man || monstername *Naughty Sorceress* || monstername lord spookyraven || monstername protector spectre) && hasskill meat shield && !haseffect meat shielded
-		skill meat shield
-	endwhile
-
+	
 	#spell + item blockers
 	if monstername *Naughty Sorceress* || monstername *bonerdagon
 		goto kill_the_mob
 	endif
-
-	#handle bugbear copying
-	if (monstername scavenger bugbear || monstername hypodermic bugbear || monstername batbugbear || monstername bugbear scientist || monstername bugaboo || monstername Black Ops Bugbear || monstername Battlesuit Bugbear || monstername ancient unspeakable bugbear || monstername trendy bugbear chef)
-		#first gunk scientists
-		if hascombatitem quantum nanopolymer spider web && monstername bugbear scientist
-			use quantum nanopolymer spider web
-		endif
-	endif
 	
-	if (monstername black ops bugbear || monstername ancient unspeakable bugbear || monstername battlesuit bugbear type || monstername trendy bugbear chef || monstername bugaboo || monstername bugbear scientist)
-		goto bugbear_item
-	endif
-
 	#unstunnable
 	if (monstername oil *)
 		#suck out oil
@@ -69,7 +52,7 @@ endif
 
 mark generic_spells1
 
-if hasskill summon love gnats || hasskill summon love mosquito || hasskill intimidating bellow || hasskill steal accordion || hasskill summon mayfly swarm || (sauceror && hasskill Curse of Weaksauce) || (!sauceror && hasskill Curse of the Thousand Islands) || hasskill feed || hasskill spring raindrop attack || hasskill infectious bite || (hasskill smash & graaagh && (monstername filthworm || monstername BL imp || monstername CH imp || monstername PR imp || monstername inkubus || monstername suckubus || monstername serialbus || monstername Gnollish Gearhead || monstername irate mariachi || monstername handsome mariachi || monstername briefcase bat || monstername raver giant || monstername furry giant || monstername goth giant || monstername sassy pirate || monstername swarthy pirate || monstername dairy goat || monstername spiny skelelton || monstername toothy sklelton || monstername blur || monstername bob racecar || monstername racecar bob || monstername grungy pirate || monstername war pledge || monstername frat warrior drill sergeant || monstername baseball bat || monstername doughbat || monstername perpendicular bat || monstername skullbat || monstername vampire bat || monstername batrat || monstername ratbat || monstername beanbat) && !monstername the queen filthworm)
+if hasskill summon love gnats || hasskill summon love mosquito || hasskill steal accordion || (sauceror && hasskill Curse of Weaksauce) || (!sauceror && hasskill Curse of the Thousand Islands) 
 	#insta-curse
 	if sauceror && hasskill Curse of Weaksauce
 		skill Curse of Weaksauce
@@ -77,14 +60,8 @@ if hasskill summon love gnats || hasskill summon love mosquito || hasskill intim
 	if !sauceror && hasskill Curse of the Thousand Islands
 		skill Curse of the Thousand Islands
 	endif
-	if hasskill intimidating bellow
-		skill intimidating bellow
-	endif
 	if hasskill steal accordion
 		skill steal accordion
-	endif
-	if hasskill summon mayfly swarm
-		skill summon mayfly swarm
 	endif
 	#stagger + drain
 	if hasskill summon love mosquito
@@ -94,62 +71,23 @@ if hasskill summon love gnats || hasskill summon love mosquito || hasskill intim
 	if hasskill summon love gnats
 		skill summon love gnats
 	endif
-	if hasskill feed || hasskill spring raindrop attack
-		if hasskill feed
-			skill feed
-		endif
-
-		if hasskill spring raindrop attack
-			skill spring raindrop attack
-			if hasskill summer siesta
-				skill summer siesta
-			endif
-		endif
-	endif
-	
-	#do infectious bite
-	if hasskill infectious bite && !beenhit 1 && !hppercentbelow 80 && !hasskill wrath of the volcano god
-		skill infectious bite
-	endif
-	
-	#smash and graaagh some monsters
-	if hasskill smash & graaagh && (monstername filthworm || monstername BL imp || monstername CH imp || monstername PR imp || monstername inkubus || monstername suckubus || monstername serialbus || monstername Gnollish Gearhead || monstername irate mariachi || monstername handsome mariachi || monstername briefcase bat || monstername raver giant || monstername furry giant || monstername goth giant || monstername sassy pirate || monstername swarthy pirate || monstername dairy goat || monstername spiny skelelton || monstername toothy sklelton || monstername blur || monstername bob racecar || monstername racecar bob || monstername grungy pirate || monstername war pledge || monstername frat warrior drill sergeant || monstername baseball bat || monstername doughbat || monstername perpendicular bat || monstername skullbat || monstername vampire bat || monstername batrat || monstername ratbat || monstername beanbat) && !monstername the queen filthworm
-		skill smash & graaagh
-	endif
 endif
-
-#boost meat drops with rain
-if hasskill make it rain && (monstername Beefy bodyguard bat || monstername dirty thieving brigand || monstername pygmy orderlies)
-	skill make it rain
-endif
-
 
 mark stunners
-if sealclubber &&  hasskill club foot
-	#should really be only with fury
-	skill club foot
-endif
-if pastamancer && hasskill entangling noodles
-	skill entangling noodles
-endif
-if accordionthief && hasskill Accordion Bash
-	skill Accordion Bash
-endif
-if turtletamer && hasskill shell up
-	skill shell up
-endif
-
-if hascombatitem rain-doh blue balls 
-	use rain-doh blue balls
-endif
-if hasskill pocket crumbs
-	skill pocket crumbs
-endif
-if hasskill ply reality
-	skill ply reality
-endif
-if hascombatitem rain-doh indigo cup && !monstername *Naughty Sorceress* && !monstername Bonerdagon
-	use rain-doh indigo cup
+if (sealclubber &&  hasskill club foot) || (pastamancer && hasskill entangling noodles) || (accordionthief && hasskill Accordion Bash) || (turtletamer && hasskill shell up)
+	if sealclubber &&  hasskill club foot
+		#should really be only with fury
+		skill club foot
+	endif
+	if pastamancer && hasskill entangling noodles
+		skill entangling noodles
+	endif
+	if accordionthief && hasskill Accordion Bash
+		skill Accordion Bash
+	endif
+	if turtletamer && hasskill shell up
+		skill shell up
+	endif
 endif
 
 if (hasskill transcendent olfaction && !haseffect on the trail && (monstername writing desk || monstername dairy goat || monstername tomb rat || monstername blooper || monstername Hellion || monstername Bob Racecar || monstername racecar bob|| monstername Quiet Healer || monstername Goth Giant || monstername Blur || monstername Green Ops Soldier || monstername Zombie waltzers || monstername Shaky Clown || monstername Knott Yeti || monstername Hellion || monstername Violent Fungus || monstername Endless Conference Call || monstername * survivor || monstername pygmy bowler || monstername morbid skull)) || (!monstername Battlie Knight Ghost && !monstername ghost miner && !monstername Claybender Sorcerer Ghost && !monstername Dusken Raider Ghost && !monstername Space Tourist Explorer Ghost && !monstername Whatsian Commando Ghost  && !monstername sheet ghost && !monstername plaid ghost && (monstername lobsterfrogman || monstername ghost || monstername bricko bat || monstername angry bassist || monstername blue-haired girl || monstername evil ex-girlfriend || monstername peeved roommate || monstername random scenester || monstername black crayon * || monstername smut orc pervert)) || ((hascombatitem rock band flyers || hascombatitem jam band flyers) || monstername * pirate) || ((monstername Bob Racecar || monstername racecar bob) && hascombatitem disposable instant camera) || (monstername pair of burnouts && hascombatitem opium grenade)
@@ -183,9 +121,11 @@ if (hasskill transcendent olfaction && !haseffect on the trail && (monstername w
 	endif
 	if monstername pirate && hascombatitem The Big Book of Pirate Insults
 		use The Big Book of Pirate Insults
+		goto kill_the_mob
 	endif
 	if monstername pirate && hascombatitem Massive Manual of Marauder Mockery
 		use Massive Manual of Marauder Mockery
+		goto kill_the_mob
 	endif
 	#banish clingy pirate
 	if monstername clingy pirate && hascombatitem cocktail napkin
@@ -212,175 +152,9 @@ endif
 #	endif
 #endif
 
-
-#banish or copy
-if ((monstername  A.M.C. gremlin || monstername  Sabre-toothed goat || monstername  crusty pirate || monstername  tomb asp || monstername  bullet bill || monstername  senile lihc || monstername  procrastination giant) && (hasskill banishing shout || hasskill howl of the alpha || hasskill creepy grin || hasskill give your opponent the stinkeye || hascombatitem divine champagne popper || hascombatitem crystal skull || hascombatitem harold's bell)) || (hascombatitem short writ of habeas corpus && monstername pygmy) || ((monstername chatty pirate || monstername tomb servant || monstername slick lihc || monstername possibility giant) && (hasskill banishing shout || hasskill howl of the alpha)) || ((hascombatitem spooky putty sheet || hascombatitem Rain-doh black box) && (!monstername Battlie Knight Ghost && !monstername ghost miner && !monstername Claybender Sorcerer Ghost && !monstername Dusken Raider Ghost && !monstername Space Tourist Explorer Ghost && !monstername Whatsian Commando Ghost && !monstername sheet ghost && !monstername plaid ghost) && (monstername ghost || monstername lobsterfrogman || monstername gaudy pirate || monstername modern zombie || monstername dirty old lich))
-	#banish
-	if ((monstername  A.M.C. gremlin || monstername  Sabre-toothed goat || monstername  crusty pirate || monstername  tomb asp || monstername  bullet bill || monstername  senile lihc || monstername  procrastination giant) && (hasskill banishing shout || hasskill howl of the alpha || hasskill creepy grin || hasskill give your opponent the stinkeye || hascombatitem divine champagne popper || hascombatitem crystal skull || hascombatitem harold's bell)) || (hascombatitem short writ of habeas corpus && monstername pygmy) || ((monstername chatty pirate || monstername tomb servant || monstername slick lihc || monstername possibility giant) && (hasskill banishing shout || hasskill howl of the alpha))
-		#normal banish
-		if ((monstername  A.M.C. gremlin || monstername  Sabre-toothed goat || monstername  crusty pirate || monstername  tomb asp || monstername  bullet bill || monstername  senile lihc || monstername  procrastination giant) && (hasskill banishing shout || hasskill howl of the alpha || hasskill creepy grin || hasskill give your opponent the stinkeye || hascombatitem divine champagne popper || hascombatitem crystal skull || hascombatitem harold's bell))
-			if hasskill banishing shout
-				skill banishing shout
-			endif
-			if hasskill howl of the alpha
-				skill howl of the alpha
-			endif
-			if hasskill creepy grin
-				skill creepy grin 
-			endif
-			if hasskill give your opponent the stinkeye
-				skill give your opponent the stinkeye
-			endif
-			if hascombatitem divine champagne popper
-				use divine champagne popper
-			endif
-			if hascombatitem crystal skull
-				use crystal skull
-			endif
-			if hascombatitem harold's bell
-				use harold's bell
-			endif
-			if hasskill talk about politics
-				skill talk about politics
-			endif
-			if hasskill Batter Up
-				skill Batter Up
-			endif
-			if hasskill thunder clap
-				skill thunder clap
-			endif
-		endif
-		
-		#pygmy banish
-		if hascombatitem short writ of habeas corpus && (monstername pygmy shaman || monstername pygmy witch lawyer || monstername pygmy orderlies || monstername pygmy witch nurse || monstername pygmy witch surgeon || monstername pygmy headhunter || monstername drunk pygmy)
-			use short writ of habeas corpus
-		endif
-		
-		#multi banish
-		if monstername chatty pirate || monstername tomb servant || monstername slick lihc || monstername possibility giant && (hasskill banishing shout || hasskill howl of the alpha)
-			if hasskill banishing shout
-				skill banishing shout
-			endif
-			if hasskill howl of the alpha
-				skill howl of the alpha
-			endif
-		endif
-	endif
-endif
-
 mark generic_spells2
-#correct juju mask buff
-if hasskill wrath of the Volcano god ||  hasskill wrath of the trickster god ||  hasskill Wrath of the Lightning God
-	if moxieclass 
-		if hasskill wrath of the Volcano god
-			skill wrath of the Volcano god
-			if hasskill sing
-				skill sing
-				goto kill_the_mob
-			endif
-			if hasskill suckerpunch 
-				skill suckerpunch
-				goto kill_the_mob
-			endif
-		endif
-		if hasskill Wrath of the Lightning God
-			skill Wrath of the Lightning God
-			if hasskill sing
-				skill sing
-				goto kill_the_mob
-			endif
-			if  hasskill suckerpunch 
-				skill suckerpunch
-				goto kill_the_mob
-			endif
-		endif
-	endif
-	if muscleclass
-		if hasskill wrath of the trickster god
-			skill wrath of the trickster god
-			if hasskill toss
-				skill toss
-				goto kill_the_mob
-			endif
-			if hasskill clobber
-				skill clobber
-				goto kill_the_mob
-			endif
-		endif
-		if hasskill Wrath of the Lightning God
-			skill Wrath of the Lightning God
-			if hasskill toss
-				skill toss
-				goto kill_the_mob
-			endif
-			if hasskill clobber
-				skill clobber
-				goto kill_the_mob
-			endif
-		endif
-	endif
-	if mysticalityclass
-		if hasskill wrath of the trickster god
-			skill wrath of the trickster god
-			if hasskill boil
-				goto jarlsbergfight
-			endif
-			if hasskill salsaball
-				skill salsaball
-				goto kill_the_mob
-			endif
-			if hasskill spaghetti spear
-				skill spaghetti spear
-				goto kill_the_mob
-			endif
-		endif
-		if hasskill Wrath of the Volcano God
-			skill Wrath of the Volcano God
-			if hasskill boil
-				goto jarlsbergfight
-			endif
-			if hasskill salsaball
-				skill salsaball
-				goto kill_the_mob
-			endif
-			if hasskill spaghetti spear
-				skill spaghetti spear
-				goto kill_the_mob
-			endif
-		endif
-	endif
-endif
-#end of juju mask correction
 	
 mark kill_the_mob
-	if hasskill lightning strike || hasskill boil || hasskill flying fire fist
-		if hasskill lightning strike
-			skill lightning strike
-		endif
-		if hasskill boil
-			goto jarlsbergfight
-		endif
-		#use fist skills
-		if hasskill flying fire fist
-			if hasskill chilled monkey brain technique
-				skill  monkey brain technique
-			endif
-			#use stinkpalm if needed/better
-			while hasskill stinkpalm && (monstername Battlie Knight Ghost || monstername ghost miner || monstername Claybender Sorcerer Ghost || monstername Dusken Raider Ghost || monstername Space Tourist Explorer Ghost || monstername Whatsian Commando Ghost || monstername chalkdust wraith || monstername ghost miner || monstername hulking construct || monstername Snow Queen || monstername ancient protector spirit || monstername Protector Spectre || monstername The Ghost of Fernswarthy || monstername banshee librarian || monstername chalkdust wraith || monstername empty suit of armor || monstername floating platter of hors d'oeuvres || monstername ghost miner || monstername skeletal cat || monstername skeletal hamster || monstername skeletal monkey || monstername skullery maid || monstername spooky mummy || monstername spooky vampire || monstername swarm of scarab beatles || monstername tapdancing skeleton || monstername tomb servant || monstername undead elbow macaroni || monstername zombie waltzers || monstername The Bonerdagon || monstername conjoined zmombie || monstername corpulent zobmie || monstername gargantulihc || monstername gaunt ghuol || monstername giant skeelton || monstername gluttonous ghuol || monstername grave rober zmobie || monstername huge ghuol || monstername senile lihc || monstername slick lihc || monstername spiny skelelton || monstername toothy sklelton || monstername flame-broiled meat blob || monstername Knob Goblin Barbecue Team || monstername overdone flame-broiled meat blob || monstername swarm of fire ants || monstername BL Imp || monstername CH Imp || monstername Demoninja || monstername Fallen Archfiend || monstername G imp || monstername Hellion || monstername inkubus || monstername L imp || monstername P imp || monstername Pr Imp || monstername serialbus || monstername suckubus || monstername W imp)
-				skill stinkpalm
-			endwhile
-			while hasskill Seven-Finger Strike
-				skill Seven-Finger Strike
-			endwhile
-			while hasskill drunken baby style
-				skill drunken baby style
-			endwhile
-			while !missed 1
-				skill flying fire fist
-			endwhile
-		endif
-	endif
-	
 	#moxie kill
 	if moxieclass
 		#build up momentum
@@ -408,21 +182,9 @@ mark kill_the_mob
 	endif
 	#muscle kill
 	if muscleclass
-		if hasskill throw shield
-			skill throw shield
-			attack
-		endif
-
-		while hasskill cleave
-			skill cleave
-		endwhile
-		while hasskill ravenous pounce && !monstername *naughty sorceress
-			skill rave
-		endwhile
 		while hasskill shieldbutt && !monstername *naughty sorceress
 			skill shieldbutt
 		endwhile
-
 		while !missed 2
 			attack
 		endwhile
@@ -432,17 +194,9 @@ mark kill_the_mob
 	if mysticalityclass
 		#saucespam
 		if sauceror
-			if hasskill throw shield
-				skill throw shield
-			endif
-			
 			while !missed 2 && hasskill saucegeyser
 				skill Saucegeyser
 			endwhile 
-		endif
-		#pastamancer
-		if hasskill throw shield
-			skill throw shield
 		endif
 		while hasskill weapon of the pastalord &&  !missed 2
 				skill weapon of the pastalord
@@ -450,6 +204,14 @@ mark kill_the_mob
 		while hasskill cannelloni cannon &&  !missed 2
 				skill cannelloni cannon
 		endwhile 
+		#last chance before punching
+		while hasskill utensil twist
+			skill utensil twist
+		endwhile
+		#fall back on punching?
+		while !missed 2
+			attack
+		endwhile
 	endif
 abort
 

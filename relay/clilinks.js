@@ -35,7 +35,7 @@ function cli_execute(cmd, caller) {
    $.ajax({
       url: 'clilinks.ash',
       data: {cli: cmd},
-	  context: caller,
+      context: caller,
       success: cliComplete
    });
 }
@@ -50,18 +50,18 @@ jQuery(function($){
    $('head').append("<style type=\"text/css\">#mask { position: fixed; left:0; top:0; width:100%; height: 100%; display:none; z-index: 999; background-color: #222; } "+
       "#clibox, #clifeedback { position:fixed; display:none; border-width:2px; border-style:solid; background-color:white; font-size:0.9em; padding:10px; z-index:1000; } "+
       "#clifeedback { top: 40px; right: 10px; } .clisuccess { border-color: #080; color: #080; } .clierror { border-color: #800; color:#800; } "+
-      ".clilink { font-size:0.7em } .clilink:before { content: \"[\" } .clilink:after { content: \"]\" } .cliimglink { border:0 } </style>");
+      ".clilink { font-size:0.7em; cursor: pointer; } .clilink:before { content: \"[\" } .clilink:after { content: \"]\" } .cliimglink { border:0 cursor: pointer; } </style>");
 
   // enable the dialog box's form
    $('#cliform').submit(function(e) { e.preventDefault(); cli_execute($('#cliform input:text').val()); });
   // enable closing the dialog
    $('.cliclose').click(function () { return cliPopdown(); });
   // enable CLI Links throughout the document
-   $(document).on('click','.clilink, .cliimglink', function(e) {  // enable CLI links; use title if present, otherwise use link text
+   $(document).on('click','.clilink, .cliimglink, .clilinknostyle', function(e) {  // enable CLI links; use title if present, otherwise use link text
      var a = $(this),
      cmd = (a.attr('title') == undefined) ? a.text() : a.attr('title');
      if (a.hasClass('edit')) return cliPopup(cmd+' ');      // if 'edit' class, pop up the CLI box prepopulated with cmd
-	 cli_execute(cmd, this);
-	 return false;
+     cli_execute(cmd, this);
+     return false;
    });
 });

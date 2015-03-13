@@ -1,10 +1,11 @@
 #/******************************************************************************/
-#                              nemesis.ash v2.7
+#                                  nemesis.ash
 #                         Slaying those Nemesises since 2010
 #*******************************************************************************/
 #
 #	Nemesis Quest script by slyz.
 #	See http://kolmafia.us/showthread.php?4761 for instructions.
+#	svn checkout https://svn.code.sf.net/p/slyz-nemesis/code/
 #
 #*******************************************************************************/
 #
@@ -13,7 +14,7 @@
 #
 #*******************************************************************************/
 script "Nemesis Quest Script";
-notify slyz ;
+//notify slyz ;
 import "zlib.ash";
 
 #/*****************************************************************************************\#
@@ -678,7 +679,7 @@ AT:
 
 boolean getVolcanoMap()
 {
-	if ( item_amount( MAP ) > 0 ) return vprint( "Volcano Map already obtained",6 );
+	if ( available_amount( MAP ) > 0 ) return vprint( "Volcano Map already obtained",6 );
 
 	// make sure the quest has been given by the guild NPC
 	string response = visit_url("guild.php?place=scg");
@@ -746,15 +747,19 @@ boolean getVolcanoMap()
 
 boolean openVolcanoIsland()
 {
-	if ( !getVolcanoMap() ) return vprint( "Could not get the Volcano Map.",-1 );
-
-	set_property( "battleAction", previous_battleaction );
-	set_property( "customCombatScript", previous_CCS );
-
+	if ( !getVolcanoMap() ) {
+		return vprint( "Could not get the Volcano Map.",-1 );
+	} else if ( !visit_url("volcanoisland.php").contains_text( "There's no island out there." ) ) {
+		return vprint( "The Volcano Island is available.",6 );
+	}
+	
 	//make sure the island isn't available
-	if ( !visit_url("volcanoisland.php").contains_text( "There's no island out there." ) )
-		return vprint( "The Volcano Island is already available.",6 );
-
+	//set_property( "battleAction", previous_battleaction );
+	//set_property( "customCombatScript", previous_CCS );
+	
+	
+	//ckb 2015-01-26: snip out all the old poop deck adventure stuff for the volcano map
+	/*
 	// visit guild
 	string response = visit_url("guild.php?place=scg");
 	matcher volcanoUnlock = create_matcher( "it was a secret tropical .+? after all", response );
@@ -802,7 +807,10 @@ boolean openVolcanoIsland()
 		visit_url( "volcanoisland.php?pwd&action=arrive" );
 		return vprint( "Volcano island unlocked!",6 );
 	}
+	*/
+	
 	return vprint( "Out of adventures.",-1 );
+	
 }
 
 
@@ -1221,8 +1229,9 @@ boolean tame_french( string page )
 {
 	// build combat macro
 	string macro;
-	if ( have_skill( $skill[ entangling noodles ] ) ) macro += "skill 3004; ";
-	if ( last_monster() == $monster[ French Guard turtle ] )
+	//if ( have_skill( $skill[ entangling noodles ] ) ) macro += "skill 3004; ";
+	//if ( last_monster() == $monster[ French Guard turtle ] )
+	if (page.contains_text("frenchturtle.gif"))
 	{
 		vprint( "Ze turtle, it is française!", "green", 4 );
 		macro += "skill 7083; ";
@@ -1299,20 +1308,12 @@ boolean nemesis_Turtle_Tamer()
 //	Pastamancer		//   Thanks to Mr Purple @ kolmafia.us
 //------------------//
 
-string orb_look()
-{
-	if ( item_amount( $item[ crystal orb of spirit wrangling ] ) == 0 ) return "none";
-	string orb_text = visit_url( "inv_use.php?whichitem=4295&action=look&ajax=1&pwd=" + my_hash(), false );
-	if ( orb_text.contains_text( "don't see" ) )
-		return "none" ;
-	if ( orb_text.contains_text( "Spaghetti Elemental" ) )
-		return "Spaghetti Elemental" ;
-	return "other" ;
-}
-
 boolean get_decoded_doc()
 {
-	if ( item_amount( $item[ decoded cult documents ] ) > 0 ) return vprint( "You already have the decoded cult documents.", 6 );
+	if (have_skill($skill[Bind Spaghetti Elemental]))
+		return vprint ("You already know how to bind a Spaghetti Elemental.",6);
+	if ( item_amount( $item[ decoded cult documents ] ) > 0 && !have_skill($skill[Bind Spaghetti Elemental]))
+		return vprint( "You already have the decoded cult documents. Go learn the skill already!", 6 );
 	if ( item_amount( $item[ encoded cult documents ] ) < 1 && !visit_url( "volcanoisland.php?action=npc" ).contains_text( "important cult documents") )
 		return vprint( "Could not obtain the encoded cult documents from the volcano NPC.",-1 );
 	if ( item_amount( $item[ cult memo ] ) == 5 )
@@ -1336,40 +1337,32 @@ boolean get_decoded_doc()
 		vprint( item_amount( $item[ cult memo ] ) + "/5 memos obtained", "green", 4 );
 	}
 	return vprint( "Out of adventures, exiting...",-1 );
+
 }
+
 
 boolean get_spaghetti()
 {
 	if ( !get_decoded_doc() ) return vprint( "Could not obtain the decoded cult documents.",-1 );
-	vprint( "Making sure the Spaghetti Elemental is our guardian...","green",2 );
-
-	record { string player; string orb; } guardian;
-	guardian.player=my_thrall().to_string();
-	/*guardian.orb = orb_look();
-
-	if ( item_amount( $item[ crystal orb of spirit wrangling ] ) > 0 )
-	{
-		use( 1 , $item[ crystal orb of spirit wrangling ] );
-		guardian.player = guardian.orb;
-		guardian.orb = orb_look();
-	}*/
+	vprint( "Making sure the Spaghetti Elemental is our thrall...","green",2 );
 
 	// if we have a Spaghetti Elemental with us
-	if ( guardian.player == "Spaghetti Elemental" ) return true;
+	if ( my_thrall() == $thrall[Spaghetti Elemental] ) return true;
 
-	// if we have a Spaghetti Elemental in the Orb
-	if ( guardian.orb == "Spaghetti Elemental" ) return use( 1 , $item[ crystal orb of spirit wrangling ] );
-
-	// if we have a guardian with us and in the Orb, let the user decide which one to discard
-	if ( guardian.player == "other" && guardian.orb == "other" )
-		return vprint( "You have a Pasta Guardian with you and a Pasta Guardian in the Crystal orb of spirit wrangling. Please take the one you wish to discard out and use the decoded cult documents before running the script again.", -1);
-
-	// if we have a guardian with us and the Orb is empty, store it before creating a link with the Spaghetti Elemental
-	if ( guardian.player == "other" ) use( 1 , $item[ crystal orb of spirit wrangling ] );
-
-	// if we don't have a guardian with us or if we don't have an Orb, create a link with the Spaghetti Elemental
-	return use( 1 , $item[ decoded cult documents ] );
+	// if we know how to bind a Spaghetti Elemental	
+	if ( have_skill($skill[Bind Spaghetti Elemental]) )
+	{
+		use_skill($skill[Bind Spaghetti Elemental]);
+		return ( my_thrall() == $thrall[Spaghetti Elemental] );
+	}
+	
+	// if we don't know how to bind a Spaghetti Elemental
+	if ( item_amount( $item[ decoded cult documents ] ) > 0 )
+		use( 1 , $item[ decoded cult documents ] );
+	use_skill($skill[Bind Spaghetti Elemental]);
+	return ( my_thrall() == $thrall[Spaghetti Elemental] );
 }
+
 
 
 boolean get_cult_robe()
@@ -1378,22 +1371,20 @@ boolean get_cult_robe()
 	vprint( "Obtaining a spaghetti cult robe...","green",2 );
 
 	// Level up your Spaghetti Elemental and obtain the spaghetti cult robe
+	if ( (my_class() == $class[Pastamancer]) && ( my_thrall() == $thrall[Spaghetti Elemental]) && ($thrall[Spaghetti Elemental].level <3) && (get_property("_pastaAdditive") == "false") && ( item_amount( $item[Experimental carbon fiber pasta additive] ) > 0 ) ){
+		use(1, $item[Experimental carbon fiber pasta additive]);
 	if ( my_adventures() == 0 ) return vprint( "Out of adventures.",-1 );
 	cli_execute ( "mood execute" );
 	if ( my_buffedstat( $stat[ moxie ] ) < ( 155 + monster_level_adjustment() ) )
 		maximize( "item, moxie, -ML, -familiar -tie", false );
 	use_familiar( previous_familiar );
 	cli_execute( "conditions clear" );
+}
 
-	int ghost_level;
-	string ghost_type = "Spaghetti Elemental";
-	boolean out_of_summons ;
 
 	while ( my_adventures() > 0 )
 	{
 		if ( available_amount( $item[ spaghetti cult robe ] ) > 0 ) return vprint( "Spaghetti cult robe obtained.", 6 );
-		if ( out_of_summons ) return vprint( "Out of Guardian summons for the day, re-run this script tomorrow.", -1 );
-		if ( ghost_type != "Spaghetti Elemental" ) return vprint( "For some reason, you don't have a Spaghetti Elemental as your Guardian. Exiting...", -1 );
 
 		restore_hp( 0 );
 		restore_mp( 0 );
@@ -1403,27 +1394,11 @@ boolean get_cult_robe()
 		string response = visit_url( "volcanoisland.php?action=tuba" );
 
 		if ( !response.contains_text( "Combat" ) ) continue;
-
-		matcher ghost_matcher = create_matcher( "value=\"Summon (?:\\w+) the Level (\\d+) (.+?)\">", response );
-		if ( !ghost_matcher.find() )
-		{
-			out_of_summons = true ;
-		}
-		else
-		{
-			ghost_level = ghost_matcher.group( 1 ).to_int() ;
-			ghost_type  = ghost_matcher.group( 2 ) ;
-		}
-
-		if ( !out_of_summons ) response = visit_url("fight.php?action=summon");
-		if ( response.contains_text( "looks stronger" ) ) ghost_level += 1 ;
 		run_combat();
 
-		vprint( "Your " + ghost_type + " is level " + ghost_level, "green", 4 );
 	}
 	return vprint( "Out of adventures, exiting...",-1 );
 }
-
 boolean nemesis_Pastamancer()
 {
 	if ( visit_url( "volcanoisland.php?action=npc" ).contains_text( "Sounds like you finally got inside, eh" ) )
@@ -2299,7 +2274,7 @@ item ULEW = ULEWs[ my_class() ].to_item();
 
 void nemesisQuest()
 {
-	if ( available_amount( ULEW ) > 0 ) { vprint( "Nemesis quest already done!", "green", 1 ); exit; } 
+	//if ( available_amount( ULEW ) > 0 ) { vprint( "Nemesis quest already done!", "green", 1 ); exit; } 
 
 	// reset step if this is the first time the script is run on this ascension
 	if ( get_property( "nemesis_lastReset" ) != get_property( "knownAscensions" ) )

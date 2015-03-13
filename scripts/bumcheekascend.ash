@@ -1,5 +1,5 @@
-//		last compared version 544
-
+//		last compared version 563
+//http://sourceforge.net/p/bumcheekascend/code/<COMMIT_NEW>/tree//bumcheekascend/scripts/bumcheekascend.ash?diff=5185f90b5fcbc90e99b6649c:<COMMIT_OLD>
 script "bumcheekascend.ash";
 
 import "florist.ash";
@@ -77,6 +77,16 @@ string bcParseOptions(string inputString, string validOptions) {
 	}
 
 	return outputString;
+}
+
+boolean type69_simon(item it)
+{
+	if(!cli_execute("ash import zlib; be_good($item["+it+"])"))
+		return false;
+	string page = visit_url("standard.php");
+	if(contains_text(page,it.to_string()))
+		return false;
+	return true;
 }
 
 void eat_hot_dog(string dog,location loc)
@@ -319,29 +329,14 @@ void clear_combat_macro()
 
 void set_combat_macro(boolean use_putty)
 {
-/*	switch(my_primestat())
+	if(in_hardcore())
 	{
-		case $stat[muscle] :
-			if(use_putty)
-				visit_url("account.php?actions[]=autoattack&autoattack=9974885&flag_aabosses=1&pwd&action=Update");
-			else
-				visit_url("account.php?actions[]=autoattack&autoattack=9982716&flag_aabosses=1&pwd&action=Update");
-		break;
-		case $stat[moxie] :
-			if(use_putty)
-				visit_url("account.php?actions[]=autoattack&autoattack=9974886&flag_aabosses=1&pwd&action=Update");
-			else
-				visit_url("account.php?actions[]=autoattack&autoattack=9982715&flag_aabosses=1&pwd&action=Update");
-		break;
-		case $stat[mysticality] :
-				if(use_putty)
-					visit_url("account.php?actions[]=autoattack&autoattack=9974884&flag_aabosses=1&pwd&action=Update");
-				else
-					visit_url("account.php?actions[]=autoattack&autoattack=9982714&flag_aabosses=1&pwd&action=Update");
-		break;
-		default:
-			abort("Unrecognised mainstat in set_combat_macro()");
-	}*/
+		if(using_putty!=1)
+		{
+			visit_url("account.php?actions[]=autoattack&autoattack=99132576&flag_aabosses=1&flag_wowbar=1&flag_compactmanuel=1&pwd&action=Update");
+			using_putty=1;
+		}
+	}
 	if(use_putty)
 	{
 		//putty
@@ -695,23 +690,23 @@ void bcAutoClancy() {
 
 // FIXME - waiting for someone clever to write the auto-code, need to -combat first
 				switch (minstrel) {
-					case "Vamps"	: visit_url("choice.php?pwd&whichchoice=571&option=1");
+					case "Vamps"	: run_choice(1); // visit_url("choice.php?pwd&whichchoice=571&option=1");
 							break;
 //A Barroom Brawl		Encounter: Jackin' the Jukebox
 
-					case "Clamps"	: visit_url("choice.php?pwd&whichchoice=572&option=1");
+					case "Clamps"	: run_choice(1); // visit_url("choice.php?pwd&whichchoice=572&option=1");
 							break;
 //cobbsknob.php?action=tolabs	Encounter: A Miner Variation
 
-					case "Stamps"	: visit_url("choice.php?pwd&whichchoice=573&option=1");
+					case "Stamps"	: run_choice(1); // visit_url("choice.php?pwd&whichchoice=573&option=1");
 							break;
 //plains.php?action=lutergrave	Encounter: The Luter
 
-					case "Camps"	: visit_url("choice.php?pwd&whichchoice=576&option=1");
+					case "Camps"	: run_choice(1); // visit_url("choice.php?pwd&whichchoice=576&option=1");
 							break;
 //The Icy Peak			Encounter: Mercury Rising
 
-					case "Scamp"	: visit_url("choice.php?pwd&whichchoice=577&option=1");
+					case "Scamp"	: run_choice(1); // visit_url("choice.php?pwd&whichchoice=577&option=1");
 							break;
 //The Middle Chamber		Encounter: Don't You Know Who I Am?
 
@@ -1067,7 +1062,7 @@ boolean buMax(string maxme, int maxMainstat) {
 	//folding
 	if(my_name()=="twistedmage")
 	{
-		if (i_a("Loathing Legion necktie") == 0 && my_path()!="Heavy Rains") //not trendy
+		if (i_a("Loathing Legion necktie") == 0 && type69_simon($item[Loathing Legion necktie])) //not trendy
 			cli_execute("fold Loathing Legion necktie");
 		//if we are high level  we don't need ml
 		if(my_level()>=13)
@@ -1171,15 +1166,27 @@ boolean buMax(string maxme, int maxMainstat) {
 	if (i_a($item[hilarious comedy prop]) > 0 && !contains_text(maxme, "hp regen")) {
         maxme = maxme + " -equip hilarious comedy prop";
     }
-
+	
+	//SIMON: this seems to interfere with outfits
+	if (!maxme.contains_text("outfit") && in_hardcore())
+	{
+		if(i_a("hand that rocks the ladle")>0 && my_class()==$class[pastamancer])
+			maxme = maxme + " +equip hand that rocks the ladle";
+		if (i_a("saucepanic")>0 && my_class()==$class[sauceror])
+			maxme = maxme + " +equip saucepanic";
+	}
+	//SIMONS DONT REMOVE BNELOW
+	boolean use_shank()
+	{
+		return (my_class()==$class[disco bandit] && i_a("frankly mr shank")>0 && in_hardcore());
+	}
 	//Manual override for the nuns.
 	if (contains_text(maxme, "nuns")) {
 		cli_execute("maximize mainstat " + ((bcasc_AllowML) ? "" : "-10 ml") + " +outfit "+bcasc_warOutfit);
 		switch (my_primestat()) {
 			case $stat[Muscle] : 		cli_execute("maximize "+max_bees+" beeosity" + (my_path() == "Zombie Slayer" ? "" : ", 0.5 mp regen max") + ", mainstat " + ((bcasc_AllowML) ? "" : "-10 ml") + (my_path() == "Way of the Surprising Fist" ? " " : " +melee ")+((anHero()) ? "+shield" : "")+" +current +outfit "+bcasc_warOutfit); break;
-			case $stat[Mysticality] : 	cli_execute("maximize "+max_bees+" beeosity, 0.5 mp regen max, mainstat +init " + ((bcasc_AllowML) ? "" : "-10 ml") + " +current +outfit "+bcasc_warOutfit); break;
-			case $stat[Moxie] : 		cli_execute("maximize "+max_bees+" beeosity, 0.5 mp regen max, mainstat " + ((bcasc_AllowML) ? "" : "-10 ml") + (my_path() == "Way of the Surprising Fist" ? " " : " -melee +current +outfit ")+bcasc_warOutfit); break;
-
+			case $stat[Mysticality] : 	cli_execute("maximize "+max_bees+" beeosity, 0.5 mp regen max, mainstat, +init " + ((bcasc_AllowML) ? "" : "-10 ml") + " +current +outfit "+bcasc_warOutfit); break;
+			case $stat[Moxie] : 		cli_execute("maximize "+max_bees+" beeosity, 0.5 mp regen max, mainstat " + ((bcasc_AllowML) ? "" : "-10 ml") + (use_shank() ? " +equip frankly mr shank " : (my_path() == "Way of the Surprising Fist" ? " " : " -melee +current +outfit "))+bcasc_warOutfit); break;
 		}
 		string sns = prepSNS();
 		if (sns != "") {
@@ -1187,13 +1194,12 @@ boolean buMax(string maxme, int maxMainstat) {
 		}
 		return true;
 	}
-	
 	//Basically, we ALWAYS want and -ml, for ALL classes. Otherwise we let an override happen. 
 	string max_str;
 	switch (my_primestat()) {
-		case $stat[Muscle] :            max_str="maximize "+max_bees+" beeosity, mainstat "+maxMainstat+" max, "+(my_path() == "Way of the Surprising Fist" ? " " : " +melee ")+((anHero()) ? "+shield" : "") + ((bcasc_AllowML) ? "" : " -10 ml") + " +muscle experience " + (my_path() == "Zombie Slayer" ? "" : "+0.5 mp regen min +0.5 mp regen max 5 hp, ")+maxme; break;
-		case $stat[Mysticality] : 	max_str="maximize "+max_bees+" beeosity, mainstat "+maxMainstat+" max, "+" +10spell damage +mysticality experience +5 mp regen min +5 mp regen max +init 5 hp, " + ((bcasc_AllowML) ? "" : "-10 ml")+maxme; break;
-		case $stat[Moxie] :             max_str="maximize "+max_bees+" beeosity, mainstat "+maxMainstat+" max, "+(my_path() == "Way of the Surprising Fist" ? " " : " -melee 5 hp, ") + ((bcasc_AllowML) ? "" : "-10 ml") + " +moxie experience +0.5 mp regen min +0.5 mp regen max "+maxme; break;
+		case $stat[Muscle] :            max_str="maximize "+max_bees+" beeosity, mainstat "+maxMainstat+" max, "+(my_path() == "Way of the Surprising Fist" ? " " : " +melee ")+((anHero() && !contains_text(maxme,"UV-resist") && !contains_text(maxme,"fulminate")) ? "+shield" : "") + ((bcasc_AllowML) ? "" : " -10 ml") + " +muscle experience " + (my_path() == "Zombie Slayer" ? "" : "+0.5 mp regen min, +0.5 mp regen max, 5 hp, ")+maxme; break;
+		case $stat[Mysticality] : 	max_str="maximize "+max_bees+" beeosity, mainstat "+maxMainstat+" max, "+" +10spell damage +mysticality experience, +5 mp regen min, +5 mp regen max, +init, 5 hp, " + ((bcasc_AllowML) ? "" : "-10 ml, ")+maxme; break;
+		case $stat[Moxie] :             max_str="maximize "+max_bees+" beeosity, mainstat "+maxMainstat+" max, "+(use_shank() ? " +equip frankly mr shank, " : (my_path() == "Way of the Surprising Fist" ? " " : " -melee 5 hp, ")) + ((bcasc_AllowML) ? "" : "-10 ml") + " +moxie experience +0.5 mp regen min +0.5 mp regen max, "+maxme; break;
 	}
 	
 	print("max string="+max_str,"lime");
@@ -1457,7 +1463,7 @@ boolean have_castitems(class who, boolean get_them) {
 				if(get_them)
 				{
 					//best is to pull a mace of the tortoise (10 turns)
-					if(i_a("mace of the tortoise")==0)
+					if(!in_hardcore() && i_a("mace of the tortoise")==0)
 						cli_execute("pull mace of the tortoise");
 					if(i_a("mace of the tortoise")>0)
 						return true;
@@ -3421,7 +3427,7 @@ boolean omNomNom() {
 	}
 	
 	int needBooze() {
-		return to_int((inebriety_limit() - my_inebriety())/4);
+		return to_int((inebriety_limit() - my_inebriety())/4)+1;
 	}
 	
 	int needFood() {
@@ -3430,7 +3436,7 @@ boolean omNomNom() {
 	
 	if (get_property("bcasc_prepareFoodAndDrink") != "true") return false;
 	//Only do this if we're rich enough or something. Might want this to not be exactly the same as willMood(), so copying rather than using the function. 
-	if (!(haveElite() || my_meat() > 5000 || my_mp() > 100 || my_level() > 9)) return false;
+	if (!(haveElite() || my_meat() > 500 || my_mp() > 100 || my_level() > 9)) return false;
 	if (!in_hardcore()) return false;
 	
 	if (have_skill($skill[Pastamastery]) && have_skill($skill[Advanced Saucecrafting])) {
@@ -3514,7 +3520,8 @@ int safeMox(location loc) {
 	
 	//Find the hardest monster. 
 	foreach mob, freq in appearance_rates(loc) {
-		if (freq >= 0 && mob != $monster[Guy Made of Bees] && mob != $monster[Baron von Ratsworth]) ret = max(ret, monster_attack(mob));
+		
+		if (freq >= 0 && !($monsters[Guy Made of Bees, Baron von Ratsworth, Ghost of Elizabeth Spookyraven] contains mob)) ret = max(ret, monster_attack(mob));
 	}
 	//Note that monster_attack() takes into account ML. So just add something to account for this.
 	return ret + 4;
@@ -3559,7 +3566,7 @@ boolean can_adv(location where) {
 	}
 	boolean pirate_check(string url) {
 	  if (!(equipcheck($item[pirate fledges]) || outfitcheck("swashbuckling getup"))) return false;
-	  return true;
+      return perm_urlcheck("place.php?whichplace=cove",url);
 	}
 
 	// begin location checking
@@ -3614,7 +3621,7 @@ boolean can_adv(location where) {
 	case $location[Tower Ruins]: return (primecheck(18) && itemcheck($item[Fernswarthy's letter]));
 	case $location[The Oasis]: return (itemcheck($item[your father's macguffin diary]) && perm_urlcheck("place.php?whichplace=desertbeach","oasis.gif"));
 	case $location[The Upper Chamber]:
-	case $location[The Middle Chamber]: return (itemcheck($item[staff of ed]));
+	case $location[The Middle Chamber]: return (itemcheck(to_item("2325"))); // Item 2325 is the Staff of Ed
 	// signs
 	case $location[Thugnderdome]: if (my_path() != "Zombie Slayer" && gnomads_available() && !primecheck(25)) return false;
 	case $location[Outskirts of Camp Logging Camp]: return (my_path() != "Zombie Slayer" && canadia_available());
@@ -3639,7 +3646,7 @@ boolean can_adv(location where) {
 	case $location[The Road to the White Citadel]: return (!white_citadel_available() && guild_store_available( ) && visit_url("woods.php").contains_text("wcroad.gif"));
 	case $location[The Haunted Kitchen]: return (primecheck(5) && (itemcheck($item[Spookyraven library key]) || perm_urlcheck("place.php?whichplace=town_right","manor.gif")));
 	case $location[The Haunted Conservatory]: return (primecheck(6) && perm_urlcheck("place.php?whichplace=town_right","manor.gif"));
-	case $location[The Haunted Billiards Room]: return (primecheck(10) && perm_urlcheck("place.php?whichplace=town_right","manor.gif"));
+	case $location[The Haunted Billiards Room]: return (primecheck(10) && perm_urlcheck("place.php?whichplace=manor1","manor1_billiards"));
 	case $location[The Haunted Bathroom]: return (primecheck(68) && get_property("questM21Dance") != "unstarted");
 	case $location[The Haunted Bedroom]: return (primecheck(85) && get_property("questM21Dance") != "unstarted");
 	case $location[The Icy Peak]: return (levelcheck(8) && primecheck(53) && perm_urlcheck("questlog.php?which=2","L337 Tr4pz0r") && numeric_modifier("Cold Resistance") > 0);
@@ -3855,7 +3862,7 @@ boolean innerSetFamiliar(string famtype) {
 			while(my_level()>=11 && i_a("astral energy drink")>0 && my_spleen_use() <= spleen_limit()-8)
 			{
 				use_filter();
-				use(1, $item[astral energy drink]);
+				chew(1, $item[astral energy drink]);
 			}
 			
 			if((my_daycount()>3 && in_hardcore()) || my_daycount()>1)
@@ -3865,24 +3872,24 @@ boolean innerSetFamiliar(string famtype) {
 			//then check grease
 			while (my_spleen_use()  <= maxspleen-4 && item_amount($item[groose grease]) > 0) {
 				use_filter();
-				use(1, $item[groose grease]);
+				chew(1, $item[groose grease]);
 				cli_execute("uneffect just the best anapests");
 			}
 			while (my_spleen_use()  <= maxspleen-4 && item_amount($item[unconscious collective dream jar]) > 0) {
-				use(1, $item[unconscious collective dream jar]);
+				chew(1, $item[unconscious collective dream jar]);
 			}
 			//now check other stuff
 			if (my_level() >= 4) {
 				print("BCC: Going to try to use some spleen items if you have them.", "purple");
 				
 				while (my_spleen_use()  <= maxspleen-4 && item_amount($item[agua de vida]) > 0) {
-					use(1, $item[agua de vida]);
+					chew(1, $item[agua de vida]);
 					use_filter();
 				}
 				
 				while (bootsSpleenThing() != $item[none] && my_spleen_use()  <= maxspleen-4) {
 					use_filter();
-					use(1, bootsSpleenThing());
+					chew(1, bootsSpleenThing());
 				}
 				
 				visit_url("place.php?whichplace=town_wrong");
@@ -3890,7 +3897,7 @@ boolean innerSetFamiliar(string famtype) {
 					if (available_amount($item[coffee pixie stick]) == 0) {
 						visit_url("arcade.php?action=skeeball&pwd="+my_hash());
 					}
-					use (1, $item[coffee pixie stick]);
+					chew (1, $item[coffee pixie stick]);
 					use_filter();
 				}
 			}
@@ -3948,6 +3955,14 @@ boolean innerSetFamiliar(string famtype) {
 		use_familiar($familiar[angry jung man]);
 		return true;
 	}*/
+	
+	//if we still need a Tales of Spelunking  
+	if(get_property("_spelunkingTalesDrops").to_int()==0 && have_path_familiar($familiar[Adventurous Spelunker]))
+	{
+		use_familiar($familiar[Adventurous Spelunker]);
+		return true;
+	}
+	
 	
 	//If we set a familiar as default, use it. 
 	if (get_property("bcasc_defaultFamiliar") != "") {
@@ -4138,14 +4153,14 @@ boolean traverse_temple()
 			}
 			else
 			{
-				visit_url("choice.php?whichchoice=582&option=2&pwd");
-				visit_url("choice.php?whichchoice=580&option=2&pwd");
-				visit_url("choice.php?whichchoice=584&option=4&pwd");
-				visit_url("choice.php?whichchoice=580&option=1&pwd");
-				visit_url("choice.php?whichchoice=123&option=2&pwd");
+				run_choice(2); // visit_url("choice.php?whichchoice=582&option=2&pwd");
+				run_choice(2); // visit_url("choice.php?whichchoice=580&option=2&pwd");
+				run_choice(4); // visit_url("choice.php?whichchoice=584&option=4&pwd");
+				run_choice(1); // visit_url("choice.php?whichchoice=580&option=1&pwd");
+				run_choice(2); // visit_url("choice.php?whichchoice=123&option=2&pwd");
 				visit_url("choice.php");
 				cli_execute("dvorak");
-				visit_url("choice.php?whichchoice=125&option=3&pwd");
+				run_choice(3); // visit_url("choice.php?whichchoice=125&option=3&pwd");
 				checkStage("nostril", true);
 				return true;
 			}
@@ -4167,13 +4182,13 @@ boolean traverse_temple()
 		}
 		else
 		{
-			visit_url("choice.php?whichchoice=580&option=2&pwd");
-			visit_url("choice.php?whichchoice=584&option=4&pwd");
-			visit_url("choice.php?whichchoice=580&option=1&pwd");
-			visit_url("choice.php?whichchoice=123&option=2&pwd");
+			run_choice(2); // visit_url("choice.php?whichchoice=580&option=2&pwd");
+			run_choice(4); // visit_url("choice.php?whichchoice=584&option=4&pwd");
+			run_choice(1); // visit_url("choice.php?whichchoice=580&option=1&pwd");
+			run_choice(2); // visit_url("choice.php?whichchoice=123&option=2&pwd");
 			visit_url("choice.php");
 			cli_execute("dvorak");
-			visit_url("choice.php?whichchoice=125&option=3&pwd");
+			run_choice(3); // visit_url("choice.php?whichchoice=125&option=3&pwd");
 			return true;
 		}
 	}
@@ -5036,7 +5051,6 @@ void setMood(string combat) {
 				}
 			}
 		}
-		
 			
 		//ranged damage for moxies
 		if(my_primestat()==$stat[moxie] && have_skill($skill[disco fever]))
@@ -5102,7 +5116,7 @@ void setMood(string combat) {
 					if(!get_property("_pastaAdditive").to_boolean())
 						use(1,$item[Experimental carbon fiber pasta additive]);
 				}
-				else
+				else if(!in_hardcore())
 					cli_execute("pull 1 Experimental carbon fiber pasta additive");
 			}
 		}
@@ -5249,9 +5263,9 @@ void setMood(string combat) {
 		if (i_a("blue snowcone") > 0) cli_execute("trigger unconditional, ,ashq if(item_amount($item[blue snowcone]) > 0 && have_effect($effect[blue tongue]) <= 1 && have_effect($effect[red tongue]) == 0) {use(1, $item[blue snowcone]);}");
 		if (have_skill($skill[Empathy of the Newt]) && my_maxmp() > mp_cost($skill[Empathy of the Newt]) * 2 && have_castitems($class[turtle tamer], true)) cli_execute("trigger lose_effect, Empathy, cast 1 Empathy of the Newt");
 		if (i_a("green candy heart") > 0) cli_execute("trigger unconditional, ,ashq if(item_amount($item[green candy heart]) > 0 && have_effect($effect[Heart of Green]) <= 1) {use(1, $item[green candy heart]);}");
-		if(i_a("polka pop")==0)
+		if(type69_simon($item[polka pop]) && i_a("polka pop")==0)
 			cli_execute("pull 2 polka pop");
-		if(i_a("polka pop")!=0 && have_effect($effect[polka face])==0)
+		if(type69_simon($item[polka pop]) && i_a("polka pop")!=0 && have_effect($effect[polka face])==0)
 			use(2,$item[polka pop]);
 		get_kolhs_buff("items");
 	}
@@ -5416,17 +5430,16 @@ boolean levelMe(int sMox, boolean needBaseStat) {
 	vamp_out();
 	vamp_out();
 	
-	location levelHere;
+	location levelHere = level_location(my_buffedstat(my_primestat()));
 	switch (my_primestat()) {
 		case $stat[Muscle] :
 			if (my_buffedstat($stat[Muscle]) < 120 || !can_adv($location[the haunted gallery])) {
-				print("I need "+sMox+" base muscle (going levelling)", "fuchsia");
+				print("I need "+sMox+" base muscle (going levelling at "+levelHere+")", "fuchsia");
 				if(to_boolean(get_property("bcasc_dontLevelInTemple")))
 					abort("BCC: You want to handle levelling yourself.");
 				else {
 					setMood("");
 					setFamiliar("");
-					levelHere = level_location(my_buffedstat(my_primestat()));
 					//place florist friar plants
 					choose_all_plants("", levelHere);
 					
@@ -5491,13 +5504,12 @@ boolean levelMe(int sMox, boolean needBaseStat) {
 		
 		case $stat[Mysticality] :
 			if (my_buffedstat($stat[Mysticality]) < 80 || !can_adv($location[the haunted bathroom])) {
-				print("I need "+sMox+" base Mysticality (going levelling)", "fuchsia");
+				print("I need "+sMox+" base Mysticality (going levelling at "+levelHere+")", "fuchsia");
 				if(to_boolean(get_property("bcasc_dontLevelInTemple")))
 					abort("BCC: You want to handle levelling yourself.");
 				else {
 					setMood("");
 					setFamiliar("");
-					levelHere = level_location(my_buffedstat(my_primestat()));
 					//place florist friar plants
 					choose_all_plants("", levelHere);
 					
@@ -5567,19 +5579,19 @@ boolean levelMe(int sMox, boolean needBaseStat) {
 		
 		case $stat[Moxie] :
 			if (my_buffedstat($stat[Moxie]) < 90 || my_basestat($stat[mysticality]) < 25 || (!canBarr() && !canBallroom())) {
-				print("I need "+sMox+" base Moxie (going levelling)", "fuchsia");
+				print("I need "+sMox+" base Mysticality (going levelling at "+levelHere+")", "fuchsia");
 				if(to_boolean(get_property("bcasc_dontLevelInTemple")))
 					abort("BCC: You want to handle levelling yourself.");
 				else {
 					setMood("");
 					setFamiliar("");
-					levelHere = level_location(my_buffedstat(my_primestat()));
 					//place florist friar plants
 					choose_all_plants("", levelHere);
 					
 					return bumMiniAdv(my_adventures(), levelHere);
 				}
-			} else if (my_path() != "way of the surprising fist" && my_buffedstat($stat[Moxie]) < 120 && canBarr()) {
+			} else if (my_path() != "way of the surprising fist" && !canBallroom() && canBarr()) {
+				print("I need "+sMox+" base moxie (going to barr)", "fuchsia");
 				setMood("-i");
 				setFamiliar("");
 				//There's pretty much zero chance we'll get here without the swashbuckling kit, so we'll be OK.
@@ -5594,7 +5606,7 @@ boolean levelMe(int sMox, boolean needBaseStat) {
 			} else {
 				setMood("-i");
 				setFamiliar("itemsnc");
-				print("I need "+sMox+" base moxie", "fuchsia");
+				print("I need "+sMox+" base moxie (going to ballroom)", "fuchsia");
 				
 				//Get as many clovers as possible. The !capture is so that it doesn't abort on failure. 
 				print("BCC: Attempting to get clovers to level with. (Don't worry - if don't want to use them to level, we won't).", "purple");
@@ -5649,6 +5661,7 @@ boolean levelMe(int sMox, boolean needBaseStat) {
 				cli_execute("goal clear");
 				setFamiliar("itemsnc");
 				while (my_basestat($stat[Moxie]) < sMox) {
+					print("BCC: ballrooming without clovers.", "purple");
 					if (my_adventures() == 0)
 					{
 						cli_execute("shower "+my_primestat());
@@ -5826,6 +5839,7 @@ boolean bumAdv(location loc, string maxme, string famtype, string goals, string 
 	omNomNom();
 	
 	int sMox = safeMox(loc);
+	print("Safemox for "+loc+" is "+sMox, "purple");
 	buMax(maxme, sMox);
 	
 	sellJunk();
@@ -6866,6 +6880,7 @@ boolean bcascCastle() {
 		set_property("choiceAdventure672", 3);
 		set_property("choiceAdventure673", 3);
 		set_property("choiceAdventure674", 3);
+		set_property("choiceAdventure1026", 2); //get a boning knife
 		print("BCC: Opening up the Top Floor (it's going to take 11 turns)", "purple");
 		while(!contains_text(get_property("lastEncounter"), "Top of the Castle, Ma"))
 		{
@@ -7135,7 +7150,7 @@ boolean bcascChasm() {
 					visit_url("inv_use.php?pwd&which=3&whichitem=5115");
 					trimmers = true;				
 				}
-				visit_url("choice.php?pwd&whichchoice=606&option=2&choiceform2=Search+the+pantry");	//Needs +50% item (no familiar)
+				run_choice(2); // visit_url("choice.php?pwd&whichchoice=606&option=2&choiceform2=Search+the+pantry");	//Needs +50% item (no familiar)
 				string html = visit_url("choice.php?pwd&whichchoice=608&option=1&choiceform1=Search+the+shelves");
 				//The hedge trimmer is removed, but Mafia is unaware
 				if (trimmers) cli_execute("refresh inv");
@@ -7279,10 +7294,10 @@ boolean bcascChasm() {
 				}
 				visit_url("choice.php?pwd&whichchoice=606&option=4&choiceform4=Wait+--+who%27s+that%3F");
 				visit_url("choice.php?pwd&whichchoice=610&option=1&choiceform1=Pursue+your+double");
-				string html = visit_url("choice.php?pwd&whichchoice=617&option=1&choiceform1=And+then...");
+				string html = visit_url("choice.php?pwd&whichchoice=1056&option=1&choiceform1=And+then...");
 				//The hedge trimmer is removed, but Mafia is unaware
 				if (trimmers) cli_execute("refresh inv");
-				if(contains_text(html,"or if it's inhabited by some kind of weird personified spirit of the Evil That Men Do"))
+				if(contains_text(html,"s inhabited by some kind of weird personified spirit of the Evil That Men Do"))
 					checkStage("peakinit", true);
 				else
 					abort("Something seems to have failed in peakinit");
@@ -7441,7 +7456,8 @@ abort("nook - get debonair deboners from choiceadv, line 6137");
 void bcascDailyDungeon() {
 	if (my_adventures() < 10 || my_path() == "Bugbear Invasion") return;
 	zapKeys();
-	int targetKeys = (get_property("bcasc_3KeysNoWand").to_boolean()) ? 3 : 2;
+//    int targetKeys = (get_property("bcasc_3KeysNoWand").to_boolean()) ? 3 : 2;
+	int targetKeys = 3;
 	print("targetKeys="+targetKeys+" numuniquekeys="+numUniqueKeys(),"lime");
 	//SIMON CHANGED, assume we will eat pies
 	if(!in_hardcore() && my_path()!="Zombie Slayer" && my_path()!="Avatar of Jarlsberg")
@@ -7914,12 +7930,12 @@ boolean bcascHoleInTheSky() {
 	cli_execute("conditions clear");
 	levelMe(safeMox($location[The Hole in the Sky]));
 	cli_execute("conditions clear");
-	if(!in_hardcore() && i_a("star hat")<1)
-		cli_execute("pull star hat");
-	if(!in_hardcore() && i_a("star crossbow")<1)
-		cli_execute("pull star crossbow");
-	
-	while (i_a("star hat") == 0 || (i_a("star crossbow") == 0 && my_path() != "Way of the Surprising Fist" && my_path() != "Avatar of Boris") || need_key($location[The Hole in the Sky])) {
+//	if(!in_hardcore() && i_a("star hat")<1)
+//		cli_execute("pull star hat");
+//	if(!in_hardcore() && i_a("star crossbow")<1)
+//		cli_execute("pull star crossbow");
+//    while (i_a("star hat") == 0 || (i_a("star crossbow") == 0 && my_path() != "Way of the Surprising Fist" && my_path() != "Avatar of Boris") || need_key($location[The Hole in the Sky])) {
+	while (need_key($location[The Hole in the Sky])) {
 		print("doing hits adv","lime");
 	
 		//place florist friar plants
@@ -7927,8 +7943,8 @@ boolean bcascHoleInTheSky() {
 		
 		bumMiniAdv(1, $location[The Hole in the Sky]);
 		if (item_amount($item[star chart]) > 0) {
-			if (i_a("star hat") == 0 && creatable_amount($item[star hat]) > 0) { if(!retrieve_item(1, $item[star hat])) {} }
-			if (i_a("star crossbow") == 0 && creatable_amount($item[star crossbow]) > 0 && item_amount($item[star chart]) > 0 && my_path() != "Way of the Surprising Fist" && my_path() != "Avatar of Boris") { if(!retrieve_item(1, $item[star crossbow])) {} }
+//			if (i_a("star hat") == 0 && creatable_amount($item[star hat]) > 0) { if(!retrieve_item(1, $item[star hat])) {} }
+//			if (i_a("star crossbow") == 0 && creatable_amount($item[star crossbow]) > 0 && item_amount($item[star chart]) > 0 && my_path() != "Way of the Surprising Fist" && my_path() != "Avatar of Boris") { if(!retrieve_item(1, $item[star crossbow])) {} }
 			if(i_a("Richard's star key") == 0 && creatable_amount($item[Richard's star key]) > 0 && !retrieve_item(1, $item[Richard's star key]))
 			{
 				abort("Line 6444 should be able to make a star key, but didn't....");
@@ -8381,8 +8397,13 @@ void bcascLairFightNS() {
 	if(my_primestat()==$stat[moxie])
 	{
 		maxstr="maximize mox, -0.1 ML, +weapon damage, elemental damage -1 tie";
-		if(my_path()!="Way of the Surprising Fist")
-			maxstr+=", -melee";
+		if(my_class()==$class[disco bandit] && i_a("frankly mr shank")>0 && in_hardcore())
+			maxstr +=", +equip frankly mr shank";
+		else
+		{
+			if(my_path()!="Way of the Surprising Fist")
+				maxstr+=", -melee";
+		}
 	}
 	else
 	{
@@ -8534,389 +8555,6 @@ void bcascLairFightNS() {
 	}
 }
 
-boolean bcascLairFirstGate() {
-	boolean tryPull(string i, boolean abortOnFailure) {
-		item it = to_item(i);
-		
-		if(pulls_remaining() > 0)
-			if (take_storage(1, it))
-				return true;
-		if (abortOnFailure) abort("We need a '"+i+"', but the script cannot get this item (if you are in softcore, you can't pull it either).");
-		return false;
-	}
-	boolean tryPull(string i) { return tryPull(i, false); }
-
-	if (checkStage("lair1")) return true;
-	load_current_map("bumrats_lairitems", lairitems);
-	html = visit_url("lair1.php?action=gates");
-	int numGatesWeHaveItemFor = 0;
-	
-	foreach x in lairitems {
-		if (contains_text(html, lairitems[x].gatename)) {
-			print("BCC: We see "+lairitems[x].gatename, "purple");
-			
-			if (lairitems[x].a == "dod") {
-				while (item_amount(bangPotionWeNeed().to_item()) == 0 && have_effect(effectWeNeed())==0) {
-					cli_execute("use * dead mimic; use * large box; use * small box");
-					
-					setFamiliar("items");
-					setMood("i+");
-					while (!identifyBangPotions() && (bangPotionWeNeed() == "")) {
-						if(!in_hardcore() && available_amount($item[large box])==0)
-							cli_execute("pull large box");
-						//if we have a box use it
-						if(available_amount($item[large box])>0)
-						{
-							cli_execute("use * dead mimic; use * large box; use * small box");
-						}
-						else //otherwise get one
-						{
-	
-							//place florist friar plants
-							cli_execute("conditions clear");
-							choose_all_plants("i", $location[The Dungeons of Doom]);
-							
-							bumMiniAdv(1, $location[The Dungeons of Doom]);
-						}
-					}
-					
-					//if we ae done with above loop we know what potion we want, but may not have it
-					if(item_amount(bangPotionWeNeed().to_item()) == 0 || have_effect(effectWeNeed())==0)
-					{
-						if(!in_hardcore())
-							cli_execute("pull "+bangPotionWeNeed());
-						else 
-						{
-							bumAdv($location[The Dungeons of Doom], "", "", "1 "+bangPotionWeNeed(), "Farming bang potion", "+i");
-						}
-					}
-				}
-				
-				if (item_amount(bangPotionWeNeed().to_item()) > 0 || have_effect(effectWeNeed())>0) { numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1; }
-				continue;
-			} 
-				
-			//try to pull if needed
-			if(!in_hardcore() && i_a(lairitems[x].a) < 1)
-				cli_execute("pull "+lairitems[x].a);
-			
-			if (i_a(lairitems[x].a) > 0 || have_effect(to_effect(lairitems[x].effectname)) > 0) {
-				print("BCC: We have the effect/item, for that gate.", "purple");
-				numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-			} else {
-				print("BCC: We do not have the item for that gate. (We need a "+lairitems[x].a+" for that.)", "purple");
-				
-				//So get the item, using a clover for the gum.  
-				if (contains_text(lairitems[x].a, "chewing gum") && i_a(to_string(lairitems[x].a)) == 0) {
-					print("BCC: I'm going to get the chewing gum using a clover.", "purple");
-					if (i_a("pack of chewing gum") == 0) {
-						if (cloversavailable(true) > 0) {
-							visit_url("adventure.php?snarfblat=45&confirm=on");
-							cli_execute("use pack of chewing gum");
-							numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-						} else {
-							print("BCC: I dont have a clover, so am going to adventure to get the gum. .", "purple");
-							if(bumAdv($location[South of the Border], "", "", "1 " + to_string(lairitems[x].a), "Hunting for Chewing Gums", "-"))
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-						}
-					} else {
-						cli_execute("use pack of chewing gum");
-						numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-					}
-				} else {
-					//Now check for any other item(s).
-					thingToGet = to_item(lairitems[x].a);
-					switch (lairitems[x].a) {
-						case " gremlin juice" :
-						case "gremlin juice" :
-							if (tryPull(lairitems[x].a))
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							else while(i_a("gremlin juice")==0)
-								 (bumAdv($location[post-war junkyard], "items", "hebo", "1 gremlin juice", "Getting gremlin juice", "i", "consultHeBo"));
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-						break;
-						
-						case "wussiness potion" :
-							if (tryPull(lairitems[x].a))
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							else while(i_a("wussiness potion")==0)
-								 (bumAdv($location[Pandamonium Slums], "items", "hebo", "1 wussiness potion", "Getting a wussiness potion", "+i", "consultHeBo"));
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-						break;
-						
-						case "thin black candle" :
-							if (tryPull(lairitems[x].a))
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							else while(i_a("thin black candle")==0)
-								 (bumAdv($location[The Castle in the Clouds in the Sky (Top Floor)], "items", "hebo", "1 thin black candle", "Getting a thin black candle", "-i", "consultHeBo"));
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-						break;
-						
-						case "Mick's IcyVapoHotness Rub" :
-							if (tryPull(lairitems[x].a))
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							else while(i_a("Mick's IcyVapoHotness Rub")==0)
-								(bumAdv($location[The Castle in the Clouds in the Sky (Top Floor)], "items", "hebo", "1 Mick's IcyVapoHotness Rub", "Getting a Mick's IcyVapoHotness Rub", "+i", "consultHeBo"));
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-						break;
-						
-						case "pygmy pygment" :
-							if (tryPull(lairitems[x].a))
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							else while(i_a("pygmy pygment")==0)
-								 (bumAdv($location[The Hidden Park], "items", "hebo", "1 pygmy pygment", "Getting some pygmy pygment", "+i", "consultHeBo"));
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-						break;
-						
-						case "super-spiky hair gel" :
-							if (tryPull(lairitems[x].a))
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							else {
-								bumUse(i_a($item[Penultimate Fantasy chest]), $item[Penultimate Fantasy chest]);
-								
-								if (i_a($item[super-spiky hair gel]) == 0) {
-									buMax("items");
-									setFamiliar("hebo");
-									setMood("i");
-									
-									while (i_a($item[super-spiky hair gel]) == 0) {
-	
-										//place florist friar plants
-										choose_all_plants("I", $location[The Penultimate Fantasy Airship]);
-										
-										bumMiniAdv(1, $location[The Penultimate Fantasy Airship], "consultHeBo");
-										bumUse(i_a($item[Penultimate Fantasy chest]), $item[Penultimate Fantasy chest]);
-									}
-								}
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							}
-						break;
-						
-						case "Angry Farmer candy" :
-						case "Tasty Fun Good rice candy" :
-							if (tryPull(lairitems[x].a))
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							else while(i_a("Angry Farmer Candy")==0 && i_a("Tasty Fun Good rice Candy")==0)
-							{
-								 bumAdv((lairitems[x].a == "Tasty Fun Good rice candy" ? $location[The Valley of Rof L'm Fao] : $location[The Castle in the Clouds in the Sky (Top Floor)]), "items", "hebo", "1 " + lairitems[x].a, "Getting " + (lairitems[x].a == "Angry Farmer candy" ? "an" : "a") + lairitems[x].a, "i", "consultHeBo");
-								}
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-						break;
-						
-						case "adder bladder" :
-							if (tryPull(lairitems[x].a))
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							else while(i_a("adder bladder")==0)
-								 (bumAdv($location[The Black Forest], "items", "hebo", "1 adder bladder", "Getting an adder bladder", "i", "consultHeBo"));
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-						break;
-						
-						case "Black No. 2" :
-							if (tryPull(lairitems[x].a))
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							else while(i_a("Black No. 2")==0)
-								 (bumAdv($location[The Black Forest], "items", "hebo", "1 Black No. 2", "Getting a Black No. 2", "i", "consultHeBo"));
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-						break;
-						
-						case "handsomeness potion" :
-							if (tryPull(lairitems[x].a))
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							else while(i_a("handsomeness potion")==0)
-								 (bumAdv($location[South of the Border], "items", "hebo", "1 handsomeness potion", "Getting a handsomeness potion", "+i", "consultHeBo"));
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-						break;
-						
-						case "Meleegra pills" :
-							if (tryPull(lairitems[x].a))
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							else while(i_a("Meleegra pills")==0)
-								 (bumAdv($location[South of the Border], "items", "items", "1 Meleegra pills", "Getting some Meelegra pills", "-i"));
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-						break;
-						
-						case "marzipan skull" :
-							if (gnomads_available()) {
-								cli_execute("buy marzipan skull");
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							} else if(tryPull(lairitems[x].a))
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-							else while(i_a("marzipan skull")==0)
-								 (bumAdv($location[South of the Border], "items", "hebo", "1 marzipan skull", "Getting a marzipan skull", "-i", "consultHeBo"));
-								numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;
-						break;
-						
-						default :
-							if (lairitems[x].a != "") {
-								if(tryPull(lairitems[x].a, true)) {numGatesWeHaveItemFor = numGatesWeHaveItemFor + 1;}
-							} else {
-								//abort("Due to the way the gates are handled, the script aborts here. Please re-run it.");
-							}
-						break;
-					}
-					thingToGet = $item[none];
-				}
-			}
-		}
-	}
-	
-	print("BCC: The number of gates for which we have items is "+numGatesWeHaveItemFor, "purple");
-	//When we get to this point, check if we have all the items. 
-	if (numGatesWeHaveItemFor == 3 || (my_path() == "Bees Hate You" && numGatesWeHaveItemFor == 1)) {
-		if (get_property("bcasc_useCloverInEntryway") == "true") {
-			if (cloversAvailable() > 0 && my_path() != "Bees Hate You") use(1, $item[disassembled clover]);
-			else if (cloversAvailable() > 0) take_closet(1, $item[ten-leaf clover]);
-		}
-		if (entryway()) {
-			print("BCC: We got through the whole entryway. That's fairly unlikely at this point....", "purple");
-		} else {
-			//Check that lair2.php appears, because we should have got through the gates and at least be in the Mariachi bit.
-			if (!contains_text(visit_url("lair1.php"), "lair2.php")) {
-				print("We successfully got through lair1.php and probably a section of lair2.php as well.", "purple");
-			} else {
-				abort("We did not successfully get to lair2.php. This is a major error. You should probably do the rest of this manually.");
-			}
-		}
-	} else {
-		abort("We do not have all the items for the gates. This script cannot yet get them. ");
-	}
-	
-	checkStage("lair1", true);
-	return true;
-}
-
-boolean bcascLairMariachis() {
-	if (checkStage("lair2")) return true;
-	print("BCC: We are doing the Mariachi part.", "purple");
-	cli_execute("maximize hp -equip tambourine -equip big bass drum -equip black kettle drum");
-	
-	//Before we do anything, we must ensure we have the instruments. 
-	
-	
-	//We should have two keys. Two DISTINCT keys.
-	if (numUniqueKeys() >= 2) {
-		if (i_a("makeshift SCUBA gear") == 0) {
-			if (i_a("boris's key") > 0 && i_a("fishbowl") == 0 && i_a("hosed fishbowl") == 0 && i_a("makeshift scuba gear")==0) {
-				print("BCC: We have boris's key, but no fishbowl. Do the entryway.", "purple");
-				if (entryway()) {}
-			}
-			if (i_a("jarlsberg's key") > 0 && i_a("fishtank") == 0 && i_a("hosed tank") == 0 && i_a("makeshift scuba gear")==0) {
-				print("BCC: We have jarlsberg's key, but no fisktank. Do the entryway.", "purple");
-				if (entryway()) {}
-			}
-			if (i_a("sneaky pete's key") > 0 && i_a("fish hose") == 0 && i_a("hosed tank") == 0 && i_a("hosed fishbowl") == 0 && i_a("makeshift scuba gear")==0) {
-				print("BCC: We have sneaky pete's key, but no fish hose. Do the entryway.", "purple");
-				if (entryway()) {}
-			}
-		
-			if (numOfWand() > 0 && i_a("makeshift scuba gear")==0) {
-				if (canZap()) {
-					//At this point, we haven't used our wand and have two distinct keys. 
-					if (numUniqueKeys() >= 3) {
-						print("BCC: You had all three keys. You don't need to zap them.", "purple");
-					} else {
-						//abort("za");
-						if ((i_a("boris's key") > 0) && (my_path() != "Avatar of Boris")) {
-							cli_execute("zap boris's key");
-						} else {
-							cli_execute("zap jarlsberg's key");
-						}
-					}
-				} else {
-					print("BCC: Your wand is not perfectly safe to zap, and as such we will not attempt to do so.", "purple");
-				}
-			} else if(i_a("makeshift scuba gear")==0){
-				print("You don't have a wand. Lets get one.","red");
-				bcascWand(true);
-				print("Now restart mariachis","purple");
-				return bcascLairMariachis();
-			}
-		}
-		
-		boolean armed() {
-			return contains_text(visit_url("lair2.php"), "lair3.php");
-		}
-
-		if (entryway()) {}
-		if (!armed()) {
-			print("BCC: Maybe we're missing an instrument.", "purple");
-			boolean haveAny(boolean[item] array) {
-				print("Checking have any instrument","lime");
-				foreach thing in array {
-					if (i_a(thing) > 0)
-					{
-						print("already have "+thing,"lime");
-						return true;
-					}
-				}
-				print("Trying to pull / buy","lime");
-				//So we don't have any of the things. Pull one. Or buy one. 
-				if (!in_hardcore()) {
-					foreach thing in array {
-						if (can_interact()) {
-							print("Buying "+thing,"lime");
-							buy(1, thing);
-						} else {
-							print("Pulling "+thing,"lime");
-							take_storage(1, thing);
-						}
-						if (i_a(thing) > 0) return true;
-					}
-				}
-				return false;
-			}
-
-			boolean[item] strings = $items[
-				acoustic guitarrr,
-				heavy metal thunderrr guitarrr,
-				stone banjo,
-				Disco Banjo,
-				Shagadelic Disco Banjo,
-				Seeger's Unstoppable Banjo,
-				Crimbo ukulele,
-				Massive sitar,
-				4-dimensional guitar,
-				plastic guitar,
-				half-sized guitar,
-				out-of-tune biwa,
-				Zim Merman's guitar,
-			];
-			boolean[item] squeezings = $items[stolen accordion,calavera concertina,Rock and Roll Legend,Squeezebox of the Ages,The Trickster's Trikitixa,];
-			boolean[item] drums = $items[tambourine,big bass drum,black kettle drum,bone rattle,hippy bongo,jungle drum,];
-
-			while (!haveAny(strings))
-				 bumAdv($location[Belowdecks], "item, +equip pirate fledges", "items", "1 acoustic guitarrr", "Getting a guitar", "i");
-				
-			while (!haveAny(squeezings))
-				use(1, $item[chewing gum on a string]);
-				
-			while (!haveAny(drums))
-			{
-				if(can_adv($location[the \"fun\" house]))
-					bumAdv($location[the \"fun\" house], "items", "hebo", "1 big bass drum", "Getting a big bass drum", "i", "consultHeBo");
-				else
-				{
-					bumAdv($location[The Hidden Park], "items", "hebo", "1 Jungle drum", "Getting a Jungle drum", "i", "consultHeBo");
-				}
-			}
-			
-			if (entryway()) {}
-		}
-		
-		if (entryway()) {}
-		if (armed()) {
-			checkStage("lair2", true);
-			return true;
-		} else {
-			abort("Failed to arm the mariachis"); 
-		}
-	} else {
-		abort("You don't have two distinct legend keys. This script will not attempt to zap anything.");
-	}
-	abort("There has been a problem in the mariachi section. Please report this issue and complete the mariachi bit manually.");
-	return false;
-}
-
 void bcascTowerItem() {
 	switch (thingToGet) {
 		case $item[baseball]:
@@ -8926,218 +8564,26 @@ void bcascTowerItem() {
 				bumAdv($location[Guano Junction], "item,  stench resistance", "hebo", "1 baseball", "Getting a baseball", "i", "consultHeBo");
 			}
 		break;
-		
-		case $item[plot hole]:
-			bumAdv($location[The Castle in the Clouds in the Sky (Ground Floor)], "items", "hebo", "1 plot hole", "Getting a plot hole", "i", "consultHeBo");
-		break;
-		
-		case $item[meat vortex]:
-			bumAdv($location[The Valley of Rof L'm Fao], "items", "hebo", "1 meat vortex", "Getting a meat vortex", "i", "consultHeBo");
-		break;
-		
-		case $item[sonar-in-a-biscuit]:
-			if (get_res($element[stench], 1, true) && cloversAvailable(true) > 0) {
-				visit_url("adventure.php?snarfblat=31&confirm=on");
-			} else {
-				bumAdv($location[Guano Junction], "item, stench resistance", "hebo", "1 sonar-in-a-biscuit", "Getting sonar-in-a-biscuit", "i", "consultHeBo");
-			}
-		break;
-		
-		case $item[leftovers of indeterminate origin]:
-			if (cloversAvailable(true) > 0) {
-				visit_url("adventure.php?snarfblat=388&confirm=on");
-			} else {
-				bumAdv($location[The Haunted Kitchen], "items", "hebo", "1 leftovers of indeterminate origin", "Getting leftovers of indeterminate origin", "i", "consultHeBo");
-			}
-		break;
-		
-		case $item[Knob Goblin firecracker]:
-			bumAdv($location[the outskirts of cobb's knob], "items", "hebo", "1 Knob Goblin firecracker", "Getting a Knob Goblin firecracker", "i", "consultHeBo");
-		break;
-		
-		case $item[inkwell]:
-			bumAdv($location[The Haunted Library], "items", "hebo", "1 inkwell", "Getting an inkwell", "i", "consultHeBo");
-		break;
-		
-		case $item[mariachi G-string]:
-			bumAdv($location[South of the Border], "items", "hebo", "1 mariachi G-string", "Getting a mariachi G-string", "i", "consultHeBo");
-		break;
-		
-		case $item[photoprotoneutron torpedo]:
-			bumAdv($location[The Penultimate Fantasy Airship], "items", "hebo", "1 photoprotoneutron torpedo", "Getting a photoprotoneutron torpedo", "i", "consultHeBo");
-		break;
-		
-		case $item[pygmy blowgun]:
-			bumAdv($location[The Hidden Park], "items", "hebo", "1 pygmy blowgun", "Getting a pygmy blowgun", "i", "consultHeBo");
-		break;
-		
-		case $item[fancy bath salts]:
-			bumAdv($location[The Haunted Bathroom], "items", "hebo", "1 fancy bath salts", "Getting fancy bath salts", "i", "consultHeBo");
-		break;
-		
-		case $item[razor-sharp can lid]:
-			bumAdv($location[The Haunted Pantry], "items", "hebo", "1 razor-sharp can lid", "Getting a razor-sharp can lid", "i", "consultHeBo");
-		break;
-		
-		case $item[frigid ninja stars]:
-			bumAdv($location[Lair of the Ninja Snowmen], "items", "hebo", "1 frigid ninja stars", "Getting frigid ninja stars", "i", "consultHeBo");
-		break;
-		
-		case $item[black pepper]:
-			cli_execute("use * black picnic basket");
-			while (i_a($item[black pepper]) == 0 && cloversAvailable(true) > 0) {
-				visit_url("adventure.php?snarfblat=405&confirm=on");
-				bumUse(1, $item[black picnic basket]);
-			}
-			while (i_a($item[black pepper]) == 0) {
-				bumAdv($location[The Black Forest], "items", "hebo", "1 black picnic basket", "Getting black pepper", "i", "consultHeBo");
-				bumUse(1, $item[black picnic basket]);
-			}
-		break;
-		
-		case $item[NG]:
-			if ((i_a($item[lowercase N]) == 0 || i_a($item[original G]) == 0) && i_a($item[wang]) > 0) {
-				cli_execute("untinker wang");
-				return;
-			}
-			
-			if (i_a($item[lowercase N]) == 0 && i_a($item[Wand of Nagamar]) > 0) cli_execute("untinker Wand of Nagamar");
-			if (i_a($item[lowercase N]) == 0 && i_a($item[ND]) > 0) cli_execute("untinker ND");
-
-			if (i_a($item[lowercase N]) == 0) bumAdv($location[The Valley of Rof L'm Fao], "items", "hebo", "1 lowercase n", "Getting a lowercase N", "i", "consultHeBo");
-			if (i_a($item[original G]) == 0) bumAdv($location[The Castle in the Clouds in the Sky (Basement)], "items", "hebo", "1 original G", "Getting an original G", "i", "consultHeBo");
-			
-			cli_execute("make NG");
-		break;
-		
-		case $item[hair spray]:
-			retrieve_item(1, $item[hair spray]);
-		break;
-		
-		case $item[bronzed locust]:
-			bumAdv($location[The Arid\, Extra-Dry Desert], "items", "hebo", "1 bronzed locust", "Getting a bronzed locust", "i", "consultHeBo");
-		break;
-		
-		case $item[powdered organs]:
-			cli_execute("use * canopic jar");
-			while (i_a($item[powdered organs]) == 0) {
-				bumAdv($location[The Upper Chamber], "items", "hebo", "1 canopic jar", "Getting powdered organs", "i", "consultHeBo");
-				bumUse(1, $item[canopic jar]);
-			}
-		break;
-		
-		case $item[spider web]:
-			bumAdv($location[The Sleazy Back Alley], "items", "hebo", "1 spider web", "Getting a spider web", "i", "consultHeBo");
-		break;
-		
-		case $item[chaos butterfly]:
-			bumAdv($location[The Castle in the Clouds in the Sky (Ground Floor)], "items", "hebo", "1 chaos butterfly", "Getting a chaos butterfly", "i", "consultHeBo");
-		break;
-		
-		case $item[disease]:
-			bumAdv($location[Cobb's Knob Harem], "items", "hebo", "1 disease", "Getting disease", "i", "consultHeBo");
-		break;
-		
-		case $item[stick of dynamite]:
-			if (item_amount($item[Shore Inc. Ship Trip Scrip]) < 1) {
-				set_property("choiceAdventure793", "1");
-				adventure(1, $location[The Shore, Inc. Travel Agency]);
-			}
-			if (i_a($item[dude ranch souvenir crate]) < 1) buy($coinmaster[The Shore\, Inc. Gift Shop], 1, ($item[dude ranch souvenir crate]));
-			use(1, $item[dude ranch souvenir crate]);
-		break;
-		
-		case $item[barbed-wire fence]:
-			if (item_amount($item[Shore Inc. Ship Trip Scrip]) < 1) {
-				set_property("choiceAdventure793", "3");
-				adventure(1, $location[The Shore, Inc. Travel Agency]);
-			}
-			if (i_a($item[ski resort souvenir crate]) < 1) buy($coinmaster[The Shore\, Inc. Gift Shop], 1, ($item[ski resort souvenir crate]));
-			use(1, $item[ski resort souvenir crate]);
-		break;
-		
-		case $item[tropical orchid]:
-			if (item_amount($item[Shore Inc. Ship Trip Scrip]) < 1) {
-				set_property("choiceAdventure793", "2");
-				adventure(1, $location[The Shore, Inc. Travel Agency]);
-			}
 			if (i_a($item[tropical island souvenir crate]) < 1) buy($coinmaster[The Shore\, Inc. Gift Shop], 1, ($item[tropical island souvenir crate]));
 			use(1, $item[tropical island souvenir crate]);
 		break;
 	}
 }
 
-void bcascLairTower() {
-	//Firstly, maximize HP and make sure we have a sugar shield to get through the shadow/familiars. 
-	cli_execute("maximize "+max_bees+" beeosity, hp; restore hp");
-	if (i_a("sugar shield") == 0 && have_skill($skill[summon sugar sheets])) { if (cli_execute("cast summon sugar; make sugar shield")) {} }
-	
-	//Then get through the place.
-	cli_execute("use * pile of candy");
-	cli_execute("use * penultimate fantasy chest");
-	cli_execute("use * canopic jar");
-	cli_execute("use * black picnic basket");
-	item missing = $item[steaming evil];
-	
-	if (in_hardcore()) {
-		missing = guardians();
-		while (missing != $item[none]) {
-			thingToGet = missing;
-			bcascTowerItem();
-			thingToGet = $item[none];
-			missing = guardians();
-		}
-		try {
-			if (have_effect($effect[Billiards Belligerence]) == 0) {
-				if (cli_execute("pool 1")) {}
-			}
-		}
-		finally {
-			if (cli_execute("concert dilated pu")) {}
-			
-			if (contains_text(visit_url("lair6.php"), "?place=5")) {
-				bcascLairFightNS();
-			} else if (my_path()=="Avatar of Jarlsberg" && contains_text(visit_url("lair6.php"), "?place=3")) {
-				string tmp = visit_url("lair6.php?place=3");
-				run_combat();
-				bcascLairFightNS();
-			} else {
-				abort("You are stuck at the top of the tower.");
-			}
-		}
-	} else {
-		//If softcore/casual then we have the option to pull or buy items.
-		while (missing != $item[none]) {
-			missing = guardians();
-			if (missing != $item[none] && can_interact()) {
-				buy(1, missing);
-			}
-			if (missing != $item[none] && pulls_remaining() > 0) {
-				take_storage(1, missing);
-			}
-		}
-		if (have_effect($effect[Billiards Belligerence]) == 0) {
-			if (cli_execute("pool 1")) {}
-		}
-		if (get_property("sidequestArenaCompleted") == "hippy" && cli_execute("concert Optimist Primal")) {}
-		
-		if (contains_text(visit_url("lair6.php"), "?place=5")) {
-			bcascLairFightNS();
-		} else if (my_path()=="Avatar of Jarlsberg" && contains_text(visit_url("lair6.php"), "?place=3")) {
-			string tmp = visit_url("lair6.php?place=3");
-			run_combat();
-			bcascLairFightNS();
-		} else {
-			abort("You are stuck at the top of the tower.");
-		}
-	}
-}
-
 boolean bcascMacguffinFinal() {
 	if (checkStage("macguffinfinal")) return true;
+	
+  if (item_amount(to_item("2325")) == 0) { // Since mafia is no longer automatically creating the Staff of Ed, do it ourselves
+      if (item_amount(to_item("2180"))+item_amount(to_item("2268"))+item_amount(to_item("2286")) == 3) {
+          if (random(2) == 0) craft("combine", 1, to_item("2180"), to_item("2268"));
+          else craft("combine", 1, to_item("2180"), to_item("2286"));
+      }
+      if (item_amount(to_item("2323"))+item_amount(to_item("2268")) == 2) craft("combine", 1, to_item("2323"), to_item("2268"));
+      else if (item_amount(to_item("2324"))+item_amount(to_item("2286")) == 2) craft("combine", 1, to_item("2324"), to_item("2286"));
+  }
 
 	if (!contains_text(visit_url("questlog.php?which=1"),"A Pyramid Scheme") && !contains_text(visit_url("questlog.php?which=2"),"A Pyramid Scheme")) {
-		if(i_a("staff of ed")==0) create(1,$item[staff of ed]);
+		if(available_amount(to_item(2325))==0) create(1,to_item(2325));
 		if (!contains_text(visit_url("place.php?whichplace=desertbeach"),"pyramid.php")) visit_url("place.php?whichplace=desertbeach&action=db_pyramid1");
 	}
 
@@ -9193,12 +8639,12 @@ boolean bcascMacguffinFinal() {
 				while (turnsUsed < 3) {
 					turnsUsed += 1;
 					if (i_a("crumbling wooden wheel") > 0) {
-						visit_url("choice.php?pwd&whichchoice=929&option=1&choiceform1=Use+a+wheel+on+the+peg&pwd="+my_hash());
+						run_choice(1); //visit_url("choice.php?pwd&whichchoice=929&option=1&choiceform1=Use+a+wheel+on+the+peg&pwd="+my_hash());
  					} else {
-						visit_url("choice.php?whichchoice=929&option=2&pwd="+my_hash());
+						run_choice(2); //visit_url("choice.php?whichchoice=929&option=2&pwd="+my_hash());
  					}
  				}
-				visit_url("choice.php?pwd&whichchoice=929&option=5&choiceform5=Head+down+to+the+Lower+Chambers+%281%29&pwd="+my_hash());
+				run_choice(5); //visit_url("choice.php?pwd&whichchoice=929&option=5&choiceform5=Head+down+to+the+Lower+Chambers+%281%29&pwd="+my_hash());
 			}
 
 			if (item_amount($item[ancient bronze token]) > 0 && item_amount($item[ancient bomb]) == 0) {
@@ -9208,12 +8654,12 @@ boolean bcascMacguffinFinal() {
 				while (turnsUsed < 4) {
 					turnsUsed += 1;
 					if (i_a("crumbling wooden wheel") > 0) {
-						visit_url("choice.php?pwd&whichchoice=929&option=1&choiceform1=Use+a+wheel+on+the+peg&pwd="+my_hash());
+						run_choice(1); //visit_url("choice.php?pwd&whichchoice=929&option=1&choiceform1=Use+a+wheel+on+the+peg&pwd="+my_hash());
 					} else {
-						visit_url("choice.php?whichchoice=929&option=2&pwd="+my_hash());
+						run_choice(2); //visit_url("choice.php?whichchoice=929&option=2&pwd="+my_hash());
 					}
 				}
-				visit_url("choice.php?pwd&whichchoice=929&option=5&choiceform5=Head+down+to+the+Lower+Chambers+%281%29&pwd="+my_hash());
+				run_choice(5); //visit_url("choice.php?pwd&whichchoice=929&option=5&choiceform5=Head+down+to+the+Lower+Chambers+%281%29&pwd="+my_hash());
  			}
 
 			if (item_amount($item[ancient bomb]) > 0) {
@@ -9237,15 +8683,15 @@ boolean bcascMacguffinFinal() {
 		if (my_adventures() < 7) { abort("You don't have enough adventures to fight Ed."); }
 		print("BCC: Fighting Ed", "purple");
 		visit_url("place.php?whichplace=pyramid&action=pyramid_state1a");
-		if (my_path() == "Heavy Rains") visit_url("choice.php?whichchoice=976&pwd&option=1"); // Start combat with Ed the Undrowning
+		if (my_path() == "Heavy Rains") run_choice(1); // visit_url("choice.php?whichchoice=976&pwd&option=1"); // Start combat with Ed the Undrowning
 		bumRunCombat();
-		while (item_amount($item[Holy MacGuffin]) == 0) {
+		while (item_amount(to_item("2334")) == 0) { // Item 2334 is the Holy MacGuffin
 			if (my_hp() == 0) abort("Oops, you died. Probably better fight this one yourself.");
 			visit_url("fight.php");
 			bumRunCombat();
 		}
 	}
-	if (item_amount($item[Holy MacGuffin]) != 0) {
+	if (item_amount(to_item("2334")) != 0) { // Item 2334 is the Holy MacGuffin
 		visit_url("council.php");
 		set_property("lastCouncilVisit", my_level());
 	}
@@ -9282,7 +8728,7 @@ boolean bcascMacguffinHiddenCity() {
 	
 	
 	if (checkStage("macguffinhiddencity")) return true;
-	if (item_amount($item[ancient amulet]) > 0 || item_amount($item[Headpiece of the Staff of Ed]) > 0 || item_amount($item[Staff of Ed, almost]) > 0 || item_amount($item[Staff of Ed]) > 0) {
+	if (item_amount(to_item("2180")) > 0 || item_amount($item[Headpiece of the Staff of Ed]) > 0 || item_amount($item[Staff of Ed, almost]) > 0 || item_amount(to_item("2325")) > 0) { // Item 2180 is the Ancient Amulet and 2325 is the Staff of Ed
 		checkStage("macguffinhiddencity", true);
 		return true;
 	}
@@ -9329,7 +8775,10 @@ boolean bcascMacguffinHiddenCity() {
 			if (my_thrall() == $thrall[Vampieroghi]) abort("BCC: Change your thrall. The Vampieroghi will keep removing the curse and wasting turns.");
 			print("Getting the moss-covered stone sphere.","purple");
 			//bumMiniAdv(1,$location[The Hidden Apartment Building]);
-			bumAdv($location[The Hidden Apartment Building], "5 elemental damage", "", "1 choiceadv", "Getting the moss-covered stone sphere.", "-");
+			string max_str = "5 elemental damage";
+			if(available_amount($item[thor's pliers])>0)
+				max_str += ", +equip thor's pliers";
+			bumAdv($location[The Hidden Apartment Building], max_str, "", "1 choiceadv", "Getting the moss-covered stone sphere.", "-");
 		}
 		while (item_amount($item[moss-covered stone sphere]) == 1) {
 			bumMiniAdv(1, $location[An Overgrown Shrine (Northwest)], "");
@@ -9366,7 +8815,10 @@ boolean bcascMacguffinHiddenCity() {
 					set_property("choiceAdventure786", "2");
 				}
 			}
-			bumAdv($location[The Hidden Office Building], "5 elemental damage", "", "1 choiceadv", "Getting the crackling stone sphere.", "-");
+			string max_str = "5 elemental damage";
+			if(available_amount($item[thor's pliers])>0)
+				max_str += ", +equip thor's pliers";
+			bumAdv($location[The Hidden Office Building], max_str, "", "1 choiceadv", "Getting the crackling stone sphere.", "-");
 			
 			if(item_amount($item[boring binder clip])<=0 && get_property("choiceAdventure786")!="2" && item_amount($item[McClusky file (complete)])<=0 && item_amount($item[crackling stone sphere]) != 1)
 				abort("BBB is fucking up the choiceadv for getting binder clip again");
@@ -9412,6 +8864,8 @@ boolean bcascMacguffinHiddenCity() {
 				equip += "-weapon, ";
 				surgeonosity+=1;
 			}
+			else if(available_amount($item[thor's pliers])>0)
+				equip += "+equip thor's pliers, ";
 
 			set_property("choiceAdventure784", "1");
 			bumAdv($location[The Hidden Hospital], equip, "item", "1 choiceadv", "Getting the dripping stone sphere (and perhaps some more gear to speed it up? current surgeonosity="+surgeonosity+").", "-i");
@@ -9456,7 +8910,7 @@ boolean bcascMacguffinHiddenCity() {
 		bumAdv($location[A Massive Ziggurat], "5 elemental damage", "", "1 choiceadv", "Defeating the last Protector Spectre.", "");
 	}
 
-	if (item_amount($item[ancient amulet]) > 0 || item_amount($item[Headpiece of the Staff of Ed]) > 0 || item_amount($item[Staff of Ed, almost]) > 0 || item_amount($item[Staff of Ed]) > 0) {
+	if (item_amount(to_item(2180)) > 0 || item_amount($item[Headpiece of the Staff of Ed]) > 0 || item_amount($item[Staff of Ed, almost]) > 0 || item_amount($item[Staff of Ed]) > 0) {
 
 		checkStage("macguffinhiddencity", true);
 		return true;
@@ -9492,11 +8946,11 @@ boolean bcascOpenTemple() {
 		if (contains_text(visit_url("adventure.php?snarfblat=15"), "Combat")) {
 			bumRunCombat();
 		} else {
-			visit_url("choice.php?whichchoice=502&option=1&pwd="+my_hash());
-			visit_url("choice.php?whichchoice=503&option=3&pwd="+my_hash());
+			run_choice(1); // visit_url("choice.php?whichchoice=502&option=1&pwd="+my_hash());
+			run_choice(3); // visit_url("choice.php?whichchoice=503&option=3&pwd="+my_hash());
 			if (item_amount($item[bar skin]) > 0) visit_url("choice.php?whichchoice=504&option=2&pwd="+my_hash());
-			visit_url("choice.php?whichchoice=504&option=3&pwd="+my_hash());
-			visit_url("choice.php?whichchoice=504&option=4&pwd="+my_hash());
+			run_choice(3); // visit_url("choice.php?whichchoice=504&option=3&pwd="+my_hash());
+			run_choice(4); // visit_url("choice.php?whichchoice=504&option=4&pwd="+my_hash());
 		}
 	}
 	
@@ -9564,7 +9018,8 @@ boolean bcascMacguffinPalindome() {
 				cli_execute("pull wet stew");
 				
 			while (item_amount($item[wet stew]) == 0 && (item_amount($item[bird rib]) == 0 || item_amount($item[lion oil]) == 0)) {
-				visit_url("guild.php?place=paco");
+				string page = visit_url("guild.php?place=paco");
+				run_choice(1);
 				bumAdv($location[whitey's grove], "", "items", "1 lion oil, 1 bird rib", "Getting the wet stew items from Whitey's Grove", "+i"); 
 			}
 			
@@ -9598,17 +9053,17 @@ boolean bcascMacguffinPalindome() {
 	setFamiliar("meatboss");
 	
 	//Enter the fight
-	if (item_amount($item[Staff of Fats])== 0) {
+	if (item_amount(to_item(2268))== 0) {
 		if(my_path()=="Heavy Rains")
 			abort("Kill dr awkward yourself, spells reduced to 1 damage");
 		palindome = visit_url("place.php?whichplace=palindome&action=pal_drlabel");
 		palindome = visit_url("choice.php?pwd&whichchoice=131&option=1&choiceform1=War%2C+sir%2C+is+raw%21");
 		bumRunCombat();
 
-		if (item_amount($item[Staff of Fats]) == 0) abort("Looks like Dr. Awkward opened a can of whoop-ass on you. Try fighting him manually.");
+		if (item_amount(to_item(2268)) == 0) abort("Looks like Dr. Awkward opened a can of whoop-ass on you. Try fighting him manually."); // 2268 is non-Ed Staff of Fats
 	}
 	
-	if (item_amount($item[Staff of Fats]) > 0) {
+	if (item_amount(to_item(2268)) > 0) { // 2268 is non-Ed Staff of Fats
 		checkStage("macguffinpalin", true);
 		return true;
 	}
@@ -9626,7 +9081,8 @@ boolean bcascMacguffinDiary()
 		//get shoes if possible
 		if(i_a("blackberry galoshes")==0 && my_basestat($stat[moxie]) >=60)
 		{
-			cli_execute("pull blackberry galoshes");
+			if(!in_hardcore())
+				cli_execute("pull blackberry galoshes");
 			//make shoes if possible
 			if(i_a("blackberry galoshes")==0 && i_a("blackberry")>3)
 			{
@@ -9634,7 +9090,8 @@ boolean bcascMacguffinDiary()
 				set_property("choiceAdventure924", "2");
 				set_property("choiceAdventure177", "4");
 			}
-
+			set_property("choiceAdventure1018", "1"); //beehive
+			set_property("choiceAdventure1019", "1"); //beehive
 		}
 		while(i_a("black map")==0)
 			bumAdv($location[The Black Forest], "", "", "", "Finding the black market", "-");
@@ -9873,11 +9330,11 @@ boolean bcascMacguffinSpooky() {
 				abort("Fight lord spookyraven yoursself (damage cap and damaging spells");
 			visit_url("place.php?whichplace=manor4&action=manor4_chamberboss");
 			bumRunCombat();
-			if (item_amount($item[eye of ed]) == 0) abort("The Spooky man pwned you with his evil. Fight him yourself.");
+			if (item_amount(to_item(2286)) == 0) abort("The Spooky man pwned you with his evil. Fight him yourself."); // Item 2286 is the non-Ed Eye of Ed
 		}
 	}
 
-	if (item_amount($item[eye of ed]) > 0) {
+	if (item_amount(to_item(2286)) > 0) { // Item 2286 is the non-Ed Eye of Ed
 		checkStage("macguffinspooky", true);
 		return true;
 	}
@@ -9892,7 +9349,7 @@ boolean bcascMacguffinPyramid() {
 	
 	string compassEquip() {
 		string maxstr = "";
-		if(my_primestat()==$stat[moxie])
+		if(my_primestat()==$stat[moxie] && !(my_class()==$class[disco bandit] && i_a("frankly mr shank")>0))
 			maxstr += "-melee";
 		else if(my_primestat()==$stat[muscle])
 			maxstr += "+melee";
@@ -10213,17 +9670,20 @@ boolean bcascManorBedroom() {
 
 boolean bcascManorGallery() {
 	if (checkStage("manorgallery")) return true;
-
+	print("lol","purple");
+	
 	string questLog = visit_url("questlog.php?which=1");
 	if(contains_text(questLog, "Lady Spookyraven's Dance")) {
 		if (!contains_text(questLog, "her shoes from the Haunted Gallery") && contains_text(questLog, "her shoes")) {
 			checkStage("manorgallery", true);
+			print("lol2","purple");
 			return true;
 		}
 	} else {
 		visit_url("place.php?whichplace=manor2&action=manor2_ladys");
 		if(!contains_text(visit_url("questlog.php?which=1"), "Lady Spookyraven's Dance") && !contains_text(visit_url("questlog.php?which=1"), "Lady Spookyraven's Necklace")) {
 			checkStage("manorgallery", true);
+			print("lol3","purple");
 			return true;
 		}
 	}
@@ -10232,12 +9692,15 @@ boolean bcascManorGallery() {
 		set_property("louvreGoal", "7");
 		set_property("louvreDesiredGoal", "7");
 		while (i_a("Lady Spookyraven's dancing shoes") == 0) {
+		print("lol4","purple");
 			bumAdv($location[The Haunted Gallery], "", "", "Lady Spookyraven's dancing shoes", "Getting Lady Spookyraven's dancing shoes", "-");
 		}
 
 		if (i_a("Lady Spookyraven's dancing shoes") > 0) {
+			set_property("louvreGoal", "4");
+			set_property("louvreDesiredGoal", "4");
 			checkStage("manorgallery", true);
-		return true;
+			return true;
 		}
 	}
 
@@ -10286,10 +9749,15 @@ boolean bcascSetSong()
 boolean bcascManorBilliards() {
 	if (checkStage("manorbilliards")) return true;
 	print("bcascManorBilliards");
+	if (item_amount($item[Spookyraven library key]) > 0) {
+		checkStage("manorbilliards", true);
+		return true;
+	}
 
 	void set_pool_choices()
 	{
 		print("Setting pool choiceadv (current skill="+get_property("poolSkill")+")", "blue");
+		abort("Not registering skilll  right (no account for drunk)");
 		if(get_property("poolSkill").to_int()<16)
 		{
 			print("Training pool","blue");
@@ -10663,38 +10131,41 @@ boolean bcascMirror() {
 }
 
 void bcascNaughtySorceress() {
+	
+abort("New NS is not yet supported. Sorry.");
 	if (contains_text(visit_url("main.php"), "lair.php")) {
 		//Get through the initial three doors. 
 		while (!contains_text(visit_url("lair1.php"), "lair2.php")) {
-			bcascLairFirstGate();
+#			bcascLairFirstGate();
 		}
 		
 		//Now try to get through the rest of the entryway.
 		while (!contains_text(visit_url("lair2.php"), "lair3.php")) {
-			bcascLairMariachis();
+#			bcascLairMariachis();
 		}
 		
 		//Get through the hedge maze. Though we'll only ever spend one adventure at a time here, we use bumAdv for moxie maximiazation. 
-		while (!contains_text(visit_url("lair3.php"), "lair4.php")) {
+/*		while (!contains_text(visit_url("lair3.php"), "lair4.php")) {
 			if (item_amount($item[hedge maze puzzle]) == 0) bumAdv($location[Sorceress' Hedge Maze], "", "items", "1 hedge maze puzzle", "Getting another Hedge Maze", "i");
 			if (hedgemaze()) {}
 		}
+*/
 		
 		while (!contains_text(visit_url("lair4.php"), "lair5.php")) {
-			bcascLairTower();
+#			bcascLairTower();
 		}
 		
 		while (!contains_text(visit_url("lair5.php"), "lair6.php")) {
-			bcascLairTower();
+#			bcascLairTower();
 		}
 		
 		while (!contains_text(visit_url("lair6.php"), "?place=5")) {
-			bcascLairTower();
+#			bcascLairTower();
 		}
 		
 		bcascLairFightNS();
 	} else if (my_path() == "Bugbear Invasion") {
-		bcascLairFightNS();
+#		bcascLairFightNS();
 	} else {
 		abort("There is some error and you don't appear to be able to access the lair...");
 	}
@@ -10712,6 +10183,7 @@ boolean bcascPantry() {
 boolean bcascPirateFledges() {
 	boolean hitTheBarrr = false;
 	if (checkStage("piratefledges")) return true;
+	print("bcascPirateFledges()","purple");
 	
 	while ((i_a("eyepatch") == 0 || i_a("swashbuckling pants") == 0 || i_a("stuffed shoulder parrot") == 0) && i_a("pirate fledges") == 0) {
 		bumAdv($location[The Obligatory Pirate's Cove], "", "equipmentnc", "1 eyepatch, 1 swashbuckling pants, 1 stuffed shoulder parrot", "Getting the Swashbuckling Kit", "-i");
@@ -10722,11 +10194,15 @@ boolean bcascPirateFledges() {
 		
 		//The Embarassed problem is only an issue if you're a moxie class. Otherwise, ignore it.
 		if (my_primestat() == $stat[Moxie]) {
+			print("speculating","purple");
 			cli_execute("speculate up Embarrassed; quiet");
 			int safeBarrMoxie = 93;
 			int specMoxie = 0;
 			while (!hitTheBarrr && in_hardcore()) {
-				specMoxie = numeric_modifier("_spec", "Buffed Moxie");
+				//THIS SPECULATE SEEMS TO BE BROKEN
+				//specMoxie = numeric_modifier("_spec", "Buffed Moxie");
+				specMoxie = 0.7*my_basestat($stat[moxie]) + numeric_modifier("Moxie");
+				print("with embarrassed, speculated to have "+specMoxie+" moxie","purple");
 				if (specMoxie > safeBarrMoxie || bcasc_ignoreSafeMoxInHardcore) { hitTheBarrr = true; }
 				if (!hitTheBarrr) { levelMe(my_basestat($stat[Moxie])+3, true); }
 			}
@@ -10762,7 +10238,8 @@ boolean bcascPirateFledges() {
 					{
 						create(1,$item[ice bucket]);
 					}
-					maxstr=maxstr+", +equip ice bucket";
+					equip($item[ice bucket]);
+					maxstr=maxstr+", -offhand";
 				}
 				else
 				{
@@ -10785,7 +10262,7 @@ boolean bcascPirateFledges() {
 						maxstr=maxstr+", +equip A Light that Never Goes Out";
 					}
 				}
-					
+				print(maxstr,"lime");
 				buMax(maxstr);
 			} else {
 				outfit("swashbuckling getup");
@@ -10906,21 +10383,21 @@ boolean bcascPirateFledges() {
 					cli_execute("checkpoint");
 					cli_execute("equip mullet wig");
 					visit_url("inv_use.php?which=3&whichitem=2951&pwd");
-					visit_url("choice.php?whichchoice=188&option=2&choiceform2=Catburgle&pwd");
+					run_choice(2); // visit_url("choice.php?whichchoice=188&option=2&choiceform2=Catburgle&pwd");
 					cli_execute("outfit checkpoint");
 				} else if(i_a("Orcish baseball cap") > 0 && i_a("homoerotic frat-paddle") > 0 && i_a("Orcish cargo shorts") > 0) {
 					print("BCC: Using the Frat Outfit to burgle the Frat House...", "purple");
 					cli_execute("checkpoint");
 					cli_execute("outfit frat boy ensemble");
 					visit_url("inv_use.php?which=3&whichitem=2951&pwd");
-					visit_url("choice.php?whichchoice=188&option=1&choiceform1=Catburgle&pwd");
+					run_choice(1); // visit_url("choice.php?whichchoice=188&option=1&choiceform1=Catburgle&pwd");
 					cli_execute("outfit checkpoint");
 				} else if ((knoll_available() || i_a("frilly skirt") > 0) && i_a("hot wing") >= 3) {
 					print("BCC: Using the skirt and hot wings to burgle the Frat House...", "purple");
 					cli_execute("checkpoint");
 					cli_execute("equip frilly skirt");
 					visit_url("inv_use.php?which=3&whichitem=2951&pwd");
-					visit_url("choice.php?whichchoice=188&option=3&choiceform3=Catburgle&pwd");
+					run_choice(3); // visit_url("choice.php?whichchoice=188&option=3&choiceform3=Catburgle&pwd");
 					cli_execute("outfit checkpoint");
 				} else if(my_adventures() > 0) {
 					while((i_a("Orcish baseball cap") == 0 || i_a("homoerotic frat-paddle") == 0 || i_a("Orcish cargo shorts") == 0))
@@ -10932,7 +10409,7 @@ boolean bcascPirateFledges() {
 					cli_execute("checkpoint");
 					cli_execute("outfit frat boy ensemble");
 					visit_url("inv_use.php?which=3&whichitem=2951&pwd");
-					visit_url("choice.php?whichchoice=188&option=1&choiceform1=Catburgle&pwd");
+					run_choice(1); // visit_url("choice.php?whichchoice=188&option=1&choiceform1=Catburgle&pwd");
 					cli_execute("outfit checkpoint");
 				} else {
 					abort("Please use the blueprints. I was not able to use them automatically, unfortunately :(");
@@ -11257,7 +10734,7 @@ boolean bcascTrapper() {
 		abort("We seem to have failed to get the cheese/ore");
 //	abort("check current value of get_property(questL08Trapper)");
 	//SIMON TRY TO PULL climbing gear
-	if(!(my_path() == "Avatar of Sneaky Pete" && get_property("peteMotorbikeTires") == "Snow Tires"))
+	if(!(in_hardcore() || my_path() == "Avatar of Sneaky Pete" && get_property("peteMotorbikeTires") == "Snow Tires"))
 	{
 		if(i_a("ninja rope")<1 && !in_hardcore())
 			cli_execute("pull ninja rope");
@@ -12125,9 +11602,9 @@ void bcs12() {
 						cli_execute("pull 2 Meat-inflating powder");
 					bumUse(2, $item[Meat-inflating powder]);
 				}
-				if(i_a("polka pop")==0)
+				if(type69_simon($item[polka pop]) && i_a("polka pop")==0)
 					cli_execute("pull 2 polka pop");
-				if(i_a("polka pop")!=0 && have_effect($effect[polka face])==0)
+				if(type69_simon($item[polka pop]) && i_a("polka pop")!=0 && have_effect($effect[polka face])==0)
 					bumUse(2,$item[polka pop]);
 				if (have_effect($effect[red tongue]) == 0) bumUse(3, $item[red snowcone]);
 				if (get_property("sidequestArenaCompleted") == "fratboy" && cli_execute("concert 2")) {}

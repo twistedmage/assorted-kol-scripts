@@ -56,9 +56,13 @@ Version History:
 2014-03-22: Attempt to rejig the elemental test in order to lower the use of phials
 2014-12-03: Squash at least one bug relating to elemental tests
 2014-12-04: DOn't consider equipment when maximizing for HP after having maximized for resistance first
+2014-12-06: Allow "prime" as a stat-code word
+2015-02-23: _spec is now Generated:_spec, needs r15467 or later
 */
 
+since r15467;
 import <zlib.ash>;
+
 
 // All settings and conditions below this are changed after the first time 
 // the script is run by typing "zlib <variable_name> = <new value>" into the CLI.
@@ -141,6 +145,7 @@ switch(char_at(combat_stat_string, 1))
 	case "u":	combat_stat = $stat[muscle]; break;
 	case "y":	combat_stat = $stat[mysticality]; break;
 	case "o":	combat_stat = $stat[moxie]; break;
+	case "i":	combat_stat = my_primestat(); break;
 }
 
 boolean get_familiar_drops = vars["autoBasement_get_familiar_drops"].to_boolean();
@@ -533,7 +538,7 @@ int elemental_damage(int level, element elem)
 	
 	float base_damage = ((level ** 1.4) * 4.5 * 1.1);
 	float M = (my_class() == $class[pastamancer] || my_class() == $class[sauceror] ? 5 : 0);
-	float R_spec = numeric_modifier("_spec", to_string(elem) + " resistance");
+	float R_spec = numeric_modifier("Generated:_spec", to_string(elem) + " resistance");
 	float R_act = numeric_modifier(to_string(elem) + " resistance");
 	
 	vprint("Element: " + elem, 7);
@@ -1029,8 +1034,8 @@ void basement(int num_turns)
 				cli_execute("whatif quiet");
 				for i from 0 to j-1 {
 					cli_execute("whatif " + perform_whatif[i] + "; quiet");
-					damage = ceil( hp * (1 - min(90.0, (square_root(numeric_modifier("_spec", "Damage Absorption") * 10) - 10))/100));					
-					if(damage < numeric_modifier("_spec", "Buffed HP Maximum")) {
+					damage = ceil( hp * (1 - min(90.0, (square_root(numeric_modifier("Generated:_spec", "Damage Absorption") * 10) - 10))/100));					
+					if(damage < numeric_modifier("Generated:_spec", "Buffed HP Maximum")) {
 						cli_execute(perform[i]);
 						break;
 					} else if(i == j-1)
@@ -1058,8 +1063,8 @@ void basement(int num_turns)
 					cli_execute("whatif quiet");
 					for i from 0 to j-1 {
 						cli_execute("whatif " + perform_whatif[i] + "; quiet");
-						damage = ceil( hp * (1 - min(90.0, (square_root(numeric_modifier("_spec", "Damage Absorption") * 10) - 10))/100));
-						if(damage < numeric_modifier("_spec", "Buffed HP Maximum")) {
+						damage = ceil( hp * (1 - min(90.0, (square_root(numeric_modifier("Generated:_spec", "Damage Absorption") * 10) - 10))/100));
+						if(damage < numeric_modifier("Generated:_spec", "Buffed HP Maximum")) {
 							cli_execute(perform[i]);
 							break;
 						} else if(i == j-1)

@@ -189,7 +189,7 @@ boolean canadv(location loc) {
 	case $location[The Haunted Boiler Room]:
 	case $location[The Haunted Laundry Room]:
 	case $location[The Haunted Wine Cellar]:
-		return get_property("questL11Manor") == "finished";
+		return get_property("questL11Manor") == "step1";
 	case $location[Cobb's Knob Laboratory]:
 		return available_amount($item[Cobb's Knob lab key]) > 0;
 	case $location[Cobb's Knob Menagerie\, Level 2]:
@@ -334,14 +334,19 @@ void eat_cookie() {
 			}
 		return count_counters() < 1;
 	}
-	if(my_path() == "Zombie Slayer") {
-		if(item_amount($item[Clan VIP Lounge key]) > 0 && my_inebriety() < inebriety_limit() && get_property("_speakeasyDrinksDrunk") < 3 && my_meat() >= 500)
-			cli_execute("drink lucky lindy");
-		else vprint("You can not find a brain flavored fortune cookie and you cannot drink a Lucky Lindy.", -3);
-	} else if(my_fullness() >= fullness_limit())
-		print("If I ate even a fortune cookie I'd burst! Remember to eat a fortune cookie when the tummy is emptier.", "red");
-	else while(toEat())
-		eatsilent(1, $item[fortune cookie]);
+	if(item_amount($item[Clan VIP Lounge key]) > 0 && npc_price($item[Lucky Lindy]) > 0 && my_inebriety() < inebriety_limit() && my_meat() >= 500) // if npc_price($item[Lucky Lindy]) > 0 then get_property("_speakeasyDrinksDrunk") < 3
+		cli_execute("drink lucky lindy");
+	else if(my_path() == "Zombie Slayer")
+		vprint("You can not find a brain flavored fortune cookie and you cannot drink a Lucky Lindy.", -3);
+	else if(my_fullness() >= fullness_limit())
+		vprint("If I ate even a fortune cookie I'd burst! Remember to eat a fortune cookie when the tummy is emptier.", -3);
+	else while(toEat()) {
+		if(my_meat() < 40) {
+			vprint("You can't afford a fortune cookie!", -3);
+			return;
+		} else 
+			eatsilent(1, $item[fortune cookie]);
+	}
 }
 
 void get_semirare() {

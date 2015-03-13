@@ -117,6 +117,15 @@ void set_autoheal()
 
 string manual_noncom(int choice_number, int valyew)
 {
+	if (choice_number <= 0)
+	{
+		matcher comat = create_matcher("whichchoice[^>]*?value=.?([0-9]+)",advstring);
+		if (find(comat))
+			choice_number = group(comat,1).to_int();
+		else
+			abort("Can't find the choice adventure number.");
+	}
+
 	if (!wumpus_hunt)
 		bottle_bouncer();
 	advstring = visit_url("choice.php?whichchoice=" + choice_number + "&option=" + valyew + "&pwd=" + my_hash());
@@ -279,7 +288,8 @@ boolean Wumpwn()
 				print("Wumpus detected in the " + room_name(c) + ". Sneaking up on him...","blue");
 			else
 				print("Wumpus detected in the " + room_name(c) + ", but can't find a route to him yet. Wandering aimlessly...","blue");
-			waitq(wumpus_delay);
+			if (wumpus_delay > 0)
+				waitq(wumpus_delay);
 		}
 	}
 	
@@ -462,7 +472,8 @@ boolean Wumpwn()
 	void kill_wumpus(int i)
 	{
 		print("Found the Wumpus! Murderfying.","blue");
-		waitq(wumpus_delay);
+		if (wumpus_delay > 0)
+			waitq(wumpus_delay);
 		change_room(3+i);
 	}
 	
@@ -496,7 +507,8 @@ boolean Wumpwn()
 			print("No hazards nearby","green");
 		else
 			print("Nearby hazards:" + wumpus_hazards[curroom],"red");
-		waitq(wumpus_delay);
+		if (wumpus_delay > 0)
+			waitq(wumpus_delay);
 		
 		wumpus_explorable[curroom] = false;
 		wumpus_pit[curroom] = "0";
@@ -698,7 +710,8 @@ boolean Wumpwn()
 				else
 				{
 					print("No safe unexplored rooms. Will have to "+danger_thing,"red");
-					waitq(wumpus_delay);
+					if (wumpus_delay > 0)
+						waitq(wumpus_delay);
 					wumpus_path_follow();
 				}
 			}
@@ -788,6 +801,9 @@ void futurella()
 		print("Initiating quest to ruin the past, save the past, and save the future, in that order.","blue");
 		wait(5);
 		set_autoheal();
+		cli_execute("unequip staph of homophones");
+		cli_execute("unequip sword behind inappropriate prepositions");
+		cli_execute("uneffect just the best anapests");
 	
 		if (!contains_text(compquests,"You remember creating an unstoppable supervirus"))
 		{
@@ -846,6 +862,8 @@ void futurella()
 					manual_noncom(350,1);
 				else if (contains_text(advstring,"Beginner's Luck"))
 					manual_noncom(351,1);
+				else if (!in_combat())
+					manual_noncom(0,1);
 				if (in_combat() && contains_text(advstring,"Cyrus") && last_pair != "")
 				{
 					advstring = throw_item(last_pair.to_item());
@@ -901,7 +919,7 @@ void futurella()
 		}
 		
 		if (contains_text(assquests,"Having defeated the High Priest of Ki'rhuss"))
-			visit_url("town_wrong.php?action=krakrox");
+			visit_url("place.php?whichplace=town_wrong&action=townwrong_1krakrox");
 		else if (!contains_text(compquests,"You discovered and dug up the Pork Elves' reward"))
 		{
 			// [noncom number, (quest*10 + hybored)] = noncom choice
@@ -1281,12 +1299,14 @@ void futurella()
 					if (in_combat())
 						advstring = run_combat();
 				}
+				else
+					manual_noncom(0, 1);
 			}
 			cli_execute("mood clear");
 			
 			if (krakrox_complete)
 			{
-				visit_url("town_wrong.php?action=krakrox");
+				visit_url("place.php?whichplace=town_wrong&action=townwrong_1krakrox");
 				print("Krakrox saved the Distant Past, after you helped Cyrus screw it up! Uh...good job?","blue");
 			}
 			else
@@ -1334,6 +1354,8 @@ void futurella()
 				manual_noncom(362, 1);
 			else if (contains_text(advstring,"finally make your way to Hangar 1138"))
 				manual_noncom(363, 1);
+			else
+				manual_noncom(0,1);   // try to escape turtle tamer adventures or whatever the hell else may pop up
 		}
 		
 		boolean future_complete = false;

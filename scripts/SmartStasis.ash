@@ -12,54 +12,22 @@
 ******************************************************************************/
 import <BatBrain.ash>
 
-boolean should_summon_ghost() {
-   if ($monsters[guy made of bees, cyrus the virus, hulking construct, trophyfish] contains m)
-      return vprint("Ghost ain't gonna work against this boss, boss.",-6);
-   if (my_adventures() < 2*((10 + (5*to_int(have_item($item[bandolier of the spaghetti elemental]) > 0))) - to_int(get_property("pastamancerGhostSummons"))))
-      return vprint("Running out of adventures to use your summons.  Summoning...",4);  // don't waste daily summonses
-   int glevel = minmax(floor(square_root(to_float(get_property("pastamancerGhostExperience")))),1,10);
-   switch (get_property("pastamancerGhostType")) {
-      case "Angel Hair Wisp": return m_dpr(0,0) < glevel + 10;
-      case "Boba Fettucini": if (glevel == 10)
-          return (!should_olfact && !should_putty &&
-            monster_attack($monster[giant sandworm]) < my_defstat() - 6 + to_int(vars["threshold"]));
-          return (!intheclear());
-      case "Bow Tie Bat": if (glevel == 10)
-          return (count(item_drops(m)) > 0);
-          return (!intheclear());
-      case "Lasagmbie": return (meat_drop() > 100 && monster_element(m) != $element[spooky]);
-      case "Penne Dreadful": if (glevel == 10)
-          return (count(item_drops(m)) > 0);
-          if (glevel > 4)
-             foreach thingy,num in item_drops(m) if (item_type(thingy) == "food" && num < 90) return vprint("This monster drops food! Summoning...",4);
-          foreach thingy,num in item_drops(m) if (item_type(thingy) == "booze" && num < 90) return vprint("This monster drops booze! Summoning...",4);
-          return false;
-      case "Spaghetti Elemental": return (glevel < 3 || !intheclear() ||
-         (m == $monster[evil spaghetti cultist] && have_item($item[spaghetti cult robe]) == 0));
-      case "Spice Ghost": return (!intheclear() || get_property("pastamancerGhostSummons") == "0");
-      case "Undead Elbow Macaroni": return (!intheclear() && monster_element(m) != $element[spooky]);
-      case "Vampieroghi": if (my_stat("hp") <= round(to_float(get_property("hpAutoRecovery"))*to_float(my_maxhp()))) return true;
-          int suckyamount = 4*(glevel + 1);
-          if (glevel == 10) suckyamount = 50;
-          if (glevel > 4)
-             return (my_maxhp() - my_stat("hp") > suckyamount || my_maxmp() - my_stat("mp") > suckyamount);
-          return (my_maxhp() - my_stat("hp") > suckyamount);
-      case "Vermincelli": if (glevel > 4 && (have_effect($effect[beaten up]) > 0 || have_effect($effect[cunctatitis]) > 0))
-            return vprint("You can remove a negative effect! Summoning...",4);
-          return (!intheclear());
-      default: return false;
-   }
-}
 boolean should_mayfly() {                // TODO: make this return an advevent
    if (!have_equipped($item[mayfly bait necklace]) || to_int(get_property("_mayflySummons")) == 30) return false;
    switch (my_location()) {
-      case $location[cobb's knob treasury]:                    // 0-100 meat
-      case $location[the slime tube]:                  // free tiny slimy cyst
-      case $location[the haunted sorority house]:      // free useful item
-      case $location[hobopolis town square]: return true;    // free hobo nickel
+      case $location[cobb's knob treasury]:                   // 0-100 meat
+      case $location[the slime tube]:                         // free tiny slimy cyst
+      case $location[The Fun-Guy Mansion]:
+      case $location[Sloppy Seconds Diner]:
+      case $location[The Sunken Party Yacht]:                 // free Beach Buck
+      case $location[the cave before time]:                   // free Chroner
+      case $location[the haunted sorority house]:             // free useful item
+      case $location[hobopolis town square]: return true;     // free hobo nickel
+      case $location[Battlefield (Cloaca Uniform)]: if (is_goal($item[cloaca-cola])) return true; break;
+      case $location[Battlefield (Dyspepsi Uniform)]: if (is_goal($item[dyspepsi-cola])) return true; break;
       case $location[the degrassi knoll garage]: foreach i in $items[spring, cog, sprocket, empty meat tank] if (has_goal(i) > 0) return true; break;
       case $location[south of the border]: for i from 297 to 300 if (is_goal(to_item(i))) return true; break;   // free gum
-      case $location[the penultimate fantasy airship]: if (my_level() < 13) return true; break;             // substats
+      case $location[the penultimate fantasy airship]: if (my_level() < 13) return true; break;                 // substats
       case $location[the hole in the sky]: for i from 657 to 665 if (is_goal(to_item(i))) return true; break;   // free star/line, free runaway
       case $location[the haunted pantry]:
       case $location[the haunted kitchen]:
@@ -68,12 +36,13 @@ boolean should_mayfly() {                // TODO: make this return an advevent
          m != $monster[knob goblin mutant]) return true; break;  // increase fruit drops, free runaway from BASIC elemental
    }
    switch (m) {
-      case $monster[zol]: 
-      case $monster[tektite]: 
-      case $monster[octorok]: 
-      case $monster[keese]: if (item_amount($item[digital key]) == 0) return true; break;    // free pixel, free runaway
+      case $monster[zol]:
+      case $monster[tektite]:
+      case $monster[octorok]:
+      case $monster[keese]: if (item_amount($item[digital key]) == 0) return true; break;      // free pixel, free runaway
+      case $monster[bugged bugbear]: if (my_location() != $location[none]) return true; break; // free runaway when normally adventuring
       case $monster[knob goblin bean counter]: if (my_level() < 10 && item_amount($item[enchanted bean]) == 0) return true; break;  // free enchanted/jumping bean
-      case $monster[swarm of killer bees]: if (has_goal(m) == 0 && has_goal($location[the dungeons of doom]) > 0) return true; break;  // free runaway
+      case $monster[swarm of killer bees]: if (has_goal(m) == 0) return true; break;           // free runaway
       case $monster[whiny pirate]: if (has_goal(m) == 0 && has_goal($location[the poop deck]) > 0) return true; break;  // free runaway
    }
    return (my_adventures()/2 - 2 < 30 - to_int(get_property("_mayflySummons")));
@@ -143,8 +112,10 @@ void set_autoputtifaction() {
    if (m == $monster[lobsterfrogman] && get_property("sidequestLighthouseCompleted") == "none" &&
        item_amount($item[barrel of gunpowder]) < 4) should_putty = true;
    if (should_putty && should_olfact) return;
-/*
   // second, set puttifaction for bounty monsters
+   foreach s in $strings[currentEasyBountyItem, currentHardBountyItem, currentSpecialBountyItem]
+      if (to_bounty(get_property(s)).monster == m) should_olfact = true;
+   /*
    boolean[location] blocs;
    foreach s in $strings[currentEasyBountyItem, currentHardBountyItem, currentSpecialBountyItem] {
       bounty thisb = to_bounty(get_property(s));
@@ -184,7 +155,7 @@ void set_autoputtifaction() {
 void build_custom() {
    vprint("Building custom actions...",9);
    boolean encustom(advevent which) { if (which.id == "" || (blacklist contains which.id && blacklist[which.id] == 0)) return false; 
-      custom[count(custom)] = merge(which,new advevent); return true; }
+      custom[count(custom)] = copy(which); return true; }
    void encustom(item which, boolean finisher) { advevent toque = get_action(which); if (encustom(toque) && finisher) custom[count(custom)-1].endscombat = true; }
    void encustom(item which) { encustom(which, false); }
    void encustom(skill which) { advevent toque = get_action(which); encustom(toque); }
@@ -197,9 +168,6 @@ void build_custom() {
    if (have_skill($skill[saucy salve]) && !happened($skill[saucy salve]) && (my_stat("hp") < m_dpr(0,0) ||
        min(round(to_float(get_property("hpAutoRecoveryTarget"))*to_float(my_maxhp())) - my_stat("hp"),12)*meatperhp > mp_cost($skill[saucy salve])*meatpermp))
       encustom(get_action($skill[saucy salve]));
-  // summon pasta guardian                              TODO: rework to modify base event
-   if (my_class() == $class[pastamancer] && contains_text(page,"form name=summon") && should_summon_ghost())
-      encustom(to_event("summonspirit","",1));
   // siphoning spirits
    if (my_fam() == $familiar[happy medium] && !happened("skill 7117") && should_siphon())
       encustom(to_event("skill 7117","stun 1, item "+get_spirit(),1));
@@ -220,7 +188,7 @@ void build_custom() {
   // attraction
    if (should_olfact) encustom(custom_action("attract"));
   // insults
-   if (m.phylum == $phylum[pirate] && !($strings[step5, finished] contains get_property("questM12Pirate")) &&
+   if (m.phylum == $phylum[pirate] && !($strings[step5, step6, finished] contains get_property("questM12Pirate")) &&
       !($monsters[scary pirate, migratory pirate, ambulatory pirate, peripatetic pirate, black crayon pirate] contains m))
      foreach i in $items[massive manual of marauder mockery, the big book of pirate insults]
        if (item_amount(i) > 0 && !happened(i)) {
@@ -237,7 +205,7 @@ void build_custom() {
          if (dier == 0) dier = die_rounds();
          if (bangcount >= ceil(dier/10.0)) break;
       }
-  // identify spheres		 
+  // identify spheres
    for i from 2174 to 2177
       if (item_amount(to_item(i)) > 0 && get_property("lastStoneSphere"+i) == "" && get_property("autoSphereID") == "true")
          encustom(to_event("use "+i,get_sphere(""),1));
@@ -299,16 +267,18 @@ void build_custom() {
       case $monster[dirty thieving brigand]: encustom($item[meat vortex]); break;      // meat vortices vs. brigands
       case $monster[tomb rat]: encustom($item[tangle of rat tails]); break;            // tomb rat king! (may require safety checks)
       case $monster[clingy pirate]: if (has_goal(m) == 0) encustom($item[cocktail napkin]); break;  // cocktail napkins
-      case $monster[hellseal pup]: encustom($item[seal tooth]); break;                 // seal tooth vs. seal pup
+      case $monster[hellseal pup]: if (!happened("sealwail")) encustom($item[seal tooth]); break;   // seal tooth vs. seal pup
       case $monster[wild seahorse]: if (item_amount($item[sea cowbell]) > 2 && get_property("lassoTraining") == "expertly" && 
                                         item_amount($item[sea lasso]) > 0) foreach it in $items[sea cowbell, sea cowbell, sea cowbell, sea lasso] encustom(it);
          encustom(to_event("runaway","endscombat",1)); break;
+      case $monster[racecar bob]: case $monster[bob racecar]: if (get_property("questL11Palindome") == "started" && item_amount($item[photograph of a dog]) == 0)
+         encustom($item[disposable instant camera]); break;
      // pretentious artist's psychoses depend on target effect specified in BatMan_pretentioustarget
       case $monster[bag of Potatoes of Security]: switch (to_effect(vars["BatMan_pretentioustarget"])) {
-         case $effect[my breakfast with andrea]: encustom($item[artist's butterknife of regret],true); break;                // make 
-         case $effect[the champion's breakfast]: encustom($item[artist's cr&egrave;me brul&eacute;e torch of fury],true); break;                // make 
-         case $effect[tiffany's breakfast]: encustom($item[artist's whisk of misery],true); break;                     // make 
-         case $effect[breakfast clubbed]: encustom($item[artist's cookie cutter of loneliness],true); encustom($item[artist's spatula of despair],true); break;    // make 
+         case $effect[my breakfast with andrea]: encustom($item[artist's butterknife of regret],true); break;
+         case $effect[the champion's breakfast]: encustom($item[artist's cr&egrave;me brul&eacute;e torch of fury],true); break;
+         case $effect[tiffany's breakfast]: encustom($item[artist's whisk of misery],true); break;
+         case $effect[breakfast clubbed]: encustom($item[artist's cookie cutter of loneliness],true); encustom($item[artist's spatula of despair],true); break;
       } break;
       case $monster[box of Batter Mix of Hope]: switch (to_effect(vars["BatMan_pretentioustarget"])) {
          case $effect[my breakfast with andrea]: encustom($item[artist's spatula of despair],true); break;
@@ -341,7 +311,7 @@ void build_custom() {
          encustom(to_event("use 4210","item urchin roe",1)); break;
      // boss killers
       case $monster[gargantulihc]: encustom($item[plus-sized phylactery],true); break;
-      case $monster[sexy sorority ghost]: encustom($item[ghost trap],true); break;
+//      case $monster[sexy sorority ghost]: encustom($item[ghost trap],true); break;
       case $monster[bugbear scientist]: encustom($item[quantum nanopolymer spider web],true); break;
       case $monster[liquid metal bugbear]: encustom($item[drone self-destruct chip],true); break;
       case $monster[guy made of bees]: encustom($item[antique hand mirror]);
@@ -358,31 +328,10 @@ void build_custom() {
       case $monster[the large-bellied snitch]: if (item_amount($item[dangerous jerkcicle]) > 7) for i from 1 to 10 encustom($item[dangerous jerkcicle]); break;
       case $monster[mammon the elephant]: if (item_amount($item[dangerous jerkcicle]) > 5) for i from 1 to 6 encustom($item[dangerous jerkcicle]); break;
       case $monster[the landscaper]: if (item_amount($item[grass clippings]) > 2) for i from 1 to 3 encustom($item[grass clippings]); break;
+      case $monster[pair of burnouts]: encustom($item[opium grenade],true); break;
      // tower monsters
-      case $monster[beer batter]: encustom($item[baseball],true); break;
-      case $monster[best-selling novelist]: encustom($item[plot hole],true); break;
-      case $monster[big meat golem]: encustom($item[meat vortex],true); break;
-      case $monster[bowling cricket]: encustom($item[sonar-in-a-biscuit],true); break;
-      case $monster[bronze chef]: encustom($item[leftovers of indeterminate origin],true); break;
-      case $monster[concert pianist]: encustom($item[knob goblin firecracker],true); break;
-      case $monster[el diablo]: encustom($item[mariachi g-string],true); break;
-      case $monster[electron submarine]: encustom($item[photoprotoneutron torpedo],true); break;
-      case $monster[endangered inflatable white tiger]: encustom($item[pygmy blowgun],true); break;
-      case $monster[fancy bath slug]: encustom($item[fancy bath salts],true); break;
-      case $monster[fickle finger of F8]: encustom($item[razor-sharp can lid],true); break;
-      case $monster[flaming samurai]: encustom($item[frigid ninja stars],true); break;
-      case $monster[giant desktop globe]: encustom($item[ng],true); break;
-      case $monster[giant fried egg]: encustom($item[black pepper],true); break;
-      case $monster[ice cube]: encustom($item[hair spray],true); break;
-      case $monster[malevolent crop circle]: encustom($item[bronzed locust],true); break;
-      case $monster[possessed pipe-organ]: encustom($item[powdered organs],true); break;
-      case $monster[pretty fly]: encustom($item[spider web],true); break;
-      case $monster[darkness]: encustom($item[inkwell],true); break;
-      case $monster[tyrannosaurus tex]: encustom($item[chaos butterfly],true); break;
-      case $monster[vicious easel]: encustom($item[disease],true); break;
-      case $monster[giant bee]: encustom($item[tropical orchid],true); break;
-      case $monster[enraged cow]: encustom($item[barbed-wire fence],true); break;
-      case $monster[collapsed mineshaft golem]: encustom($item[stick of dynamite],true); break;
+      case $monster[wall of skin]: encustom($item[beehive],true); break;
+      case $monster[wall of bones]: encustom($item[boning knife],true); break;
    }
   // learn rave combos
    advevent unknown_rave() {
@@ -394,7 +343,7 @@ void build_custom() {
             if (k == j || k == i) continue;
             boolean found = false;
             for l from 1 to 6 if (get_property("raveCombo"+l) == to_skill(i)+","+to_skill(j)+","+to_skill(k)) found = true;
-            if (!found) return merge(to_event("skill "+i,factors["skill",i],1), to_event("skill "+j,factors["skill",j],1), to_event("skill "+k,factors["skill",k],1));
+            if (!found) return merge(merge(to_event("skill "+i,factors["skill",i],1), to_event("skill "+j,factors["skill",j],1)), to_event("skill "+k,factors["skill",k],1));
          }
       }
       return new advevent;
@@ -409,7 +358,7 @@ void enqueue_custom() {
    sort custom by to_int(value.endscombat);  // move all combat-enders to the end of the queue
    foreach n,ev in custom {
       if (my_stat("mp") < ev.mp) continue;   // can't cast this skill (yet)
-      boolean stunfirst = (adj.stun + ev.stun < 1 && !ev.endscombat && to_profit(merge(stun_action(contains_text(ev.id,"use ")),ev)) > to_profit(ev));  // should we stun?
+      boolean stunfirst = (adj.stun + ev.stun < 1 && !ev.endscombat && to_profit(merge(copy(stun_action(contains_text(ev.id,"use "))),ev)) > to_profit(ev));  // should we stun?
       if (!stunfirst && !ev.endscombat && !($monsters[guy made of bees, cyrus the virus] contains m) && my_stat("hp") - ev.pdmg[$element[none]] < 0) continue;   // you will die
       vprint("Custom action: "+ev.id+((stunfirst) ? " (stun first with "+buytime.id+")" : " (no stun)"),"purple",5);
       if (stunfirst && buytime.id != ev.id) enqueue(buytime);
@@ -442,7 +391,7 @@ advevent to_combo(effect which) {
    advevent res;
    foreach i,s in ord {
       if (get_action(to_skill(s)).id == "") return new advevent;
-      res = (res.id == "" ? get_action(to_skill(s)) : merge(res,get_action(to_skill(s))));
+      merge(res,get_action(to_skill(s)));
       if (to_int(to_skill(s)) < 53) res.dmg[$element[none]] += 5;    // rave combos are merge(1,2,3) + 15 dmg
    }
    if (-res.mp > my_maxmp()) return new advevent;
@@ -529,9 +478,9 @@ boolean is_our_huckleberry() {
 
 string stasis_repeat() {       // the string of repeat conditions for stasising
    int expskill() { int res; foreach s in $skills[] if (s.combat && have_skill(s)) res = max(res,mp_cost(s)); return res; }
-   return "!hpbelow "+my_stat("hp")+                                                        // hp
+   return "!hpbelow "+round(my_stat("hp"))+                                                 // hp
       (my_stat("hp") < my_maxhp() ? " && hpbelow "+my_maxhp() : "")+
-      " && !mpbelow "+my_stat("mp")+                                                        // mp
+      " && !mpbelow "+round(my_stat("mp"))+                                                 // mp
       (my_stat("mp") < min(expskill(),my_maxmp()) ? " && mpbelow "+min(expskill(),my_maxmp()) : "")+
       " && !pastround "+max(1,floor(maxround - 3 - kill_rounds(smack)))+                    // time to kill
       ((have_equipped($item[crown of thrones]) || have_equipped($item[buddy bjorn])) ? " && !match \"acquire an item\"" : "")+   // CoT/BB

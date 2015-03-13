@@ -8,6 +8,7 @@
 // ----------------------------------------------------------------------------
 script "EatDrink.ash"
 notify "Theraze"
+since r15466;
 
 import <zlib.ash>;
 
@@ -91,7 +92,7 @@ setvar("eatdrink_shrug", false);
 boolean ode_shrug = wants_ode ? to_boolean(vars["eatdrink_shrug"]) : false;
 
 // If shopping, ignore items that cost more than PRICE FLEXIBILITY * this 
-// (another safety precaution, but not as reliable as closting your meat). 
+// (another safety precaution, but not as reliable as closeting your meat). 
 // This should not be necessary (you can set it to MAXMEAT theoretically)
 // since the interplay of other variables ensures you won't spend more than
 // you're willing to... still, it's good to be safe. 
@@ -2233,7 +2234,9 @@ boolean consumeone(con_rec con, string type, int iteration, int step)
         if (tuxworthy(con.it))
           outfit("checkpoint");
       }
-      if ((type == "spleen") || (type == "choc"))
+      if (type == "spleen")
+        chew(1, con.it);
+      if (type == "choc")
         use(1, con.it);
       ateone = get_adventures() != adv_before || item_amount_before != item_amount(con.it);
 #      if (con.mustDaily) ateone = get_adventures() != adv_before;

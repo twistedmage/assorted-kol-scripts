@@ -4690,18 +4690,29 @@ save [$item[nugget of Crimbonium]] = 0;
 save [$item[Rompedores de Fantasmas]] = 0;
 save [$item[La Fantasma y La Oscuridad]] = 0;
 save [$item[Fantasma en la M&aacute;quina]] = 0;
-
-
-
-
-
-
-
-
+save [$item[picky tweezers]] = 1;
+save [$item[sock garters]] = 1;
+save [$item[funny bone]] = 0;
+save [$item[Fog Murderer]] = 0;
+save [$item[intriguing puzzle box]] = 0;
+save [$item[gunky chicken]] = 0;
+save [$item[moose chocolate]] = 0;
+save [$item[liquid smoke]] = 0;
+save [$item[bottle of lighter fluid]] = 0;
+save [$item[Choco-Mint patty]] = 0;
+save [$item[homeopathic mint tea]] = 0;
+save [$item[dollop of barbecue sauce]] = 0;
+save [$item[teflon ore]] = 0;
+save [$item[vinyl ore]] = 0;
+save [$item[hot mint schnocolate]] = 0;
+save [$item[bowl of marinade]] = 0;
 
 
 
 //stuff to sell later;s
+save [$item[Tales of Spelunking]] = -1;
+save [$item[golden monkey statuette]] = -1;
+save [$item[Professor of Spelunkology]] = -1;
 save [$item[topiary nugglet]] = -1;
 save [$item[Crimbot ROM: Rapid Prototyping]] = -1;
 save [$item[Crimbot ROM: Mathematical Precision]] = -1;

@@ -293,7 +293,7 @@ void keep_cleanup() {
 	
 	// Make sure you only keep the worst guitar for the Lair
 	boolean have_unfeedable_guitar = false ;
-	foreach itm in $items[stone banjo, Disco Banjo, Shagadelic Disco Banjo, Seeger's Unstoppable Banjo, Crimbo ukelele, Zim Merman's guitar]
+	foreach itm in $items[stone banjo, Disco Banjo, Shagadelic Disco Banjo, Seeger's Unstoppable Banjo, Crimbo ukulele, Zim Merman's guitar]
 		if ( available_amount(itm) > 0 ) { have_unfeedable_guitar = true ; break ; }
 	
 	item[int] guitars;	// list of feedable guitars, sorted by meatpermp

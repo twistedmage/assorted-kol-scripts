@@ -71,7 +71,7 @@ endif
 
 mark generic_spells1
 
-if hasskill intimidating bellow || hasskill steal accordion || hasskill summon mayfly swarm || (sauceror && hasskill Curse of Weaksauce) || (!sauceror && hasskill Curse of the Thousand Islands) || hasskill feed || hasskill spring raindrop attack || hasskill infectious bite || (hasskill smash & graaagh && (monstername filthworm || monstername BL imp || monstername CH imp || monstername PR imp || monstername inkubus || monstername suckubus || monstername serialbus || monstername Gnollish Gearhead || monstername irate mariachi || monstername handsome mariachi || monstername briefcase bat || monstername raver giant || monstername furry giant || monstername goth giant || monstername sassy pirate || monstername swarthy pirate || monstername dairy goat || monstername spiny skelelton || monstername toothy sklelton || monstername blur || monstername bob racecar || monstername racecar bob || monstername grungy pirate || monstername war pledge || monstername frat warrior drill sergeant || monstername baseball bat || monstername doughbat || monstername perpendicular bat || monstername skullbat || monstername vampire bat || monstername batrat || monstername ratbat || monstername beanbat) && !monstername the queen filthworm)
+if hasskill summon love mosquito || hasskill intimidating bellow || hasskill steal accordion || hasskill summon mayfly swarm || (sauceror && hasskill Curse of Weaksauce) || (!sauceror && hasskill Curse of the Thousand Islands) || hasskill feed || hasskill spring raindrop attack || hasskill infectious bite || (hasskill smash & graaagh && (monstername filthworm || monstername BL imp || monstername CH imp || monstername PR imp || monstername inkubus || monstername suckubus || monstername serialbus || monstername Gnollish Gearhead || monstername irate mariachi || monstername handsome mariachi || monstername briefcase bat || monstername raver giant || monstername furry giant || monstername goth giant || monstername sassy pirate || monstername swarthy pirate || monstername dairy goat || monstername spiny skelelton || monstername toothy sklelton || monstername blur || monstername bob racecar || monstername racecar bob || monstername grungy pirate || monstername war pledge || monstername frat warrior drill sergeant || monstername baseball bat || monstername doughbat || monstername perpendicular bat || monstername skullbat || monstername vampire bat || monstername batrat || monstername ratbat || monstername beanbat) && !monstername the queen filthworm)
 	#insta-curse
 	if sauceror && hasskill Curse of Weaksauce
 		skill Curse of Weaksauce
@@ -87,6 +87,10 @@ if hasskill intimidating bellow || hasskill steal accordion || hasskill summon m
 	endif
 	if hasskill summon mayfly swarm
 		skill summon mayfly swarm
+	endif
+	#stagger + drain
+	if hasskill summon love mosquito
+		skill summon love mosquito
 	endif
 	if hasskill feed || hasskill spring raindrop attack
 		if hasskill feed
@@ -129,13 +133,15 @@ if hascombatitem rain-doh indigo cup && !monstername *Naughty Sorceress* && !mon
 endif
 
 if (hasskill transcendent olfaction && !haseffect on the trail && (monstername writing desk || monstername dairy goat || monstername tomb rat || monstername blooper || monstername Hellion || monstername Bob Racecar || monstername racecar bob|| monstername Quiet Healer || monstername Goth Giant || monstername Blur || monstername Green Ops Soldier || monstername Zombie waltzers || monstername Shaky Clown || monstername Knott Yeti || monstername Hellion || monstername Violent Fungus || monstername Endless Conference Call || monstername * survivor || monstername pygmy bowler || monstername morbid skull)) || (!monstername Battlie Knight Ghost && !monstername ghost miner && !monstername Claybender Sorcerer Ghost && !monstername Dusken Raider Ghost && !monstername Space Tourist Explorer Ghost && !monstername Whatsian Commando Ghost  && !monstername sheet ghost && !monstername plaid ghost && (monstername lobsterfrogman || monstername ghost || monstername bricko bat || monstername angry bassist || monstername blue-haired girl || monstername evil ex-girlfriend || monstername peeved roommate || monstername random scenester || monstername black crayon * || monstername smut orc pervert)) || ((hascombatitem rock band flyers || hascombatitem jam band flyers) || monstername * pirate) || ((monstername Bob Racecar || monstername racecar bob) && hascombatitem disposable instant camera)
-	if (hasskill transcendent olfaction && !haseffect on the trail && (monstername writing desk || monstername dairy goat || monstername tomb rat || monstername blooper || monstername Hellion || monstername Bob Racecar || monstername racecar bob|| monstername Quiet Healer || monstername Goth Giant || monstername Blur || monstername Green Ops Soldier || monstername Zombie waltzers || monstername Shaky Clown || monstername Knott Yeti || monstername Hellion || monstername Violent Fungus || monstername Endless Conference Call || monstername * survivor || monstername pygmy bowler || monstername morbid skull))
-		skill transcendent olfaction
-		goto generic_spells2
-	endif
-	if (monstername Bob Racecar || monstername racecar bob) && hascombatitem disposable instant camera
-		use disposable instant camera
-		goto generic_spells2
+	if (hasskill transcendent olfaction && !haseffect on the trail && (monstername writing desk || monstername dairy goat || monstername tomb rat || monstername blooper || monstername Hellion || monstername Bob Racecar || monstername racecar bob|| monstername Quiet Healer || monstername Goth Giant || monstername Blur || monstername Green Ops Soldier || monstername Zombie waltzers || monstername Shaky Clown || monstername Knott Yeti || monstername Hellion || monstername Violent Fungus || monstername Endless Conference Call || monstername * survivor || monstername pygmy bowler || monstername morbid skull)) || ((monstername Bob Racecar || monstername racecar bob) && hascombatitem disposable instant camera)
+		if (hasskill transcendent olfaction && !haseffect on the trail && (monstername writing desk || monstername dairy goat || monstername tomb rat || monstername blooper || monstername Hellion || monstername Bob Racecar || monstername racecar bob|| monstername Quiet Healer || monstername Goth Giant || monstername Blur || monstername Green Ops Soldier || monstername Zombie waltzers || monstername Shaky Clown || monstername Knott Yeti || monstername Hellion || monstername Violent Fungus || monstername Endless Conference Call || monstername * survivor || monstername pygmy bowler || monstername morbid skull))
+			skill transcendent olfaction
+			goto generic_spells2
+		endif
+		if (monstername Bob Racecar || monstername racecar bob) && hascombatitem disposable instant camera
+			use disposable instant camera
+			goto generic_spells2
+		endif
 	endif
 
 	if !monstername Battlie Knight Ghost && !monstername ghost miner && !monstername Claybender Sorcerer Ghost && !monstername Dusken Raider Ghost && !monstername Space Tourist Explorer Ghost && !monstername Whatsian Commando Ghost  && !monstername sheet ghost && !monstername plaid ghost && (monstername lobsterfrogman || monstername ghost || monstername bricko bat || monstername angry bassist || monstername blue-haired girl || monstername evil ex-girlfriend || monstername peeved roommate || monstername random scenester || monstername black crayon * || monstername smut orc pervert)
@@ -157,15 +163,21 @@ if (hasskill transcendent olfaction && !haseffect on the trail && (monstername w
 			use jam band flyers
 		endif
 	endif
-	if monstername pirate && hascombatitem The Big Book of Pirate Insults
-		use The Big Book of Pirate Insults
-	endif
-	if monstername pirate && hascombatitem Massive Manual of Marauder Mockery
-		use Massive Manual of Marauder Mockery
-	endif
-	#banish clingy pirate
-	if monstername clingy pirate && hascombatitem cocktail napkin
-		use cocktail napkin
+	
+	if monstername pirate
+		if monstername pirate && hascombatitem The Big Book of Pirate Insults
+			use The Big Book of Pirate Insults
+			goto generic_spells2
+		endif
+		if monstername pirate && hascombatitem Massive Manual of Marauder Mockery
+			use Massive Manual of Marauder Mockery
+			goto generic_spells2
+		endif
+		#banish clingy pirate
+		if monstername clingy pirate && hascombatitem cocktail napkin
+			use cocktail napkin
+		endif
+		goto generic_spells2
 	endif
 endif
 

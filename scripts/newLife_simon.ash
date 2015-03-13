@@ -7,7 +7,7 @@ import "zlib.ash";
 
 if(check_version("newLife", "bale-new-life", "1.14.4", 2769) != "" 
   && user_confirm("The script has just been updated!\nWould you like to quit now and manually resume execution so that you can use the current version?")) {
-	print("New Life aborted to complete update. Please run newLife.ash to finish setting up your current ascension.", "red");
+	vprint("New Life aborted to complete update. Please run newLife.ash to finish setting up your current ascension.", -1);
 	exit;
 }
 
@@ -24,9 +24,9 @@ void knife_untinker(item it)
 
 if(!($strings[None, Teetotaler, Boozetafarian, Oxygenarian, Bees Hate You, Way of the Surprising Fist, Trendy,
 Avatar of Boris, Bugbear Invasion, Zombie Slayer, Class Act, Avatar of Jarlsberg, BIG!, KOLHS, Class Act II: A Class For Pigs, 
-Avatar of Sneaky Pete, Slow and Steady, 19, Heavy Rains] contains my_path())
+Avatar of Sneaky Pete, Slow and Steady, Heavy Rains, Picky] contains my_path())
   && user_confirm("Your current challenge path is unknown to this script!\nUnknown and unknowable errors may take place if it is run.\nDo you want to abort?")) {
-	print("Your current path is unknown to this script! A new version of this script should be released very soon.", "red");
+	vprint("Your current path is unknown to this script! A new version of this script should be released very soon.", -1);
 	exit;
 }
 
@@ -90,13 +90,14 @@ void set_choice_adventures() {
 	set_choice(875, 1, "Billiards Room: Play Pool");
 	set_choice(888, 4, "Library, Rise of the House of Spookyraven: Ignore");
 	set_choice(889, 4, "Library, Fall of the House of Spookyraven: Ignore");
-	set_choice(876, 6, "Bedroom, White Nightstand: Skip");
-	set_choice(877, 6, "Bedroom, Mahogany Nightstand: Skip");
+	set_choice(877, 1, "Bedroom, Mahogany Nightstand: old coin purse");
 	set_choice(878, 3, "Bedroom, Ornate Nightstand: Get spectacles");
 	if(my_path() == "Bees Hate You")
 		set_choice(879, 3, "Bedroom, Rustic Nightstand: Fight Mistress for Antique Mirror");
+	else if(primestat == $stat[Moxie])
+		set_choice(879, 1, "Bedroom, Rustic Nightstand: Get Moxie Stats");
 	else
-		set_choice(879, 6, "Bedroom, Rustic Nightstand: Skip");
+		set_choice(879, 2, "Bedroom, Rustic Nightstand: Get grouchy restless spirit");
 	set_choice(880, 1, "Bedroom, Elegant Nightstand: Get Lady Spookyraven's finest gown");
 	set_choice(106, 2, "Ballroom song: Non-combat");
 	set_choice(89, 6, "Haunted Gallery: Ignore 'Out in the Garden'");
@@ -200,6 +201,7 @@ void set_choice_adventures() {
 		set_choice(141, 2, "Hippies on the Verge of War, Blockin' Out the Scenery: Get rations");
 		set_choice(145, 1, "Frats on the Verge of War, Fratacombs: Get Muscle stats");
 		set_choice(793, 1, "Take Muscle vacation.");
+		set_choice(876, 2, "Bedroom, White Nightstand: Get Muscle stats");
 		break;
 	case $stat[mysticality]:
 		set_choice(73, 3, "Whitey's Grove: Get wedding cake and rice");
@@ -212,6 +214,8 @@ void set_choice_adventures() {
 		set_choice(402, 2, "Bathroom, Don't Hold a Grudge: Get Mysticality stats");
 		set_choice(141, 1, "Hippies on the Verge of War, Blockin' Out the Scenery: Get Mysticality stats");
 		set_choice(145, 2, "Frats on the Verge of War, Fratacombs: Get food");
+		set_choice(793, 2, "Take Mysticality vacation.");
+		set_choice(876, 1, "Bedroom, White Nightstand: old leather wallet");
 		break;
 	case $stat[moxie]:
 		set_choice(73, 3, "Whitey's Grove: Get wedding cake and rice");
@@ -227,6 +231,8 @@ void set_choice_adventures() {
 		set_choice(402, 3, "Bathroom, Don't Hold a Grudge: Get Moxie stats");
 		set_choice(141, 2, "Hippies on the Verge of War, Blockin' Out the Scenery: Get rations");
 		set_choice(145, 2, "Frats on the Verge of War, Fratacombs: Get food");
+		set_choice(793, 3, "Take Moxie vacation.");
+		set_choice(876, 1, "Bedroom, White Nightstand: old leather wallet");
 		break;
 	}
 	if(vars["newLife_SetupGuyMadeOfBees"].to_boolean())
@@ -255,8 +261,10 @@ void set_choice_adventures() {
 
 void campground(boolean softBoo) {
 	// Break the hippy stone?
-	if(vars["newLife_SmashHippyStone"] == "true" && !hippy_stone_broken() && good("Hippy Stone"))
+	if(vars["newLife_SmashHippyStone"] == "true" && !hippy_stone_broken() && good("Hippy Stone")) {
+		vprint("Smashing that hippy-dippy crap so you can have some violent fun!", "olive", 3);
 		visit_url("campground.php?confirm=on&smashstone=Yep.&pwd");
+	}
 	
 	if(get_dwelling() != $item[big rock])
 		return;  // If dwelling is something other than a big rock, we're done here.
@@ -264,7 +272,7 @@ void campground(boolean softBoo) {
 	  && vars["newLife_UseNewbieTent"].to_boolean();
 	// If the player is in Hardcore Nation it is time to send a "Please brick me" announcement!
 	// I only announce it if I am ascending hardcore. Silly, but that's me.
-	if( (in_hardcore() || !softBoo) & (tent || my_turncount() < 1) && get_clan_id() == 41543) {  // 41543 is the ID for HCN
+	if( (in_hardcore() || !softBoo) && (tent || my_turncount() < 1) && get_clan_id() == 41543) {  // 41543 is the ID for HCN
 		chat_clan(now_to_string("MM/dd/yyyy hh:mm aaa") + " - Welcome Back to the Kingdom of Loathing. Noob.");
 		// Pause for a suitable bricking window.
 		if(tent) {
@@ -292,7 +300,16 @@ void get_bugged_balaclava() {
 	}
 }
 
-void buy_stuff() {
+void get_stuff() {
+	boolean need_accordion() {
+		// ATs come with a stolen accordion and ability to steal more
+		if(my_class() != $class[Accordion Thief] && item_amount($item[toy accordion]) == 0 && available_amount($item[antique accordion]) == 0 && good($item[toy accordion]))
+			foreach s in $skills[]
+				if(have_skill(s) && s.class == $class[Accordion Thief] && s.buff == true && s.dailylimit < 0)
+					return true; 	// Only need an accordion if the character can cast a AT skill (Unlimited skills only!)
+		return false;
+	}
+	
 	boolean meat4pork(int price) {
 		if(my_meat() >= price) return true;
 		if(item_amount($item[baconstone]) > 0) return autosell(1, $item[baconstone]);
@@ -340,7 +357,7 @@ void visit_toot() {
 		if(item_amount($item[pork elf goodies sack]) > 0 && good($item[pork elf goodies sack]))
 			use(1, $item[pork elf goodies sack]);
 		if(item_amount($item[baconstone]) + item_amount($item[hamethyst]) + item_amount($item[porquoise]) > 0)
-			buy_stuff();
+			get_stuff();
 	}
 }
 
@@ -353,20 +370,17 @@ boolean use_shield() {
 }
 
 familiar start_familiar() {
-	void set_bcca(string f) {
-		if(get_property("bcasc_lastCouncilVisit") == "") return;
-		// Only set this if BCCAscend has actually been run by this player
-		set_property("bcasc_100familiar", f); 
-		set_property("bcasc_defaultFamiliar", f); 
+	familiar f100 = vars["is_100_run"].to_familiar();	// Is this a 100% familiar run?
+	// If player has used BCCAscend, normalize familiar settings with "is_100_run"
+	if(get_property("bcasc_lastCouncilVisit") != "") {
+		if(f100 == $familiar[none]) {
+			set_property("bcasc_100familiar", ""); 
+		} else {
+			set_property("bcasc_100familiar", f100); 
+			set_property("bcasc_defaultFamiliar", f100); 
+		}
 	}
-	// Check for the zlib variable "is_100_run"
-	familiar f100 = vars["is_100_run"].to_familiar();
-	if(f100 == $familiar[none]) {
-		set_bcca("");
-	} else {
-		set_bcca(vars["is_100_run"]);
-		return f100;
-	}
+	if(f100 != $familiar[none]) return f100;
 	
 	if(my_path() == "Zombie Slayer" && have_familiar($familiar[Hovering Skull]))
 		return $familiar[Hovering Skull];
@@ -381,26 +395,46 @@ familiar start_familiar() {
 }
 
 void equip_stuff() {
-	string gear = "mainstat, 0.2 hp, 0.2 dr, 0.2 familiar weight, 0.1 spell damage, -equip sugar shield, 4 ";
-	gear += my_primestat() + " experience";
+	buffer gear;
+	gear.append("mainstat, 0.2 hp, 0.2 dr, 0.1 spell damage, 4 ");
+	gear.append(my_primestat());
+	gear.append(" experience");
 	if(my_path() != "Zombie Slayer")
-		gear += ", mp regen";
+		gear.append(", mp regen");
+	if(good("familiar"))
+		gear.append(", 0.2 familiar weight");
+	if(available_amount($item[sugar shield]) > 0)
+		gear.append(" -equip sugar shield");
+	
 	// Ensure correct type of weapon
 	if(primestat == $stat[Muscle])
-		gear += " +melee";
+		gear.append(" +0.5 melee");
 	else if(primestat == $stat[Moxie])
-		gear += " -melee";
+		gear.append(" -0.5 melee");
 	// Unarmed combat or require shield?
 	if(have_skill($skill[Master of the Surprising Fist]) && have_skill($skill[Kung Fu Hustler]) && available_amount($item[Operation Patriot Shield]) < 1)
-		gear +=" -weapon -offhand";  // Barehanded can be BEST at level 1!
+		gear.append(" -weapon -offhand");  // Barehanded can be BEST at level 1!
 	else if(use_shield())
-		gear +=" +shield";
-	if(my_path() == "Bees Hate You")
-		gear += ", 0 beeosity";
-	else if(my_path() == "KOLHS" || my_path() == "15")
-		gear+= " -hat";
+		gear.append(" +shield");
+	
+	// Things to not equip for specific path
+	switch(my_path()) {
+	case "Bees Hate You":
+		gear.append(", 0 beeosity");
+		break;
+	case "KOLHS":
+		gear.append(" -hat");
+		break;
+	case "Heavy Rains":
+		if(available_amount($item[miniature life preserver]) > 0) {
+			equip($item[miniature life preserver]);
+			lock_familiar_equipment(true);
+			gear.append(" -familiar");
+		}
+		break;
+	}
 	//SIMON ADDED item bonus
-	gear +=", 0.2 items";
+	gear.append(", 0.2 items");
 	print("maximize "+gear,"green");
 	maximize(gear, false);
 }
@@ -416,7 +450,7 @@ void handle_starting_items() {
 	foreach it in $items[astral hot dog dinner, astral six-pack, carton of astral energy drinks,
 	  box of bear arms]
 		if(item_amount(it) > 0 && good(it)) use(item_amount(it), it);
-
+		
 	// Put on the best stuff you've got.
 	vprint("Put on your best gear.", "olive", 3);
 	// First equip best familiar!
@@ -460,7 +494,7 @@ void path_skills(boolean always_learn) {
 			for t from 1 to 3
 				for i from 1 to 10
 					visit_url("da.php?whichtree="+t+"&action=borisskill");
-			vprint("You are filled with all of Boris' skills and ready to use them.", "blue", 3);
+			vprint("You are filled with all of Boris' skills and are ready to use them.", "blue", 3);
 		}
 		break;
 	case "Zombie Slayer":
@@ -483,9 +517,8 @@ void path_skills(boolean always_learn) {
 		}
 		break;
 	case "Avatar of Jarlsberg":
-		string jarl = visit_url("da.php?place=gate2");
-		matcher unassigned = create_matcher("have (\\d+) skill points", jarl);
-		if(unassigned.find() && unassigned.group(1).to_int() > 31) {
+		matcher jarlskills = create_matcher("have (\\d+) skill points", visit_url("da.php?place=gate2"));
+		if(jarlskills.find() && jarlskills.group(1).to_int() > 31) {
 			foreach sk in $skills[Boil, Conjure Eggs, Conjure Dough, Fry, Coffeesphere, Egg Man, Early Riser, The Most Important Meal,
 			  Conjure Vegetables, Chop, Slice, Lunch Like a King, Oilsphere, Radish Horse, Conjure Cheese, Working Lunch,
 			  Bake, Conjure Potato, Conjure Meat Product, Grill, Gristlesphere, Food Coma, Hippotatomous, Never Late for Dinner,
@@ -494,14 +527,28 @@ void path_skills(boolean always_learn) {
 			vprint("You are filled with all of Jarlsberg's skills, now get cooking!", "blue", 3);
 		}
 		break;
+	case "Avatar of Sneaky Pete":
+		matcher peteskills = create_matcher("<b>(\\d+)</b> skill points available", visit_url("da.php?place=gate3"));
+		if(peteskills.find() && peteskills.group(1).to_int() > 29) {
+			visit_url("choice.php?whichchoice=867&pwd&option=4"); // All 10 Loveable Rogue
+			visit_url("choice.php?whichchoice=867&pwd&option=6"); // All 10 Dangerous Rebel
+			visit_url("choice.php?whichchoice=867&pwd&option=5"); // All 10 Motorcycle Guy
+			vprint("You are filled with all of Sneaky Pete's skills, so hit the St.", "blue", 3);
+		}
+		break;
 	}
 }
+
 boolean pull_if_good(item it)
 {
 	if(good(it))
 	{
+		//check for unrecognised type69
 		print("pulling "+it);
-		take_storage(1,it);
+		if(available_amount(it)==0)
+			take_storage(1,it);
+		if(available_amount(it)==0)
+			abort("Failed to pull "+it);
 		return true;
 	}
 	return false;
@@ -523,6 +570,18 @@ void pull_and_wear_if_good(item it, slot sl)
 	}
 }
 
+void make_smithness_weapon(item it)
+{
+	if(available_amount(it)<1 && good(it))
+	{
+		if(available_amount($item[lump of brituminous coal])==0)
+			use_skill(1,$skill[summon smithsness]);
+			
+		create(1,it);
+		equip(it);
+	}
+}
+
 // This is stuff I like to do, but not everyone will be happy with.
 void special(boolean bonus_actions) {
 	if(!bonus_actions) return;
@@ -539,7 +598,34 @@ void special(boolean bonus_actions) {
 	if(available_amount($item[detuned radio]) > 0 || canadia_available())
 		change_mcd(10 + canadia_available().to_int());
 	//if in softcore, pull my set
-	if(!in_hardcore())
+	if(in_hardcore())
+	{
+		if(have_skill($skill[summon smithsness]))
+		{
+			switch(my_class())
+			{
+				case($class[seal clubber]):
+					make_smithness_weapon($item[Meat Tenderizer is Murder]);
+					break;
+				case($class[turtle tamer]):
+					make_smithness_weapon($item[Ouija Board, Ouija Board]);
+					break;
+				case($class[pastamancer]):
+					make_smithness_weapon($item[Hand that Rocks the Ladle]);
+					break;
+				case($class[sauceror]):
+					make_smithness_weapon($item[Saucepanic]);
+					break;
+				case($class[disco bandit]):
+					make_smithness_weapon($item[Frankly Mr. Shank]);
+					break;
+				case($class[accordion thief]):
+					make_smithness_weapon($item[Shakespeare's Sister's Accordion]);
+					break;
+			}
+		}
+	}
+	else
 	{
 		cli_execute("inventory refresh");
 		refresh_stash();
@@ -561,6 +647,7 @@ void special(boolean bonus_actions) {
 			{
 				pull_and_wear_if_good($item[crown of thrones]);
 				if(available_amount($item[crown of thrones])>0)
+				{
 					if(good("el vibrato Megadrone"))
 					{
 						cli_execute("enthrone El Vibrato Megadrone");
@@ -569,6 +656,13 @@ void special(boolean bonus_actions) {
 					}
 					else
 						abort("Don't know what familiar to enthrone for this path");
+				}
+				else
+				{
+					pull_and_wear_if_good($item[Helm of the Scream Emperor]);
+					if(available_amount($item[Helm of the Scream Emperor])==0)
+						abort("Couldn't find a good hat");
+				}
 			}
 			//pull_and_wear_if_good($item[greatest american pants]);
 			if(available_amount($item[pantsgiving])==0)
@@ -616,7 +710,7 @@ void special(boolean bonus_actions) {
 	//				cli_execute("enthrone Li'l Xenomorph");
 				}
 				else
-					abort("Don't know what familiar to enthrone for this path");
+					abort("Don't know what familiar to bjornify for this path");
 			}
 			else
 			{
@@ -696,7 +790,7 @@ void special(boolean bonus_actions) {
 				if(my_primestat()==$stat[mysticality] && my_path()!="Bees Hate You" && my_path()!="BIG!")
 				{
 					//pull whichever
-					if(storage_amount($item[Jarlsberg's pan (Cosmic portal mode)])>0)
+					if(storage_amount($item[Jarlsberg's pan (Cosmic portal mode)])>0 || available_amount($item[Jarlsberg's pan (Cosmic portal mode)])>0)
 					{
 						pull_if_good($item[Jarlsberg's pan (Cosmic portal mode)]);
 					}
@@ -715,7 +809,7 @@ void special(boolean bonus_actions) {
 				else //others want a shield
 				{
 					//not trendy
-					if(my_path()!="Heavy Rains")
+					if(good($item[operation patriot shield]))
 						pull_and_wear_if_good($item[operation patriot shield]);
 					else
 					{
@@ -723,7 +817,7 @@ void special(boolean bonus_actions) {
 							pull_and_wear_if_good($item[Meat Tenderizer is Murder], $slot[off-hand]);
 						else if(my_class()==$class[disco bandit])
 							pull_and_wear_if_good($item[Frankly Mr. Shank], $slot[off-hand]);
-						else if(my_class()==$class[accordion thief])
+						else
 							pull_and_wear_if_good($item[Shield of Icy Fate], $slot[off-hand]);
 							
 					}
@@ -733,71 +827,83 @@ void special(boolean bonus_actions) {
 				if(screw)
 				{
 					cli_execute("fold loathing legion necktie");
-					if(good($item[loathing legion necktie]))
-						equip($slot[acc1],$item[loathing legion necktie]);
 				}
 				
-				//not trendy enough for HR
-				if(my_path()!="Heavy Rains")
+				//do accessoriess
+				boolean acc1=false;
+				boolean acc2=false;
+				boolean acc3=false;
+				//use astral if available
+				foreach it in $items[astral belt, astral mask, astral bracer, astral ring]
 				{
-					pull_and_wear_if_good($item[juju mojo mask],$slot[acc2]);
-					//if we have no astral belt, wear fangs. Else pull fangs as superclover but dont wear 
-					if(available_amount($item[astral belt])<1)
-						pull_and_wear_if_good($item[plastic vampire fangs],$slot[acc3]);
-					else
+					if(available_amount(it)>0)
 					{
-						pull_if_good($item[plastic vampire fangs]);
-						equip($slot[acc3],$item[astral belt]);
+						equip($slot[acc1],it);
+						acc1=true;
 					}
 				}
-				else
+				//now necktie
+				if(good($item[loathing legion necktie]) && available_amount($item[loathing legion necktie])>0)
 				{
-					//in heavy rains our accessory choice is pretty limmited
-					//assume we got an astral, then we need 2
-					boolean acc1=false;
-					boolean acc2=false;
-					boolean acc3=false;
-					foreach it in $items[astral belt, astral mask, astral bracer, astral ring]
+					if(!acc1)
 					{
-						if(available_amount(it)>0)
+						equip($slot[acc1],$item[loathing legion necktie]);
+						acc1=true;
+					}
+					else
+					{
+						equip($slot[acc2],$item[loathing legion necktie]);
+						acc2=true;
+					}
+				}
+				//priority queue for remaining accs
+				item [int] acc_list;
+				acc_list[count(acc_list)] = $item[juju mojo mask];
+				acc_list[count(acc_list)] = $item[plastic vampire fangs];
+				if(my_path()=="Heavy Rains")
+				{
+					if(my_primestat()==$stat[mysticality])
+					{
+						acc_list[count(acc_list)] = $item[fishbone bracers];
+					}
+					else
+					{
+						acc_list[count(acc_list)] = $item[fishbone belt];
+					}
+				}
+				acc_list[count(acc_list)] = $item[Talisman of Baio];
+				acc_list[count(acc_list)] = $item[Talisman of Baio];
+				if(my_class()==$class[disco bandit])
+					acc_list[count(acc_list)] = $item[warbear laser beacon];
+				
+				acc_list[count(acc_list)] = $item[Mr. Accessory Jr.];
+				acc_list[count(acc_list)] = $item[Mr. Accessory Jr.];
+				acc_list[count(acc_list)] = $item[Mr. Accessory Jr.];
+				
+				acc_list[count(acc_list)] = $item[Gauntlets of the Blood Moon];
+				acc_list[count(acc_list)] = $item[time-twitching toolbelt];
+				foreach idx in acc_list
+				{
+					item it = acc_list[idx];
+					if(pull_if_good(it))
+					{
+						if(!acc1)
 						{
 							equip($slot[acc1],it);
 							acc1=true;
 						}
+						else if(!acc2)
+						{
+							equip($slot[acc2],it);
+							acc2=true;
+						}
+						else if(!acc3)
+						{
+							equip($slot[acc3],it);
+							acc3=true;
+							break;
+						}
 					}
-					//get some
-					if(my_primestat()==$stat[mysticality])
-					{
-						cli_execute("pull fishbone bracers  ");
-						equip($slot[acc3],$item[fishbone bracers]);
-						acc3=true;
-					}
-					else
-					{
-						cli_execute("pull fishbone belt   ");
-						equip($slot[acc3],$item[fishbone belt]);
-						acc3=true;
-					}
-					//time-twitching toolbelt 15 all stats
-					//Talisman of Baio * 2 ~ +42% all stats
-					//warbear laser beacon for DBS - 6,9,12 PRISMATIC damage when building momentum
-					//Gauntlets of the Blood Moon - 75 hp and 5% stats and 5% items
-					if(!acc1)
-					{
-						cli_execute("pull Mr. Accessory Jr.");
-						equip($slot[acc1],$item[Mr. Accessory Jr.]);
-					}
-					if(!acc2)
-					{
-						cli_execute("pull Mr. Accessory Jr.");
-						equip($slot[acc2],$item[Mr. Accessory Jr.]);
-					}
-					if(!acc3)
-					{
-						cli_execute("pull Mr. Accessory Jr.");
-						equip($slot[acc3],$item[Mr. Accessory Jr.]);
-					}
-							
 				}
 			}
 			if(available_amount($item[wrecked generator])<1 && can_drink() && my_path() != "KOLHS" && my_path() != "Avatar of Jarlsberg" && my_path() != "Heavy Rains")

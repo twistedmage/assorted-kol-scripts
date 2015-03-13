@@ -225,6 +225,8 @@ void stock_hagnks()
 	buy_item($item[polka pop],10);
 	buy_item($item[crappy waiter disguise],1);
 	buy_item($item[star hat],1);
+	buy_item($item[wa],1);
+	buy_item($item[nd],1);
 	
 	//stuff for twistedmage
 	if(my_name()=="twistedmage")
@@ -323,9 +325,9 @@ void main()
 		while(spleen_limit() - my_spleen_use() > 2)
 		{
 			if(spleen_limit() - my_spleen_use() > 5)
-				use(1,$item[Hatorade]);
+				chew(1,$item[Hatorade]);
 			else if(spleen_limit() - my_spleen_use() > 2)
-				use(1,$item[watered-down red minotaur]);
+				chew(1,$item[watered-down red minotaur]);
 		}
 		//do pvp
 		do_fights();

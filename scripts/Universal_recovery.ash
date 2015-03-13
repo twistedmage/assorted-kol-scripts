@@ -2,7 +2,8 @@
 // http://kolmafia.us/showthread.php?t=1780
 script "Universal_recovery.ash";
 notify "Bale";
-string thisver = "3.13";		// This is the script's version!
+since r15461; // Version where _spec is changed to Generated:_spec
+string thisver = "3.14";		// This is the script's version!
 
 // To use this script, put Universal_recovery in the /script directory. 
 // Then in the Graphical CLI type:
@@ -119,8 +120,8 @@ boolean use_herb = contains_text(hpAutoRecoveryItems, "medicinal herb's medicina
 	|| (my_class() == $class[accordion thief] && my_level() >= 9));
 int camp_hp = numeric_modifier("Base Resting HP") * (numeric_modifier("Resting HP Percent")+100) / 100 + numeric_modifier("Bonus Resting HP");
 int camp_mp = numeric_modifier("Base Resting MP") * (numeric_modifier("Resting MP Percent")+100) / 100 + numeric_modifier("Bonus Resting MP");
-int chateau_hp = 110; // Horrible Approximation
-int chateau_mp = 110; // Horrible Approximation
+int chateau_hp = 250; // Range is 200-300
+int chateau_mp = 125; // Range is 100-150
 	// If the character has properties set to not auto-purhase from mall, then always stay in hardcore mode.
 boolean mallcore = can_interact() && buy_mall && (my_ascensions() > 0 || my_level() > 4);
 	// Switch equipment to minimize casting cost of skills in ronin/hardcore? (delete end to do it in mallcore)
@@ -216,9 +217,13 @@ boolean beset(boolean [effect] badstuff) {
 }
 
 int mpcost(skill sk) {
+	int cost;
+	if(sk==$skill[lasagna bandages]) // Dang in-combat vs out of combat mp cost reduction for Astral Bracers
+		cost = max(1,6 - mana_cost_modifier());
+	else cost = mp_cost(sk);
 	if(have_effect($effect[Chilled to the Bone]) > 0)
-		return 3 ** (my_location().kisses - 1) + mp_cost(sk);
-	return mp_cost(sk);
+		cost = 3 ** (my_location().kisses - 1) + mp_cost(sk);
+	return cost;
 }
 
 // This will return the character's best equipment for reducing mp cost. There are two times that this function
@@ -256,8 +261,8 @@ item [slot] mp_gear(int target) {
 				whatif = whatif + " equip "+ key+ " "+ gear[key]+ ";";
 		whatif = whatif+ " equip "+ where+ " "+ it+";";
 		cli_execute(whatif+ " quiet");
-		int changed_hp = numeric_modifier("_spec", "Buffed HP Maximum");
-		int changed_mp = numeric_modifier("_spec", "Buffed MP Maximum");
+		int changed_hp = numeric_modifier("Generated:_spec", "Buffed HP Maximum");
+		int changed_mp = numeric_modifier("Generated:_spec", "Buffed MP Maximum");
 		if(beset($effect[Beaten Up])) {  	// If beaten up, this is evaluating tongue skills.
 			int tongue_target = 20* have_skill($skill[Tongue of the Walrus]).to_int() + 15; 
 			// tongue is 35 with Walrus or 15 without. (Since that's what a tongue skill will heal.)
@@ -274,7 +279,7 @@ item [slot] mp_gear(int target) {
 				whatif = whatif + " unequip "+ slt+ ";";
 		whatif = whatif + " equip " + where + " " + it + ";";
 		cli_execute(whatif + " quiet");
-		return numeric_modifier("_spec", "Mana Cost") < best_bonus;
+		return numeric_modifier("Generated:_spec", "Mana Cost") < best_bonus;
 	}
 	
 	slot equip_type;		// This is the slot where a given item is equipped.
@@ -291,13 +296,13 @@ item [slot] mp_gear(int target) {
 							unset_failure();
 							gear[slt] = mana_gear;
 							remove acc[slt];
-							best_bonus = numeric_modifier("_spec", "Mana Cost");
+							best_bonus = numeric_modifier("Generated:_spec", "Mana Cost");
 							break;
 						}
 			} else if(test_gear(equip_type, mana_gear)) {
 				unset_failure();
 				gear[equip_type] = mana_gear;
-				best_bonus = numeric_modifier("_spec", "Mana Cost");
+				best_bonus = numeric_modifier("Generated:_spec", "Mana Cost");
 			}
 		}
 	
@@ -1342,8 +1347,8 @@ boolean cure_beatenup(int target){
 	if(mallcore)  	// Switch to mallcore mode if out of ronin.
 		return cheapest_beatup();
 	cli_execute("whatif uneffect beaten up; quiet");
-	int maxhp = numeric_modifier("_spec", "Buffed HP Maximum");
-	int maxmp = numeric_modifier("_spec", "Buffed MP Maximum");
+	int maxhp = numeric_modifier("Generated:_spec", "Buffed HP Maximum");
+	int maxmp = numeric_modifier("Generated:_spec", "Buffed MP Maximum");
 	// Test a restorative to see if an average return will over restore. returns TRUE if it doesn't waste.
 	boolean test_waste(item healing_item) {
 		return heal[healing_item].avehp <= maxhp - my_hp() && heal[healing_item].avemp <= maxmp - my_mp();
@@ -1484,6 +1489,10 @@ boolean noncom() {
 // First nuns if completed as hippy, then from inventory, then skills, finally purchasing as necessary.
 // Skills are after inventory because they consume a more valuable resource: mp
 boolean hp_heal(int target){
+	if(my_path() == "Actually Ed the Undying") {
+		if(Verbosity > 2) print("Ed does not heal his HP like a mortal.", "red");
+		return true; 
+	}
 	if(target > my_maxhp())
 		target = my_maxhp();
 	if(Verbosity > 0) print("Restoring HP! Currently at "+ my_hp()+ " of " + my_maxhp()+ " HP, "+ my_mp()+ " of " + my_maxmp()+ " MP, current meat: "+my_meat()+" ... Target HP = "+ target+ ".", "#66CC00");

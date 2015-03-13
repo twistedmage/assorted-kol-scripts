@@ -201,6 +201,8 @@
 		14-03-11:Take a photo of Racecar Bob or Bob Racecar if we need one.
 		14-08-29:nostun is nostagger and a float
 		14-10-13:Adapt to BatBrain changes
+		15-02-14:Make WHAM work again.
+		15-02-23:Adapt to another round of BatBrain-changes, this time with lots of help form Zarqon :)
 ***********************************************************************************************************************/
 import <SmartStasis.ash>;
 
@@ -310,26 +312,6 @@ void pre_brain(monster foe, string pg) {
 	}
 }
 
-//Set information for the procedurally generated skeletons
-void set_skeleton_info() {
-	if(contains_text(to_string(last_monster()), "vicious")) {
-		vprint("WHAM: Vicious skeletons deal bonus damage. Currently not handled.", "green", 5);
-		//Vicious ones deal bonus damage (500 at 1100 monster attack, compared to a deadly doing ~90 damage at 1600 monster attack). 
-	}
-}
-
-//Set information for the procedurally generated skeletons
-void set_gameinformboss_info() {
-	switch(get_property("gameProBossSpecialPower")) {
-		case "Ignores armor":
-			vprint("WHAM: This boss is ignores some of your armor. This is currently not handled, attempting anyway.", "green", 5);	
-			break;		
-		case "Reduced damage from spells":
-			vprint("WHAM: This boss is takes 30% less damage from spells. This is currently not handled, attempting anyway.", "green", 5);	
-			break;
-	}
-}
-    
 //Calculate number of bees if needed
 int bees(monster foe) {
 	int bees;
@@ -384,7 +366,8 @@ void WHAM_round(string extra) {
 	vprint("WHAM: WHAM added the following to BatRound: " + batround_insert,9);
 }
 
-//Count happenings to avoid items that have already been enqueued as many as we have
+/*    This function is unneccessary!  BatBrain already accounts for this when building opts.
+Count happenings to avoid items that have already been enqueued as many as we have
 int times_happened(string occurrence) {
 	if (count(happenings) == 0)
 		file_to_map("happenings_"+replace_string(my_name()," ","_")+".txt",happenings);
@@ -392,6 +375,7 @@ int times_happened(string occurrence) {
 		return happenings[occurrence].queued + happenings[occurrence].done;
 	return 0;
 }
+*/
 
 //Function to return skills and items that are usable
 boolean ok(advevent a) {
@@ -458,14 +442,6 @@ boolean ok(advevent a) {
 				return (item_amount($item[gnomitronic hyperspatial demodulizer]) > 0 && !happened($item[gnomitronic hyperspatial demodulizer]));
 			case "use 3391":	//Frosty's Iceball, should not be used but is anyway so disallow it
 				return false;
-			case "skill 66": //Flying Fire Fist
-				if (have_effect($effect[Salamanderenity]) == 0)
-					return true;
-				foreach i in tower_items(true) {
-					if (item_amount(i) == 0)
-						return false;
-				}
-				return true; 
 			case "skill 1003": //Thrust-Smack
 			case "skill 1004": //Lunge-Smack
 			case "skill 1005": //Lunging Thrust-Smack
@@ -483,11 +459,11 @@ boolean ok(advevent a) {
 				return (no_cunctatitis() && no_teleportitis());
 			case "skill 1023": //Harpoon!
 				return no_cunctatitis();				
-			case "skill 7061":	//Spring Raindrop Attack
+			/*case "skill 7061":	//Spring Raindrop Attack
 			case "skill 7062":	//Summer Siesta
 			case "skill 7063":	//Falling Leaf Whirlwind
 			case "skill 7064":	//Winter's Bite Technique
-				return ((equipped_amount($item[haiku katana]) - (times_happened("skill 7061") + times_happened("skill 7062") + times_happened("skill 7063") + times_happened("skill 7064"))) > 0);
+				return ((equipped_amount($item[haiku katana]) - (times_happened("skill 7061") + times_happened("skill 7062") + times_happened("skill 7063") + times_happened("skill 7064"))) > 0);*/
 			case "skill 7082":	//Major and minor He-Boulder rays
 				return spread_to_string(a.dmg) != to_string(monster_stat("hp") * 6);
 			case "skill 7131":
@@ -533,7 +509,7 @@ void allMyOptions(float hitlimit) {
 	if(m == $monster[dr. awkward] && hitlimit != -1)
 		hitlimit = min(1, hitlimit + 0.25);
 	sort opts by -to_profit(value);
-	sort opts by kill_rounds(value.dmg)*-(min(value.profit,-1));
+	sort opts by kill_rounds(value)*-(min(value.profit,-1));
 	foreach i,opt in opts {
 		vprint("WHAM: Currently checking " + (contains_text(opt.id, "skill") ? to_string(to_skill(to_int(excise(opt.id,"skill ","")))) : to_string(to_item(to_int(excise(opt.id,"use ",""))))) + " which has a reported damage of " + dmg_dealt(opt.dmg) + " and is " + (ok(opt) ? "ok." : "not ok."), "blue", 11);
 		if(dmg_dealt(opt.dmg) > 0) {
@@ -587,7 +563,7 @@ advevent attack_option(boolean noitems) {
 	float drnd = max(1.0,die_rounds());   // a little extra pessimistic
 	sort opts by -dmg_dealt(value.dmg);
 	sort opts by -to_profit(value);
-	sort opts by kill_rounds(value.dmg)* -(min(value.profit-(can_interact() ? WHAM_roundcost_aftercore : WHAM_roundcost_ronin),-1));
+	sort opts by kill_rounds(value)* -(min(value.profit-(can_interact() ? WHAM_roundcost_aftercore : WHAM_roundcost_ronin),-1));
 	
 	foreach i,opt in opts {
 		vprint(opt.id + " does hurt the monster for " + dmg_dealt(opt.dmg) + " and is " + (ok(opt) ? "ok." : "not ok."), "green", 10);
@@ -607,7 +583,7 @@ advevent attack_option(boolean noitems) {
 			continue;
 		}
 		//Reduce RNG risk for stasisy actions
-		if (kill_rounds(opt.dmg) > min(min(maxround, WHAM_maxround) - round - 1,drnd)) {
+		if (kill_rounds(opt) > min(min(maxround, WHAM_maxround) - round - 1,drnd)) {
 			vprint("Skipping " + opt.id + " since it is too risky.", "purple", 9);
 			continue;
 		}
@@ -617,7 +593,7 @@ advevent attack_option(boolean noitems) {
 			continue;
 		}
 		//Don't attempt to overstay our welcome
-		if(kill_rounds(opt.dmg) + round + WHAM_safetymargin > maxround)	{
+		if(kill_rounds(opt) + round + WHAM_safetymargin > maxround)	{
 			vprint("Skipping " + opt.id + " since it is will take too long to kill the monster.", "purple", 9);
 			continue;
 		}
@@ -671,15 +647,15 @@ advevent item_option() {
 	float drnd = max(1.0,die_rounds());   // a little extra pessimistic
 	//sort opts by -dmg_dealt(value.dmg);	
 	sort opts by -to_profit(value);
-	sort opts by kill_rounds(value.dmg)*-(min(value.profit,-1));
+	sort opts by kill_rounds(value)*-(min(value.profit,-1));
 	foreach i,opt in opts {
 		if(!ok(opt))
 			continue;
 		if(!contains_text(opt.id, "use"))
 			continue; //Ignore skills (only looking at items for this one)
 		if(hitchance(opt.id) < hitchance)
-			continue;			
-		if(kill_rounds(opt.dmg) > min(min(maxround, WHAM_maxround) - round - 1,drnd))
+			continue;
+		if(kill_rounds(opt) > min(min(maxround, WHAM_maxround) - round - 1,drnd))
 			continue;   // reduce RNG risk for stasisy actions
 		if(opt.stun < 1 && to_profit(opt) < -runaway_cost())
 			continue;  // don't choose actions worse than fleeing
@@ -691,7 +667,7 @@ advevent item_option() {
 }
 
 advevent stasis_option() {  // returns most profitable lowest-damage option
-	boolean ignoredelevel = (smacks.id != "" && kill_rounds(smacks.dmg) == 1);
+	boolean ignoredelevel = (smacks.id != "" && kill_rounds(smacks) == 1);
 
 	if (train_skills()) {
 		WHAM_round("if match " + (equipped_item($slot[weapon]) == $item[Mer-kin dragnet] ? "\"New Special Move Unlocked: Net Neutrality\"" : (equipped_item($slot[weapon]) == $item[Mer-kin switchblade] ? "\"New Special Move Unlocked: Blade Runner\"" : "\"New Special Move Unlocked: Ball Sack\"")) + "; abort \"BatBrain abort: loogie.\"; endif; ");
@@ -825,7 +801,7 @@ actions[int] Calculate_Options(float base_hp) {
 						vprint("WHAM: Could not find a way to kill the monster. Trying the best available option since you've set WHAM_AlwaysContinue to true.", "purple", 5);
 						allMyOptions(hitchance); //Recalculate our options before doing this part
 						sort opts by -to_profit(value);
-						sort opts by kill_rounds(value.dmg)*-(min(value.profit,-1));
+						sort opts by kill_rounds(value)*-(min(value.profit,-1));
 						enqueue(opts[0]);
 						kill_it[i].hp = monster_stat("hp");
 						kill_it[i].my_hp = my_stat("hp");
@@ -991,11 +967,6 @@ string Evaluate_Options() {
 
 	if(monster_stat("hp") <= 0)
 		quit("Unable to get monster HP. Fight the battle yourself");
-		
-	if(my_location() == $location[The Tower of Procedurally-Generated Skeletons])
-		set_skeleton_info();
-	if(m == $monster[Video Game Boss])
-		set_gameinformboss_info();
 
 	if(finished())
 		return "";
@@ -1038,7 +1009,7 @@ void build_custom_WHAM() {
 	
 	void encustom(advevent which) {
 		if(which.id != "")
-			custom[count(custom)] = merge(which,new advevent);
+			custom[count(custom)] = copy(which);
 	}
 	
 	//Zombie steal
@@ -1051,7 +1022,7 @@ void build_custom_WHAM() {
 	}
 	
 	//Zombie infect
-	if(has_option($skill[Infectious Bite]) && (kill_rounds(attack_option().dmg) * my_level() >= monster_hp() * 0.5) && kill_rounds(attack_option().dmg) - 1 < die_rounds()) {
+	if(has_option($skill[Infectious Bite]) && (kill_rounds(attack_option()) * my_level() >= monster_hp() * 0.5) && kill_rounds(attack_option()) - 1 < die_rounds()) {
 		vprint("WHAM: Infecting the opponent to try and turn it", "purple", 5);
 		encustom(get_action($skill[Infectious Bite]));
 	}
@@ -1317,7 +1288,7 @@ void build_custom_WHAM() {
 		case "Tormented Baobab":
 		case "Whimpering Willow":
 		case "Woeful Magnolia":
-			if(kill_rounds(smacks.dmg) < die_rounds() && has_option($skill[Torment Plant]))
+			if(kill_rounds(smacks) < die_rounds() && has_option($skill[Torment Plant]))
 				encustom(get_action($skill[Torment Plant]));
 			break;
 		case "Bettie Barulio":
@@ -1325,7 +1296,7 @@ void build_custom_WHAM() {
 		case "Marvin J. Sunny":
 		case "Mortimer Strauss":
 		case "Wonderful Winifred Wongle":
-			if(kill_rounds(smacks.dmg) < die_rounds() && has_option($skill[Pinch Ghost]))
+			if(kill_rounds(smacks) < die_rounds() && has_option($skill[Pinch Ghost]))
 				encustom(get_action($skill[Pinch Ghost]));
 			break;
 		case "Brock \"Rocky\" Flox":
@@ -1333,7 +1304,7 @@ void build_custom_WHAM() {
 		case "Hugo Von Douchington":
 		case "Vivian Vibrian Vumian Varr":
 		case "Wacky Zack Flacky":
-			if(kill_rounds(smacks.dmg) < die_rounds() && has_option($skill[Tattle]))
+			if(kill_rounds(smacks) < die_rounds() && has_option($skill[Tattle]))
 				encustom(get_action($skill[Tattle]));
 			break;
 	}
@@ -1387,7 +1358,7 @@ string stasis_WHAM() {
 			case (plink.id == "skill 7062"):
 			case (plink.id == "skill 7063"):
 			case (plink.id == "skill 7064"):
-				turns = count(queue) + min(1, equipped_amount($item[haiku katana]) - times_happened(plink.id));
+				turns = count(queue) + min(1, equipped_amount($item[haiku katana]) - (happened(plink.id) ? count(happenings[m, turncount, plink.id]) : 0));
 				break;
 			case (optid.find() && contains_text(factors[(optid.group(1) == "use " ? "item" : (optid.group(1) == "skill " ? "skill" : "chef")), (optid.group(1) != "jiggle" ? to_int(optid.group(2)) : to_int(equipped_item($slot[weapon])))].special, "once")):
 				turns = count(queue) + 1;	//Options that can only be used once, should only be used once before recalculating
@@ -1454,14 +1425,6 @@ void main(int initround, monster foe, string pg) {
 	vprint("WHAM: Setting up variables via BatBrain", "purple", 8);
 	act(pg);
 
-	if(my_location() == $location[The Tower of Procedurally-Generated Skeletons]) {
-		vprint("WHAM: Setting Skeleton type.", "purple", 7);
-		set_skeleton_info();
-	}
-	if(m == $monster[Video Game Boss]) {
-		vprint("WHAM: Setting special boss power.", "purple", 7);
-		set_gameinformboss_info();
-	}	
 	//Debug info
 	vprint("WHAM: We currently think that the round number is: " + round + " and that the turn number is " + my_turncount() + ".", "purple", 9);
 	

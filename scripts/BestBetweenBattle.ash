@@ -113,7 +113,8 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
           else if (is_goal($item[blackberry combat boots])) friendlyset(928,"3","Get goal of blackberry combat boots.");
           else if (is_goal($item[blackberry galoshes]) || available_amount($item[blackberry galoshes]) == 0) friendlyset(928,"4","Get galoshes.");
           else friendlyset(928,"6","No blackberry footwear needed.");
-         if (get_property("choiceAdventure928") != "6" && item_amount($item[blackberry]) > 2) friendlyset(924,"2","Visit cobbler for footwear.");
+         if (!get_property("kingLiberated").to_boolean() && item_amount($item[beehive]) < 1) friendlyset(924,"3","Get a beehive for the wall of skin.");
+         else if (get_property("choiceAdventure928") != "6" && item_amount($item[blackberry]) > 2) friendlyset(924,"2","Visit cobbler for footwear.");
           else friendlyset(924,"1","Fight a bush.");
         // blacksmith
          boolean blackgoal; foreach i in $items[black sword, black shield, black helmet, black greaves] if (is_goal(i)) blackgoal = true;
@@ -133,12 +134,13 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
              friendlyset(927,"1","Get +50% items buff.");
           else friendlyset(927,"6","Skip the black church.");
         // All Over the Map
-         switch (to_int(get_property("blackForestProgress"))) {
-            case 5: case 4: if (get_property("choiceAdventure927") != "6") { friendlyset(923,"4","We have business in the black church."); break; }
-            case 3: if (get_property("choiceAdventure926") != "6") { friendlyset(923,"3","Take care of business in the black mine."); break; }
-            case 2: if (blackgoal || (to_int(get_property("blackForestProgress")) > 4 && blackchoice < 5)) { friendlyset(923,"2","Get black equipment from the black smith."); break; }
-            default: friendlyset(923,"1","Fight a bush or get blackberry footwear.");
-         }
+         if (!get_property("kingLiberated").to_boolean() && item_amount($item[beehive]) < 1) friendlyset(923,"1","Get beehive for the tower.");
+          else switch (to_int(get_property("blackForestProgress"))) {
+             case 5: case 4: if (get_property("choiceAdventure927") != "6") { friendlyset(923,"4","We have business in the black church."); break; }
+             case 3: if (get_property("choiceAdventure926") != "6") { friendlyset(923,"3","Take care of business in the black mine."); break; }
+             case 2: if (blackgoal || (to_int(get_property("blackForestProgress")) > 4 && blackchoice < 5)) { friendlyset(923,"2","Get black equipment from the black smith."); break; }
+             default: friendlyset(923,"1","Fight a bush or get blackberry footwear.");
+          }
          return;
       case $location[the castle in the clouds in the sky (basement)]:
         // Fitness
@@ -162,6 +164,10 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
 //            (have_equipped($item[titanium assault umbrella]) ? friendlyset(669,"1","Unlock the ground floor with your umbrella.") : friendlyset(669,"3","Repeat the Furry room with an umbrella."));
           else if (get_property("choiceAdventure671") == "1" && is_goal($stat[moxie])) friendlyset(669,"2","Get moxie stats.");
           else friendlyset(669,"1","Proceed to the Neckbeard room for more options.");
+         return;
+      case $location[the castle in the clouds in the sky (ground floor)]:
+         if (item_amount($item[electric boning knife]) == 0) friendlyset(1026,"2","Get an electric boning knife.");
+          else friendlyset(1026,"3","Skip the foodie giant's room.");
          return;
       case $location[the castle in the clouds in the sky (top floor)]:
         // Raver
@@ -283,6 +289,9 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
          if (item_amount($item[spookyraven library key]) == 0 &&   // probably need some kind of pool skill check here
              have_effect($effect[chalky hand]) == 0 && item_amount($item[handful of hand chalk]) > 0)
             use(1,$item[handful of hand chalk]);
+         if (is_goal($item[cube of billiard chalk]) || get_property("poolSharkCount").to_int() >= 25) 
+            friendlyset(330,"2","Fight a hustled spectre for a cube of billiard chalk.");
+          else friendlyset(330,"1","Improve your pool skill (visit "+(25 - to_int(get_property("poolSharkCount")))+" more times to max bonus).");
 //            friendlyset(875,"1","Challenge the poolghost.");
 //            friendlyset(875,"2","Hone your pool skills some more.");
          return;
@@ -321,7 +330,7 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
       case $location[the hidden office building]:
          if (item_amount($item[boring binder clip]) > 0 && get_property("hiddenOfficeProgress") == "5") use(1,$item[boring binder clip]);
          if (item_amount($item[mcclusky file (complete)]) > 0) friendlyset(786,"1","Fight protector spirit.");
-          else if (item_amount($item[boring binder clip]) == 0) friendlyset(786,"2","Get boring binder clip.");
+          else if (item_amount($item[boring binder clip]) == 0 && get_property("hiddenOfficeProgress").to_int() < 6) friendlyset(786,"2","Get boring binder clip.");
           else if (get_property("hiddenOfficeProgress").to_int() < 5 || has_goal($monster[pygmy witch accountant]) > 0) friendlyset(786,"3","Fight pygmy witch accountants.");
           else friendlyset(786,"6","Skip Working Holiday.");
          return;
@@ -438,6 +447,9 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
                 upairs = upairs + 1;
             if (upairs > 2) return;
          }
+         return;
+      case $location[The Road to the White Citadel]: if ($strings[started, step1] contains get_property("questG02Whitecastle") && 
+            item_amount($item[opium grenade]) == 0 && creatable_amount($item[opium grenade]) > 0) create(1,$item[opium grenade]);
          return;
       case $location[The Shore, Inc. Travel Agency]:
          foreach i in $items[] if (sells_item($coinmaster[The Shore\, Inc. Gift Shop],i) && has_goal(i) > 0 &&
