@@ -8,21 +8,22 @@ function goodNum(n) {
    return parseFloat(res.match(/\d/) ? res.replace( /[^\d\-\.]/g, "" ) : 0);
 }
 
-jQuery.fn.dataTableExt.oSort['batnum-html-asc']  = function(a,b) {
-   if (a == "") return (b == "") ? 0 : 1;           // empties are always sorted down, regardless of asc/desc
-   if (b == "") return (a == "") ? 0 : -1;
-   var x = goodNum(a);
-   var y = goodNum(b);
-   return ((x < y) ? -1 : ((x > y) ?  1 : 0));
-};
- 
-jQuery.fn.dataTableExt.oSort['batnum-html-desc'] = function(a,b) {
-   if (a == "") return (b == "") ? 0 : 1;
-   if (b == "") return (a == "") ? 0 : -1;
-   var x = goodNum(a);
-   var y = goodNum(b);
-   return ((x < y) ?  1 : ((x > y) ? -1 : 0));
-};
+jQuery.extend( jQuery.fn.dataTableExt.oSort, {
+   "batnum-html-asc": function ( a, b ) {
+      if (a == "") return (b == "") ? 0 : 1;           // empties are always sorted down, regardless of asc/desc
+      if (b == "") return (a == "") ? 0 : -1;
+      var x = goodNum(a);
+      var y = goodNum(b);
+      return ((x < y) ? -1 : ((x > y) ?  1 : 0));
+   },
+   "batnum-html-desc": function ( a, b ) {
+      if (a == "") return (b == "") ? 0 : 1;
+      if (b == "") return (a == "") ? 0 : -1;
+      var x = goodNum(a);
+      var y = goodNum(b);
+      return ((x < y) ?  1 : ((x > y) ? -1 : 0));
+   }
+});
 
 function bjilgt(doug) {
    $('#battab').slideUp('fast');
@@ -50,7 +51,7 @@ function bjilgt(doug) {
 jQuery(function($){
   // show old combat form (for CAB-enabled users)
    $('#fightform').removeClass("hideform").show();
-
+   
   // animate bat-computer
    for (i=0;i<=8;i++) $('#compimg').animate({opacity: 0.6},700).animate({opacity: 1},400);
    
@@ -79,6 +80,11 @@ jQuery(function($){
       mouseenter: function(){ tfadeIn($(this)); },
       mouseleave: function(){ tfadeOut($(this)); }
    },".popout");
+  // elements helper
+   $(document).on({
+      mouseenter: function(){ $('#elementhelper').stop().fadeIn(); },
+      mouseleave: function(){ $('#elementhelper').stop().fadeOut(); }
+   },".showelements");
 
   // initialize/enable tabs
    if ($('#battab').length != 0) {
@@ -107,53 +113,64 @@ jQuery(function($){
    }
    if ($('#actbox').length != 0) {
       slide_actbox();
+//      alert('actbox length > 0');
    } else $('#bat-enhance').load('BatMan_RE.ash', {turnflag: turncount, page: $('html').html()}, function() {
       slide_actbox();
      // define our ridiculously awesome Actions Table
-      var bt = $('#battable').dataTable( {
-          'sScrollY': '244px',                                      // vertical scroll, table is 244px high
-          'bScrollCollapse': true,                                  // if table data is shorter than 244px, shrink table to fit
-          'bPaginate': false,                                       // we scroll instead of paginate
-          'aaSorting': [],                                          // no initial sort, options are already sorted
-          'oLanguage': {
-             'sInfo': '_TOTAL_ possible actions',
-             'sSearch': '<img src="/images/itemimages/magnify.gif" title="Filter (press 9 to give focus)" height=16 width=16> ',
-             'sZeroRecords': 'No matching actions found'
+      var bt = $('#battable').DataTable( {
+          'scrollY': '244px',                                       // vertical scroll, table is 244px high
+          'scrollCollapse': true,                                   // if table data is shorter than 244px, shrink table to fit
+          'paging': false,                                          // we scroll instead of paginate
+          'order': [],                                              // no initial sort, options are already sorted
+          'language': {
+             'info': '_TOTAL_ possible actions',
+             'search': '<img src="/images/itemimages/magnify.gif" title="Filter (press 9 to give focus)" height=16 width=16> ',
+             'zeroRecords': 'No matching actions found'
           },
-          'bSortClasses': false,                                    // don't bother applying classes to sorted columns
-          'aoColumnDefs': [
-              { "bVisible": false, "aTargets": [ 9, 10, 11, 12 ] },     // hidden action-type indices (attack, stasis, stun)
-              { "sType": "html", "aTargets": [ 5 ] },
-              { "sType": "batnum-html", "aTargets": [ 1, 2, 3, 6, 7 ] },
-              { "sType": "numeric", "aTargets": [ 9, 10, 11 ] },
-              { "sClass": "attackcol", "aTargets": [ 0 ] },         // apply classes to all cells, per row
-              { "sClass": "damagecol", "aTargets": [ 1 ] },
-              { "sClass": "delevelcol", "aTargets": [ 2, 3 ] },
-              { "sClass": "stuncol", "aTargets": [ 4 ] },
-              { "sClass": "hpcol", "aTargets": [ 5 ] },
-              { "sClass": "mpcol", "aTargets": [ 6 ] },
-              { "sClass": "profitcol", "aTargets": [ 7 ] },
-              { "sClass": "blackcol", "aTargets": [ 8 ] },
-              { "iDataSort": 9, "aTargets": [ 0 ] },                // sort Attack column by hidden index
-              { "iDataSort": 11, "aTargets": [ 4 ] },               // sort Stun column by hidden index
-              { "aDataSort": [ 6, 7 ], "aTargets": [ 6 ] },         // sort MP column by itself, then profit
-              { "asSorting": [ "desc", "asc" ], "aTargets": [ 1, 7 ] },
-              { "asSorting": [ "desc" ], "aTargets": [ 5, 6 ] },
-              { "asSorting": [ "asc" ], "aTargets": [ 0, 2, 3, 4, 9, 10, 11 ] }
+          'orderClasses': false,                                    // don't bother applying classes to sorted columns
+          'columnDefs': [
+              { "visible": false, "targets": [ 9, 10, 11, 12 ] },   // hidden action-type indices (attack, stasis, stun)
+              { "type": "batnum-html", "targets": [ 1, 2, 3, 6, 7 ] },
+              { "type": "html-num-fmt", "targets": [ 4 ] },
+              { "type": "html", "targets": [ 5 ] },
+              { "type": "numeric", "targets": [ 9, 10, 11 ] },
+              { "className": "attackcol", "targets": [ 0 ] },       // apply classes to all cells, per row
+              { "className": "damagecol", "targets": [ 1 ] },
+              { "className": "delevelcol", "targets": [ 2, 3 ] },
+              { "className": "stuncol", "targets": [ 4 ] },
+              { "className": "hpcol", "targets": [ 5 ] },
+              { "className": "mpcol", "targets": [ 6 ] },
+              { "className": "profitcol", "targets": [ 7 ] },
+              { "className": "blackcol", "targets": [ 8 ] },
+              { "orderData": 9, "targets": [ 0 ] },                 // sort Attack column by hidden index
+//              { "orderData": 11, "targets": [ 4 ] },                // sort Stun column by hidden index
+//              { "aDataSort": [ 6, 7 ], "targets": [ 6 ] },        // sort MP column by itself, then profit
+              { "orderSequence": [ "desc", "asc" ], "targets": [ 1, 7 ] },
+              { "orderSequence": [ "desc" ], "targets": [ 4, 6 ] },
+              { "orderSequence": [ "asc" ], "targets": [ 0, 2, 3, 5, 9, 10, 11 ] }
           ]
       } );
-      bt.fnSortListener( document.getElementById('attacksort'), 9 );  // use hidden indices for sorting from external links
-      bt.fnSortListener( document.getElementById('stasissort'), 10 );
-      bt.fnSortListener( document.getElementById('stunsort'), 11 );
+      bt.order.listener( document.getElementById('attacksort'), 9 );  // use hidden indices for sorting from external links
+      bt.order.listener( document.getElementById('stasissort'), 10 );
+      bt.order.listener( document.getElementById('stunsort'), 11 );
+
+     // enable ENTER submitting the first action listed -- only when the table has been filtered to a single action
+      bt.on('draw.dt', function () {
+         if (bt.rows({filter: 'applied'}).count() == 1) $('#battable_filter label input').addClass('goodtogo');
+          else $('#battable_filter label input').removeClass('goodtogo');
+      });
+      $(document).on('keyup','input.goodtogo', function(e) {
+         if (e.keyCode === 13) { bjilgt(this); $('#battable form:first').submit(); }  // 13 = ENTER
+      });
 
      // move a few things
       $('#undermon').insertAfter($('#monname'));
       $('body').append($('#actbox'));
 
-    // blacklist functions
+     // blacklist functions
       $(document).on('click','.addblack', function() {
          refresh_blacklist({black: 'add', id: $(this).attr('title')});
-         bt.fnDeleteRow(bt.fnGetPosition($(this).closest("tr").get(0)));
+         bt.row($(this).closest("tr")).remove().draw();
       });
       $(document).on('click','.removeblack', function() {
          refresh_blacklist({black: 'remove', id: $(this).attr('title')});
@@ -175,32 +192,35 @@ jQuery(function($){
      // enhance Manuel
       if ($('#manuelbox').length != 0) { 
          if ($('#manuelcell').length == 0) {                      // add empty manuel cell for players without Manuel
-            $('#nowfighting').append('<td width=30></td><td id="manuelcell"></td>');
+            $('#monsterpic').closest('tr').append('<td width=30></td><td id="manuelcell"></td>');
          }
          $('#manuelcell').html($('#manuelbox'));
       }
    });
 
   // register hotkeys if no CAB
-   if ($('table.actionbar').length == 0) $(document).keypress(function(e) {
+   if ($('table.actionbar').length == 0) $(document).on('keypress', function(e) {
       if (e.keyCode == 27) {                                      // ESC closes blacklist editor/CLI Box
          $('#blackformbox').slideUp();
          return cliPopdown();
       }
+//      if ($('input.goodtogo').is(":focus")) alert(e.keyCode);
       if ($('input,textarea').is(":focus")) return true;          // otherwise, give all keystrokes to inputs when focused
 //      alert(e.keyCode);
-      switch(e.keyCode) {
-         case 96: if ($('#actbox form:first').length == 0 || $('#actbox form:first').attr('name') == 'disablebatman') {  // ` key submits first menu (for blasting through)
-            $('#actbox img:first').click();
-           } else $('#actbox form:first').submit();
-           break;
+      if ($('#actbox').length != 0) switch (e.keyCode) {
+         case 96: bjilgt($('#actbox img:first'));
+            if ($('#actbox form:first').length == 0 || $('#actbox form:first').attr('name') == 'disablebatman') {  // ` key submits first menu (for blasting through)
+               $('#actbox img:first').click();
+            } else $('#actbox form:first').submit();
+            break;
          case 49:
          case 50:
          case 51:
          case 52:
          case 53: $('.onemenu:eq('+(e.keyCode-48)+') form:first').submit(); break;  // 1-5 keys submit 2nd-6th menus
-         case 57: if ($('#battable_filter').is(":visible")) $('#battable_filter label input:text').focus(); return false; // 9 key gives focus to filter
+         case 57: if ($('#battable_filter').is(":visible")) $('#battable_filter label input').focus(); return false; // 9 key gives focus to filter
          case 48: return cliPopup('');                            // 0 key opens CLI box
+         case 101: $('#elementhelper').stop().fadeIn().fadeOut(1200); return true;      // 'E' key pops up element helper
       }
    });
 

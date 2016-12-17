@@ -113,7 +113,8 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
           else if (is_goal($item[blackberry combat boots])) friendlyset(928,"3","Get goal of blackberry combat boots.");
           else if (is_goal($item[blackberry galoshes]) || available_amount($item[blackberry galoshes]) == 0) friendlyset(928,"4","Get galoshes.");
           else friendlyset(928,"6","No blackberry footwear needed.");
-         if (!get_property("kingLiberated").to_boolean() && item_amount($item[beehive]) < 1) friendlyset(924,"3","Get a beehive for the wall of skin.");
+         if (!get_property("kingLiberated").to_boolean() && item_amount($item[beehive]) < 1 && my_path() != "Bugbear Invasion")
+            friendlyset(924,"3","Get a beehive for the wall of skin.");
          else if (get_property("choiceAdventure928") != "6" && item_amount($item[blackberry]) > 2) friendlyset(924,"2","Visit cobbler for footwear.");
           else friendlyset(924,"1","Fight a bush.");
         // blacksmith
@@ -166,7 +167,8 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
           else friendlyset(669,"1","Proceed to the Neckbeard room for more options.");
          return;
       case $location[the castle in the clouds in the sky (ground floor)]:
-         if (item_amount($item[electric boning knife]) == 0) friendlyset(1026,"2","Get an electric boning knife.");
+         if (item_amount($item[electric boning knife]) == 0 && !have_skill($skill[garbage nova]))
+            friendlyset(1026,"2","Get an electric boning knife.");
           else friendlyset(1026,"3","Skip the foodie giant's room.");
          return;
       case $location[the castle in the clouds in the sky (top floor)]:
@@ -188,7 +190,8 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
         // Steampunk
          if (item_amount($item[model airship]) > 0 && get_property("questL10Garbage") != "finished")      // complete quest
             friendlyset(677,"1","Complete Trash quest with model airship.");
-          else if (item_amount($item[steam-powered model rocketship]) == 0) friendlyset(677,"2","Get a rocketship from the Steampunk Giant.");  // unlock hits
+          else if (item_amount($item[steam-powered model rocketship]) == 0 && my_path() != "Bugbear Invasion")
+             friendlyset(677,"2","Get a rocketship from the Steampunk Giant.");                           // unlock hits
           else if (is_goal($item[brass gear]) && to_int(excise(get_goals()[0],"+"," brass")) > 1) friendlyset(677,"3","Get goal multiple brass gears.");
           else if (has_goal($monster[steampunk giant]) > 0) friendlyset(677,"1","Fight Steampunk Giants for goals.");
           else friendlyset(677,"4","Nothing in Steampunk; proceed to Goth.");
@@ -225,7 +228,8 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
         // door
          if (item_amount($item[platinum yendorian express card]) > 0) friendlyset(692,"7","Use your PYEC for free dooropenings like a boss.");
           else if (item_amount($item[pick-o-matic lockpicks]) > 0) friendlyset(692,"3","Use your lockpicks for free dooropenings like a pro.");
-          else if (retrieve_item(1,$item[skeleton key])) friendlyset(692,"2","Use a skeleton key because hey, free dooropening.");
+          else if (retrieve_item(1 + to_int($strings[unstarted, started, step1, step2, step3, step4, step5] contains get_property("questL13Final")),$item[skeleton key])) 
+             friendlyset(692,"2","Use a skeleton key because hey, free dooropening.");
           else switch (my_primestat()) {
              case $stat[muscle]: friendlyset(692,"4","Bash down the doors!"); break;
              case $stat[mysticality]: friendlyset(692,"5","Twiddle open the doors."); break;
@@ -384,7 +388,7 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
          hacienda_target("W","Hacienda cleared; head to Puttin' on the Wax.");
          return;
       case $location[kegger in the woods]:
-         if (is_goal($item[orquette's phone number]) || item_amount($item[orquette's phone number]) < 20)
+         if (is_goal($item[orquette's phone number]) || item_amount($item[orquette's phone number]) < 20 || goal_exists("factoid"))
             friendlyset(457,"2","Keep getting phone numbers.");
           else friendlyset(457,"1","Turn in your "+item_amount($item[orquette's phone number])+" phone numbers for some neat prizes.");
          return;
@@ -393,8 +397,8 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
           else friendlyset(522,"1","Complete the KGE Outfit.");
          return;
       case $location[a massive ziggurat]:
-         if (item_amount($item[stone triangle]) == 4) friendlyset(791,"1","Fight the final Protector Spectre.");
-          else friendlyset(791,"6","Not enough triangles; skip the Protector Spectre.");
+         if (item_amount($item[stone triangle]) == 4) friendlyset(my_path() == "Actually Ed the Undying"? 1002: 791,"1","Fight the final Protector Spectre.");
+          else friendlyset(my_path() == "Actually Ed the Undying"? 1002: 791,"6","Not enough triangles; skip the Protector Spectre.");
          return;
       case $location[mer-kin colosseum]: if (!have_equipped(next_w())) equip(next_w()); return;
       case $location[mer-kin library]: if (get_property("merkinVocabularyMastery") != "100") return; int choice;
@@ -448,8 +452,19 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
             if (upairs > 2) return;
          }
          return;
-      case $location[The Road to the White Citadel]: if ($strings[started, step1] contains get_property("questG02Whitecastle") && 
+      case $location[the road to the white citadel]: if ($strings[started, step1, step2, step3, step4] contains get_property("questG02Whitecastle") && 
             item_amount($item[opium grenade]) == 0 && creatable_amount($item[opium grenade]) > 0) create(1,$item[opium grenade]);
+         return;
+      case $location[the rowdy saloon]: if (item_amount($item[pocket ace]) > 0) friendlyset(998,"5","Cheat with your pocket ace.");
+          else switch (item_amount($item[sleeve deuce])) {
+             case 0: friendlyset(998,"1","Play without cheating since you have nothing to put up your sleeve."); break;
+             case 1: friendlyset(998,"2","Cheat with your sleeve deuce."); break;
+             case 2: friendlyset(998,"3","Cheat with two sleeve deuces! (20% chance of being caught and losing your deuces)"); break;
+             default: friendlyset(998,"4","Cheat with three sleeve deuces! (40% chance of being caught and losing your deuces)"); break;
+          }
+         return;
+      case $location[The Secret Council Warehouse]: if (item_amount($item[warehouse map page]) > 0 && item_amount($item[warehouse inventory page]) > 0) 
+            use(1, $item[warehouse map page]); 
          return;
       case $location[The Shore, Inc. Travel Agency]:
          foreach i in $items[] if (sells_item($coinmaster[The Shore\, Inc. Gift Shop],i) && has_goal(i) > 0 &&
@@ -519,7 +534,10 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
         return;
       case $location[twin peak]:
          int twinPeakProgress = to_int(get_property("twinPeakProgress"));
-         if ((twinPeakProgress & 1) == 0 && numeric_modifier("Stench Resistance") >= 4) {
+         if (my_path() == "Bees Hate You") {
+            friendlyset(606,"6","Shortcuts not available in BHY.");
+            friendlyset(618,"2","Burn the hotel to the ground.");
+         } else if ((twinPeakProgress & 1) == 0 && numeric_modifier("Stench Resistance") >= 4) {
             friendlyset(606,"1","Investigate the stinky room.");
             friendlyset(607,"1","");
          } else if ((twinPeakProgress & 2) == 0 && foodDrop() >= 50) {
@@ -535,6 +553,10 @@ void set_choiceadvs() {       // this is where the arduous magic happens.
             friendlyset(617,"1","");
         } else friendlyset(606,"0","What to do here?");
         return;
+      case $location[waste processing]: while (get_property("statusWasteProcessing") != "cleared" && item_amount($item[handful of juicy garbage]) > 0 &&
+            have_item($item[bugbear communicator badge]) == 0) use(1,$item[handful of juicy garbage]);
+         if (!have_equipped($item[bugbear communicator badge]) && item_amount($item[bugbear communicator badge]) > 0) equip($slot[acc3],$item[bugbear communicator badge]);
+         return;
       case $location[whitey's grove]:
          if (is_goal($item[piece of wedding cake]) || is_goal($item[white rice]))
             friendlyset(73,"3","Get goal cake/rice.");
@@ -601,36 +623,25 @@ boolean use_fam(familiar f) {
 }
 
 familiar dropfam() {
-   if (my_location().zone == "The Sea" || $locations[none, the slime tube] contains my_location()) return my_familiar();
+   if (my_location().environment == "underwater" || $locations[none, the slime tube] contains my_location()) return my_familiar();
    boolean has_more_drop(familiar f, int soft) {
       boolean clim(string prop, int hard) { return to_int(get_property(prop)) < min(soft,hard); }
       switch(f) {
-         case $familiar[angry jung man]: return clim("_jungDrops",1);
-         case $familiar[astral badger]: return clim("_astralDrops",5);
-         case $familiar[baby sandworm]: return clim("_aguaDrops",5);
-         case $familiar[blavious kloop]: return clim("_kloopDrops",5);
-         case $familiar[bloovian groose]: return clim("_grooseDrops",5);
          case $familiar[gelatinous cubeling]: return (available_amount($item[eleven-foot pole]) == 0 || 
             available_amount($item[ring of detect boring doors]) == 0 || available_amount($item[pick-o-matic lockpicks]) == 0);
-         case $familiar[green pixie]: if (have_effect($effect[absinthe-minded]) > 0) return false; return clim("_absintheDrops",5);
-         case $familiar[grim brother]: return clim("_grimFairyTaleDrops",5);
-         case $familiar[grimstone golem]: return clim("_grimstoneMaskDrops",1);
          case $familiar[happy medium]: return clim("_mediumSiphons",20);
          case $familiar[knob goblin organ grinder]: return clim("_pieDrops",5);
-         case $familiar[li'l xenomorph]: return clim("_transponderDrops",5);
-         case $familiar[llama lama]: return clim("_gongDrops",5);
          case $familiar[artistic goth kid]: if (!hippy_stone_broken() && have_familiar($familiar[mini-hipster])) return false;
          case $familiar[mini-hipster]: if (!contains_text(to_url(my_location()),"adventure.php")) return false; return clim("_hipsterAdv",7);
          case $familiar[pair of stomping boots]: foreach i,m in get_monsters(my_location()) if (!($phyla[dude,none] contains m.phylum)) return clim("_pasteDrops",7); return false;
-         case $familiar[rogue program]: return clim("_tokenDrops",5);
-         case $familiar[unconscious collective]: return clim("_dreamJarDrops",5);
-      } return false;
+         case $familiar[green pixie]: if (have_effect($effect[absinthe-minded]) > 0) return false; break;
+      }
+      return f.drops_today < min(soft,f.drops_limit);
    }
-   for i from 1 upto 10
-    foreach f in $familiars[green pixie, li'l xenomorph, baby sandworm, grim brother, grimstone golem, astral badger, llama lama, mini-hipster, 
-       bloovian groose, rogue program, blavious kloop, unconscious collective, angry jung man, happy medium, 
-       knob goblin organ grinder, artistic goth kid, pair of stomping boots, gelatinous cubeling]
-      if (have_familiar(f) && has_more_drop(f,i)) return f;
+  for i from 1 upto 10
+    foreach f in $familiars[] if (have_familiar(f) && !(
+          $familiars[cotton candy carnie]          // list familiars here you want to SKIP
+       contains f) && has_more_drop(f,i)) return f;
    return my_familiar();
 }
 
@@ -718,7 +729,6 @@ void bbb() {
       } break;
       case "Keep On Turnin' the Wheel in the Sky": visit_url("council.php"); break;
    }
-//   if (my_location() == $location[the island barracks]) hacienda_tracking();
    if (have_equipped($item[bag o' tricks]) && (run_combat().contains_text("a single fat bumblebee") || run_combat().contains_text("You open the bag and ")))
       set_property("bagOTricksCharges","0");
   // exchange tokens for tickets if they'll probably be needed
@@ -726,6 +736,8 @@ void bbb() {
      item_amount($item[not-a-pipe]) + item_amount($item[glimmering roc feather]) + item_amount($item[agua de vida]) +
      item_amount($item[coffee pixie stick])), item_amount($item[Game Grid token]))
       visit_url("arcade.php?action=skeeball&pwd");
+  // if you have BatBrain, make sure pricing information is relatively current for your combat items
+   if (svn_exists("batbrain")) foreach i in get_inventory() if (i.combat && sell_val(i,3) == 0) {}
    cookiecheck();
    use_goalcontaining_items();
    fight_items();

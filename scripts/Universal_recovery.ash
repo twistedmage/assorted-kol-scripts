@@ -2,8 +2,8 @@
 // http://kolmafia.us/showthread.php?t=1780
 script "Universal_recovery.ash";
 notify "Bale";
-since r15461; // Version where _spec is changed to Generated:_spec
-string thisver = "3.14";		// This is the script's version!
+since r17118; // Nuclear Autumn skill: Internal Soda Machine
+string thisver = "3.15";		// This is the script's version!
 
 // To use this script, put Universal_recovery in the /script directory. 
 // Then in the Graphical CLI type:
@@ -110,14 +110,12 @@ boolean buy_mmj = ($classes[Pastamancer, Sauceror] contains my_class()) || (my_c
 string hpAutoRecoveryItems = get_property("hpAutoRecoveryItems");
 string mpAutoRecoveryItems = get_property("mpAutoRecoveryItems");
 	// Is there a familiar that grants spleen items?
-boolean spleenfam =have_familiar($familiar[Green Pixie]) || have_familiar($familiar[LLama lama])
+boolean spleenfam = have_familiar($familiar[Green Pixie]) || have_familiar($familiar[LLama lama])
 	|| have_familiar($familiar[Baby Sandworm]) || have_familiar($familiar[Rogue Program])
 	|| have_familiar($familiar[Pair of Stomping Boots]);
 	// Use Medicinal Herb's medicinal herbs?
-boolean use_herb = contains_text(hpAutoRecoveryItems, "medicinal herb's medicinal herbs")
-	&& !(bees || boris || zombie) && my_level() > 2
-	&& (my_primestat() == $stat[muscle] || item_amount($item[Medicinal Herb's medicinal herbs]) > 0
-	|| (my_class() == $class[accordion thief] && my_level() >= 9));
+boolean use_herb = contains_text(hpAutoRecoveryItems, "medicinal herb's medicinal herbs") && !bees && my_level() > 2
+	&& (my_class() == $class[Seal Clubber] || my_class() == $class[Turtle Tamer] || (my_class() == $class[Accordion Thief] && my_level() >= 9) || item_amount($item[Medicinal Herb's medicinal herbs]) > 0);
 int camp_hp = numeric_modifier("Base Resting HP") * (numeric_modifier("Resting HP Percent")+100) / 100 + numeric_modifier("Bonus Resting HP");
 int camp_mp = numeric_modifier("Base Resting MP") * (numeric_modifier("Resting MP Percent")+100) / 100 + numeric_modifier("Bonus Resting MP");
 int chateau_hp = 250; // Range is 200-300
@@ -184,10 +182,9 @@ void restore_values() {
 		heal[$item[beer-scented teddy bear]] = new restorative_info(0, 0, 15, 20, 0.0, 17.5);
 		heal[$item[comfy pillow]] = new restorative_info(20, 30, 0, 0, 25.0, 0.0);
 	}
-	if(bees)
-		foreach it in heal
-			if(it.to_string().to_lower_case().index_of("b") != -1)
-				remove heal[it];
+	foreach it in heal
+		if(!is_unrestricted(it) || (bees && it.to_string().to_lower_case().index_of("b") != -1))
+			remove heal[it];
 	heal[null] = new restorative_info(0, 0, 0, 0, 0.0, 0.0);
 }
 
@@ -411,14 +408,11 @@ int for_use(item it) {
 // in inventory (but not closet) and then buy any extra needed. Returns true if it returns any items at all.
 boolean purchase(int q, item it) {
 	int price;
-	switch(it) {
-	case $item[magical mystery juice]:
-	case $item[Medicinal Herb's medicinal herbs]:
-		price = 100;
-		break;
-	default:
+	if(npc_price(it) > 0)
+		price = npc_price(it);
+	else	
 		price = historical_price(it);
-	}
+	if(price < 1) return false;
 	// Stores with limits are a bitch
 	int buyit(int x, item doodad, int limit) {
 		int bought = buy(x, it, limit);
@@ -488,7 +482,8 @@ void use_inv(int q, item it, int amount){
 		use(min(q*6, inv_quant($item[New Cloaca-Cola], amount, "MP")), $item[New Cloaca-Cola]);
 		break;
 	default:
-		use(q, it);
+		if(it.spleen < 1)
+			use(q, it);
 	}
 }
 void use_inv(int q, item it){
@@ -511,23 +506,6 @@ skill find_cheapest_skill(int target) {
 		}
 	}
 	return cheapest;
-}
-
-// This will return the cost of healing with Doc Galaktik's services. If doit == TRUE, then it will actually
-// purchase the service from Doc, otherwise it only returns a value.
-int galaktik(int amount, boolean doit, string type) {
-	int [string, boolean] galaktik_price;
-		galaktik_price["HP", true] = 6;
-		galaktik_price["HP", false] = 10;
-		galaktik_price["MP", true] = 12;
-		galaktik_price["MP", false] = 17;
-	int cost = galaktik_price[type, galaktik_cures_discounted()]; 
-	if(doit) {
-		amount = min(amount, floor(my_meat()/ cost));   // If actually healing, don't spend non-existent meat.
-		if(amount > 0)
-			cli_execute("galaktik "+type+ " "+ to_string(amount));
-	}
-	return cost * amount;
 }
 
 // How many times do I need to cast the skill? The second is concerned with max MP.
@@ -568,27 +546,25 @@ float mall_quant(item it, int amount, string type){
 // Returns price of an item or if the character wants to use inventory, it will return 1 for an item in inventory. (Ugh!)
 int item_price(item it) {
 	if(UseInventoryInMallmode && item_amount(it) > 0) return 1;
+	if(npc_price(it) > 0)
+		return npc_price(it);
 	switch(it) {
 	// Untradeables, might as well use them
 	case $item[beer-scented teddy bear]:
 	case $item[comfy pillow]:
 		return 1;
-	case $item[magical mystery juice]:
-	case $item[Medicinal Herb's medicinal herbs]:
-		return npc_price(it);
 	}
 	if(historical_age(it) > 1.5) 	// Ensure that historical_price() is good
 		return mall_price(it);
 	return historical_price(it);
 }
 
-// This will return the best value from the mall. Returns null if the best is Doc Galaktik's restoration.
+// This will return the best value from the mall. 
 // Don't forget to consider the costs of Palm frond, six-pack of New Cloaca-Cola & mummy wrapping.
 item best_mall(int amount, string type) {
 	item best_item = null;
-	float best_cost = galaktik(amount, false, type); // This is a good price to beat. For low values it might even be best!
+	float best_cost = amount * 11; // Too high: Doc Galaktik's Invigorating Tonic before quest is 10.
 	float q, cost;
-	if(Verbosity > 2) print("To heal with Doc Galaktik would cost "+best_cost+ " meat. Now to beat that price...", "blue");
 	foreach key in heal {
 		if(!(is_tradeable(key) || key == $item[magical mystery juice] || key == $item[Medicinal Herb's medicinal herbs])
 		  || (type == "HP" && heal[key].maxhp == 0) || (type == "MP" && heal[key].maxmp == 0))
@@ -626,14 +602,13 @@ item best_mall(int amount, string type) {
 			if(Verbosity > 2) print(best_item+" is now the best for restoring "+type+".", "blue");
 		}
 	}
-	if(Verbosity > 1) {
-		if(best_item == null) print("In mallmode, best "+type+ " restorative is: Doc Galaktik's services. Huh?", "red");
-		else print("In mallmode, best "+type+ " restorative is: "+best_item+ " @ "+best_cost+" meat total.", "blue");
-	}
+	if(best_item == null)
+		abort("In mallmode, couldn't find a best restorative. Huh? Please report this error on the Kolmafia.us forums!");
+	if(Verbosity > 1)
+		print("In mallmode, best "+type+ " restorative is: "+best_item+ " @ "+best_cost+" meat total.", "blue");
 	// Set meat per MP so that the information is available to other scripts, like zarqon's SmartStasis
 	if(type == "MP")
-		set_property("_meatpermp", to_string((best_item == $item[magical mystery juice]
-		  ? 100.0 : item_price(best_item))/ heal[best_item].avemp));
+		set_property("_meatpermp", to_string(item_price(best_item)/ heal[best_item].avemp));
 	return best_item;
 }
 
@@ -716,9 +691,6 @@ boolean mall_heal(int target, string type) {
 				mall_heal(skills[best_skill].mp * q_skill, "MP");
 				old = old - 1; 	// mp restoration may have restored hp. Do another iteration and recalc
 			}
-		} else if(best_item == null) {
-			if(Verbosity > 1) print("Restoring with Doc Galaktik", "blue");
-			galaktik(amount, true, type);
 		} else if(!use_mall(q_item, best_item, target)) {
 			if(Verbosity > 1) print("Failed to use an item from the mall.", "red");
 			old = old -1;  // If no item was used, this becomes a do-over.
@@ -756,30 +728,30 @@ boolean mall_heal(int target, string type) {
 
 // This returns meat per mp in hardcore. Use with: set_property("_meatpermp", meatpermp());
 string meatpermp() {
+	float value(item it) { return npc_price(it) / heal[ it ].avemp; }
+	string best(item it) { return to_string(min(value(it), value($item[Doc Galaktik's Invigorating Tonic]))); }
 	switch {
+	case my_path() == "Nuclear Autumn" && have_skill($skill[Internal Soda Machine]):
+		return "2.0";
 	case zombie:
 		return (have_skill($skill[summon horde]) ? "80.0" : "100.0");
 	case buy_mmj:
-		return to_string(100.0/ heal[$item[magical mystery juice]].avemp);
+		return best($item[magical mystery juice]);
 	case black_market_available() && !bees:
-		return to_string(80.0/ heal[$item[black cherry soda]].avemp);
+		return best($item[black cherry soda]);
 	case dispensary_available() && !bees:
-		return to_string(80.0/ heal[$item[knob goblin seltzer]].avemp);
+		return best($item[knob goblin seltzer]);
 	case white_citadel_available():
-		return to_string(80.0/ heal[$item[Regular Cloaca Cola]].avemp);
-	case galaktik_cures_discounted():
-		return "12.0";
+		return best($item[Regular Cloaca Cola]);
 	}
-	return "17.0";
+	return value($item[Doc Galaktik's Invigorating Tonic]);
 }
 
 // Returns best value to purchase HP in Hardcore
 float meatperhp() {
 	if(zombie)
 		return (100.0 / (my_maxhp() / (have_skill($skill[summon horde]) ? 8 : 10)));
-	if(galaktik_cures_discounted() && contains_text(hpAutoRecoveryItems, "curative nostrum"))
-		return 6.0;
-	return 60.0/ heal[$item[Doc Galaktik's Ailment Ointment]].avehp;
+	return npc_price($item[Doc Galaktik's Homeopathic Elixir])/ heal[ $item[Doc Galaktik's Homeopathic Elixir] ].avehp;
 }
 
 // This will set _meatperhp and _meatpermp, considering the possibility of healing with skills.
@@ -868,8 +840,8 @@ boolean use_hot_tub() {
 	int hotTubSoaks = get_property("_hotTubSoaks").to_int();
 	if(hotTubSoaks > 4) return false;
 	if(my_hp() < my_maxhp() /8) return hot_tub();
-	int expec_adv = my_adventures() + 3.5 * (fullness_limit() - my_fullness()) 
-	  + 3.5 * (inebriety_limit() - my_inebriety());
+	int expec_adv = my_adventures() + 4.5 * (fullness_limit() - my_fullness()) 
+	  + 4.5 * (inebriety_limit() - my_inebriety());
 	if(spleenfam) expec_adv += (((spleen_limit() - my_spleen_use()) / 4) * 1.88);
 	if(expec_adv < 10 * (5 - hotTubSoaks))
 		return hot_tub();
@@ -1011,26 +983,35 @@ boolean inv_mp_restore(int target) {
 
 // At the very end, MP needs to be purchased with meat. Figure out how to do this most efficiently.
 boolean purchase_mp(int target) {
+	// MP is cheap in Nuclear Autumn with the right skill. This is the only way to purchase MP in the path.
+	if(have_skill($skill[Internal Soda Machine])) {
+		// Heals 10 MP for 20 meat with each cast
+		int q = min(ceil((target - my_mp()) / 10.0), my_meat() / 20);
+		if(q > 0)
+			use_skill(q, $skill[Internal Soda Machine]);
+			return my_mp() >= target;
+	}
 	if(!buy_npc) return false;
 	if(my_mp() >= target) return true;
 	int old_mp, cost;
 	item best_buy = null;
-	boolean fizzy = contains_text(mpAutoRecoveryItems, "fizzy invigorating tonic"); // Can use Doc Galaktik?
+	item [int] opts;
+	foreach key in $items[magical mystery juice, black cherry soda, knob goblin seltzer, Regular Cloaca Cola, Doc Galaktik's Invigorating Tonic]
+		if(npc_price(key) > 0 && heal contains key)
+			opts[count(opts)] = key;
+	if(count(opts) == 0) {
+		if(Verbosity > 1) print("For some reason there are no restoration optiions available to you", "red");
+		return false;
+	}
 	repeat {
 		old_mp = my_mp();
-		if(buy_mmj && my_meat() >= 100) {
-			best_buy = $item[magical mystery juice];
-			cost = 100;
-		} else if(my_meat() >= 80 && 6 + my_mp() <= my_maxmp() || !fizzy) {
-			if(black_market_available() && !bees)
-				best_buy = $item[black cherry soda];
-			else if(dispensary_available() && !bees)
-				best_buy = $item[knob goblin seltzer];
-			else if(white_citadel_available())
-				best_buy = $item[Regular Cloaca Cola];
-			else best_buy = null;
-			cost = 80;
-		} else best_buy = null;
+		sort opts by (npc_price(value) / heal[value].avemp);
+		foreach x,it in opts
+			if(my_meat() >= npc_price(it)) {
+				best_buy = it;
+				cost = npc_price(it);
+				break;
+			}
 		if(best_buy != null) {
 			int q = ceil((target - my_mp()) / heal[best_buy].avemp);
 			if(q == 0) q = 1;
@@ -1039,24 +1020,16 @@ boolean purchase_mp(int target) {
 			purchase(q, best_buy); 	// If we don't have anything to use, then we're done.
 			q = min(q, for_use(best_buy));
 			use(q, best_buy);
-		} else if(fizzy) {
-			// Let's not heal all the way to mp_target if not required -- expensive!
-			if(start_type == "MP")
-				target = objective == 0 ? min(target *.9, mp_trigger) : objective;
-				// In the case that objective !=0, target is lowered to original minimum
-			if(target <= my_mp()) return true;
-			galaktik(target - my_mp(), true, "MP");
 		}
 	} until(old_mp >= my_mp() || my_mp() >= target);
 	set_property("_meatpermp", meatpermp());
 	if(my_mp() < target) {
-		if(my_meat() >= 80 && best_buy != null)
+		if(best_buy == null)
+			print("Could not find good option to restore MP.", "red");
+		else
 			print("Cannot spend meat to fully restore MP! Failed to use "+best_buy+" for some reason.", "red");
-		else if(!fizzy && ((galaktik_cures_discounted() && my_meat() > 11)|| my_meat() > 16))
-			print("Cannot restore MP because fizzy invigorating tonic is disabled!", "red");
-		else print("Insufficient meat to fully restore MP without wasting restoratives!", "red");
 	}
-	return (my_mp() >= target);
+	return my_mp() >= target;
 }
 
 int rest_hp() {
@@ -1199,7 +1172,8 @@ boolean mp_heal(int target){
 				cli_execute("sofa "+x);  //visit_url("clan_rumpus.php?preaction=nap&numturns="+ x + "&pwd");
 		}
 	} else if(my_adventures() > 0 && contains_text(mpAutoRecoveryItems, "rest at your campground"))
-		while(my_mp() < target && my_mp() < my_maxmp() &&(my_maxmp() - my_mp() >=rest_mp() && my_maxhp() - my_hp() >= rest_hp() || AlwaysContinue) && my_adventures() > 0)
+		while(my_adventures() > 0 && my_mp() < target && my_mp() < my_maxmp() 
+		  && (my_maxmp() - my_mp() >=rest_mp() && my_maxhp() - my_hp() >= rest_hp() || AlwaysContinue || my_path() == "Nuclear Autumn"))
 			rest();			// This will waste adventures resting if set in HP/MP Usage.
 	if(my_mp() >= target) return true;
 	if(Verbosity > 1) print("Last attempt to purchase MP with meat.", "blue");
@@ -1210,23 +1184,19 @@ boolean mp_heal(int target){
 boolean fullheal() {
 	if(Verbosity > 2) print("Trying to fullheal", "#002080");
 	skill cheap_skill = find_cheapest_skill(my_maxhp());
-	int galaktik_price = galaktik(my_maxhp() - my_hp(), false, "HP");
 	string select_method() {
 		switch {
 		case beset($effect[Form of...Bird!]) && item_amount($item[plump juicy grub]) > 0 
 		  && heal[$item[plump juicy grub]].avehp + my_hp() >= my_maxhp() && !bees:
 			return use(1, $item[plump juicy grub]);
 		case use_herb && my_spleen_use() < (spleenfam? (spleen_limit()%4): spleen_limit())
-		  && (item_amount($item[Medicinal Herb's medicinal herbs]) >0 || (my_meat() >=100 && my_primestat() == $stat[muscle] && buy_npc)):
-			if(item_amount($item[Medicinal Herb's medicinal herbs]) < 1)
-				retrieve_item(1, $item[Medicinal Herb's medicinal herbs]);
-			return use(1, $item[Medicinal Herb's medicinal herbs]);
+		  && (item_amount($item[Medicinal Herb's medicinal herbs]) > 0 || (my_meat() >= npc_price($item[Medicinal Herb's medicinal herbs])
+		  && my_primestat() == $stat[muscle] && buy_npc && retrieve_item(1, $item[Medicinal Herb's medicinal herbs]))):
+			return chew(1, $item[Medicinal Herb's medicinal herbs]);
 		case skills[cheap_skill].ave + my_hp() >= my_maxhp() && (my_mp() >= skills[cheap_skill].mp
 		  || (my_maxmp() >= skills[cheap_skill].mp && mp_heal(skills[cheap_skill].mp))):
 			if(my_hp() >= my_maxhp()) return true;
 			return cast(1, cheap_skill);
-		case galaktik_price <= 100 && my_meat() >= galaktik_price && !zombie:
-			return galaktik(my_maxhp() - my_hp(), true, "HP");
 		case item_amount($item[scroll of drastic healing]) >0 && contains_text(hpAutoRecoveryItems, "drastic healing"):
 			return use(1, $item[scroll of drastic healing]);
 		case contains_text(hpAutoRecoveryItems, "scented massage oil") 
@@ -1236,7 +1206,8 @@ boolean fullheal() {
 		// Select something which is just too big for normal use
 		foreach key, value in heal
 			if(item_amount(key) >0 && value.avehp > my_maxhp() - my_hp() && value.maxhp > 120 && my_maxhp() > 100 && my_hp() < my_maxhp() / 5)
-				return use(1, key);
+			if(item_amount(key) >0 && value.avehp > my_maxhp() - my_hp() && value.maxhp > 120 && my_maxhp() > 100 && my_hp() < my_maxhp() / 5 && key.spleen < 1)
+			return use(1, key);
 		return false;
 	} select_method();
 	return (my_hp() == my_maxhp());
@@ -1446,7 +1417,7 @@ boolean skill_restore(int target) {
 
 // At the very end, HP needs to be purchased with meat. Figure out how to do this most efficiently.
 boolean purchase_hp(int target) {
-	if(!buy_npc) return false;
+	if(!buy_npc || my_path() == "Nuclear Autumn") return false;
 	if(objective == 0) {   // Let's not be stubborn. Lets save meat by getting close enough
 		if(target * .9 > hp_trigger) {
 			if(Verbosity > 0) print("Recovery target reduced to healing trigger ("+hp_trigger+")to conserve meat.", "#66CC00");
@@ -1454,19 +1425,17 @@ boolean purchase_hp(int target) {
 		} else target = max(hp_trigger, target * .9);
 	} else if(target > objective)
 		target = objective;		// In the case that objective !=0, target is lowered to original minimum
-	while(my_meat() >= 60 && my_hp() < target && !zombie)
-		if(galaktik_cures_discounted() && contains_text(hpAutoRecoveryItems, "curative nostrum")) {
-			galaktik(target - my_hp(), true, "HP");
-		} else if(my_meat() >= 60) {
-			int q = floor((target - my_hp()) / 9.0);
+	float elixir = npc_price($item[Doc Galaktik's Homeopathic Elixir]);
+	while(my_meat() >= elixir && my_hp() < target && !zombie) {
+			int q = floor((target - my_hp()) / heal[ $item[Doc Galaktik's Homeopathic Elixir] ].avehp);
 			if(q == 0)
 				q = 1;
-			if(my_meat()< q * 60)
-				q = floor(my_meat()/60.0);
-			purchase(q, $item[Doc Galaktik's Ailment Ointment]);
-			use(q, $item[Doc Galaktik's Ailment Ointment]);
-		}
-	if(my_meat() < 60 && my_hp() < target)
+			if(my_meat()< q * elixir)
+				q = floor(my_meat()/ elixir);
+			purchase(q, $item[Doc Galaktik's Homeopathic Elixir]);
+			use(q, $item[Doc Galaktik's Homeopathic Elixir]);
+	}
+	if(my_meat() < elixir && my_hp() < target)
 		print("Insufficient meat to fully restore HP without wasting restoratives!", "red");
 	return (my_hp() >= target);
 }
@@ -1579,7 +1548,8 @@ boolean hp_heal(int target){
 				cli_execute("sofa "+x);
 		} 
 	} else if(my_adventures() > 0 && contains_text(hpAutoRecoveryItems, "rest at your campground"))
-		while(my_hp() < target && my_hp() < my_maxhp() && (my_maxmp() - my_mp() >=rest_mp() && my_maxhp() - my_hp() >= rest_hp() || AlwaysContinue) && my_adventures() > 0)
+		while(my_adventures() > 0 && my_hp() < target && my_hp() < my_maxhp()
+		  && (my_maxmp() - my_mp() >=rest_mp() && my_maxhp() - my_hp() >= rest_hp() || AlwaysContinue|| my_path() == "Nuclear Autumn"))
 			rest();			// This will waste adventures resting if set in HP/MP Usage.
 	if((objective == 0 && my_hp() >= target*.9) || (objective !=0 && my_hp() >= objective))
 		return true;
@@ -1590,7 +1560,7 @@ boolean hp_heal(int target){
 // This will cure poisoning. It will only fail if the character does not possess an antidote, or can't afford to buy one.
 // It will also attempt to keep a few spare anti-anti-antidotes in inventory, for emergency in-combat use.
 boolean unpoison() {
-	if(zombie)		 // Zombie Masters don't stay poisoined and cannot purchase antidotes.
+	if(zombie)		 // Zombie Masters don't stay poisoned and cannot purchase antidotes.
 		return true;
 
 	// Am I poisoned?
@@ -1627,7 +1597,8 @@ boolean unpoison() {
 
 // If Hot Tub would be used by the script anyway, then lets use it to clear up your status!!
 void cure_status() {
-	if(!unpoison()) print("Can't cure poison! OOoch! It burns in my veins!", "red");
+	if(my_path() != "Nuclear Autumn")
+		if(!unpoison()) print("Can't cure poison! OOoch! It burns in my veins!", "red");
 	if(get_property("removeMalignantEffects").to_boolean()) return;
 	boolean skill_pop = false;
 	boolean skill_cure(skill cure) {
@@ -1844,8 +1815,8 @@ void daily_handling() {
 		restore_values();
 		meatper();
 		if(svn_exists("mafiarecovery")) {
-			cli_execute("svn update mafiarecovery");
 			set_property("_version_BalesUniversalRecovery", thisver);
+			cli_execute("svn update mafiarecovery");
 		}
 		else check_version();
 	}
@@ -1879,8 +1850,10 @@ boolean restore(string type, int amount) {
 			if(Verbosity > 0) print("Restoring only 1 HP since more is irrelevant here", "#66CC00");
 			if(zombie)
 				hp_heal(1);
-			else
-				galaktik(1, true, "HP");
+			else {
+				retrieve_item(1, $item[Doc Galaktik's Pungent Unguent]);
+				use(1, $item[Doc Galaktik's Pungent Unguent]);
+			}
 		}
 		return my_hp() > 0;
 	}

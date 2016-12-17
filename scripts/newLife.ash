@@ -3,31 +3,26 @@
 
 script "newLife.ash"
 notify "Bale";
-since r15561; // Edpiece support
+since r16944; // Track Enlightenment points for The Source
 import "zlib.ash";
 
-if(check_version("newLife", "bale-new-life", "1.14.4", 2769) != "" 
-  && user_confirm("The script has just been updated!\nWould you like to quit now and manually resume execution so that you can use the current version?")) {
-	vprint("New Life aborted to complete update. Please run newLife.ash to finish setting up your current ascension.", -1);
-	exit;
-}
-
-if(!($strings[None, Teetotaler, Boozetafarian, Oxygenarian, Bees Hate You, Way of the Surprising Fist, Trendy,
+if(!($strings[None, Standard, Teetotaler, Boozetafarian, Oxygenarian, Bees Hate You, Way of the Surprising Fist, Trendy,
 Avatar of Boris, Bugbear Invasion, Zombie Slayer, Class Act, Avatar of Jarlsberg, BIG!, KOLHS, Class Act II: A Class For Pigs, 
-Avatar of Sneaky Pete, Slow and Steady, Heavy Rains, Picky, Standard, Actually Ed the Undying] 
+Avatar of Sneaky Pete, Slow and Steady, Heavy Rains, Picky, Actually Ed the Undying, One Crazy Random Summer, Community Service,
+Avatar of West of Loathing, The Source, Nuclear Autumn] 
   contains my_path()) && user_confirm("Your current challenge path is unknown to this script!\nUnknown and unknowable errors may take place if it is run.\nDo you want to abort?")) {
 	vprint("Your current path is unknown to this script! A new version of this script should be released very soon.", -1);
 	exit;
 }
 
-// Often I get this script out before full mafia support. Hence these variable are necessary.
+// Often I get this script out before full mafia support. Hence these variable are used.
 // It's no longer necessary for old paths however I may need it in the future.
 stat primestat = my_primestat();
 class myclass = my_class();
-if(my_path() == "17") {
-	primestat = $stat[moxie];
-	myclass = $class[Avatar of Sneaky Pete];
-}
+# if(my_path() == "17") {
+	# primestat = $stat[moxie];
+	# myclass = $class[Avatar of Sneaky Pete];
+# }
 boolean skipStatNCs = my_path() == "BIG!" || my_path() == "Class Act II: A Class For Pigs";
 
 // This is a wrapper for be_good() that contains exceptions for this script's purpose.
@@ -60,12 +55,17 @@ boolean good(item it) {
 	case "Actually Ed the Undying":  // Ed has no campground
 		if(it == $item[Newbiesport&trade; tent]) return false;
 		break;
+	case "BIG!":
+		if($items[detuned radio] contains it) return false; // Unnecessary expense
+		break;
+	case "Nuclear Autumn":
+		if($items[chewing gum on a string] contains it) return false; 
+		break;
 	}
 	return be_good(it);
 }
 
 boolean good(familiar f) {
-	if(my_path() == "Actually Ed the Undying") return false;  // remove this line later when zlib is updated
 	return be_good(f); 
 }
 
@@ -97,10 +97,13 @@ void set_choice_adventures() {
 	set_choice(888, 4, "Library, Rise of the House of Spookyraven: Ignore");
 	set_choice(889, 4, "Library, Fall of the House of Spookyraven: Ignore");
 	set_choice(877, 1, "Bedroom, Mahogany Nightstand: old coin purse");
-	set_choice(878, 3, "Bedroom, Ornate Nightstand: Get spectacles");
+	if(in_hardcore() && my_path() == "Nuclear Autumn") // Cannot cook a wine bomb, so spectacles are useless
+		set_choice(878, 3, "Bedroom, Ornate Nightstand: Get disposable instant camera");
+	else
+		set_choice(878, 4, "Bedroom, Ornate Nightstand: Get spectacles");
 	if(my_path() == "Bees Hate You")
 		set_choice(879, 3, "Bedroom, Rustic Nightstand: Fight Mistress for Antique Mirror");
-	else if(primestat == $stat[Moxie])
+	else if(primestat == $stat[Moxie] || my_path() == "The Source")
 		set_choice(879, 1, "Bedroom, Rustic Nightstand: Get Moxie Stats");
 	else
 		set_choice(879, 2, "Bedroom, Rustic Nightstand: Get grouchy restless spirit");
@@ -136,7 +139,7 @@ void set_choice_adventures() {
 	set_choice(670, 0, "Fitness Giant's Room: Manual");
 	set_choice(671, 0, "Neckbeard Giant's Room: Manual");
 	set_choice(672, 3, "Possibility Giant's Room: skip adventure");
-	set_choice(673, 3, "Procrastination Giant's Room: skip adventure");
+	set_choice(673, 1, "Procrastination Giant's Room: very overdue library book");
 	set_choice(674, 3, "Renaissance Giant's Room: skip adventure");
 	set_choice(675, 0, "Goth Giant's Room: Manual");
 	set_choice(676, 0, "Raver Giant's Room: Manual");
@@ -163,6 +166,14 @@ void set_choice_adventures() {
 		set_choice(1019, 1, "Black Forest, Get beehive");
 		set_choice(1026, 2, "Giant's Castle, Get electric boning knife");
 	}
+	if(be_good($item[munchies pill]))
+		set_choice("violetFogGoal", 8, "Violet Fog is great place to get the munchies.");
+	else
+		set_choice("violetFogGoal", 0, "Violet Fog is too out of date to care about.");
+	// Ghost Dog
+	# set_choice(1106, 2, 'Ghost Dog says, "Wooof! Wooooooof!": Get buff'); // 1 is stats, 2 is buff, 3 is Ghost Dog food
+	set_choice(1107, 1, "Play Fetch with your Ghost Dog: Get 1 tennis ball");
+	set_choice(1108, my_ascensions() % 2 + 1, "Your Dog Found Something Again: Get food or booze"); // 1 is food, 2 is booze - Alternate
 	
 	// Path specific choices
 	if(my_path() == "Way of the Surprising Fist")
@@ -171,12 +182,15 @@ void set_choice_adventures() {
 		set_choice(297, 3, "Haiku Dungeon: Skip adventure to keep looking for the Bugbear Disguise");
 	if(my_path() == "Way of the Surprising Fist" && in_hardcore()) {
 		set_choice(153, 2, "Defiled Alcove: get meat");
-		set_choice(155, 2, "Defiled Niche: get meat");
-		set_choice(157, 3, "Defiled Nook: get meat");
+		set_choice(155, 3, "Defiled Nook: get meat");
+		set_choice(157, 2, "Defiled Niche: get meat");
 	} else {
 		set_choice(153, 4, "Defiled Alcove: skip adventure");
-		set_choice(155, 4, "Defiled Niche: skip adventure");
-		set_choice(157, 4, "Defiled Nook: skip adventure");
+		set_choice(157, 4, "Defiled Niche: skip adventure");
+		if(my_path() == "Zombie Slayer" && !have_familiar($familiar[Hovering Skull]) && storage_amount($item[talkative skull]) == 0)
+			set_choice(155, 1, "Defiled Nook: get talkative skull familiar");
+		else
+			set_choice(155, 4, "Defiled Nook: skip adventure");
 	}
 	if($strings[Way of the Surprising Fist, Avatar of Boris] contains my_path()) {
 		// Can't use the outfit, so get some meat
@@ -202,7 +216,7 @@ void set_choice_adventures() {
 	if(skipStatNCs) {
 		set_choice("oceanDestination", "ignore", "At the Poop Deck: Skip the wheel");
 	} else {
-		set_choice("oceanDestination", primestat.to_lower_case(), "At the Poop Deck: take the Wheel and Sail to "+primestat+" stats");
+		set_choice("oceanDestination", to_lower_case(primestat), "At the Poop Deck: take the Wheel and Sail to "+primestat+" stats");
 	}
 	
 	// Prime Stat specific choices
@@ -221,6 +235,8 @@ void set_choice_adventures() {
 		set_choice(145, 1, "Frats on the Verge of War, Fratacombs: Get Muscle stats");
 		set_choice(793, 1, "Take Muscle vacation.");
 		set_choice(876, 2, "Bedroom, White Nightstand: Get Muscle stats");
+		if(my_path() == "The Source")
+			set_choice(153, 1, "Defiled Alcove: Desperately need mainstat when fighting the Source");
 		break;
 	case $stat[mysticality]:
 		set_choice(73, 3, "Whitey's Grove: Get wedding cake and rice");
@@ -234,7 +250,11 @@ void set_choice_adventures() {
 		set_choice(141, 1, "Hippies on the Verge of War, Blockin' Out the Scenery: Get Mysticality stats");
 		set_choice(145, 2, "Frats on the Verge of War, Fratacombs: Get food");
 		set_choice(793, 2, "Take Mysticality vacation.");
-		set_choice(876, 1, "Bedroom, White Nightstand: old leather wallet");
+		if(my_path() == "The Source") {
+			set_choice(157, 1, "Defiled Niche: Desperately need mainstat when fighting the Source");
+			set_choice(876, 2, "Bedroom, White Nightstand: Get Muscle stats");
+		} else
+			set_choice(876, 1, "Bedroom, White Nightstand: old leather wallet");
 		break;
 	case $stat[moxie]:
 		set_choice(73, 3, "Whitey's Grove: Get wedding cake and rice");
@@ -251,6 +271,10 @@ void set_choice_adventures() {
 		set_choice(141, 2, "Hippies on the Verge of War, Blockin' Out the Scenery: Get rations");
 		set_choice(145, 2, "Frats on the Verge of War, Fratacombs: Get food");
 		set_choice(793, 3, "Take Moxie vacation.");
+		if(my_path() == "The Source") {
+			set_choice(876, 2, "Bedroom, White Nightstand: Get Muscle stats");
+			set_choice(155, 1, "Defiled Nook: Desperately need mainstat when fighting the Source");
+		} else
 		set_choice(876, 1, "Bedroom, White Nightstand: old leather wallet");
 		break;
 	}
@@ -282,7 +306,9 @@ void campground(boolean softBoo) {
 	// Break the hippy stone?
 	if(vars["newLife_SmashHippyStone"] == "true" && !hippy_stone_broken() && good("Hippy Stone")) {
 		vprint("Smashing that hippy-dippy crap so you can have some violent fun!", "olive", 3);
-		visit_url("campground.php?confirm=on&smashstone=Yep.&pwd");
+		string pvp = visit_url("peevpee.php?confirm=on&action=smashstone&pwd");
+		if(pvp.contains_text("Pledge allegiance to"))
+			visit_url("peevpee.php?action=pledge&place=fight&pwd");
 	}
 	
 	if(get_dwelling() != $item[big rock])
@@ -319,8 +345,10 @@ void get_bugged_balaclava() {
 	}
 }
 
-void get_stuff() {
+void buy_stuff() {
 	boolean need_accordion() {
+		if(my_path() == "Avatar of West of Loathing") // Cowboys don't need accordions
+			return false;
 		// ATs come with a stolen accordion and ability to steal more
 		if(myclass != $class[Accordion Thief] && item_amount($item[toy accordion]) == 0 && available_amount($item[antique accordion]) == 0 && good($item[toy accordion]))
 			foreach s in $skills[]
@@ -376,7 +404,8 @@ void get_stuff() {
 
 	string garner;
 	
-	if(need_accordion())
+	// Don't get the toy accordion if I have a Deck of Every Card because I'll probably prefer to sell a Mickey Mantle card and buy an antique accordion.
+	if(need_accordion() && !(available_amount($item[Deck of Every Card]) > 0 && be_good($item[Deck of Every Card])))
 		garner = trade_pork4item($item[toy accordion]);
 		
 	if(knoll_available() && good($item[detuned radio]))
@@ -400,6 +429,27 @@ void get_stuff() {
 		vprint("Pork Elf stones were sold to garner a "+garner+".", "blue", 3);
 }
 
+void get_stuff() {
+	get_bugged_balaclava();
+	if(vars["newLife_SellPorkForStuff"].to_boolean()) {
+		if(item_amount($item[pork elf goodies sack]) > 0 && good($item[pork elf goodies sack]))
+			use(1, $item[pork elf goodies sack]);
+		if(item_amount($item[baconstone]) + item_amount($item[hamethyst]) + item_amount($item[porquoise]) + my_meat() > 0)
+			buy_stuff();
+	}
+	// Get your cowboy boots from the LT&T Office
+	if(get_property("telegraphOfficeAvailable") ==  "true") {
+		visit_url("place.php?whichplace=town_right&action=townright_ltt");
+		run_choice(8);
+	}
+	// Clan Floundry -- get the fishin' pole. I hate the server hit, but I don't have another option yet
+	if(available_amount($item[Clan VIP Lounge key]) > 0 && visit_url("clan_viplounge.php").contains_text("vipfloundry.gif"))
+		visit_url("clan_viplounge.php?action=floundry");
+	// 11th Precinct
+	if(get_property("hasDetectiveSchool") == "true")
+		visit_url("place.php?whichplace=town_wrong&action=townwrong_precinct");
+}
+
 // Visit Mt. Noob to get pork gems.
 void visit_toot() {
 	vprint("The Oriole welcomes you back at Mt. Noob.", "olive", 3);
@@ -409,12 +459,6 @@ void visit_toot() {
 		letter = $item[letter to Ed the Undying];
 	if(item_amount(letter) > 0 && good(letter))
 		use(1, letter);
-	if(vars["newLife_SellPorkForStuff"].to_boolean()) {
-		if(item_amount($item[pork elf goodies sack]) > 0 && good($item[pork elf goodies sack]))
-			use(1, $item[pork elf goodies sack]);
-		if(item_amount($item[baconstone]) + item_amount($item[hamethyst]) + item_amount($item[porquoise]) + my_meat() > 0)
-			get_stuff();
-	}
 }
 
 boolean use_shield() {
@@ -452,7 +496,7 @@ familiar start_familiar() {
 
 void equip_stuff() {
 	buffer gear;
-	gear.append("0.2 mainstat, 0.2 hp, 0.2 dr, 0.1 spell damage, 4 ");
+	gear.append("0.2 mainstat, 0.2 hp, 0.2 dr, 0.1 spell damage, +effective 4 ");
 	gear.append(primestat);
 	gear.append(" experience");
 	if(my_path() != "Zombie Slayer")
@@ -462,19 +506,13 @@ void equip_stuff() {
 	if(available_amount($item[sugar shield]) > 0)
 		gear.append(" -equip sugar shield");
 	
-	// Ensure correct type of weapon
-	if(primestat == $stat[Muscle])
-		gear.append(" +0.5 melee");
-	else if(primestat == $stat[Moxie])
-		gear.append(" -0.5 melee");
-	
 	// Unarmed combat or require shield?
 	if(!have_skill($skill[Summon Smithsness]) && have_skill($skill[Master of the Surprising Fist]) && have_skill($skill[Kung Fu Hustler]) && available_amount($item[Operation Patriot Shield]) < 1)
 		gear.append(" -weapon -offhand");  // Barehanded can be BEST at level 1!
 	else if(use_shield())
 		gear.append(" +shield");
 	
-	// Things to not equip for specific path
+	// Things to equip or not equip for specific path
 	switch(my_path()) {
 	case "Bees Hate You":
 		gear.append(", 0 beeosity");
@@ -489,6 +527,9 @@ void equip_stuff() {
 			gear.append(" -familiar");
 		}
 		break;
+	case "One Crazy Random Summer":
+		gear.append(", 5 Random Monster Modifiers");
+		break;
 	}
 	maximize(gear, false);
 }
@@ -497,13 +538,19 @@ void handle_starting_items() {
 	// Free pulls
 	if(good($item[brick]))
 		retrieve_item(available_amount($item[brick]), $item[brick]);
-	#if(my_path() == "Avatar of Jarlsberg" && available_amount($item[Jarlsberg's pan (Cosmic portal mode)]) < 1 && available_amount($item[Jarlsberg's pan]) > 0)
-	#	visit_url("inv_use.php?pwd&which=2&ajax=1&whichitem=6305");
 
 	// Unpack astral consumables
-	foreach it in $items[astral hot dog dinner, astral six-pack, carton of astral energy drinks,
-	  box of bear arms]
+	foreach it in $items[astral hot dog dinner, astral six-pack, carton of astral energy drinks, box of bear arms]
 		if(item_amount(it) > 0 && good(it)) use(item_amount(it), it);
+	
+	// In AWoL, holster your toy sixgun or, if you're casual about it, Pecos Dave's sixgun.
+	item best_gun() {
+		foreach gun in $items[Pecos Dave's sixgun, porquoise-handled sixgun, hamethyst-handled sixgun, baconstone-handled sixgun, custom sixgun, makeshift sixgun, reliable sixgun, rinky-dink sixgun, toy sixgun]
+			if(available_amount(gun) > 0) return gun;
+		return $item[none];
+	}
+	if(my_path() == "Avatar of West of Loathing")
+		equip($slot[holster], best_gun());
 		
 	// Put on the best stuff you've got.
 	vprint("Put on your best gear.", "olive", 3);
@@ -602,6 +649,53 @@ void path_skills(boolean always_learn) {
 			vprint("Go forth and wreck just Vengeance upon "+my_name()+" with all your Skills, thus sayeth the Book of the Undying.", "blue", 3);
 		}
 		break;
+	case "Avatar of West of Loathing":
+		// If you have 10 skill points in a given book, learn all skills in that book
+		foreach book in $items[Tales of the West: Cow Punching, Tales of the West: Beanslinging, Tales of the West: Snake Oiling] {
+			string prop;
+			class awol = to_class(to_int(book) - 8937); // The three skill books and the classes they teach are in the same order
+			if(awol == $class[Cow Puncher]) prop = "awolPointsCowpuncher";
+			else if(awol == $class[Beanslinger]) prop = "awolPointsBeanslinger";
+			else prop = "awolPointsSnakeoiler";
+			int points = to_int(get_property(prop));
+			if(my_class() == awol)
+				points = min(max(points, 1) + my_level(), 10);
+			if(points >= 10) {
+				visit_url('inv_use.php?pwd&which=3&whichitem=' + to_int(book));
+				for sk from 0 to 9
+					visit_url("choice.php?whichchoice=" + to_string(to_int(awol) + 1159) + "&option=1&pwd&whichskill=" + sk);
+			}
+		}
+		break;
+	case "The Source":
+		if(get_property("sourceEnlightenment").to_int() > 10) {
+			visit_url("place.php?whichplace=manor1&action=manor1_sourcephone_ring");
+			for x from 1 to 11
+				visit_url("choice.php?whichchoice=1188&option=1&pwd&skid=" + x);
+		}
+		break;
+	// This isn't exactly learning new skills, but it is relevant and convenient to put it here.
+	case "Nuclear Autumn":
+		int shelter = to_int(get_property("falloutShelterLevel"));
+		if(shelter >= 5 && get_property("falloutShelterChronoUsed") == "false") {
+			print("Visiting your fallout shelter's Chronodynamics Laboratory.", "blue");
+			visit_url("place.php?whichplace=falloutshelter&action=vault5");
+		}
+		if(shelter >= 8 && get_property("falloutShelterCoolingTankUsed") == "false") {
+			print("Visiting your fallout shelter's Main Reactor.", "blue");
+			visit_url("place.php?whichplace=falloutshelter&action=vault8");
+		}
+		break;
+	}
+}
+
+// If you've got a Shrine to the Barrel God, get free stuff from the barrel.
+void free_barrels() {
+	if(!in_bad_moon() && get_property("barrelShrineUnlocked") == "true") {
+		print("Seek free stuff from the Barrel full of Barrels since you have the Barrel god's blessing.", "blue");
+		matcher barrel = create_matcher('<div class="ex"><a class="spot" href="([^"]+)"><img title="A barrel"', visit_url("barrel.php"));
+		while(barrel.find())
+			visit_url(barrel.group(1));
 	}
 }
 
@@ -618,11 +712,17 @@ void special(boolean bonus_actions) {
 		return true;
 	}
 	vprint("Now for a few things that "+my_name()+" wants to do.", "blue", 3);
-	if(available_amount($item[detuned radio]) > 0 || canadia_available())
+	if(available_amount($item[detuned radio]) > 0 || canadia_available() || (gnomads_available() && my_path() == "Actually Ed the Undying"))
 		change_mcd(10 + canadia_available().to_int());
 	
+	// transmission from planet Xi -> Xiblaxian holo-wrist-puter simcode -> Xiblaxian holo-wrist-puter
+	if(available_amount($item[Xiblaxian holo-wrist-puter]) == 0 && good($item[Xiblaxian holo-wrist-puter]))
+		foreach it in $items[transmission from planet Xi, Xiblaxian holo-wrist-puter simcode]
+			if(available_amount(it) > 0 && good(it))
+				use(1, it);
+	
 	// In softcore I want to pull stuff
-	if(!in_hardcore()) {
+	if(!in_hardcore() && my_path() != "Community Service") {
 		if(my_path() == "BIG!") {  // Most pulls involve leveling up, so BIG is very different!
 			if(!knoll_available() && pull_it($item[Loathing Legion knife]))
 				cli_execute("fold Loathing Legion universal screwdriver");
@@ -650,8 +750,9 @@ void special(boolean bonus_actions) {
 				(pull_it($item[Sneaky Pete's leather jacket]) || pull_it($item[Sneaky Pete's leather jacket (collar popped)]) || pull_it($item[cane-mail shirt]));
 			
 			// Back
-			if(have_familiar($familiar[El Vibrato Megadrone]) && good($familiar[El Vibrato Megadrone]) && pull_it($item[Buddy Bjorn]))
-				cli_execute("bjornify El Vibrato Megadrone");
+			if(available_amount($item[protonic accelerator pack]) == 0 || !good($item[protonic accelerator pack])) // New guear never needs to be pulled anymore!
+				if(!have_familiar($familiar[El Vibrato Megadrone]) && good($familiar[El Vibrato Megadrone]) && pull_it($item[Buddy Bjorn]))
+					cli_execute("bjornify El Vibrato Megadrone");
 			
 			// Best Hat? Jarlsberg comes with all the hat he needs and some other paths auto-pull their Path Hat
 			if(my_path() != "Avatar of Jarlsberg" && available_amount($item[The Crown of Ed the Undying]) < 1 && available_amount($item[Boris's Helm]) < 1 && available_amount($item[Boris's Helm (askew)]) < 1) {
@@ -689,12 +790,13 @@ void new_ascension() {
 	boolean extra_stuff = vars["newLife_Extras"].to_boolean();  // Do extra stuff if this is true
 	set_choice_adventures();
 	campground(extra_stuff);
-	get_bugged_balaclava();
 	visit_toot();
+	get_stuff();
 	if(my_turncount() < 1) {
 		recovery_settings();
 		path_skills(extra_stuff);	// Always learn skills if true
 		handle_starting_items();
+		free_barrels();
 		special(extra_stuff);		// Only executes if true
 		equip_stuff();
 	}

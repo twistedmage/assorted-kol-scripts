@@ -1,18 +1,29 @@
 script "Character Info Toolbox";
 notify "Bale";
-since r15559; // KoLmafia now counts Purr of the Feline, so workaround removed.
+since r17526; // handle proper item disambiguation for I Love Me, Staff of Fats, ancient amulet & Eye of Ed
+
 import "zlib.ash";
+import "chit_global.ash";
+import "chit_brickFamiliar.ash"; // This has to be before chit_brickGear due to addItemIcon() and... weirdly enough pickerFamiliar()
+import "chit_brickGear.ash";
+import "chit_brickTracker.ash";
+import "chit_brickTerminal.ash";
 
 /************************************************************************************
 CHaracter Info Toolbox
 A character pane relay override script
 By Chez up to v 0.6.0
 Everything after that by Bale
+As of r241 on SVN, some revisions also by soolar
 
 Additional major contributors:
 	AlbinoRhino - Provided invaluable assistance with CSS & Javascript
 	ckb - Created the tracker brick and effect description code
 	bordemstirs - Created the florist brick and moved the frams to make charpane taller
+	soolar - Added the gear brick, and some general tweaks/polish
+
+For Help and Documentation, you will find that in your KoLmafia/data directory:
+	/data/chit_ReadMe.txt
 
 *************************************************************************************
 Many thanks to:
@@ -67,145 +78,6 @@ Many thanks to:
 			All future changelogs will be on the SVN and will be much more complete.
 	
 ************************************************************************************/
-	
-string [string] chitSource;
-string [string] chitBricks;
-string [string] chitPickers;
-string [string] chitTools;
-string [string] chitEffectsMap;
-location lastLoc;
-boolean isCompact = false;
-boolean inValhalla = false;
-string imagePath = "/images/relayimages/chit/";
-
-/*****************************************************
-	Script functions
-*****************************************************/
-
-// '"/KoLmafia/sideCommand?cmd=' + cmd + '&pwd=' + my_hash() + '"'
-string sideCommand(string cmd) {
-	buffer c;
-	c.append('/KoLmafia/sideCommand?cmd=');
-	c.append(url_encode(cmd));
-	c.append('&pwd=');
-	c.append(my_hash());
-	return c;
-}
-
-void bakeUpdate(string thisver, string prefix, string newver) {
-	buffer result;
-	result.append('<table id="chit_update" class="chit_brick nospace">');
-	result.append('<thead><tr><th colspan="2">Character Info Toolbox</th></tr>');
-	result.append('</thead><tbody><tr><td class="info">');
-	result.append('<p>(');
-	result.append(prefix);
-	result.append(thisver);
-	result.append(')</p>');
-	result.append('<p>');
-	result.append(prefix);
-	result.append(newver);
-	result.append(' is now available');
-	result.append('<br>Click <a href="');
-	if(svn_exists("mafiachit")) {
-		result.append(sideCommand('svn update mafiachit'));
-		result.append('" title="SVN Update">here</a> to upgrade from SVN</p>');
-	} else {
-		result.append(sideCommand('svn checkout https://svn.code.sf.net/p/mafiachit/code/'));
-		result.append('" title="SVN Installation">here</a> to install current version from SVN</p>');
-	}
-	result.append('</td></tr></tbody></table>');
-	chitBricks["update"] = result.to_string();		
-}
-
-/*****************************************************
-	String functions
-*****************************************************/
-
-string formatInt(int n) {
-	return to_string(n, "%,d");
-}
-
-string formatInt(float f) {
-	return to_string(f, "%,.0f");
-}
-
-string formatModifier(int n) {
-	return to_string(n, "%+,d");
-}
-
-// Round off to p decimals
-string formatModifier(float f, int p) {
-	if(p<1) return to_string(round(f), "%+,d%%");
-	return replace_all(create_matcher("(?<!\\.)0+$", to_string(f, "%+,."+p+"f") ), "")+"%";
-}
-
-string formatModifier(float f) {
-	return formatModifier(f, 2);
-}
-
-string formatStats(stat s) {
-	int buffed = my_buffedstat(s);
-	int unbuffed = my_basestat(s);
-	if(buffed > unbuffed)
-		return '<span style="color:blue">' + formatInt(buffed) + '</span>&nbsp;&nbsp;(' + unbuffed + ')';
-	else if(buffed < unbuffed)
-		return '<span style="color:red">' + formatInt(buffed) + '</span>&nbsp;&nbsp;(' + unbuffed + ')';
-	return to_string(buffed);
-}
-
-stat findSub(stat s) {
-	if(s == $stat[muscle]) return $stat[submuscle];
-	else if(s == $stat[mysticality]) return $stat[submysticality];
-	return $stat[submoxie];
-}
-
-string progressSubStats(stat s) {
-	int statval = my_basestat(s);
-	
-	int lower = statval**2;
-	int range = (statval + 1)**2 - lower;
-	int current = my_basestat(findSub(s)) - lower;
-	int needed = range - current;
-	float progress = (current * 100.0) / range;
-	return '<div class="progressbox" title="' + current + ' / ' + range + ' (' + needed + ' needed)"><div class="progressbar" style="width:' + progress + '%"></div></div>';
-}
-
-string progressCustom(int current, int limit, string hover, int severity, boolean active) {
-
-	string color = "";
-	string title = "";
-	string border = "";
-	
-	switch (severity) {
-		case -1	: color = "#D0D0D0"; 	break;		//disabled
-		case 0	: color = "blue"; 		break;		//neutral
-		case 1	: color = "green"; 		break;		//good
-		case 2	: color = "orange"; 	break;		//bad
-		case 3	: color = "red"; 		break;		//ugly
-		case 4	: color = "#707070"; 	break;		//full
-		case 5	: color = "black"; 		break;		//busted
-		case 6	: color = "black"; 		break;		//super-busted
-		default	: color = "blue";
-	}
-	string title() { return current + ' / ' + limit; }
-	switch (hover) {
-		case "" : title = ""; break;
-		case "auto": title = ' title="' + title() + '"'; break;
-		default: title = ' title="' + hover +' ('+ title() +')"';
-	}
-	if (active) border = ' style="border-color:#707070"';
-	if (limit == 0) limit = 1;
-	
-	float progress = (min(current, limit) * 100.0) / limit;
-	buffer result;
-	result.append('<div class="progressbox"' + title + border + '>');
-	result.append('<div class="progressbar" style="width:' + progress + '%;background-color:' + color + '"></div>');
-	result.append('</div>');
-	return result.to_string();
-}
-string progressCustom(int current, int limit, int severity, boolean active) {
-	return progressCustom(current, limit, current + ' / ' + limit, severity, active);
-}
 
 string helperDanceCard() {
 
@@ -469,12 +341,14 @@ string helperSemiRare() {
 	string [location] rewards;
 		rewards[$location[The Sleazy Back Alley]] = "wine.gif|Distilled fotified wine (3)|0";
 		rewards[$location[The Haunted Pantry]] = "pie.gif|Tasty tart (3)|0";
+		rewards[$location[The Outskirts of Cobb's Knob]] = "lunchbox.gif|Knob Goblin lunchbox|0";
 		rewards[$location[The Limerick Dungeon]] = "eyedrops.gif|cyclops eyedrops|0";
-		rewards[$location[The Valley of Rof L'm Fao]] = "scroll2.gif|Fight Bad ASCII Art|68";
+	if($strings[step1, step2, finished] contains get_property("questL05Goblin"))
+		rewards[$location[Cobb's Knob Harem]] = "vial.gif|scented massage oil (3)|20";
 	if(get_property("lastCastleTopUnlock").to_int() == my_ascensions())
 		rewards[$location[The Castle in the Clouds in the Sky (Top Floor)]] = "inhaler.gif|Mick's IcyVapoHotness Inhaler|85";
-	if($strings[step4, step5, finished] contains get_property("questL10Garbage"))
-		rewards[$location[The Outskirts of Cobb's Knob]] = "lunchbox.gif|Knob Goblin lunchbox|0";
+	if(get_property("grimstoneMaskPath") == "gnome")
+		rewards[$location[Ye Olde Medievale Villagee]] = "leather.gif|3 each: Straw, Leather and Clay|0";
 	if(get_property("kingLiberated") == "true") {
 		rewards[$location[An Octopus's Garden]] = "bigpearl.gif|Fight a moister oyster|148";
 	} else {
@@ -485,13 +359,11 @@ string helperSemiRare() {
 			rewards[$location[Cobb's Knob Kitchens]] = "elitehelm.gif|Fight KGE Guard Captain|20";
 		if(!have_outfit("Mining Gear") && my_path() != "Way of the Surprising Fist" && ($strings[started, step1] contains get_property("questL08Trapper")))
 			rewards[$location[Itznotyerzitz Mine]] = "mattock.gif|Fight Dwarf Foreman|53";
-		if(get_property("questL11Palindome") != "finished" && item_amount($item[Talisman o' Nam]) == 0) {
+		if(get_property("questL11Palindome") != "finished" && item_amount($item[Talisman o' Namsilat]) == 0) {
 			rewards[$location[The Copperhead Club]] = "rocks_f.gif|Flamin' Whatshisname (3)|104";
 			rewards[$location[A Mob of Zeppelin Protesters]] = "bansai.gif|Choice of Protesting|104";
 		}
 	}
-	if(get_property("grimstoneMaskPath") == "gnome")
-		rewards[$location[Ye Olde Medievale Villagee]] = "leather.gif|3 each: Straw, Leather and Clay|0";
 	
 	int semirareCounter = to_int(get_property("semirareCounter"));
 	location semirareLocation = semirareCounter == 0? $location[none]: get_property("semirareLocation").to_location();
@@ -588,7 +460,7 @@ string helperXiblaxian() {
 	int alloy = 1-available_amount($item[xiblaxian alloy]);
 	int polymer = 1-available_amount($item[xiblaxian polymer]);
 	
-	if(countdown == 0 && get_counters("Xiblaxian Material", 0, 0) == "")
+	if(countdown == 0 && !can_interact() && get_counters("Xiblaxian Material", 0, 0) == "")
 		cli_execute("counters add 0 Xiblaxian Material holoputer.gif");
 
 	// Build a buffer that creates a bar similar to the fortune cookie
@@ -597,23 +469,32 @@ string helperXiblaxian() {
 	result.append('<tr class="effect"');
 	if(countdown == 0)
 		result.append(' style="background-color: khaki"');
-	result.append('>');
 	// Icon
-	result.append('<td class="icon"><a ');
-	if(available_amount($item[Xiblaxian 5D printer]) > 0)
-		result.append('target=mainpane href="shop.php?whichshop=5dprinter');
-	else
-		result.append('target=_blank href="http://kol.coldfront.net/thekolwiki/index.php/Xiblaxian_5D_printer');
-	result.append('"><img src="/images/itemimages/holoputer.gif"></a></td>');
+	result.append('><td class="icon"><a target=mainpane href="chit_xiblaxian.php"><img src="/images/itemimages/holoputer.gif"></a></td>');
 	// Text
 	if(countdown == 0) {
+		string bold_if(string text, boolean condition) {
+			if(condition)
+				return '<b>' + text + '</b>';
+			else
+				return text;
+		}
+		location currLoc = my_location();
+		boolean circ = currLoc.environment == "indoor";
+		boolean poly = currLoc.environment == "outdoor" || currLoc.environment == "underwater";
+		boolean alloy = currLoc.environment == "underground";
 		result.append('<td class="info" style="text-align:right;">');
-		result.append('Circuit (indoor):<br />Polymer (outdoor):<br />Alloy (under): </td><td class="info">');
-		result.append( available_amount($item[xiblaxian circuitry]));
+		result.append(bold_if('Circuit (indoor):', circ));
 		result.append('<br />');
-		result.append(available_amount($item[xiblaxian polymer]));
+		result.append(bold_if('Polymer (outdoor):', poly));
 		result.append('<br />');
-		result.append(available_amount($item[xiblaxian alloy]));
+		result.append(bold_if('Alloy (under):', alloy));
+		result.append('</td><td class="info">');
+		result.append(bold_if(available_amount($item[xiblaxian circuitry]), circ));
+		result.append('<br />');
+		result.append(bold_if(available_amount($item[xiblaxian polymer]), poly));
+		result.append('<br />');
+		result.append(bold_if(available_amount($item[xiblaxian alloy]), alloy));
 		result.append('</td>');
 	} else {
 		result.append('<td class="info">Xiblaxian <br />Wrist-puter</td>');
@@ -627,36 +508,19 @@ string helperXiblaxian() {
 	return result.to_string();
 }
 
-// Functions for pickers
-void pickerStart(buffer picker, string rel, string message) {
-	picker.append('<div id="chit_picker');	
-	picker.append(rel);	
-	picker.append('" class="chit_skeleton" style="display:none"><table class="chit_picker"><tr><th colspan="2">');
-	picker.append(message);
-	picker.append('</th></tr>');
-}
-void pickerStart(buffer picker, string rel, string message, string image) {
-	picker.pickerStart(picker, rel, '<img src="' + imagePath + image + '.png">' + message);
-}
-
-void addLoader(buffer picker, string message) {
-	picker.append('<tr class="pickloader" style="display:none"><td class="info">');
-	picker.append(message);
-	picker.append('</td><td class="icon"><img src="/images/itemimages/karma.gif"></td></tr>');
-}
-
-void addSadFace(buffer picker, string message) {
-	picker.append('<tr class="picknone"><td class="info" colspan="2">');
-	picker.append(message);
-	picker.append('</td></tr>');
-}
-
 // elementchart1.gif or elementchart2.gif are valid values for img
 void addElementMap(buffer result, string img) {
 	result.append('<img src="');
 	result.append(imagePath);
 	result.append(img);
-	result.append('" width="190" height="190"');
+	
+	if     (have_effect($effect[Spirit of Peppermint]) > 0) result.append("cold");
+	else if(have_effect($effect[Spirit of Bacon Grease]) > 0) result.append("sleaze");
+	else if(have_effect($effect[Spirit of Garlic]) > 0) result.append("stench");
+	else if(have_effect($effect[Spirit of Cayenne]) > 0) result.append("hot");
+	else if(have_effect($effect[Spirit of Wormwood]) > 0) result.append("spooky");
+	
+	result.append('.gif" width="190" height="190"');
 	if(have_skill($skill[Flavour of Magic])) {
 		result.append(' alt="Cast Flavour of Magic" usemap="#flavmap">');
 		result.append('<map id="flavmap" name="flavmap"><area shape="circle" alt="Sleaze" title="Spirit of Bacon Grease (Sleaze)" coords="86,33,22" href="');
@@ -682,216 +546,12 @@ void pickerFlavour() {
 	
 	picker.addLoader("Spiriting flavours...");
 	picker.append('<tr class="pickitem"><td>');
-	picker.addElementMap("elementchart2.gif");
+	picker.addElementMap("elementchart2");
 	picker.append('</td></tr>');
 	
 	picker.append('</table></div>');
 	chitPickers["flavour"] = picker;
 }
-
-//ckb: function for effect descriptions to make them short and pretty, called by chit.effects.describe
-string parseMods(string evm) {
-	buffer enew;  // This is used for rebuilding evm with append_replacement()
-	
-	// Standardize capitalization
-	matcher uncap = create_matcher("\\b[a-z]", evm);
-	while(uncap.find())
-		uncap.append_replacement(enew, to_upper_case(uncap.group(0)));
-	uncap.append_tail(enew);
-	evm = enew;
-	
-	// Move parenthesis to the beginning of the modifier
-	enew.set_length(0);
-	matcher paren = create_matcher("(, ?|^)([^,]*?)\\((.+?)\\)", evm);
-	while(paren.find()) {
-		paren.append_replacement(enew, paren.group(1));
-		enew.append(paren.group(3));
-		enew.append(" ");
-		enew.append(paren.group(2));
-	}
-	paren.append_tail(enew);
-	evm = enew;
-	
-	// Anything that applies the same modifier to all stats or all elements can be combined
-	record {
-		boolean [string] original;
-		string val;
-	} [string] modsort;
-	string [int,int] modparse = group_string(evm, "(?:,|^)\\s*([^,:]*?)(Muscle|Mysticality|Moxie|Hot|Cold|Spooky|Stench|Sleaze)([^:]*):\\s*([+-]?\\d+)");
-	string key;
-	foreach m in modparse {
-		if($strings[Muscle,Mysticality,Moxie] contains modparse[m][2])
-			key = modparse[m][1]+"Stats"+modparse[m][3];
-		else
-			key = modparse[m][1]+"Prismatic"+modparse[m][3];
-		if(!(modsort contains key) || modsort[key].val == modparse[m][4]) {
-			modsort[ key ].original[ modparse[m][0] ] = true;
-			modsort[ key ].val = modparse[m][4];
-		}
-	}
-	foreach m,s in modsort
-		if((m.contains_text("Stats") && count(s.original) == 3) || (m.contains_text("Prismatic") && count(s.original) == 5)) {
-			foreach o in s.original
-				evm = evm.replace_string(o, "");
-			buffer result;
-			if(length(evm) > 0) {
-				result.append(evm);
-				result.append(", ");
-			}
-			result.append(m);
-			result.append(": ");
-			result.append(s.val);
-			evm = to_string(result);
-		}
-	
-	//Combine modifiers for  (weapon and spell) damage bonuses, (min and max) regen modifiers and maximum (HP and MP) mods
-	enew.set_length(0);
-	matcher parse = create_matcher("((?:Hot|Cold|Spooky|Stench|Sleaze|Prismatic) )Damage: ([+-]?\\d+), \\1Spell Damage: \\2"
-		+"|([HM]P Regen )Min: (\\d+), \\3Max: (\\d+)"
-		+"|Maximum HP( Percent|):([^,]+), Maximum MP\\6:([^,]+)"
-		+"|Weapon Damage( Percent|): ([+-]?\\d+), Spell Damage\\9?: \\10"
-		+'|Avatar: "([^"]+)"', evm);
-	while(parse.find()) {
-		parse.append_replacement(enew, "");
-		if(parse.group(1) != "") {
-			enew.append("All ");
-			enew.append(parse.group(1));
-			enew.append("Dmg: ");
-			enew.append(parse.group(2));
-		} else if(parse.group(3) != "") {
-			enew.append(parse.group(3));
-			enew.append(parse.group(4));
-			if(parse.group(4) != parse.group(5)) {
-				enew.append("-");
-				enew.append(parse.group(5));
-			}
-		} else if(parse.group(7) != "") {
-			enew.append("Max HP/MP:");
-			enew.append(parse.group(7));
-			if(parse.group(7) != parse.group(8)) {
-				enew.append("/");
-				enew.append(parse.group(8));
-			}
-			if(parse.group(6) == " Percent") enew.append("%");
-		} else if(parse.group(10) != "") {
-			enew.append("All Dmg: ");
-			enew.append(parse.group(10));
-			if(parse.group(9) == " Percent") enew.append("%");
-		} else if(parse.group(11) != "") {
-			enew.append(parse.group(11));
-		}
-	}
-	parse.append_tail(enew);
-	evm = enew;
-	
-	// May be an extra comma left at start. :(
-	// Add missing + in front of modifier, for consistency. Then remove colon because it is in the way of legibility
-	// Change " Percent: +XX" and " Drop: +XX" to "+XX%"
-	// If HP and MP regen are the same, combine them
-	enew.set_length(0);
-	parse = create_matcher("^\\s*(,)\\s*"
-		+"|(\\s*Drop|\\s*Percent([^:]*))?(?<!Limit):\\s*(([+-])?\\d+)"
-		+"|(HP Regen ([0-9-]+), MP Regen \\6)", evm);
-	while(parse.find()) {
-		parse.append_replacement(enew, "");
-		if(parse.group(1) == ",") {			// group would contain extra comma at beginning
-			// Delete this: append nothing
-		} else if(parse.group(4) != "") { 	// group is the numeric modifier
-			enew.append(parse.group(3));	// group is possible words after "Percent"
-			if(parse.group(5) == "")		// group would contain + or -
-				enew.append(" +");
-			else enew.append(" ");
-			enew.append(parse.group(4));	// This does not contain Drop, Percent or the colon.
-			if(parse.group(2) != "")		// group is Drop or Percent
-				enew.append("%");
-		
-		} else if(parse.group(6) != "") {	// group is the HP&MP combined Regen	
-			enew.append("All Regen ");
-			enew.append(parse.group(7));
-		}
-	}
-	parse.append_tail(enew);
-	evm = enew;
-	
-	//shorten various text
-	evm = replace_string(evm,"Damage Reduction","DR");
-	evm = replace_string(evm,"Damage Absorption","DA");
-	evm = replace_string(evm,"Weapon","Wpn");
-	evm = replace_string(evm,"Damage","Dmg");
-	evm = replace_string(evm,"Initiative","Init");
-	evm = replace_string(evm,"Monster Level","ML");
-	evm = replace_string(evm,"Moxie","Mox");
-	evm = replace_string(evm,"Muscle","Mus");
-	evm = replace_string(evm,"Mysticality","Myst");
-	evm = replace_string(evm,"Resistance","Res");
-	evm = replace_string(evm,"Familiar Experience","Fam xp");
-	evm = replace_string(evm,"Familiar","Fam");
-	evm = replace_string(evm,"Experience","Exp");
-	evm = replace_string(evm,"Maximum","Max");
-	evm = replace_string(evm,"Smithsness","Smith");
-	evm = replace_string(evm,"Hobo Power","Hobo");
-	evm = replace_string(evm,"Pickpocket Chance","Pickpocket");
-	evm = replace_string(evm,"Adventures","Adv");
-	evm = replace_string(evm,"PvP Fights","Fites");
-	//highlight items and meat
-	evm = replace_string(evm,"Item","<span class=moditem>Item</span>");
-	evm = replace_string(evm,"Meat","<span class=moditem>Meat</span>");
-	//highlight ML
-	evm = replace_string(evm,"ML","<span class=modml>ML</span>");
-	
-	//decorate elemental effects with pretty colors
-	string prismatize(string input) {
-		string [int] prism;
-			prism[0] = "<span class=modHot>";
-			prism[2] = "<span class=modSleaze>";
-			prism[4] = "<span class=modStench>";
-			prism[6] = "<span class=modCold>";
-			prism[8] = "<span class=modSpooky>";
-		buffer output;
-		int i = 0;
-		int last = length(input) - 1;
-		while(i <= last) {
-			output.append(prism[i % 10]);
-			if(i < last)
-				output.append(substring(input, i, i+ 2));
-			else
-				output.append(char_at(input, last));
-			output.append("</span>");
-			i += 2;
-		}
-		return output;
-	}
-	matcher elemental = create_matcher("([^,]*(Hot|Cold|Spooky|Stench|Sleaze|Prismatic)[^,]*)(?:,|$)", evm);
-	while(elemental.find()) {
-		if(elemental.group(2) == "Prismatic")
-			evm = replace_string(evm, elemental.group(1), prismatize(elemental.group(1)));
-		else
-			evm = replace_string(evm, elemental.group(1), "<span class=mod"+elemental.group(2)+">"+elemental.group(1)+"</span>");
-	}
-
-	return evm;
-}
-string parseEff(string ef) {
-	# if(ef == "Polka of Plenty") ef = "Video... Games?";
-	switch(ef) {
-	case "Knob Goblin Perfume": return "";
-	case "Bored With Explosions": 
-		matcher wafe = create_matcher(":([^:]+):walk away from explosion:", get_property("banishedMonsters"));
-		if(wafe.find()) return wafe.group(1);
-		return "You're just over them"; 
-	}
-
-	return string_modifier("Effect:" + ef,"Evaluated Modifiers").parseMods();
-}
-
-record buff {
-	string effectName;
-	string effectHTML;
-	string effectImage;
-	string effectType;
-	int effectTurns;
-	boolean isIntrinsic;
-};
 
 buff parseBuff(string source) {
 	buff myBuff;
@@ -902,7 +562,7 @@ buff parseBuff(string source) {
 	string columnIcon, columnTurns, columnArrow;
 	string spoiler, style;
 
-	matcher parse = create_matcher('(?:<td[^>]*>(.*?)</td>)?<td[^>]*>(<.*?itemimages/([^"]*).*?)</td><td[^>]*>[^>]*>(.*?) +\\((?:(.*?), )?((?:<a[^>]*>)?(\\d+||&infin;)(?:</a>)?)\\)(?:(?:</font>)?&nbsp;(<a.*?</a>))?.*?</td>', source);
+	matcher parse = create_matcher('(?:<td[^>]*>(.*?)</td>)?<td[^>]*>(<.*?itemimages/([^"]*)"(?:.*?eff\\("([^"]+)"\\))?.*?)</td><td[^>]*>[^>]*>(.*?) +\\((?:(.*?), )?((?:<a[^>]*>)?(\\d+||&infin;)(?:</a>)?)\\)(?:(?:</font>)?&nbsp;(<a.*?</a>))?.*?</td>', source);
 	// The ? stuff at the end is because those arrows are a mafia option that might not be present
 	if(parse.find()) {
 		columnIcon = parse.group(2);	// This is full html for the icon
@@ -911,20 +571,21 @@ buff parseBuff(string source) {
 		columnIcon = replace_string(columnIcon,"width=30 height=30","");
 		
 		myBuff.effectImage = parse.group(3);
-		myBuff.effectName = parse.group(4);
-		spoiler = parse.group(5);		// This appears for "Form of...Bird!" and "On the Trail"
+		myBuff.eff = parse.group(4).desc_to_effect();
+		myBuff.effectName = parse.group(5);
+		spoiler = parse.group(6);		// This appears for "Form of...Bird!" and "On the Trail"
 		if(get_campground() contains $item[jar of psychoses (The Crackpot Mystic)] && $strings[Consumed by Anger, Consumed by Doubt, Consumed by Fear, Consumed by Regret] contains myBuff.effectName)
-			columnTurns = '<a target="mainpane" href="/place.php?whichplace=junggate_3&action=mystic_face" title="This... This isn\'t me.">'+parse.group(7)+'</a>';
+			columnTurns = '<a target="mainpane" href="/place.php?whichplace=junggate_3&action=mystic_face" title="This... This isn\'t me.">'+parse.group(8)+'</a>';
 		else
-			columnTurns = parse.group(6).replace_string('title="Use a remedy to remove', 'title="SGEEAs Left: '+ item_amount($item[soft green echo eyedrop antidote]) +'\nUse a remedy to remove');
-		if(parse.group(7) == "&infin;") {	// Is it intrinsic?
+			columnTurns = parse.group(7).replace_string('title="Use a remedy to remove', 'title="SGEEAs Left: '+ item_amount($item[soft green echo eyedrop antidote]) +'\nUse a remedy to remove');
+		if(parse.group(8) == "&infin;") {	// Is it intrinsic?
 			myBuff.effectTurns = -1;
 			myBuff.isIntrinsic = true;
 		} else
-			myBuff.effectTurns = parse.group(7).to_int();
+			myBuff.effectTurns = parse.group(8).to_int();
 		// There are various problems with KoL's native uparrows. Only use them if KoL's uparrows are missing
-		if(parse.group(8) != "")
-			columnArrow = parse.group(8).replace_string("/images/", imagePath).replace_string("up.gif", "up.png");
+		if(parse.group(9) != "")
+			columnArrow = parse.group(9).replace_string("/images/", imagePath).replace_string("up.gif", "up.png");
 		else if(parse.group(1) != "" ) {
 			doArrows = true;			// In case they were disabled in KoLmafia. Make a column for it.
 			columnArrow = parse.group(1);
@@ -986,14 +647,14 @@ buff parseBuff(string source) {
 	}
 	
 	// Flavour of Magic picker!
-	if($strings[Spirit of Cayenne, Spirit of Peppermint, Spirit of Garlic, Spirit of Wormwood, Spirit of Bacon Grease] contains myBuff.effectName) {
+	if($effects[Spirit of Cayenne, Spirit of Peppermint, Spirit of Garlic, Spirit of Wormwood, Spirit of Bacon Grease] contains myBuff.eff) {
 		columnIcon = '<a class="chit_launcher" rel="chit_pickerflavour" href="#">' + columnIcon + '</a>';
 		columnTurns = '<a class="chit_launcher" rel="chit_pickerflavour" href="#">&infin;</a>';
 		pickerFlavour();
 	}
 	
 	// Check Mirror picker
-	if($strings[Slicked-Back Do, Pompadour, Cowlick, Fauxhawk] contains myBuff.effectName)
+	if($effects[Slicked-Back Do, Pompadour, Cowlick, Fauxhawk] contains myBuff.eff)
 		columnTurns = '<a target="mainpane" href="skills.php?pwd='+my_hash()+'&action=Skillz&whichskill=15017&skillform=Use+Skill&quantity=1">&infin;</a>';
 
 	//Add spoiler info
@@ -1006,6 +667,9 @@ buff parseBuff(string source) {
 	// Add spoiler info that mafia doesn't provide
 	if(myBuff.effectName.contains_text("Romantic Monster window"))
 		effectAlias = effectAlias.replace_string("Romantic Monster", get_property("romanticTarget"));
+	else if(myBuff.effectName.contains_text("Digitize Monster"))
+		effectAlias = "Digitized " + get_property("_sourceTerminalDigitizeMonster") + " #" +
+                  (to_int(get_property("_sourceTerminalDigitizeMonsterCount")) + 1);
 	
 	//Replace effect icons, if enabled
 	string [string] classmap;
@@ -1025,6 +689,14 @@ buff parseBuff(string source) {
 	result.append('<tr class="effect"');
 	if(length(style) > 0)
 		result.append(' style="' + style + '"');
+	if(!to_boolean(vars["chit.effects.describe"])) {
+		string efMod = parseEff(myBuff.eff, false);
+		if(length(efMod)>0) {
+			result.append(' title="');
+			result.append(efMod);
+			result.append('"');
+		}
+	}
 	result.append('>');
 	if(showIcons) 
 		result.append('<td class="icon">' + columnIcon + '</td>');
@@ -1035,8 +707,8 @@ buff parseBuff(string source) {
 	result.append(effectAlias);
 	
 	//ckb: Add modification details for buffs and effects
-	if(vars["chit.effects.describe"] == "true") {
-		string efMod = parseEff(myBuff.effectName);
+	if(to_boolean(vars["chit.effects.describe"])) {
+		string efMod = parseEff(myBuff.eff);
 		if(length(efMod)>0) {
 			result.append('<br><span class="efmods">');
 			result.append(efMod);
@@ -1091,12 +763,12 @@ void bakeEffects() {
 	boolean showSongs = contains_text(layout,"songs");
 	
 	//Load effects map
-	string mapfile = "chit_effects.txt";
-	if (vars["chit.effects.usermap"] == "true") {
-		mapfile = "chit_effects_" + my_name() + ".txt";
-	}
-	if (!file_to_map(mapfile, chitEffectsMap)) {
-		vprint("CHIT: Effects map could not be loaded (" + mapfile + ")", "red", 1);
+	static {
+		string mapfile = "chit_effects.txt";
+		if(vars["chit.effects.usermap"] == "true")
+			mapfile = "chit_effects_" + my_name() + ".txt";
+		if(!file_to_map(mapfile, chitEffectsMap))
+			vprint("CHIT: Effects map could not be loaded (" + mapfile + ")", "red", 1);
 	}
 	
 	buff currentbuff;
@@ -1108,7 +780,7 @@ void bakeEffects() {
 
 		if (currentBuff.isIntrinsic) {
 			intrinsics.append(currentbuff.effectHTML);
-		} else if (showSongs && $strings[at, aob, aoj] contains currentbuff.effectType) {
+		} else if (showSongs && $strings[at, aob, aoj, awol] contains currentbuff.effectType) {
 			songs.append(currentbuff.effectHTML);
 		} else if(showSongs && to_skill(currentbuff.effectName).expression == true) {
 			expression.append('<tbody class="buffs">');
@@ -1134,8 +806,7 @@ void bakeEffects() {
 	// Add helper for Xiblaxian holo-wrist-puter
 	if(vars["chit.helpers.xiblaxian"] != "false" && have_equipped($item[Xiblaxian holo-wrist-puter]))
 		helpers.append(helperXiblaxian());
-
-
+	
 	//Intrinsic Effects
 	rowMatcher = create_matcher("<tr>(.*?)</tr>", chitSource["intrinsics"]);
 	while (find(rowMatcher)){
@@ -1254,7 +925,7 @@ void bakeElements() {
 	result.append(imagePath);
 	result.append('elements.png">Elements</th></tr></thead>');
 	result.append("<tr><td>");
-	result.addElementMap("elementchart1.gif");
+	result.addElementMap("elementchart1");
 	result.append('</tr></table>');
 	
 	chitBricks["elements"] = result;
@@ -1427,17 +1098,24 @@ void bakeTrail() {
 	//Container
 	string url = "main.php";
 	matcher target = create_matcher('href="(.*?)" target=mainpane>Last Adventure:</a>', source);
-	if (find(target)) {
-		url = group(target, 1);
-	}
-	result.append('<tr><th><a class="visit" target="mainpane" href="' + url + '"><img src="');
+	if(target.find())
+		url = target.group(1);
+	if(url == "place.php?whichplace=town_right" && source.contains_text("Investigating a Plaintive Telegram"))
+		url = "place.php?whichplace=town_right&action=townright_ltt";
+	result.append('<tr><th><a class="visit" target="mainpane" href="');
+	result.append(url);
+	result.append('"><img src="');
 	result.append(imagePath);
 	result.append('trail.png">Last Adventure</a></th></tr>');
 	
 	//Last Adventure
 	target = create_matcher('target=mainpane href="(.*?)">(.*?)</a><br></font>', source);
-	if (find(target)) {
-		result.append('<tr><td class="last"><a class="visit" target="mainpane" href="' + group(target, 1) + '">' + group(target, 2) + '</a></td></tr>');
+	if(target.find()) {
+		result.append('<tr><td class="last"><a class="visit" target="mainpane" href="');
+		result.append(target.group(1));
+		result.append('">');
+		result.append(target.group(2));
+		result.append('</a></td></tr>');
 	}
 	
 	//Other adventures
@@ -1445,7 +1123,11 @@ void bakeTrail() {
 	while (find(others)) {
 		target = create_matcher('target=mainpane href="(.*?)">(.*?)</a>', group(others, 1));
 		if (find(target)) {
-			result.append('<tr><td><a class="visit" target="mainpane" href="' + group(target, 1) + '">' + group(target, 2) + '</a></td></tr>');
+			result.append('<tr><td><a class="visit" target="mainpane" href="');
+			result.append(target.group(1));
+			result.append('">');
+			result.append(target.group(2));
+			result.append('</a></td></tr>');
 		}
 	}
 	
@@ -1456,503 +1138,12 @@ void bakeTrail() {
 
 }
 
-void pickerFamiliar(familiar myfam, item famitem, boolean isFed) {
-
-	int [item] allmystuff = get_inventory();
-	string [item] addeditems;
-	buffer picker;
-
-	item [int] generic;
-	// Powerful Generic Familiar Equipment
-	generic[1]=$item[moveable feast];
-	generic[2]=$item[little box of fireworks];
-	generic[3]=$item[plastic pumpkin bucket];
-	generic[4]=$item[lucky tam o'shanter];
-	generic[5]=$item[lucky tam o'shatner];
-	generic[6]=$item[mayflower bouquet];
-	generic[7]=$item[miniature gravy-covered maypole];
-	generic[8]=$item[wax lips];
-	generic[10]=$item[snow suit];
-	generic[11]=$item[astral pet sweater];
-
-	// Mr. Store Foldables
-	generic[100]=$item[flaming familiar doppelg&auml;nger];	//flaming familiar doppelgänger
-	generic[101]=$item[origami &quot;gentlemen's&quot; magazine];	//origami "gentlemen's" magazine
-	generic[102]=$item[Loathing Legion helicopter];
-	
-	// "Special" items
-	generic[200]=$item[ittah bittah hookah];	
-	generic[201]=$item[li'l businessman kit];
-	generic[202]=$item[tiny costume wardrobe];
-	generic[203]=$item[little bitty bathysphere];
-	generic[204]=$item[das boot];
-	generic[205]=$item[miniature life preserver];
-	
-	//Summonable
-	generic[300]=$item[sugar shield];
-	
-	string fam_equip(item famitem) {
-		string ave(string l, string h) {
-			float m = (to_int(l) + to_int(h)) / 2.0;
-			if(m == to_int(m))
-				return to_string(m, "%,.0f");
-			return to_string(m, "%,.1f");
-		}
-		string eval(string mod) {
-			float m = modifier_eval(mod);
-			if(m == to_int(m))
-				return to_string(m, "%+,.0f");
-			return to_string(m, "%+,.1f");
-		}
-		
-		switch(famitem) {
-		case $item[none]:
-			return "";
-		case $item[bag of many confections]:
-			return "Yummy Candy!";
-		case $item[Loathing Legion helicopter]:
-			return "Familiar acts more often";
-		case $item[tiny costume wardrobe]:
-			if(my_familiar() == $familiar[doppelshifter])
-				return "Familiar Weight +25";
-			return "Doppelshifter";
-		case $item[bugged balaclava]:
-			return "Volleyball, ML +20";
-		case $item[bugged b&Atilde;&para;n&plusmn;&Atilde;&copy;t]:
-			return "Fairy: Food, Pants, Candy +5%";
-		case $item[fixed-gear bicycle]:
-			return "+3 stats per fight";
-		case $item[chiptune guitar]:
-			return "+25% Item Drops";
-		case $item[ironic moustache]:
-			return "Weight: +10";
-		case $item[school spirit socket set]:
-			return "Keeps more steam in";
-		case $item[flask of embalming fluid]:
-			return "Helps collect body parts";
-		case $item[tiny bowler]:
-			return "Lets your familiar bowl";
-		}
-		
-		if(famitem != $item[none]) {
-			string mod = parseMods(string_modifier(famitem,"Evaluated Modifiers"));
-			// Effects for Scarecrow and Hatrack
-			matcher m = create_matcher('Fam Effect: "(.*?), Cap ([^"]+)"', mod);
-			if(find(m))
-				return replace_string(m.group(1), "x", "x ");
-			// farming implements from swarm of fire ants
-			m  = create_matcher('"(.*? Dmg, Meat)", Meat Bonus ', mod);
-			if(find(m))
-				mod = mod.replace_string(m.group(0), m.group(1)+" Bonus ");
-			// Remove boring stuff
-			mod = mod.replace_string(' "Adventure Underwater"', ", Underwater");
-			mod = create_matcher(',? *(Generic|Softcore Only|Fam Weight \\+5| *\\(Fam\\)|Equips On: "[^"]+"|Fam Effect:|Underwater Fam|")', mod).replace_all("");
-			// Remove comma abandoned at the beginning
-			mod = create_matcher('^ *, *', mod).replace_first("");
-			// Last touch ups
-			mod = mod.replace_string("Fam Weight", "Weight");
-			if(famitem == $item[Snow Suit] && equipped_item($slot[familiar]) != $item[Snow Suit])
-				mod += (length(mod) == 0? "(": " (") + get_property("_carrotNoseDrops")+"/3 carrots)";
-			if(length(mod) > 1)
-				return mod;
-		}
-		return "";
-	}
-	string fam_equip(string action, item famitem) {
-		switch(famitem) {
-		case $item[Loathing Legion helicopter]:
-			action = action.replace_string(to_string(famitem), "Legion Helicopter");
-			break;
-		}
-		string mod = fam_equip(famitem);
-		if(mod == "") return action;
-		return action + "<br /><span class='efmods'>" + mod + "<span>";
-	}
-
-	void addEquipment(item it, string cmd) {
-		if (!(addeditems contains it)) {
-			string hover;
-			string cli;
-			string action = to_string(it);
-			switch (cmd) {
-				case "remove":
-					hover = "Unequip " + it.to_string();
-					action = "Remove equipment";
-					cli = "remove familiar";
-					break;
-				case "inventory":
-					hover = "Equip " + it.to_string();
-					cli = "equip familiar "+it;
-					break;
-				case "fold":
-					hover = "Fold and equip " + it.to_string();
-					cli = "fold "+it+";equip familiar "+it;
-					break;
-				case "make":
-					hover = "Make and equip " + it.to_string();
-					cli = "make "+it+";equip familiar "+it;
-					break;
-				case "retrieve":
-					hover = "Retrieve and equip " + it.to_string();
-					cli = "equip familiar "+it;
-					break;
-				case "clancy":
-					hover = "Eequip Clancy with his " + it.to_string();
-					cli = "use "+it;
-					break;
-				default:	
-					hover = "Equip " + it.to_string();
-					cli = "equip familiar "+it;
-			}
-			picker.append('<tr class="pickitem">');
-			picker.append('<td class="' + cmd + '"><a class="change" href="' + sideCommand(cli) + '" title="' 
-			  + hover + '">' + fam_equip(action, it) + '</a></td>');
-			picker.append('<td class="icon"><a class="change" href="' + sideCommand(cli) + '" title="' 
-			  + hover + '"><img src="/images/itemimages/' + it.image + '"></a></td>');
-			picker.append('</tr>');
-			addeditems[it] = to_string(it);
-		}
-	}
-
-	string sadMessage(string it, string fam) {
-		string famname = my_path() == "Avatar of Boris"? "Clancy": myfam.name;
-		return "You don't have any "+it+" for your " + fam + ".<br><br>Poor "+famname;
-	}
-	
-	void pickEquipment() {
-
-		// First add a decorate link if you are using a Snow Suit
-		if(equipped_item($slot[familiar]) == $item[Snow Suit]) {
-			string suiturl = '<a target=mainpane class="change" href="inventory.php?pwd='+my_hash()+'&action=decorate" title="Decorate your Snow Suit\'s face">';
-			int faceIndex = index_of(chitSource["familiar"], "itemimages/snow");
-			string face = substring(chitSource["familiar"], faceIndex + 11, faceIndex + 24);
-			if(have_effect($effect[SOME PIGS]) > 0)
-				face = "snowsuit.gif";
-			picker.append('<tr class="pickitem">');
-			picker.append('<td class="fold">' +suiturl+ 'Decorate Snow Suit<br /><span style="color:#707070">Choose a Face</span></a></td>');
-			picker.append('<td class="icon">'+suiturl+'<img src="/images/itemimages/' + face + '"></a></td>');
-			picker.append('</tr>');
-		}
-	
-		//Most common equipment for current familiar
-		item common = familiar_equipment(myfam);
-		boolean havecommon = false;
-		if (allmystuff contains common) {
-			havecommon = true;
-		} else {
-			foreach foldable in get_related(common, "fold") {
-				if ( allmystuff contains foldable) {
-					common = foldable;
-					havecommon = true;
-					break;
-				}
-			}
-		}
-		if (havecommon) {
-			addEquipment(common, "inventory");
-			foreach foldable in get_related(common, "fold") {
-				addEquipment(foldable, "fold");
-			}
-		}
-		
-		//Generic equipment
-		foreach n, piece in generic {
-			if (allmystuff contains piece) {
-				addEquipment(piece, "inventory");
-			} else if (available_amount(piece) > 0 ) {
-				addEquipment(piece, "retrieve");
-			} else if (n==100 || n==101 || n==102) {
-				foreach foldable in get_related(piece, "fold") {
-					if (available_amount(foldable) > 0 ) {
-						addEquipment(piece, "fold");
-						break;
-					}
-				}
-			}
-		}
-
-		//Make Sugar Shield
-		item shield = $item[sugar shield];
-		if (!(addeditems contains shield)) {
-			item sheet = $item[sugar sheet];
-			if (allmystuff contains sheet) {
-				addEquipment(shield, "make");
-			}
-		}
-			
-		//Check rest of inventory
-		foreach thing in allmystuff {
-			if ( (item_type(thing) == "familiar equipment") && (can_equip(thing))) {
-				addEquipment(thing, "inventory");
-			}
-		}
-	}
-
-	void pickSlot(string slottype) {
-		string pref = vars["chit.familiar."+slottype];
-		if (pref != "") {
-			string [int] equipmap = split_string(pref, ",");
-			item equip;
-			foreach i in equipmap {
-				equip = to_item(equipmap[i]);
-				if ( allmystuff contains equip) {
-					addEquipment(equip, "inventory");
-				} else if ( available_amount(equip) > 0 ) {
-					addEquipment(equip, "retrieve");
-				} else {
-					foreach foldable in get_related(equip, "fold") {
-						if ( allmystuff contains foldable) {
-							addEquipment(equip, "fold");
-						}
-					}
-				}
-			}
-		}
-	}
-	
-	void pickClancy() {
-		foreach instrument in $items[Clancy's sackbut,Clancy's crumhorn,Clancy's lute]
-			if(allmystuff contains instrument)
-				addEquipment(instrument, "clancy");
-	}
-	
-	void pickChameleon() {
-		string mods;
-		//Scan inventory
-		foreach thing in allmystuff {
-			if(item_type(thing) == "familiar equipment") {
-				mods = string_modifier(thing, "modifiers");
-				if(!contains_text(mods, "Generic") && !contains_text(mods, "pet rock"))
-					addEquipment(thing, "inventory");
-			}
-		}
-	}
-	
-	picker.pickerStart("fam", "Equip Thy Familiar Well");
-	
-	//Feeding time
-	string [familiar] feedme;
-	feedme[$familiar[Slimeling]] = "Mass Slime";
-	feedme[$familiar[Stocking Mimic]] = "Give lots of candy";
-	feedme[$familiar[Spirit Hobo]] = "Encourage Chugging";
-	feedme[$familiar[Gluttonous Green Ghost]] = "Force Feed";
-	if (feedme contains myfam) {
-		picker.append('<tr class="pickitem"><td class="action" colspan="2"><a class="done" target="mainpane" href="familiarbinger.php">' + feedme[myfam] + '</a></tr>');
-	}
-
-	// Use link for Moveable Feast
-	if (myfam != $familiar[Comma Chameleon]) {
-		item feast = $item[moveable feast];
-		if(available_amount(feast) > 0) {
-			if (isFed) {
-				//currently fed
-				picker.append('<tr class="picknone">');
-				picker.append('<td class="info" colspan="2">Your familiar is overfed</td>');
-				picker.append('</tr>');
-			} else if (get_property("_feastedFamiliars").contains_text(to_string(myfam))) {
-				//previously fed
-				picker.append('<tr class="picknone">');
-				picker.append('<td class="info" colspan="2">Your familiar has feasted today</td>');
-				picker.append('</tr>');
-			} else if (get_property("_feastUsed") == "5") {
-				//no feast remaining
-				picker.append('<tr class="picknone">');
-				picker.append('<td class="info" colspan="2">Feast used 5 times today</td>');
-				picker.append('</tr>');
-			} else if (famitem == feast) {
-				picker.append('<tr class="pickitem">');
-				picker.append('<td class="action" colspan="2"><a class="change" href="');
-				picker.append(sideCommand("remove familiar;use moveable feast;equip familiar moveable feast"));
-				picker.append('">Use Moveable Feast</a></td>');
-				picker.append('</tr>');
-			} else if (available_amount(feast) > 0) {
-				picker.append('<tr class="pickitem">');
-				picker.append('<td class="action" colspan="2"><a class="change" href="');
-				picker.append(sideCommand("use moveable feast"));
-				picker.append('">Use Moveable Feast</a></td>');
-				picker.append('</tr>');
-			}
-		}
-	}
-
-	//Bugged Bugbear (Get free equipment from Arena)
-	if(myfam == $familiar[Baby Bugged Bugbear] && (available_amount($item[bugged beanie]) + available_amount($item[bugged balaclava]) + available_amount($item[bugged b&Atilde;&para;n&plusmn;&Atilde;&copy;t])) == 0)
-		picker.append('<tr class="pickitem"><td class="action" colspan="2"><a class="done" target="mainpane" href="arena.php">Visit the Arena</a></tr>');
-
-	//Handle Current Equipment
-	if (famitem != $item[none]) {
-		addEquipment(famitem, "remove");
-		foreach foldable in get_related(famitem, "fold") {
-			if ( (item_type(foldable) == "familiar equipment") && (can_equip(foldable))) {
-				addEquipment(foldable, "fold");
-			}
-		}
-	}
-	
-	switch (myfam) {
-		case $familiar[Mad Hatrack]:
-			picker.addLoader("Changing Hats...");
-			pickSlot("hats");
-			if(count(addeditems) == 0) picker.addSadFace(sadMessage("hats", myfam));
-			break;
-		case $familiar[Fancypants Scarecrow]:
-			picker.addLoader("Changing Pants...");
-			pickSlot("pants");
-			if(count(addeditems) == 0) picker.addSadFace(sadMessage("pants", myfam));
-			break;
-		case $familiar[disembodied hand]:
-			picker.addLoader("Changing Weapons...");
-			pickSlot("weapons");
-			if(count(addeditems) == 0) picker.addSadFace(sadMessage("weapons", myfam));
-			break;
-		case $familiar[comma chameleon]:
-			picker.addLoader("Changing Equipment...");
-			pickChameleon();
-			if(count(addeditems) == 0) picker.addSadFace(sadMessage("equipment", myfam));
-			break;
-		case $familiar[none]:
-			if(my_path() == "Avatar of Boris") {
-				picker.addLoader("Changing Instrument...");
-				pickClancy();
-				if(item_amount($item[Clancy's lute]) + item_amount($item[Clancy's crumhorn]) == 0)
-					picker.addSadFace("Clancy only has a sackbut to play with.<br><br>Poor Clancy.");
-			}
-			break;
-		default:
-			picker.addLoader("Changing Equipment...");
-			pickEquipment();
-			if(count(addeditems) == 0) picker.addSadFace(sadMessage("equipment", myfam));
-	}
-	picker.append('</table></div>');
-
-	chitPickers["equipment"] = picker;
-		
-}
-
-void pickerCompanion(string famname, string famtype) {
-
-	item [skill] companion;
-		companion [$skill[Egg Man]] = $item[cosmic egg];
-		companion [$skill[Radish Horse]] = $item[cosmic vegetable];
-		companion [$skill[Hippotatomous]] = $item[cosmic potato];
-		companion [$skill[Cream Puff]] = $item[cosmic Cream];
-	
-	string companionImg(skill s) {
-		switch(s) {
-		case $skill[Egg Man]: return "jarl_eggman";
-		case $skill[Radish Horse]: return "jarl_horse";
-		case $skill[Hippotatomous]: return "jarl_hippo";
-		case $skill[Cream Puff]: return "jarl_creampuff";
-		}
-		return "blank";
-	}
-	
-	void addCompanion(buffer result, skill s, boolean gotfood) {
-		string hover = "Play with " + s +"<br />";
-		if(gotfood)
-			hover += "<span style='color:#707070'>Costs "+mp_cost(s)+" mp and <br />1 "+companion[s]+" (have "+item_amount(companion[s])+")";
-		else
-			hover += "<span style='color:#FF2B2B'>Need "+companion[s];
-		hover +="</span>";
-		string url = sideCommand("cast " + s);
-		result.append('<tr class="pickitem">');
-		if(gotfood) {
-			result.append('<td class="inventory"><a class="change" href="' + url + '" title="Play with ' + s + '">' + hover + '</a></td>');
-			result.append('<td class="icon"><a class="change" href="' + url + '" title="Play with ' + s + '"><img src="/images/itemimages/' + companionImg(s) + '.gif"></a></td>');
-		} else {
-			result.append('<td class="remove">' + hover + '</td>');
-			result.append('<td class="icon"><img src="/images/itemimages/' + companionImg(s) + '.gif"></td>');
-		}
-		result.append('</tr>');
-	}
-
-	buffer picker;
-	picker.pickerStart("fam", "Summon thy Companion");
-	
-	// Check for all companions
-	picker.addLoader("Summoning Companion...");
-	boolean sad = true;
-	foreach s, i in companion
-		if(have_skill(s) && (length(famtype) < 4 || substring(famtype, 4).to_skill() != s)) {  // Remove "the " from famtype before converting
-			picker.addCompanion(s, available_amount(i) > 0);
-			sad = false;
-		}
-	if(sad) {
-		if(famname == "")
-			picker.addSadFace("You haven't yet learned how to play with your food.<br /><br />How sad.");
-		else
-			picker.addSadFace("Poor "+famname+" has no other food to play with.");
-	}
-	
-	picker.append('</table></div>');
-	chitPickers["equipment"] = picker;
-}
-
-string servant_ability(servant s, int lvl) {
-	switch(lvl) {
-	case 1: return s.level1_ability;
-	case 7: return s.level7_ability;
-	case 14: return s.level14_ability;
-	case 21: return s.level21_ability;
-	}
-	return "";
-}
-
-void pickerServant() {
-	void addServant(buffer result, servant s) {
-		string url = sideCommand("servant " + s);
-		result.append('<tr class="pickitem"><td class="inventory"><a class="change" href="');
-		result.append(url);
-		result.append('"><b>');
-		result.append(s);
-		result.append('</b>');
-		foreach i in $ints[1, 7, 14] {
-			result.append('<br /><span style="color:');
-			if(s.level >= i)
-				result.append('blue');
-			else
-				result.append('gray');
-			result.append('">');
-			result.append(s.servant_ability(i));
-			result.append("</span>");
-		}
-		result.append('</span></a></td><td class="icon"><a class="change" href="');
-		result.append(url);
-		result.append('"><img src="/images/itemimages/');
-		result.append(s.image);
-		result.append('"></a></td></tr>');
-	}
-
-	buffer picker;
-	picker.pickerStart("fam", "Put thy Servant to Work");
-	picker.addLoader("Summoning Servant...");
-	boolean sad = true;
-	foreach s in $servants[]
-		if(have_servant(s) && my_servant() != s) {
-			picker.addServant(s);
-			sad = false;
-		}
-	if(sad) {
-		if(my_servant() == $servant[none])
-			picker.addSadFace("You haven't yet released any servants to obey your whims.<br /><br />How sad.");
-		else
-			picker.addSadFace("Poor " + my_servant().name + " has no other servants for company.");
-	}
-	
-	// Link to Servant's Quarters
-	picker.append('<tr class="pickitem"><td colspan=2 class="make"><a class="change" style="border-top: 1px solid gray; padding: 3px 0px 3px 0px;" onclick="javascript:location.reload();" target=mainpane href="place.php?whichplace=edbase&action=edbase_door"><b>Go to the Servant\'s Quarters</b></a></td></tr>');
-	
-	picker.append('</table></div>');
-	
-	chitPickers["servants"] = picker;
-}
-
 static { string [thrall] [int] pasta;
 	pasta[$thrall[Vampieroghi]][1] = "Attacks and heals";
 	pasta[$thrall[Vampieroghi]][5] = "Dispels bad effects";
 	pasta[$thrall[Vampieroghi]][10] = "+60 max HP";
-	pasta[$thrall[Vermincelli]][1] = "Attacks to restore MP";
-	pasta[$thrall[Vermincelli]][5] = "Attacks enemy";
+	pasta[$thrall[Vermincelli]][1] = "Restores MP after combat";
+	pasta[$thrall[Vermincelli]][5] = "Attacks and poisons enemy";
 	pasta[$thrall[Vermincelli]][10] = "+30 max MP";
 	pasta[$thrall[Angel Hair Wisp]][1] = "Combat Initiative";
 	pasta[$thrall[Angel Hair Wisp]][5] = "Prevents enemy crits";
@@ -1975,7 +1166,6 @@ static { string [thrall] [int] pasta;
 }
 
 void pickerThrall() {
-
 	thrall [int] binds;
 	foreach s in $thralls[]
 		binds[count(binds)] = s;
@@ -1990,7 +1180,7 @@ void pickerThrall() {
 	void addThrall(buffer result, thrall t) {
 		skill s = t.skill;
 		buffer url;
-		if(t.level == 0) { // If this is a first time summmons, I want to see it in mainpaine!
+		if(t.level == 0) { // If this is a first time summmons, I want to see it in mainpain!
 			url.append('<a target=mainpane class="change" href="runskillz.php?action=Skillz&whichskill=');
 			url.append(to_int(s));
 			url.append('&pwd=');
@@ -2068,507 +1258,16 @@ void pickerThrall() {
 	chitPickers["thrall"] = picker;
 }
 
-void FamBoris() {
-	string famimage, equiptype, equipimage, clancyLink, famweight;
-	string source = chitSource["familiar"];
-	matcher level = create_matcher("Level <b>(.*?)</b> Minstrel", source);
-	if(find(level)) famweight = level.group(1).to_int();
-	matcher image = create_matcher("(otherimages/.*?) width=60", source);
-	if(find(image)) famimage = image.group(1);
-
-	// Does Clancy want attention?
-	matcher att = create_matcher("Minstrel</font><br><a target=mainpane href=(.*?)>", source);
-	if(find(att)) clancyLink = att.group(1);
-	
-	// What is Clancy equipped with?
-	if(famimage.contains_text("_1"))
-		equiptype = "Clancy's sackbut";
-	else if(famimage.contains_text("_2"))
-		equiptype = "Clancy's crumhorn";
-	else if(famimage.contains_text("_3"))
-		equiptype = "Clancy's lute";
-	equipimage = equiptype.to_item().image;
-	
-	string info = '<br><span style="color:#606060;font-weight:normal">Level ' + famweight + ' Minstrel';
-	switch(equiptype) {
-	case "Clancy's sackbut": info += "<br><br>Restore HP/MP</span>"; break;
-	case "Clancy's crumhorn": info += "<br><br>Increase Exp</span>"; break;
-	case "Clancy's lute": info += "<br><br>Phat Loot!</span>"; break;
-	}
-	
-	
-	//Finally start some output
-	buffer result;
-	result.append('<table id="chit_familiar" class="chit_brick nospace">');
-	
-	result.append('</tr><tr>');
-	result.append('<td class="clancy" title="Your Faithful Minstrel">');
-	#result.append('<img src="/images/' + famimage + '" width=50 height=100 border=0>');
-	if(clancyLink != "")
-		result.append('<a target=mainpane href="'+clancyLink+'" class="familiarpick">');
-	result.append('<img src="/images/' + famimage + '">');
-	if(clancyLink != "")
-		result.append('</a>');
-	result.append('</td>');
-	result.append('<td class="info">Clancy');
-	result.append(info);
-	result.append('</td>');
-	result.append('<td class="icon" title="');
-	result.append(equiptype);
-	result.append('">');
-	result.append('<a class="chit_launcher" rel="chit_pickerfam" href="#">');
-	result.append('<img src="/images/itemimages/' );
-	result.append(equipimage);
-	result.append('">');
-	result.append('</a></td>');
-	result.append('</tr>');
-	
-	result.append('</table>');
-	chitBricks["familiar"] = result;
-
-	//Add Equipment Picker
-	pickerFamiliar($familiar[none], familiar_equipped_equipment(my_familiar()), false);
-}
-
-# <font size=2><b>Companion:</b><br><img src=http://images.kingdomofloathing.com/adventureimages/jarlcomp3.gif width=100 height=100><br><b>Ella</b><br>the Hippotatomous</font><br><font color=blue size=2><b>+3 Stats per Combat</b></font>
-# <font size=2><b>Companion:</b><br>(none)
-void FamJarlsberg() {
-	string famimage, famname, famtype, actortype, equiptype;
-	matcher companion = create_matcher('images/(.*?\\.gif).*?<b>([^<]*)</b><br>([^<]*).*?<br>(.*?font>)', chitSource["familiar"]);
-	if(find(companion)) {
-		famimage = companion.group(1);
-		famname = companion.group(2);
-		famtype = companion.group(3);
-		actortype = famname+', '+famtype;
-		equiptype = companion.group(4);
-	} else {
-		famimage = "blank.gif";
-		famname = "";
-		famtype = "";
-		actortype = "(No Companion)";
-		equiptype = "<font color=blue size=2><b>Click to Summon a Companion</b></font>";
-	}
-	buffer result;
-	result.append('<table id="chit_familiar" class="chit_brick nospace">');
-	result.append('<tr><th colspan="2" title="Companion">');
-	result.append(actortype);
-	result.append('</th></tr>');
-	
-	result.append('<tr><td class="companion" title="Playing with this food">');
-	result.append('<a class="chit_launcher" rel="chit_pickerfam" href="#">');
-	result.append('<img src="images/adventureimages/' );
-	result.append(famimage);
-	result.append('"></a></td>');
-	result.append('<td class="info"><a class="chit_launcher" rel="chit_pickerfam" href="#">');
-	result.append(equiptype);
-	result.append('</a></td>');
-	result.append('</tr></table>');
-	
-	chitBricks["familiar"] = result;
-
-	//Add Companion Picker
-	pickerCompanion(famname, famtype);
-}
-
-# <a target=mainpane href=main.php?action=motorcycle><img src=/images/adventureimages/bigbike.gif width=100 height=100 border=0 alt="Hermes the Motorcycle" title="Hermes the Motorcycle"></a><br> <b>Hermes</b>
-void FamPete() {
-	string peteMotorbike(string part) {
-		string pref = get_property("peteMotorbike"+part.replace_string(" ", ""));
-		if(pref == "") return "(factory standard)";
-		return pref;
-	}
-	string famlink, famimage, famname;
-	matcher motorcycle = create_matcher('(<[^>]+>).*?adventureimages/([^ ]+).*?<b>(.+?)</b>', chitSource["familiar"]);
-	if(find(motorcycle)) {
-		famlink = motorcycle.group(1);
-		famimage = motorcycle.group(2);
-		famname = motorcycle.group(3);
-	} else {
-		famlink = "main.php";
-		famimage = "blank.gif";
-		famname = "No Motorcycle?";
-	}
-	buffer result;
-	result.append('<table id="chit_familiar" class="chit_brick nospace">');
-	result.append('<tr><th colspan="2" title="Motorcycle">');
-	result.append(famname);
-	result.append('</th></tr>');
-	result.append('<tr><td class="motorcycle" title="');
-	foreach pref in $strings[Tires, Gas Tank, Headlight, Cowling, Muffler, Seat] {
-		result.append(pref);
-		result.append(': ');
-		result.append(peteMotorbike(pref));
-		if(pref != "Seat") result.append('\n');
-	}
-	result.append('" style="overflow:hidden;">');
-	result.append(famlink);
-	result.append('<img src="images/adventureimages/');
-	result.append(famimage);
-	result.append('"></a></td>');
-	result.append('</tr></table>');
-	
-	chitBricks["familiar"] = result;
-}
-
-# <p><font size=2><b>Servant:</b><br /><a href="/place.php?whichplace=edbase&action=edbase_door" target="mainpane">Bakthenamen the 1 level Cat</a><br /><a href="/place.php?whichplace=edbase&action=edbase_door" target="mainpane"><img border=0 src="//images.kingdomofloathing.com/itemimages/edserv1.gif" /></a></font></p>
-void FamEd() {
-	buffer result;
-	void bake(int lvl, string name, servant type, string img) {
-		result.append('<table id="chit_familiar" class="chit_brick nospace">');
-		result.append('<tr><th title="Servant Level">');
-		if(type != $servant[none]) {
-			result.append('Lvl.&nbsp;');
-			result.append(lvl);
-		}
-		result.append('</th><th colspan="2" title="Servant"><a title="');
-		result.append(name);
-		result.append('" target=mainpane href="/place.php?whichplace=edbase&action=edbase_door">');
-		result.append(name);
-		if(type != $servant[none]) {
-			result.append(", the ");
-			result.append(type);
-		}
-		result.append('</a></th></tr>');
-		
-		result.append('<tr><td class="icon" title="Servant">');
-		result.append('<a class="chit_launcher" rel="chit_pickerfam" href="#">');
-		result.append('<img title="Release thy Servant" src=');
-		result.append(img);
-		result.append('></a></td>');
-		if(type != $servant[none]) {
-			result.append('<td class="info"><a class="chit_launcher" rel="chit_pickerfam" href="#"><span style="color:blue;font-weight:bold">');
-			foreach i in $ints[1, 7, 14]
-				if(lvl >= i) {
-					result.append(type.servant_ability(i));
-					result.append('<br>');
-				}
-			result.append('</span></a></td>');
-		} else {
-			result.append('<td class="info"><a target=mainpane href="/place.php?whichplace=edbase&action=edbase_door"><span style="color:blue;font-weight:bold">(Click to release<br>a Servant)</span></a></td>');
-		}
-		result.append('</tr></table>');
-	}
-	
-	matcher id = create_matcher('mainpane">.+? src="([^"]+)"', chitSource["familiar"]);
-	if(id.find())
-		bake(my_servant().level, my_servant().name, my_servant(), id.group(1));
-	else
-		bake(0, "No Servant", $servant[none], "/images/itemimages/blank.gif");
-	
-	chitBricks["familiar"] = result;
-	pickerServant();
-}
-
-// Set familiar image, including path to image. Some familiar images are purposefully changed, others need to be normalized.
-string familiar_image(familiar f) {
-	switch(f) {
-	case $familiar[Fancypants Scarecrow]: return "/images/itemimages/pantscrow2.gif";
-	case $familiar[Disembodied Hand]: return "/images/itemimages/dishand.gif";
-	case $familiar[Mad Hatrack]: return "/images/itemimages/hatrack.gif";
-	
-	case $familiar[Golden Monkey]: return imagePath + 'goldmonkey_darkcodelagsniper.gif';
-	
-	case $familiar[Crimbo Shrub]:  // Get rid of that Gollywog look!
-		if(to_boolean(vars["chit.familiar.anti-gollywog"]))
-			return imagePath + 'crimboshrub_fxx_ckb.gif';
-		break;
-	
-	case $familiar[Happy Medium]:
-		switch(f.image) {
-			case "medium_1.gif": return imagePath + 'medium_blue.gif';
-			case "medium_2.gif": return imagePath + 'medium_orange.gif';
-			case "medium_3.gif": return imagePath + 'medium_red.gif';
-		}
-		break;
-	}
-	return '/images/itemimages/' + f.image;
-}
-
-void bakeFamiliar() {
-
-	// Special Challenge Path Familiar-ish things
-	switch(my_path()) {
-	case "Avatar of Boris": FamBoris(); return;
-	case "Avatar of Jarlsberg": FamJarlsberg(); return;
-	case "Avatar of Sneaky Pete": FamPete(); return;
-	case "Actually Ed the Undying": FamEd(); return;
-	}
-
-	string source = chitSource["familiar"];
-
-	string famname = "Familiar";
-	string famtype = '<a target=mainpane href="familiar.php" class="familiarpick">(None)</a>';
-	string famimage = "/images/itemimages/blank.gif";
-	string equipimage = "blank.gif";
-	string equiptype, actortype, famweight, info, famstyle, charges, chargeTitle;
-	boolean isFed = false;
-	string weight_title = "Buffed Weight";
-	
-	familiar myfam = my_familiar();
-	item famitem = $item[none];
-
-	if(myfam != $familiar[none]) {
-		famtype = to_string(myfam);
-		actortype = famtype;
-		if(myfam == $familiar[Fancypants Scarecrow])
-			famtype = "Fancy Scarecrow"; // Name is too long when there's info added
-		famimage =  familiar_image(myfam);
-	}
-	
-	//Get Familiar Name
-	matcher nameMatcher = create_matcher("<b><font size=2>(.*?)</a></b>, the", source);
-	if (find(nameMatcher)){
-		famname = group(nameMatcher, 1);
-	}
-	
-	//Drops
-	matcher dropMatcher = create_matcher("<b>Familiar:</b>\\s*(\?:<br>)?\\s*\\((.*?)\\)</font>", source);
-	if (find(dropMatcher)){
-		info = group(dropMatcher, 1).replace_string("<br>", ", ");
-		switch ( myfam ) {
-			case $familiar[frumious bandersnatch]:
-				info = "Runaways: " + info;
-				break;
-			case $familiar[rogue program]:
-				info = "Tokens: " + info;
-				break;
-			case $familiar[green pixie]:
-				info = "Absinthe: " + info;
-				break;
-			case $familiar[baby sandworm]:
-				info = "Agua: " + info;
-				break;
-			case $familiar[llama lama]:
-				info = "Gongs: " + info;
-				break;
-			case $familiar[astral badger]:
-				info = "Shrooms: " + info;
-				break;
-			case $familiar[Mini-Hipster]:
-				info = "Fights: " + info;
-				break;
-			case $familiar[Bloovian Groose]:
-				info = "Grease: " + info;
-				break;
-			case $familiar[blavious kloop]:
-				info = "Folio: " + info;
-				break;
-			case $familiar[Steam-Powered Cheerleader]:
-				// Truncate the decimal
-				info = replace_first(create_matcher("\\.\\d", info), "");
-				break;
-			default:
-		}
-	}
-
-	// Show Reanimator parts
-	if(myfam == $familiar[Reanimated Reanimator])
-		foreach l in $strings[Arm, Leg, Skull, Wing, WeirdPart] {
-			string prop = get_property("reanimator"+l+"s");
-			if(prop != "0")
-				info += (length(info) == 0? "": ", ") + prop + " "+ l +(prop == "1"? "": "s");
-		}
-
-	//Get Familiar Weight
-	matcher weightMatcher = create_matcher("</a></b>, the (<i>extremely</i> well-fed)? <b>(.*?)</b> pound ", source);
-	if (find(weightMatcher)) {
-		isFed = weightMatcher.group(1) != "";
-		famweight = weightMatcher.group(2);
-	} else if (myfam != $familiar[none]) {
-		famweight = to_string(familiar_weight(myfam) + weight_adjustment());
-	}
-
-	//Get equipment info
-	if(myfam == $familiar[Comma Chameleon]) {
-		famitem = $item[none];
-		equiptype = to_string(famitem);
-		matcher actorMatcher = create_matcher("</b\> pound (.*?),", source);
-		if (find(actorMatcher)) {
-			actortype = group(actorMatcher, 1);
-			equipimage = to_familiar(actortype).image;
-			info = actortype;
-		}
-	} else {
-		famitem = familiar_equipped_equipment(my_familiar());
-		if (famitem != $item[none]) {
-			equiptype = to_string(famitem);
-			// If using snow suit, find the current face & add carrot drop info
-			if(famitem == $item[Snow Suit] && have_effect($effect[SOME PIGS]) == 0) {
-				int snowface = index_of(source, "itemimages/snow");
-				equipimage = substring(source, snowface + 11, snowface + 24);
-				info += (length(info) == 0? "": ", ") + get_property("_carrotNoseDrops")+"/3 carrots";
-			} else
-				equipimage = famitem.image;
-		}
-	}
-
-	// Get familiar specific info
-	switch(myfam) {
-	case $familiar[Mad Hatrack]:
-	case $familiar[Fancypants Scarecrow]:
-		if(famitem != $item[none]) {
-			matcher m = create_matcher('Familiar Effect: \\"(.*?), cap (.*?)\\"', string_modifier(famitem, "Modifiers"));
-			if(find(m)) {
-				info = replace_string(m.group(1), "x", " x ");
-				if(group_count(m) > 1 ) {
-					famweight = famweight + " / " + m.group(2);
-					weight_title = "Buffed/Max Weight";
-				}
-			} else info = "Unknown effect";
-		} else info = "None";
-		break;
-	case $familiar[Reanimated Reanimator]:
-		famname += ' (<a target=mainpane href="main.php?talktoreanimator=1">chat</a>)';
-		break;
-	case $familiar[Grim Brother]:
-		if(source.contains_text(">talk</a>)"))
-			famname += ' (<a target=mainpane href="familiar.php?action=chatgrim&pwd='+my_hash()+'">talk</a>)';
-		break;
-	case $familiar[Crimbo Shrub]:
-		if(get_property("_shrubDecorated") == "false")
-			famname += ' (<a target=mainpane href="inv_use.php?pwd='+my_hash()+'&which=3&whichitem=7958">decorate</a>)';
-		buffer mods;
-		foreach shrub in $strings[shrubTopper, shrubLights, shrubGarland, shrubGifts] {
-			string decoration = get_property(shrub);
-			if(length(decoration) > 0) {
-				if(length(mods) > 0)
-					mods.append(", ");
-				mods.append(decoration);
-			}
-		}
-		if(info != "")
-			mods = mods.replace_string("PvP", "PvP: "+info.replace_string(" charges", ""));
-		info = parseMods(mods);
-		if(get_property("shrubGifts") == "yellow")
-			info = info.replace_string(", Yellow", ", <span style='color:#999933'>Yellow</span>");
-		else if(get_property("shrubGifts") == "red")
-			info = info.replace_string(", Red", ", <span style='color:#FE2E2E'>Red</span>");
-		break;
-	case $familiar[Mini-Crimbot]:
-		if(source.contains_text(">configure</a>)"))
-			famname += ' (<a target=mainpane href="main.php?action=minicrimbot">configure</a>)';
-		break;
-	}
-	
-	// Charges
-	if (famitem == $item[sugar shield]) {
-		charges = to_string( 31 - to_int(get_property("sugarCounter4183")));
-		chargeTitle = "Charges remaining";
-	} else 	if (famitem == $item[sugar chapeau]) {
-		charges = to_string( 31 - to_int(get_property("sugarCounter4181")));
-		chargeTitle = "Charges remaining";
-	} else 	if (famitem == $item[moveable feast]) {
-		charges = get_property("_feastUsed") + " / 5";
-		chargeTitle = "Familiars Feasted";
-	} else 	if ( (myfam == $familiar[Pair of Stomping Boots]) && (get_property("bootsCharged") == "true") ) {
-		charges = "GO";
-		chargeTitle = "Your Boots are charged and ready for some stomping";
-	}
-		
-	string hover = "Visit your terrarium";	
-
-	//Extra goodies for 100% runs
-	boolean protect = false;
-	if (to_familiar(vars["is_100_run"]) != $familiar[none]) {
-		if (myfam == to_familiar(vars["is_100_run"])) {
-			famstyle = famstyle + "color:green;";
-			if (vars["chit.familiar.protect"] == "true") {
-				hover = "Don't ruin your 100% run!";
-				protect = true;
-			}
-		} else {
-			famstyle = famstyle + "color:red;";
-		}
-	}
-	
-	//Add final touches to additional info
-	if (info != "") {
-		info = '<br><span style="color:#606060;font-weight:normal">(' + info + ')</span>';
-	}
-	
-	//Finally start some output
-	buffer result;
-	result.append('<table id="chit_familiar" class="chit_brick nospace">');
-	if (isFed) {
-		result.append('<tr class="wellfed">');
-	} else {
-		result.append('<tr>');
-	}	
-	result.append('<th width="40" title="'+ weight_title +'" style="color:blue">' + famweight + '</th>');
-	
-	if (protect) {
-		result.append('<th title="' + hover + '">' + famname + '</th>');
-	} else {
-		result.append('<th><a target=mainpane href="familiar.php" class="familiarpick" title="' + hover + '">' + famname + '</a></th>');
-	}
-	if (charges == "") {
-		result.append('<th width="30">&nbsp;</th>');
-	} else {
-		result.append('<th width="30" title="' + chargeTitle + '">' + charges + '</th>');
-	}
-	result.append('</tr><tr>');
-	result.append('<td class="icon" title="' + hover + '">');
-	if (protect) {
-		result.append('<img src="' + famimage + '">');
-	} else {
-		result.append('<a target=mainpane href="familiar.php" class="familiarpick">');
-		result.append('<img src="' + famimage + '">');
-		result.append('</a>');
-	}
-	result.append('</td>');
-	result.append('<td class="info" style="' + famstyle + '"><a title="Familiar Haiku" class="hand" onclick="fam(' + to_int(myfam) + ')" origin-level="third-party"/>' + famtype + '</a>' + info + '</td>');
-	if (myfam == $familiar[none]) {
-		result.append('<td class="icon">');
-		result.append('</td>');
-	} else {
-		if (equiptype == "") {
-			result.append('<td class="icon" title="Equip your familiar">');
-		} else {
-			result.append('<td class="icon">');
-		}
-		boolean lockable = string_modifier(famitem, "Modifiers").contains_text("Generic") && vars["chit.familiar.showlock"].to_boolean();
-		if(lockable)
-			result.append('<div id="fam_equip">');
-		result.append('<a class="chit_launcher" rel="chit_pickerfam" href="#">');
-		result.append('<img title="' + equiptype + '" src="/images/itemimages/' + equipimage + '">');
-		if(lockable) {
-			result.append('<a href="' + sideCommand("ashq lock_familiar_equipment("+ (!is_familiar_equipment_locked()) +")")  +'"><img title="Equipment ');
-			if(is_familiar_equipment_locked())
-				result.append('Locked" id="fam_lock" src="/images/itemimages/padlock.gif"></a>');
-			else
-				result.append('Unlocked" id="fam_lock" src="/images/itemimages/openpadlock.gif"></a>');
-		}
-		result.append('</a>');
-		if(lockable)
-			result.append('</div>');
-		result.append('</td>');
-	}
-	result.append('</tr>');
-	
-	//Add Progress bar if we have one
-	matcher progMatcher = create_matcher("<table title='(.*?)' cellpadding=0", source);
-	if (find(progMatcher)) {
-		string[1] minmax = split_string(group(progMatcher, 1), " / ");
-		int current = to_int(minmax[0]);
-		int upper = to_int(minmax[1]);
-		float progress = (current * 100.0) / upper;
-		result.append('<tr><td colspan="3" class="progress" title="' + current + ' / ' + upper + '" >');
-		result.append('<div class="progressbar" style="width:' + progress + '%"></div></td></tr>');
-	}
-	result.append('</table>');
-	chitBricks["familiar"] = result;
-
-	//Add Equipment Picker
-	if (myfam != $familiar[none]) {
-		pickerFamiliar(myfam, famitem, isFed);
-	}
-	
-}
-
 void bakeThrall() {
-	if(my_class() != $class[Pastamancer]) return;
+	if(my_class() != $class[Pastamancer] || my_path() == "Nuclear Autumn") return;
 	buffer result;
 	void bake(string lvl, string name, string type, string img) {
+		if(to_boolean(vars["chit.thrall.showname"])) {
+			string temp = name;
+			name = type;
+			type = temp;
+		}
+		
 		result.append('<table id="chit_thrall" class="chit_brick nospace">');
 		result.append('<tr><th title="Thrall Level">');
 		if(lvl != "")
@@ -2605,6 +1304,33 @@ void bakeThrall() {
 		bake(my_thrall().level, my_thrall().name, my_thrall(), my_thrall().tinyimage);
 	chitBricks["thrall"] = result;
 	pickerThrall();
+}
+
+void bakeVYKEA() {
+	string img_margin() {
+		switch(get_property("_VYKEACompanionType")) {
+		case "couch":
+		case "dishrack":
+			return 'top:-20';
+		case "dresser":
+		case "bookshelf":
+			return 'top:-10';
+		case "ceiling fan":
+			return 'bottom:-20';
+		}
+		return 'top:0';
+	}
+	vykea v = my_vykea_companion();
+	if(v != $vykea[none]) {
+		buffer result;
+		result.append('<table id="chit_VYKEA" class="chit_brick nospace">');
+		result.append('<tr class="effect"><td class="vykea" style="overflow:hidden;"><img title="VYKEA Companion" src="images/adventureimages/');
+		result.append(v.image);
+		result.append('" style="margin-'+img_margin()+'px; border:0" /></td><td class="info"><b>VYKEA Companion</b><p style="margin-top:2px; margin-bottom:0px"><b>');
+		result.append(replace_string(to_string(v), ", t", "</b>, t"));
+		result.append('</td></tr></table>');
+		chitBricks["vykea"] = result;
+	}
 }
 
 string currentMood() {
@@ -2650,13 +1376,6 @@ void addCurrentMood(buffer result, boolean picker) {
 }
 
 void pickMood() {
-	boolean mood_plus(string full, string mood) {
-		if(mood == "apathetic") return false;
-		foreach i,m in split_string(full,", ")
-			if(m == mood) return false;
-		return true;
-	}
-
 	buffer picker;
 	picker.pickerStart("mood", "Select New Mood");
 	picker.addLoader("Getting Moody");
@@ -2668,12 +1387,26 @@ void pickMood() {
 		picker.append('">');
 		picker.append(m);
 		picker.append('</a></td><td>');
-		if(moodname != "???" && mood_plus(moodname,m)) {
-			picker.append('<a title="ADD this to current mood" href="');
-			picker.append(sideCommand("mood "+moodname+", "+m));
-			picker.append('"><img src="');
-			picker.append(imagePath);
-			picker.append('control_add_blue.png"><a>');
+		boolean isActive = list_contains(moodname,m);
+		if(moodname != "???" && m != "apathetic" && moodname != m) {
+			if(!isActive) {
+				string mlist = moodname;
+				if(m == "combat")
+					mlist = list_remove(mlist, "noncom");
+				else if(m == "noncom")
+					mlist = list_remove(mlist, "combat");
+				picker.append('<a title="ADD ' + m + ' to current mood" href="');
+				picker.append(sideCommand("mood " + list_add(mlist,m)));
+				picker.append('"><img src="');
+				picker.append(imagePath);
+				picker.append('control_add_blue.png"></a>');
+			} else {
+				picker.append('<a title="REMOVE ' + m + ' from current mood" href="');
+				picker.append(sideCommand("mood " + list_remove(moodname,m)));
+				picker.append('"><img src="');
+				picker.append(imagePath);
+				picker.append('control_remove_red.png"></a>');
+			} 
 		} else
 			picker.append('&nbsp;');
 		picker.append('</td></tr>');
@@ -2768,7 +1501,7 @@ void bakeToolbar() {
 					result.append('"><img src="');
 					result.append(imagePath);
 					result.append(toolprops[1]);
-					result.append('"></a></li>');				
+					result.append('"></a></li>');
 				}
 			}
 		}	
@@ -3014,7 +1747,7 @@ void addFury(buffer result) {
 		}
 	}
 	matcher fury = create_matcher("Fury:.*?<font color[^>]*>(<span[^>]*>)?((\\d+) gal.)", chitSource["stats"]);
-	if(fury.find()) {
+	if(fury.find() && my_maxfury() > 0) {
 		result.append('<tr><td class="label">');
 		result.spanWrap("Fury", fury.group(1));
 		result.append('</td><td class="fury">');
@@ -3087,6 +1820,16 @@ void addHeavyRains(buffer result) {
 	}
 }
 
+void addEnlightenment(buffer result) {
+	string enlightenment = get_property("sourceEnlightenment");
+	if(enlightenment != "0") {
+		result.append('<tr><td class="label"><a href="place.php?whichplace=manor1&action=manor1_sourcephone_ring" target="mainpane">Enlight</a></td><td class="info"');
+		result.append('><a href="place.php?whichplace=manor1&action=manor1_sourcephone_ring" target="mainpane">');
+		result.append(enlightenment);
+		result.append('</a></td></tr>');
+	}
+}
+
 void addHooch(buffer result) {
 	matcher hooch = create_matcher("Hooch:</td><td align=left><b>(\\d+) / (\\d+)</b>", chitSource["stats"]);
 	if(hooch.find()) {
@@ -3106,6 +1849,92 @@ void addHooch(buffer result) {
 			result.append(to_string(100.0 * my_hooch / max_hooch));
 			result.append('%"></div></div></td></td>');
 		}
+		result.append('</tr>');
+	}
+}
+
+void addGhostBusting(buffer result) {
+	string ghostLocation = get_property("ghostLocation");
+	boolean hasPack = available_amount($item[protonic accelerator pack]) > 0;
+	if(!hasPack && ghostLocation == "")
+		return;
+	
+	string zone_url(string loc) {
+		switch(loc) {
+		case "Madness Bakery":
+			if(get_property("questM25Armorer") == "unstarted" && npc_price($item[sweet ninja sword]) != 0)
+				return "shop.php?whichshop=armory&action=talk";
+			return "place.php?whichplace=town_right";
+		case "The Overgrown Lot":
+			if(get_property("questM24Doc") == "unstarted" && npc_price($item[Doc Galaktik's Pungent Unguent]) != 0)
+				return "shop.php?whichshop=doc&action=talk";
+			return "place.php?whichplace=town_wrong";
+		case "The Skeleton Store":
+			if(get_property("questM23Meatsmith") == "unstarted" && npc_price($item[big stick]) != 0)
+				return "shop.php?whichshop=meatsmith&action=talk";
+			return "place.php?whichplace=town_market";
+		case "The Haunted Conservatory":
+		case "The Haunted Kitchen":
+			return "place.php?whichplace=manor1";
+		case "The Haunted Gallery": return "place.php?whichplace=manor2";
+		case "The Haunted Wine Cellar": return "place.php?whichplace=manor4";
+		case "The Spooky Forest":
+		case "The Old Landfill": return "place.php?whichplace=woods";
+		case "Cobb's Knob Treasury": return "cobbsknob.php";
+		case "The Icy Peak": return "place.php?whichplace=mclargehuge";
+		case "The Smut Orc Logging Camp": return "place.php?whichplace=orc_chasm";
+		case "Inside the Palindome": return "place.php?whichplace=palindome";
+		}
+		return "main.php";
+	}
+
+	int turnsToGo = to_int(get_property("nextParanormalActivity")) - total_turns_played();
+	result.append('<tr><td class="label">Bust</td><td class="ghostbust info" colspan="2">');
+	if(ghostLocation == "") {
+		result.append('<a ');
+		if(turnsToGo <= 0) {
+			if(hasPack && equipped_amount($item[protonic accelerator pack]) < 1) {
+				result.append('href="');
+				result.append(sideCommand("equip protonic accelerator pack"));
+				result.append('" title="Equip your PAP"');
+			}
+			else result.append('style="color:#555555;"');
+			result.append('>ghost report due!');
+		}
+		else {
+			result.append('style="color:#BBBBBB;">ghost in ');
+			result.append(turnsToGo);
+			result.append(' turns');
+		}
+		result.append('</a></td></tr>');
+	}
+	else {
+		result.append('<a href="');
+		result.append(zone_url(ghostLocation));
+		result.append('" title="Bust a ghost here');
+		if(turnsToGo > 0) {
+			result.append('\nReplacement ghost in ');
+			result.append(turnsToGo);
+			result.append(' turns');
+		}
+		result.append('" target="mainpane">');
+		result.append(ghostLocation);
+		result.append(' (');
+		if(turnsToGo > 0) {
+			result.append(turnsToGo);
+			result.append(' turns');
+		} else result.append('next ready');
+		result.append(')</a></td></tr>');
+	}
+}
+
+// if KoL adds sprinkle count, do that here also.
+void addSprinkles(buffer result) {
+	if(chitSource["stats"].contains_text("Sprinkles:")) {
+		result.append('<tr>');
+		result.append('<td class="label">Sprinkles</td><td class="info">');
+		result.append(available_amount($item[sprinkles]));
+		result.append('</td>');
 		result.append('</tr>');
 	}
 }
@@ -3149,9 +1978,40 @@ void addCIQuest(buffer result) {
 		result.append(final);
 		result.append('"><a href="place.php?whichplace=airport_spooky&action=airport2_radio" target="mainpane"><div class="progressbar" style="width:');
 		result.append(to_string(100.0 * current / final));
-		result.append('%"></div></a></div></td></td>');
+		result.append('%"></div></a></div></td>');
 	}
 	result.append('</tr>');
+}
+
+void addWalfordBucket(buffer result) {
+	if(have_equipped($item[Walford's bucket]) || get_property("questECoBucket") != "unstarted") {
+		int current = get_property("walfordBucketProgress").to_int();
+		result.append('<tr title="');
+		if(get_property("walfordBucketItem") != "") {
+			result.append(current);
+			result.append('% full of ');
+			result.append(get_property("walfordBucketItem"));
+		} else
+			result.append("Select something to put in the bucket");
+		result.append('"><td class="label"><a href="place.php?whichplace=airport_cold&action=glac_walrus" target="mainpane">');
+		if(current >= 100)
+			result.append('<span class="walford_done">Walford</span>');
+		else if(!have_equipped($item[Walford's bucket]))
+			result.append('<span class="walford_nobucket">Walford</span>');
+		else if(get_property("questECoBucket") == "unstarted" || get_property("walfordBucketItem") == "")
+			result.append('<span class="walford_noquest">Walford</span>');
+		else
+			result.append('Walford');
+		result.append('</a></td><td class="info"><a href="place.php?whichplace=airport_cold&action=glac_walrus" target="mainpane">');
+		result.append(current);
+		result.append(' % </a></td>');
+		if(to_boolean(vars["chit.stats.showbars"])) {
+			result.append('<td class="progress"><div class="progressbox"><a href="place.php?whichplace=airport_cold&action=glac_walrus" target="mainpane"><div class="progressbar" style="width:');
+			result.append(current);
+			result.append('%"></div></a></div></td>');
+		}
+		result.append('</tr>');
+	}
 }
 
 void addAud(buffer result) {
@@ -3183,6 +2043,26 @@ void addKa(buffer result) {
 		result.append('</td><td><div title="Ka Coins" style="float:left"><img style="max-width:14px;padding-left:3px;" onClick="descitem(826932303,0, event);" src="/images/itemimages/kacoin.gif"></td></tr>');
 	else
 		result.append('<img title="Ka Coins" style="max-width:14px;padding-left:3px;" src="/images/itemimages/kacoin.gif"></td></tr>');
+}
+
+void addRadSick(buffer result) {
+	int sickness = current_rad_sickness();
+	if(sickness > 0) {
+		result.append('<tr><td class="label"><a target="mainpane" href="campground.php" title="Head to your fallout shelter to deal with Radiation Sickness">Radsick</a></td><td class="info" title="-');
+		result.append(sickness);
+		result.append(' to All Stats">');
+		result.append(sickness);
+		if(to_boolean(vars["chit.stats.showbars"])) {
+			result.append('</td><td title="-');
+			result.append(sickness);
+			result.append(' to All Stats" style="float:left"><img style="max-width:14px;padding-left:3px;" src="/images/itemimages/radiation.gif">');
+		} else {
+			result.append('<img title="-');
+			result.append(sickness);
+			result.append(' to All Stats" style="max-width:14px;padding-left:3px;" src="/images/itemimages/radiation.gif">');
+		}
+		result.append('</td></tr>');
+	}
 }
 
 void addOrgan(buffer result, string organ, boolean showBars, int current, int limit, boolean eff) {
@@ -3388,8 +2268,7 @@ void addMCD(buffer result, boolean bake) {
 		//Loader
 		picker.addLoader(mcdbusy);
 		picker.mcdlist(true);
-		picker.append('</table>');
-		picker.append('</div>');
+		picker.append('</table></div>');
 		
 		chitPickers["mcd"] = picker.to_string();
 	}
@@ -3426,19 +2305,25 @@ void addTrail(buffer result) {
 	//Container
 	string url = "main.php";
 	matcher target = create_matcher('href="(.*?)" target=mainpane>Last Adventure:</a>', source);
-	if (find(target)) {
-		url = group(target, 1);
-	}
-	result.append('<tr>');
-	result.append('<td class="label"><a class="visit" target="mainpane" href="' + url + '">Last</a></td>');
+	if(target.find())
+		url = target.group(1);
+	if(url == "place.php?whichplace=town_right" && source.contains_text("Investigating a Plaintive Telegram"))
+		url = "place.php?whichplace=town_right&action=townright_ltt";
+		
+	result.append('<tr><td class="label"><a class="visit" target="mainpane" href="');
+	result.append(url);
+	result.append('">Last</a></td>');
 	
 	//Last Adventure
 	target = create_matcher('target=mainpane href="(.*?)">\\s*(.*?)</a><br></font>', source);
-	if (find(target)) {
-		result.append('<td class="info" style="display:block;" colspan="2"><a class="visit" target="mainpane" href="' + group(target, 1) + '">' + group(target, 2) + '</a></td>');
-	} else {
+	if(target.find()) {
+		result.append('<td class="info" colspan="2" style="display:block;"><a class="visit" target="mainpane" href="');
+		result.append(target.group(1));
+		result.append('">');
+		result.append(target.group(2));
+		result.append('</a></td>');
+	} else
 		result.append('<td class="info" colspan="2">(None)</td>');
-	}
 	result.append('</tr>');
 	
 }
@@ -3624,11 +2509,13 @@ void bakeStats() {
 				case "liver": 	result.addLiver(showBars); 			break;
 				case "spleen": 	result.addSpleen(showBars); 		break;
 				case "florist": result.addFlorist(true);			break;
+				case "terminal":result.addTerminal();				break;
 				case "hp": 		addHP(); 			break;
 				case "mp": 		addMP(); 			break;
 				case "axel": 	addAxel(); 			break;
 				case "mcd": 	result.addMCD(); 	break;
 				case "trail": 	result.addTrail();	break;
+				case "gear": 	result.addGear();	break;
 				default:
 			}
 		}
@@ -3637,10 +2524,12 @@ void bakeStats() {
 		if(section.contains_stat()) {
 			switch(my_class()) {
 			case $class[Seal Clubber]:
-				result.addFury();
+				if(my_path() != "Nuclear Autumn")
+					result.addFury();
 				break;
 			case $class[Sauceror]:
-				result.addSauce();
+				if(my_path() != "Nuclear Autumn")
+					result.addSauce();
 				break;
 			case $class[Avatar of Sneaky Pete]:
 				result.addAud();
@@ -3650,13 +2539,34 @@ void bakeStats() {
 				break;
 			}
 			
-			if(my_path() == "Heavy Rains")
+			switch(my_path()) {
+			case "Heavy Rains":
 				result.addHeavyRains();
+				break;
+			case "The Source":
+				result.addEnlightenment();
+				break;
+			case "Nuclear Autumn":
+				result.addRadSick();
+				break;
+			}
 			
 			if(numeric_modifier("Maximum Hooch") > 0)
 				result.addHooch();
 			
-			result.addCIQuest();
+			if(available_amount($item[sprinkles]) > 0)
+				result.addSprinkles();
+			
+			// Quest updates should be shown if the tracker brick is not in use.
+			boolean tracker;
+			foreach layout in $strings[roof, walls, floor, toolbar]
+				if(vars["chit." + layout + ".layout"].contains_text("tracker"))
+					tracker = true;
+			if(!tracker) {
+				result.addGhostBusting();
+				result.addCIQuest();
+				result.addWalfordBucket();
+			}
 		}
 		
 		result.append("</tbody>");
@@ -3703,45 +2613,153 @@ void bakeStats() {
 	chitBricks["stats"] = result.to_string();
 }
 
-//fancy currency relay override for charpane by DeadNed (#1909053)
+// Based on fancy currency relay override for charpane by DeadNed (#1909053)
 // http://kolmafia.us/showthread.php?12311-Fancy-Currency-(Charpane-override)
-// Currently unimplemented, but being considered
-string fancycurrency(string page) {
-	string output='<ul id="chit_currency"> \n <li>';
-
-	//big ol ugly case structure to figure out which thing you clicked last!
-	switch(get_property("_ChitCurrency")){
-	case "meat": 
-		output+='<a href="#"><img src="/images/itemimages/meat.gif" class="hand" title="Meat" alt="Meat"><br>"+formatInt(my_meat())+" </a> ';
-		break;
-	case "sanddollar":
-		output+='<a href="#"><img src="/images/itemimages/sanddollar.gif" class="hand" title="Sand Dollars" alt="Sand Dollars"> <br>'+ formatInt(item_amount($item[sand dollar]))+' </a>';
-		break;
-	 case "isotope":
-		output+='<a href="#"><img src="/images/itemimages/isotope.gif" class="hand" title="Lunar Isotopes" alt="Lunar Isotopes"> <br>'+ formatInt(item_amount($item[lunar isotope]))+' </a>';
-		break;
-	 case "nickel":
-		output+='<a href="#"><img src="/images/itemimages/nickel.gif" class="hand" title="Hobo Nickels" alt="Hobo Nickels"> <br>'+ formatInt(item_amount($item[hobo nickel]))+' </a>';
-		break;
+void allCurrency(buffer result) {
+	string amount_of(item it) {
+		if(it == $item[none])
+			return formatInt(my_meat());
+		return formatInt(item_amount(it));
 	}
-
-	output+='\n <ul> \n <li><a href="/KoLmafia/sideCommand?cmd='+url_encode("set _ChitCurrency=sanddollar")+ '&pwd=' + my_hash() +'" ><img src="/images/itemimages/sanddollar.gif"> <br>'
-		+ formatInt(item_amount($item[sand dollar]))+' </a></li> \n <li><a href="/KoLmafia/sideCommand?cmd='+url_encode("set _ChitCurrency=isotope")+ '&pwd=' 
-		+ my_hash() +'" ><img src="/images/itemimages/isotope.gif"> <br>'+formatInt(item_amount($item[lunar isotope]))+' </a></li> \n <li><a href="/KoLmafia/sideCommand?cmd='
-		+ url_encode("set _ChitCurrency=nickel")+ '&pwd=' + my_hash() +'" ><img src="/images/itemimages/nickel.gif"> <br>'
-		+ formatInt(item_amount($item[hobo nickel]))+'</a></li> \n <li><a href="/KoLmafia/sideCommand?cmd='+url_encode("set _ChitCurrency=meat")+ '&pwd=' 
-		+ my_hash() +'" ><img src="/images/itemimages/meat.gif"><br>'+formatInt(my_meat())+'</a></li> \n </li> \n </ul> \n';
 	
-	page.replace_string('<img src="/images/itemimages/meat.gif" class=hand onclick=\'doc("meat");\' title="Meat" alt="Meat"><br>',"output");
-
-	matcher m;
-	m = create_matcher('<img src="/images/itemimages/meat.gif" .+</td><td a',page);
-	if (m.find()){
-	page = replace_first(m, output +" </td><td a");
+	string name_of(item it) {
+		if(it == $item[none])
+			return "Meat";
+		return to_string(it);
 	}
-	return page;
+	
+	string image_of(item it) {
+		if(it == $item[none])
+			return "meat.gif";
+		return it.image;
+	}
+	
+	boolean [item] displayedCurrencies;
+	
+	void addCurrencyIcon(buffer result, item currency, string link) {
+		result.append(link);
+		result.append('<img class="currency_icon" src="/images/itemimages/');
+		result.append(image_of(currency));
+		result.append('" alt="');
+		result.append(name_of(currency));
+		if(link == "") {
+			result.append('" class="hand" title="');
+			result.append(name_of(currency));
+		}
+		result.append('" />');
+		if(link != "")
+			result.append('</a>');
+	}
+	
+	void addCurrency(buffer result, item currency) {
+		if(displayedCurrencies[currency])
+			return;
+		
+		displayedCurrencies[currency] = true;
+		
+		result.append('<span class="currency_amount">');
+		result.append(amount_of(currency));
+		result.append('</span>');
+		
+		switch(currency) {
+			case $item[disassembled clover]:
+				result.addCurrencyIcon(currency, item_amount($item[ten-leaf clover]) > 0 ? '<a title="disassemble a clover" href="' + sideCommand("use 1 ten-leaf clover") + '">' : "");
+				result.addCurrency($item[ten-leaf clover]);
+				break;
+			case $item[ten-leaf clover]:
+				result.addCurrencyIcon(currency, item_amount($item[disassembled clover]) > 0 ? '<a title="assemble a clover" href="' + sideCommand("use 1 disassembled clover") + '">' : "");
+				result.addCurrency($item[disassembled clover]);
+				break;
+			case $item[Beach Buck]:
+				result.addCurrencyIcon(currency, '<a title="Take a trip to Spring Break Beach" target="mainpane" href="place.php?whichplace=airport_sleaze">');
+				break;
+			case $item[Coinspiracy]:
+				result.addCurrencyIcon(currency, '<a title="Down the hatch to the Conspiracy Island bunker" target="mainpane" href="place.php?whichplace=airport_spooky_bunker">');
+				break;
+			case $item[FunFunds&trade;]:
+				result.addCurrencyIcon(currency, '<a title="Buy some souvenirs at the Dinsey Company Store" target="mainpane" href="shop.php?whichshop=landfillstore">');
+				break;
+			case $item[Volcoino]:
+				result.addCurrencyIcon(currency, '<a title="Boogie right on down to Disco GiftCo" target="mainpane" href="shop.php?whichshop=infernodisco">');
+				break;
+			case $item[Wal-Mart gift certificate]:
+				result.addCurrencyIcon(currency, '<a title="Browse the goods at Wal-Mart" target="mainpane" href="shop.php?whichshop=glaciest">');
+				break;
+			case $item[rad]:
+				result.addCurrencyIcon(currency, '<a title="Fiddle with your genes" target="mainpane" href="shop.php?whichshop=mutate">');
+				break;
+			case $item[source essence]:
+				string termlink = 'campground.php?action=terminal';
+				if(my_path() == "Nuclear Autumn")
+					termlink = 'place.php?whichplace=falloutshelter&action=vault_term';
+				result.addCurrencyIcon(currency, '<a title="Boot up the Source Terminal" target="mainpane" href="' + termlink + '">');
+				break;
+			case $item[BACON]:
+				result.addCurrencyIcon(currency, '<a title="Born too late to explore the Earth&#013;Born too soon to explore the galaxy&#013;Born just in time to BROWSE DANK MEMES" target="mainpane" href="shop.php?whichshop=bacon">');
+				break;
+			case $item[cop dollar]:
+				result.addCurrencyIcon(currency, '<a title="Visit the quartermaster" target="mainpane" href="shop.php?whichshop=detective">');
+				break;
+			default:
+				result.addCurrencyIcon(currency, "");
+				break;
+		}
+	}
+
+	boolean showMany = to_boolean(vars["chit.currencies.showmany"]);
+	string chitCurrency = showmany ? get_property("chitCurrency") : get_property("_chitCurrency");
+	string [int] dispCurrencies = split_string(chitCurrency, ",");
+	item current = to_item(dispCurrencies[0]);
+	
+	result.append('<div style="float:left" class="hand"><ul id="chit_currency"><li>');
+	foreach i,curr in dispCurrencies {
+		result.append('<span class="currency_block">');
+		result.addCurrency(to_item(curr));
+		result.append('</span>');
+	}
+	result.append('<ul>');
+	
+	boolean [item] currencies; // This is to ensure no duplication of currencies, perhaps due to ambiguous names being rectified by to_item().
+	foreach x,cur in split_string("none,"+vars["chit.currencies"], "\\s*(?<!\\\\),\\s*") {
+		item it = to_item(cur);
+		if(amount_of(it) > 0 && !(currencies contains it)) {
+			currencies[it] = true;
+			result.append('<li');
+			if(displayedCurrencies[it]) result.append(' class="current"');
+			result.append('><a href="/KoLmafia/sideCommand?cmd=');
+			if(showMany) {
+				result.append(url_encode("set chitCurrency="));
+				if(list_contains(chitCurrency,cur,","))
+					result.append(list_remove(chitCurrency,cur,","));
+				else
+					result.append(list_add(chitCurrency,cur,","));
+			} else {
+				result.append(url_encode("set _chitCurrency="));
+				result.append(it);
+			}
+			result.append('&pwd=');
+			result.append(my_hash());
+			result.append('" title="');
+			result.append(name_of(it));
+			result.append('" alt="');
+			result.append(name_of(it));
+			result.append('"><span>');
+			result.append(amount_of(it));
+			result.append('</span><img src="/images/itemimages/');
+			result.append(image_of(it));
+			result.append('"></a></li>');
+		}
+	}
+	result.append('<li class="currency_edit"><a onclick=\'var currencies = prompt("Edit displayed currencies: (Items that you have none of will not be displayed)", "');
+	result.append(vars["chit.currencies"]);
+	result.append('"); if(currencies!=null) { window.location.href = "/KoLmafia/sideCommand?cmd=zlib+chit.currencies+=+" + currencies.replace(/ /g,"+") + "&pwd=');
+	result.append(my_hash());
+	result.append('"; }\'>Edit List</a></li></ul>');
+	
+	result.append('</li></ul></div>');
 }
 
+// This function also makes use of gearName() which is in chit_brickGear.ash
 void pickOutfit() {
 	location loc = my_location();
 	if(loc == $location[none]) // Possibly beccause a fax was used
@@ -3835,97 +2853,33 @@ void pickOutfit() {
 			special.addGear("equip "+get_property("_hatBeforeKolhs")+"; set _hatBeforeKolhs = ", "Restore "+get_property("_hatBeforeKolhs"));
 	}
 	
-	if(get_property("dailyDungeonDone") == "false")
-		special.addGear($item[ring of Detect Boring Doors]);
-		
-	// Certain quest items need to be equipped to enter locations
-	if(available_amount($item[digital key]) + creatable_amount($item[digital key]) < 1 && get_property("questL13Final") != "finished")
-		special.addGear($item[continuum transfunctioner]);
-	
-	special.addGear($items[pirate fledges, Talisman o' Nam, black glass, Personal Ventilation Unit, gore bucket]);
-	special.addGear($item[encrypted micro-cassette recorder], "micro-cassette recorder");
-	if(get_property("questL10Garbage") != "finished")
-		switch(loc) {
-		case $location[The Castle in the Clouds in the Sky (Basement)]:
-			special.addGear($item[titanium assault umbrella]);
-			special.addGear($item[amulet of extreme plot significance], "amulet of plot significance");
-			break;
-		case $location[The Castle in the Clouds in the Sky (Ground Floor)]:
-		case $location[The Castle in the Clouds in the Sky (Top Floor)]:
-			special.addGear($item[mohawk wig]);
-			break;
-		}
-	if(item_amount($item[Mega Gem]) > 0 && get_property("questL11Palindome") != "finished")
-		special.addGear("equip acc3 Talisman o\' Nam;equip acc1 Mega+Gem", "Talisman & Mega Gem");
-	if($strings[step3, step4] contains get_property("questL11Worship") && item_amount($item[antique machete]) > 0)
-		special.addGear($item[antique machete]);
-		#special.addGear("equip antique machete", "antique machete");
-	if(get_property("questL11Desert") == "started")
-		special.addGear($items[UV-resistant compass, ornate dowsing rod]);
-	if(get_property("questL11Manor") == "step1" || get_property("questL11Manor") == "step2" || get_property("questL11Manor") == "step2") {
-		if(available_amount($item[bottle of Chateau de Vinegar]) == 1 && available_amount($item[blasting soda]) == 1)
-			special.addGear("create unstable fulminate; equip unstable fulminate", "Cook & Equip unstable fulminate");
-		else
-			special.addGear($item[unstable fulminate]);
-	}
-	if($strings[started,step1] contains get_property("questL11Manor"))
-		special.addGear($item[Lord Spookyraven's spectacles], "Spookyraven's spectacles");
-		
-	if(length(special) > 0) {
-		picker.append('<tr class="pickitem"><td style="color:white;background-color:blue;font-weight:bold;">Equip for Quest</td></tr>');
-		picker.append(special);
-	}
-	
-	// Some gear just makes stuff easier
-	if(get_property("kingLiberated") == "false") {
-		special.set_length(0);
-		// If using Kung Fu Fighting, you might want to empty your hands
+	// If using Kung Fu Fighting, you might want to empty your hands
 		if(have_effect($effect[Kung Fu Fighting]) > 0 && (equipped_item($slot[weapon]) != $item[none] || equipped_item($slot[off-hand]) != $item[none]))
 			special.addGear("unequip weapon; unequip off-hand", "Empty Hands");
-		if(my_path() == "Heavy Rains")
-			special.addGear($item[pool skimmer]);
-		special.addGear($item[Bram's choker]);
-		if(length(special) > 0) {
-			picker.append('<tr class="pickitem"><td style="color:white;background-color:blue;font-weight:bold;">Helpful Equipment</td></tr>');
-			picker.append(special);
+	
+	boolean noGearBrick = true;
+	foreach layout in $strings[roof, walls, floor, toolbar]
+		if(vars["chit." + layout + ".layout"].contains_text("gear"))
+			noGearBrick = false;
+	if(noGearBrick) {
+		foreach it in favGear
+			special.addGear(it, gearName(it));
+		foreach reason in recommendedGear
+			foreach it in recommendedGear[reason]
+				special.addGear(it, '<span style="font-weight:bold">(' + reason + ")</span> " + gearName(it));
+
+		if(item_amount($item[Mega Gem]) > 0 && get_property("questL11Palindome") != "finished")
+			special.addGear("equip acc3 Talisman o\' Namsilat;equip acc1 Mega+Gem", "Talisman & Mega Gem");
+		if(get_property("questL11Manor") == "step1" || get_property("questL11Manor") == "step2") {
+			if(available_amount($item[bottle of Chateau de Vinegar]) == 1 && available_amount($item[blasting soda]) == 1)
+				special.addGear("create unstable fulminate; equip unstable fulminate", "Cook & Equip unstable fulminate");
 		}
 	}
 	
-	// Special Smithsness section. Sometimes it is helpful to switch them around, like A Light that Never Goes Out or Half a Purse. Or sometimes put mainstat in offhand.
-	if(have_effect($effect[Merry Smithsness]) > 0) {
-		special.set_length(0);
-		
-		void addOffhand(buffer result, item e, string useName) {
-			if(equipped_item($slot[off-hand]) != e && item_amount(e) > 0 && e != $item[none])
-				result.addGear("equip off-hand " + e, useName);
-		}
-		
-		item classSmiths() {
-			switch(my_class()) {
-			case $class[Seal Clubber]: return $item[Meat Tenderizer is Murder];
-			case $class[Turtle Tamer]: return $item[Ouija Board\, Ouija Board];
-			case $class[Pastamancer]: return $item[Hand that Rocks the Ladle];
-			case $class[Sauceror]: return $item[Saucepanic];
-			case $class[Disco Bandit]: return $item[Frankly Mr. Shank];
-			case $class[Accordion Thief]: return $item[Shakespeare's Sister's Accordion];
-			}
-			return $item[none];
-		} item classSmiths = classSmiths();
-		
-		special.addGear($items[A Light that Never Goes Out, Half a Purse, Work is a Four Letter Sword, Sheila Take a Crossbow, Hairpiece On Fire, Vicar's Tutu]);
-		special.addGear($item[Staff of the Headmaster's Victuals], "Staff of the Headmaster");
-		special.addGear(classSmiths);
-		
-		// Put Smithsness weapon in off-hand?
-		if(my_class() != $class[Turtle Tamer] && have_skill($skill[Double-Fisted Skull Smashing]) && equipped_item($slot[off-hand]) != classSmiths && item_amount(classSmiths) > 0)
-			special.addGear("equip off-hand " + classSmiths, "Offhand: Class Weapon");
-		
-		if(length(special) > 0) {
-			picker.append('<tr class="pickitem"><td style="color:white;background-color:blue;font-weight:bold;">Swap Smithsness Items</td></tr>');
-			picker.append(special);
-		}
+	if(length(special) > 0) {
+		picker.append('<tr class="pickitem"><td style="color:white;background-color:blue;font-weight:bold;">Equipment Helper</td></tr>');
+		picker.append(special);
 	}
-
 	
 	picker.addLoader("Getting Dressed");
 	picker.append('</table>');
@@ -3970,12 +2924,11 @@ void bakeCharacter() {
 	}
 
 	//Avatar
-	string myAvatar = "";
-	if (vars["chit.character.avatar"] != "false") {
-		matcher avatarMatcher = create_matcher('<img src="(.*?)" width=60 height=100 border=0>', source);
-		if (find(avatarMatcher)){
-			myAvatar = group(avatarMatcher, 1);
-		}
+	string myAvatar;
+	if(vars["chit.character.avatar"] != "false") {
+		matcher avatarMatcher = create_matcher('<table align=center><tr><td>(.*?)<a class=\'([^\']+).+?("><img.+?</a>)', source);
+		if(avatarMatcher.find())
+			myAvatar = avatarMatcher.group(1) + '<a href="#" rel="chit_pickeroutfit" title="Select Outfit" class="chit_launcher ' + avatarMatcher.group(2) + avatarMatcher.group(3);
 	}
 	
 	//Outfit
@@ -4001,27 +2954,34 @@ void bakeCharacter() {
 	}
 	
 	string myGuild() {
-		switch(my_path()) {
-		case "Avatar of Boris":
+		if(my_path() == "Nuclear Autumn")
+			return "shop.php?whichshop=mutate";
+		switch(my_class()) {
+		case $class[Seal Clubber]:
+		case $class[Turtle Tamer]:
+			return "guild.php?guild=f";
+		case $class[Disco Bandit]:
+		case $class[Accordion Thief]:
+			return "guild.php?guild=t";
+		case $class[Pastamancer]:
+		case $class[Sauceror]:
+			return "guild.php?guild=m";
+		case $class[Avatar of Boris]:
 			return "da.php?place=gate1";
-		case "Zombie Slayer":
+		case $class[Zombie Master]:
 			return "campground.php?action=grave";
-		case "Avatar of Jarlsberg":
+		case $class[Avatar of Jarlsberg]:
 			return "da.php?place=gate2";
-		case "Avatar of Sneaky Pete":
+		case $class[Avatar of Sneaky Pete]:
 			return "da.php?place=gate3";
-		case "Actually Ed the Undying":
+		case $class[Ed]:
 			return "place.php?whichplace=edbase&action=edbase_book";
+		case $class[Cow Puncher]:
+		case $class[Beanslinger]:
+		case $class[Snake Oiler]:
+			return "chit_WestGuild.php";
 		}
-		switch (my_primestat()) {
-			case $stat[mysticality]:
-				return "guild.php?guild=m";
-			case $stat[moxie]:
-				return "guild.php?guild=t";
-			case $stat[muscle]:
-				return "guild.php?guild=f";
-		}
-		return "";
+		return "town.php";
 	}
 
 	// LifeStyle suitable for charpane
@@ -4064,6 +3024,9 @@ void bakeCharacter() {
 		case "Class Act II: A Class For Pigs": return "Class Act <span style='font-family:Times New Roman,times,serif'>II</span>"; // Shorten. Also II looks a LOT better in serif
 		case "Avatar of Sneaky Pete": return "Sneaky Pete";
 		case "Actually Ed the Undying": return "The Undying";
+		case "Avatar of West of Loathing": return "West of Loathing";
+		case "The Source": return "<a target='mainpane' style='font-weight:normal;' href='place.php?whichplace=town_wrong&action=townwrong_oracle'>The Source</a>";
+		case "Nuclear Autumn": return "<a target='mainpane' style='font-weight:normal;' href='campground.php'>Nuclear Autumn</a>";
 		}
 		return my_path();
 	}
@@ -4082,7 +3045,7 @@ void bakeCharacter() {
 	//Level + Council
 	string councilStyle = "";
 	string councilText = "Visit the Council";
-	if(to_int(get_property("lastCouncilVisit")) < my_level() && get_property("kingLiberated") == "false") {
+	if(to_int(get_property("lastCouncilVisit")) < my_level() && my_path() != "Community Service" && get_property("kingLiberated") == "false") {
 		councilStyle = 'background-color:#F0F060';
 		councilText = "The Council wants to see you urgently";		
 	}
@@ -4091,32 +3054,57 @@ void bakeCharacter() {
 
 	// Character name and outfit name
 	result.append('<tr>');
-	result.append('<th colspan="'+ (myAvatar == ""? "2": "3") +'">');
+	result.append('<th colspan="');
+	result.append(myAvatar == ""? "2": "3");
+	result.append('">');
 	// If there's no avatar, place Outfit switcher here
 	if(vars["chit.character.avatar"] == "false") {
 		result.append('<div style="float:left"><a href="#" class="chit_launcher" rel="chit_pickeroutfit" title="Select Outfit"><img src="');
 		result.append(imagePath);
 		result.append('select_outfit.png"></a></div>');
 	}
-	result.append('<a target="mainpane" href="charsheet.php">' + myName + '</a>' + myOutfit + '</th>');
- 	result.append('</tr>');
+	result.append('<a target="mainpane" href="charsheet.php">');
+	result.append(myName);
+	result.append('</a>');
+	result.append(myOutfit);
+	if(vars["chit.clan.display"] == "on" || vars["chit.clan.display"] == "true" || (vars["chit.clan.display"] == "away" && get_clan_name() != vars["chit.clan.home"])) {
+		result.append('<br /><span style="font-weight:normal">');
+		result.append(get_clan_name());
+		result.append('</span>');
+	}
+	result.append('</th></tr>');
 	
 	result.append('<tr>');
-	if(myAvatar != "")
-		result.append('<td rowspan="4" class="avatar"><a href="#" class="chit_launcher" rel="chit_pickeroutfit" title="Select Outfit"><img src="' + myAvatar + '"></a></td>');
+	if(myAvatar != "") {
+		result.append('<td rowspan="4" class="avatar">');
+		result.append(myAvatar);
+		result.append('</td>');
+		# result.append('<td rowspan="4" class="avatar"><a href="#" class="chit_launcher" rel="chit_pickeroutfit" title="Select Outfit">' + myAvatar + '</a></td>');
+	}
 	pickOutfit();
-	result.append('<td class="label"><a target="mainpane" href="' + myGuild() +'" title="Visit your guild">' + myTitle() + '</a></td>');
-	result.append('<td class="level" rowspan="2" style="width:30px;' + councilStyle + '"><a target="mainpane" href="council.php" title="' + councilText + '">' + my_level() + '</a></td>');
-	result.append('</tr>');
+	result.append('<td class="label">');
+	result.append('<a target="mainpane" href="');
+	result.append(myGuild());
+	result.append('" title="Visit your guild">');
+	result.append(myTitle());
+	result.append('</a>');
+	result.append('</td><td class="level" rowspan="2" style="width:30px;');
+	result.append(councilStyle);
+	result.append('"><a target="mainpane" href="council.php" title="');
+	result.append(councilText);
+	result.append('">');
+	result.append(my_level());
+	result.append('</a></td></tr>');
 
-	result.append('<tr>');
-	result.append('<td class="info">' + myPath() + '</td>');
-	result.append('</tr>');
+	result.append('<tr><td class="info">');
+	result.append(myPath());
+	result.append('</td></tr>');
 	
 	// 30x30:	hp.gif		meat.gif		hourglass.gif		swords.gif
 	// 20x20:	slimhp.gif	slimmeat.gif	slimhourglass.gif	slimpvp.gif
-	result.append('<tr>');
-	result.append('<td class="info">' + myLifeStyle() + '</td>');
+	result.append('<tr><td class="info">');
+	result.append(myLifeStyle());
+	result.append('</td>');
 	if(hippy_stone_broken() && index_of(chitSource["health"], "peevpee.php") > 0) {
 		matcher fites = create_matcher("PvP Fights Remaining.+?black>(\\d+)</span>", chitSource["health"]);
 		if(fites.find())
@@ -4129,8 +3117,7 @@ void bakeCharacter() {
 
 	result.append('<tr>');
 	result.append('<td colspan="2"><div class="chit_resource">');
-	result.append('<div title="Meat" style="float:left"><span>' + formatInt(my_meat()) 
-		+ '</span><img src="/images/itemimages/meat.gif"></div>');
+	result.allCurrency();
 	result.append('<div title="'+my_adventures()+' Adventures remaining'
 		+ (get_property("kingLiberated") == "true"? '': '\n Current Run: '+my_daycount() +' / '+ turns_played())
 		+ '" style="float:right"><span>' + my_adventures() 
@@ -4138,11 +3125,18 @@ void bakeCharacter() {
 	result.append('</div><div style="clear:both"></div></td>');
 	result.append('</tr>');
 
-	if (index_of(source, "<table title=") > -1) {
-		result.append('<tr>');
-		result.append('<td class="progress" colspan="3" title="' + (my_level() ** 2 + 4 - my_basestat(my_primestat())) + " " + my_primestat().to_lower_case() + " until level "+ (my_level() + 1) + '\n (' + formatInt(needed) + ' substats needed)" >');
-		result.append('<div class="progressbar" style="width:' + progress + '%"></div></td>');
-		result.append('</tr>');
+	if(index_of(source, "<table title=") > -1) {
+		result.append('<tr><td class="progress" colspan="3" title="');
+		result.append( to_string(my_level() ** 2 + 4 - my_basestat(my_primestat())) );
+		result.append(' ');
+		result.append(my_primestat().to_lower_case());
+		result.append(' until level ');
+		result.append(to_string(my_level() + 1));
+		result.append('\n (');
+		result.append(formatInt(needed));
+		result.append(' substats needed)" ><div class="progressbar" style="width:');
+		result.append(progress);
+		result.append('%"></div></td></tr>');
 	}	
 	result.append('</table>');
 		
@@ -4308,933 +3302,29 @@ void bakeQuests() {
 	chitTools["quests"] = "Current Quests|quests.png";
 }
 
+// heeheehee wrote this to make ChIT remember the position of the scrollbar when the screen is refreshed.
+string autoscrollScript = "<script>\
+$(window).unload(function () {\
+	var scrolls = {};\
+	$('div').each(function () {\
+		var scroll = $(this).scrollTop();\
+		if (scroll !== 0) {\
+			scrolls[$(this).attr('id')] = $(this).scrollTop();\
+		}\
+	});\
+	sessionStorage.setItem('chit.scroll', JSON.stringify(scrolls));\
+});\
 
-// Tracker brick created by ckb
-void bakeTracker() {
-	
-	//useful sub-functions for checking items: yes=green, no=red
-	string item_report(boolean good, string itname) {
-		return('<span style="color:' + (good? "green": "red") + '">'+itname+'</span>');
-	}
-	string item_report(boolean[item] itlist, string itname) {
-		foreach it in itlist
-			if(available_amount(it) > 0)
-				return item_report(true, itname);
-		return item_report(false, itname);
-	}
-	string item_report(item it, string itname) {
-		return item_report(available_amount(it) > 0, itname);
-	}
-	string item_report(item it) {
-		return item_report(available_amount(it) > 0, to_string(it));
-	}
-	string item_report(item it, string itname, int num) {
-		return item_report(available_amount(it) >= num, itname + ' '+available_amount(it)+'/'+num);
-	}
-	string item_report(item it, int num) {
-		return item_report(it, to_plural(it), num);
-	}
-
-	string decomods(string ss) {
-		//cap first letter
-		ss = to_upper_case(substring(ss,0,1)) + substring(ss,1);
-		//shorten various text
-		ss = replace_string(ss,"Moxie","Mox");
-		ss = replace_string(ss,"Muscle","Mus");
-		ss = replace_string(ss,"Mysticality","Myst");
-		//decorate elemental tags with pretty colors
-		ss = replace_string(ss,"Hot","<span class=modHot>Hot</span>");
-		ss = replace_string(ss,"Cold","<span class=modCold>Cold</span>");
-		ss = replace_string(ss,"Spooky","<span class=modSpooky>Spooky</span>");
-		ss = replace_string(ss,"Stench","<span class=modStench>Stench</span>");
-		ss = replace_string(ss,"Sleaze","<span class=modSleaze>Sleaze</span>");
-		return (ss);
-	}
-	
-	boolean started(string pref) {
-		return get_property(pref) != "unstarted" && get_property(pref) != "finished";
-	}
-	
-	void comma(buffer b, string s) {
-		if(length(b) > 0)
-			b.append(", ");
-		b.append(s);
-	}
-	string twinPeak() {
-		int p = get_property("twinPeakProgress").to_int();
-		boolean mystery(int c) { return (p & (1 << c)) == 0; }
-		float famBonus() {
-			switch(my_path()) {
-			case "Avatar of Boris":
-				return minstrel_instrument() != $item[Clancy's lute]? 0:
-					numeric_modifier($familiar[baby gravy fairy], "Item Drop", minstrel_level() * 5, $item[none]);
-			case "Avatar of Jarlsberg":
-				return my_companion() != "Eggman"? 0: (have_skill($skill[Working Lunch])? 75: 50);
-			}
-				item fameq = familiar_equipped_equipment(my_familiar());
-				int famw = round( familiar_weight(my_familiar()) + weight_adjustment() - numeric_modifier(fameq, "Familiar Weight") ); 
-				return numeric_modifier( my_familiar(), "Item Drop", famw , fameq );
-		}
-		float foodDrop() { return round(numeric_modifier("Item Drop") - famBonus() + numeric_modifier("Food Drop")); }
-		buffer need;
-		// Only check for final if first three done
-		if(p < 7) {
-			if(mystery(0)) need.comma(item_report(numeric_modifier("Stench Resistance") >= 4, "4 Stench Resistance"));
-			if(mystery(1)) need.comma(item_report(foodDrop() >= 50, "+50% Food Drop"));
-			if(mystery(2)) need.comma(item_report($item[Jar of Oil], "a Jar of Oil"));
-		} else if(p == 15)
-			need.append(item_report(true, "Mystery Solved!"));
-		else
-			need.comma(item_report(numeric_modifier("Initiative") >= 40, "+40% Initiative"));
-		return need;
-	}
-	
-	buffer highlands() {
-		buffer high;
-		high.append("<br>A-boo: ");
-		high.append(item_report(get_property("booPeakProgress") == "0", get_property("booPeakProgress")+'% haunted'));
-		if (get_property("booPeakProgress")!="0") {
-			high.append(", "+item_report($item[A-Boo clue]));
-			high.append(" ("+item_amount($item[A-Boo clue])+")");
-		}
-		//L9: twin peak
-		high.append("<br>Twin: "+twinPeak());
-		//check 4 stench res, 50% items (no familiars), jar of oil, 40% init
-		//L9: oil peak
-		high.append("<br>Oil: ");
-		high.append(item_report(get_property("oilPeakProgress").to_float() == 0, get_property("oilPeakProgress")+' &mu;B/Hg'));
-		if(high.contains_text(">0% haunt") && high.contains_text("Solved!") && high.contains_text("0.00")) {
-			high.set_length(0);
-			high.append('<br>Return to <a target="mainpane" href="place.php?whichplace=highlands&action=highlands_dude">High Landlord</a>');
-		}
-		return high;
-	}
-	string source = chitSource["quests"]; 
-
-	// Start building our table	
-	buffer result;	
-	result.append('<table id="chit_tracker" class="chit_brick nospace"><tr><th>');
-	result.append('<img src="');
-	result.append(imagePath);
-	result.append('tracker.png">');
-	result.append('<a target="mainpane" href="questlog.php">Quest Tracker</a></th></tr>');
-
-	//Add Tracker for each available quest
-	//G for Guild. S for Sea. F for Familiar. I for Item. M for Miscellaneous 
-	
-	string bhit;
-	foreach b in $strings[Easy, Hard, Special] {
-		bhit = get_property("current"+ b +"BountyItem");
-		if(bhit != "") {
-			result.append("<tr><td>");
-			result.append('Your <a target="mainpane" href="bhh.php">Bounty</a> is: <br>');
-			result.append(bhit);
-		}
-	}
-	
-	//questM02Artist
-	if(started("questM02Artist")) {
-		result.append("<tr><td>");
-		result.append('Find the <a target="mainpane" href="town_wrong.php">Artists</a> supplies: <br>');
-		result.append(item_report($item[pretentious palette], "Palette")+" (<a target=\"mainpane\" href=\"manor.php\">Pantry</a>)<br>");
-		result.append(item_report($item[pail of pretentious paint], "Paint")+" (<a target=\"mainpane\" href=\"town_wrong.php\">Back Alley</a>)<br>");
-		result.append(item_report($item[pretentious paintbrush], "Paintbrush")+" (<a target=\"mainpane\" href=\"plains.php\">Outskirts</a>)");
-		result.append("</td></tr>");
-	}
-
-	//questM01Untinker
-	if(started("questM01Untinker")) {
-		result.append("<tr><td>");
-		result.append('Find the <a target="mainpane" href="forestvillage.php">Untinker\'s</a> ');
-		result.append(item_report($item[rusty screwdriver], "screwdriver"));
-		result.append("</td></tr>");
-	}
-
-	//questM20Necklace
-	if(started("questM20Necklace")) {
-		result.append("<tr><td>");
-		result.append("Find ");
-		result.append(item_report($item[Lady Spookyraven's necklace]));
-		result.append(" at the <a target=\"mainpane\" href=\"manor.php\">Manor</a>");
-		if (available_amount($item[Spookyraven billiards room key])==0) {
-			result.append("<br>Kitchen Drawers: "+get_property("manorDrawerCount")+"/21");
-		}
-		result.append("<br>Writing Desks: "+get_property("writingDesksDefeated")+"/5");
-		result.append("</td></tr>");
-	}
-	
-	//questM21Dance
-	if(started("questM21Dance")) {
-		result.append("<tr><td>");
-		result.append("Find <a target=\"mainpane\" href=\"place.php?whichplace=manor2\">Lady Spookyravens</a> dancing supplies:<br>");
-		result.append(item_report($item[Lady Spookyraven's dancing shoes], "dancing shoes")+" (Gallery)<br>");
-		result.append(item_report($item[Lady Spookyraven's powder puff], "powder puff")+" (Bathroom)<br>");
-		result.append(item_report($item[Lady Spookyraven's finest gown], "finest gown")+" (Bedroom)");
-		result.append("</td></tr>");
-	}
-
-	//Gorgonzola wants you to exorcise a poltersandwich in the Haunted Pantry.
-	//Take the poltersandwich back to Gorgonzola at the League of Chef-Magi.
-	if(started("questG07Myst")) {
-		result.append("<tr><td>");
-		result.append('Find a poltersandwich in the <a target="mainpane" href="place.php?whichplace=manor1">Pantry</a>');
-		result.append("</td></tr>");
-	}
-	
-	//Shifty wants you to lure yourself into the Sleazy Back Alley and steal your own pants.
-	//Take your pants back to Shifty at the Department of Shadowy Arts and Crafts.
-	if(started("questG08Moxie")) {
-		result.append("<tr><td>");
-		result.append('Steal you pants in the <a target="mainpane" href="place.php?whichplace=town_wrong">Alley</a>');
-		result.append("</td></tr>");
-	}
-	
-	//Gunther wants you to get the biggest sausage you can find in Cobb's Knob.
-	//Take the huge sausage back to Gunther at the Brotherhood of the Smackdown.
-	if(started("questG09Muscle")) {
-		result.append("<tr><td>");
-		result.append('Find a big sausage in the <a target="mainpane" href="plains.php">Outskirts</a>');
-		result.append("</td></tr>");
-	}
-
-	//L2: get mosquito larva, questL02Larva
-	if(started("questL02Larva")) { 
-		result.append("<tr><td>");
-		result.append('Find a <a target="mainpane" href="woods.php">mosquito larva</a>');
-		result.append("</td></tr>");
-	}
-	
-	//L3 Typical tavern, questL03Rat
-	if(started("questL03Rat")) { 
-		result.append("<tr><td>");
-		result.append('Clear the <a target="mainpane" href="cellar.php">Typical Tavern</a> rats');
-		result.append("</td></tr>");
-	}
-	
-	//L4: find and defeat the boss bat, questL04Bat
-	if(started("questL04Bat")) { 
-		result.append("<tr><td>");
-		result.append('Find and defeat the <a target="mainpane" href="bathole.php">Boss Bat</a>');
-		result.append("</td></tr>");
-	}
-	
-	//L5: encryption key - item_amount($item[Knob Goblin encryption key]), item_amount($item[Cobb's Knob map])
-	if(item_amount($item[Knob Goblin encryption key]) < 1 && (get_property("questL05Goblin") == "unstarted" || item_amount($item[Cobb's Knob map]) > 0)) {
-		result.append("<tr><td>");
-		result.append('Find encryption key at <a target="mainpane" href="plains.php">Outskirts</a>');
-		result.append("</td></tr>");
-	}
-	
-	//knob king, questL05Goblin
-	if(started("questL05Goblin")) { 
-		result.append("<tr><td>");
-		result.append('Find and defeat the <a target="mainpane" href="cobbsknob.php">Goblin King</a>');
-		result.append("<br>KGE: ");
-		result.append(item_report($item[Knob Goblin elite polearm], "polearm"));
-		result.append(", ");
-		result.append(item_report($item[Knob Goblin elite pants], "pants"));
-		result.append(", ");
-		result.append(item_report($item[Knob Goblin elite helm], "helm"));
-		result.append(", ");
-		result.append(item_report($item[Knob cake], "cake"));
-		result.append("<br>Harem: ");
-		result.append(item_report($item[Knob Goblin harem veil], "veil"));
-		result.append(", ");
-		result.append(item_report($item[Knob Goblin harem pants], "pants"));
-		result.append(", ");
-		result.append(item_report($item[Knob Goblin perfume], "perfume"));
-		result.append("</td></tr>");
-	}
-	
-	//L6: Friars gate, questL06Friar
-	if(started("questL06Friar")) {
-		result.append("<tr><td>");
-		result.append('Clear the <a target="mainpane" href="friars.php">Deep Fat Friars</a><br>');
-		result.append(item_report($item[eldritch butterknife])+" (Elbow)<br>");
-		result.append(item_report($item[box of birthday candles], "birthday candles")+" (Heart)<br>");
-		result.append(item_report($item[dodecagram])+" (Neck)");
-		result.append("</td></tr>");
-	}
-	
-	//L6.5: Steel organ, questM10Azazel
-	if (started("questM10Azazel")) { 
-		result.append("<tr><td>");
-		string steelname() {
-			if (!can_drink() && !can_eat()) { return "Steel Air Freshener"; }
-			if (!can_drink()) { return "Steel Lasagna"; }
-			return "Steel Margarita";
-		}
-		result.append('Get '+steelname()+' from <a target="mainpane" href="pandamonium.php">Azazel</a>');
-		result.append("<br><a target=mainpane href=\"pandamonium.php?action=infe\">Arena</a>: ");
-		result.append(item_report($item[Azazel's unicorn], "Unicorn"));
-		if(available_amount($item[Azazel's tutu])==0) {
-			result.append(", ");
-			result.append(item_report($item[bus pass],5));
-		}
-		result.append("<br><a target=mainpane href=\"pandamonium.php?action=beli\">Comedy</a>: ");
-		result.append(item_report($item[Azazel's lollipop], "Lollipop"));
-		if(available_amount($item[Azazel's tutu])==0) {
-			result.append(", ");
-			result.append(item_report($item[imp air],5));
-		}
-		result.append("<br><a target=mainpane href=\"pandamonium.php?action=moan\">Panda Square</a>: ");
-		result.append(item_report($item[Azazel's tutu]));
-		result.append("</td></tr>");
-	}
-	
-	//L7: crypt, questL07Cyrptic
-	if(started("questL07Cyrptic")) {
-		void evilat(buffer report, string place) {
-			int evil = to_int(get_property("cyrpt"+place+"Evilness"));
-			report.append('<span style="color:');
-			if(evil==0) report.append('gray');
-				else if(evil<26) report.append('red');
-				else report.append('black');
-			report.append('">');
-			report.append(place);
-			report.append(': ');
-			report.append(evil);
-			report.append('</span>');
-		}
-		result.append('<tr><td><table><tr><td colspan=2><a target=mainpane href="crypt.php">Cyrpt</a> Evilometer: ');
-		if(get_property("cyrptTotalEvilness") == "0") {
-			result.append('999</td></tr><tr><td><span style="color:black">&nbsp;&nbsp;&nbsp;Haert of the Cyrpt</span>');
-		} else {
-			result.append(get_property("cyrptTotalEvilness"));
-			result.append('</td></tr><tr><td><table><tr><td title="+items">');
-			result.evilat("Nook");
-			result.append('</td><td title="sniff dirty old lihc">');
-			result.evilat("Niche");
-			result.append('</td></tr><tr><td title="+NC, +ML">');
-			result.evilat("Cranny");
-			result.append('</td><td title="+init">');
-			result.evilat("Alcove");
-			result.append('</td></tr></table>');
-		}
-		result.append("</td></tr></table></td></tr>");
-	}
-
-	//L7.5ish: pirates, questM12Pirate
-	//step1, step2, step3, step4 = insults
-	//step5 = fcle
-	if(have_outfit("Swashbuckling Getup") && available_amount($item[Pirate Fledges])==0) {
-		result.append("<tr><td>");
-		//fcle items mizzenmast mop, ball polish, rigging shampoo
-		if (get_property("questM12Pirate")=="step5") {
-			result.append("<a target=mainpane href=cove.php>F'c'le</a> Items: ");
-			result.append("<br>"+item_report($item[mizzenmast mop]));
-			result.append("<br>"+item_report($item[ball polish]));
-			result.append("<br>"+item_report($item[rigging shampoo]));
-		} else {
-			int totalInsults = 0;
-			for ii from 1 upto 8
-				if (to_boolean(get_property("lastPirateInsult" + to_string(ii))))
-					totalInsults = totalInsults + 1;
-			result.append("<a target=mainpane href=cove.php>Pirate</a> Insults = <span style=\"color:");
-			switch (totalInsults) {
-				case 1: result.append("red\"><b>1</b> (0.0%)"); break;
-				case 2: result.append("red\"><b>2</b> (0.0%)"); break;
-				case 3: result.append("red\"><b>3</b> (1.8%)"); break;
-				case 4: result.append("red\"><b>4</b> (7.1%)"); break;
-				case 5: result.append("red\"><b>5</b> (17.9%)"); break;
-				case 6: result.append("olive\"><b>6</b> (35.7%)"); break;
-				case 7: result.append("green\"><b>7</b> (62.5%)"); break;
-				case 8: result.append("green\"><b>8</b> (100.0%)"); break;
-				default: result.append("red\"><b>0</b> (0.0%)");
-			}
-			result.append("</span>");
-		}
-		result.append("</td></tr>");
-	}
-
-	//L8: trapper: 3 ore, 3 goat cheese, questL08Trapper
-	if(started("questL08Trapper")) {
-		result.append('<tr><td><a target="mainpane" href="place.php?whichplace=mclargehuge">Help the Trapper</a>');
-		switch(get_property("questL08Trapper")) {
-		case "started":
-			result.append('<br>Visit the <a target="mainpane" href="place.php?whichplace=mclargehuge&action=trappercabin">Trapper</a>');
-			break;
-		case "step1":
-			if(get_property("trapperOre").to_item().available_amount() >= 3 && available_amount($item[goat cheese]) >= 3)
-				result.append('<br>Visit the <a target="mainpane" href="place.php?whichplace=mclargehuge&action=trappercabin">Trapper</a>');
-			else {
-				result.append("<br>Mine: "+item_report(to_item(get_property("trapperOre")),3));
-				result.append("<br>Goatlet: "+item_report($item[goat cheese],3));
-			}
-			break;
-		case "step2":
-		case "step3":
-			if(numeric_modifier("Cold Resistance") < 5) {
-				result.append("<br>Extreme: ");
-				result.append(item_report($item[eXtreme scarf], "scarf, "));
-				result.append(item_report($item[snowboarder pants], "pants, "));
-				result.append(item_report($item[eXtreme mittens], "mittens"));
-			}
-			result.append("<br>Ninja: ");
-			result.append(item_report($item[ninja rope], "rope, "));
-			result.append(item_report($item[ninja crampons], "crampons, "));
-			result.append(item_report($item[ninja carabiner], "carabiner"));
-		case "step4":
-			result.append('<br>Ascend the <a target="mainpane" href="place.php?whichplace=mclargehuge">Mist-Shrouded Peak</a>');
-		}
-		result.append("</td></tr>");
-	}
-	
-	//L9: orc chasm bridge, questL09Topping
-	if(started("questL09Topping")) {
-		result.append('<tr><td>');
-		int chasmBridgeProgress = get_property("lastChasmReset").to_int() == my_ascensions()? get_property("chasmBridgeProgress").to_int(): 0;
-		if(chasmBridgeProgress < 30) {
-		result.append('Cross the <a target="mainpane" href="place.php?whichplace=orc_chasm">Orc Chasm</a>');
-			result.append("<br>Bridge Progress: "+(get_property("lastChasmReset") == my_ascensions()? get_property("chasmBridgeProgress"): "0")+"/30");
-		} else {
-			result.append('Explore the <a target="mainpane" href="place.php?whichplace=highlands">Highland</a> Peaks');
-			result.append(highlands());
-		}
-		result.append("</td></tr>");
-	}
-	
-	//L10: SOCK, Giants Castle, questL10Garbage
-	if(started("questL10Garbage")) {
-		result.append("<tr><td>");
-		if(item_amount($item[S.O.C.K.])==0) {
-			result.append('Climb the <a target="mainpane" href="place.php?whichplace=beanstalk">Beanstalk</a>');
-			int numina = item_amount($item[Tissue Paper Immateria])+item_amount($item[Tin Foil Immateria])+item_amount($item[Gauze Immateria])+item_amount($item[Plastic Wrap Immateria]);
-			result.append('<br>Immateria found: '+item_report(numina == 4, to_string(numina)+'/4'));
-			result.append("<br>");
-			result.append(item_report($item[amulet of extreme plot significance], "amulet")+", ");
-			result.append(item_report($item[mohawk wig], "mohawk")+", ");
-			result.append(item_report($item[titanium assault umbrella], "umbrella")+", ");
-			result.append("<br>");
-			result.append(item_report($item[soft green echo eyedrop antidote], "SGEEA")+": "+item_amount($item[soft green echo eyedrop antidote]));
-		} else {
-			result.append('Conquer the <a target="mainpane" href="place.php?whichplace=giantcastle">Giant\'s Castle</a>');
-		}
-		result.append("</td></tr>");
-	}
-
-	//L11: MacGuffin, questL11MacGuffin
-	if (started("questL11MacGuffin")) {
-		result.append("<tr><td>");
-		result.append("Quest for the Holy MacGuffin");
-		result.append("</td></tr>");
-	}
-	
-	//L11: questL11Black
-	if (started("questL11Black")) {
-		result.append("<tr><td>");
-			switch(get_property("questL11Black")) {
-			case "started": case "step1": case "step2":
-				result.append('Find the <a target="mainpane" href="woods.php">Black Market</a>');
-				result.append(" ("+get_property("blackForestProgress")+"/5)");
-				break;
-			case "step3":
-				result.append('<br>Get your Father\'s <a target="mainpane" href="shore.php">Diary</a>');
-				result.append("<br>"+item_report($item[forged identification documents]));
-				break;
-		}
-		result.append("</td></tr>");
-	}
-		
-	//Get pirate fledges from island.php
-	if (started("questL11MacGuffin") && get_property("questL11Palindome")=="unstarted") {
-		result.append("<tr><td>");
-		if(available_amount($item[pirate fledges])==0) {
-			result.append('Get some <a target="mainpane" href="island.php">pirate fledges</a>');
-		} else if(available_amount($item[Talisman o' Nam])==0) {
-			result.append('Find the <a target="mainpane" href="cove.php">Talisman o Nam</a>');
-		} else if(available_amount($item[Talisman o' Nam])>0) {
-			result.append('Find the <a target="mainpane" href="plains.php">Palindome</a>');
-		}
-		result.append("</td></tr>");
-	}
-		
-	//L11: questL11Palindome
-	if (started("questL11Palindome")) {
-		result.append("<tr><td>");
-		if(get_property("questL11Palindome") == "step5") {
-			result.append('<a target="mainpane" href="place.php?whichplace=palindome">Palindome</a>: Kill Dr. Awkward');
-		} else {
-			result.append('Seek Dr. Awkward at <a target="mainpane" href="place.php?whichplace=palindome">Palindome</a>');
-		}
-		if(get_property("questL11Palindome") == "started") {
-			result.append("<br>Obtain: ");
-			result.append(item_report($item[photograph of God],"photo of God"));
-			result.append(", ");
-			result.append(item_report($item[photograph of a red nugget],"photo of red nugget"));
-			result.append(", ");
-			result.append(item_report($item[photograph of a dog],"photo of dog"));
-			result.append(", ");
-			result.append(item_report($item[photograph of an ostrich egg],"photo of ostrich egg"));
-			result.append(", ");
-			result.append(item_report($item[&quot;I Love Me\, Vol. I&quot;],"I Love Me"));
-			result.append(", ");
-			result.append(item_report($item[stunt nuts]));
-		}
-		if(get_property("questL11Palindome") == "step1") {
-			result.append("<br>Obtain: ");
-			result.append(item_report($item[&quot;2 Love Me\, Vol. 2&quot;]));
-		}
-		// get wet stunt nut stew, mega gem
-		if (available_amount($item[Mega Gem])==0) {
-			result.append('<br>Get the <a target="mainpane" href="place.php?whichplace=palindome">Mega Gem</a>');
-			result.append("<br>");
-			if (available_amount($item[wet stunt nut stew])>0) {
-				result.append(item_report($item[wet stunt nut stew]));
-			} else if (available_amount($item[wet stew])>0) {
-				result.append(item_report($item[stunt nuts]));
-				result.append(", ");
-				result.append(item_report($item[wet stew]));
-			} else {
-				result.append(item_report($item[stunt nuts]));
-				result.append(", ");
-				result.append(item_report($item[bird rib]));
-				result.append(", ");
-				result.append(item_report($item[lion oil]));
-			}
-		}
-		result.append("</td></tr>");
-	}
-	
-	//L11: questL11Manor, assume wine bomb route
-	if (started("questL11Manor")) {
-		result.append("<tr><td>");
-			switch(get_property("questL11Manor")) {
-			case "started":
-				result.append('Open Spookyraven <a target="mainpane" href="manor2.php">Manor</a> cellar (Ballroom)');
-				break;
-			case "step1": case "step2":
-				result.append('Find Spookyraven in the <a target="mainpane" href="manor3.php">Cellar</a>: ');
-				if (available_amount($item[Lord Spookyraven's spectacles])==0) {
-					result.append("<br>Find "+item_report($item[Lord Spookyraven's spectacles]));
-				} else if (get_property("spookyravenRecipeUsed")!="with_glasses") {
-					result.append("<br>Equip spectacles, read mortar recipe");
-				} else if (available_amount($item[wine bomb])==0) {
-					if (available_amount($item[unstable fulminate])>0) {
-						result.append("<br>"+item_report($item[wine bomb])+" (Boiler Room)");
-					} else {
-						result.append("<br>"+item_report($item[bottle of Chateau de Vinegar],"Chateau de Vinegar")+" (Wine Cellar)");
-						result.append("<br>"+item_report($item[blasting soda])+" (Laundry Room)");
-					}
-				}
-				break;
-			case "step3":
-				result.append('<a target="mainpane" href="manor3.php">Manor Cellar</a>: Kill Spookyraven');
-				break;
-			}
-		result.append("</td></tr>");
-	}
-	
-	
-	if(started("questL11Worship")) {
-		// How many McClusky file pages are present?
-		int files() {
-			for f from 6693 downto 6689
-				if(to_item(f).available_amount() > 0)
-					return f - 6688;
-			return 0;
-		}
-		int nts = 0;
-		result.append("<tr><td>");
-		switch(get_property("questL11Worship")) {
-		case "started": case "step1": case "step2":
-			result.append('Search <a target="mainpane" href="woods.php">Temple</a> for Hidden City');
-			break;
-		case "step3":
-			if(item_amount($item[stone triangle]) < 4) {
-				result.append('Explore <a target="mainpane" href="hiddencity.php">Hidden City</a>:<br>');
-				boolean relocatePygmyJanitor = get_property("relocatePygmyJanitor").to_int() == my_ascensions();
-				result.append("Hidden Park: ");
-				if(available_amount($item[antique machete]) == 0 || !relocatePygmyJanitor) {
-					result.append(item_report($item[antique machete]));
-					result.append(", ");
-					result.append(item_report(relocatePygmyJanitor, "relocate janitors"));
-					result.append("<br>");
-				} else 
-					result.append(item_report(true, "Done!<br>"));
-				foreach loc in $strings[Apartment, Office, Hospital, BowlingAlley] {
-					result.append(loc+": ");
-					int prog = get_property("hidden"+loc+"Progress").to_int();
-					if(prog == 0)
-						result.append(item_report(false, "Explore Shrine<br>"));
-					else if(prog < 7) {
-						switch(loc) {
-						case "Apartment":
-							//result.append(item_report(get_property("relocatePygmyLawyer").to_int() == my_ascensions(), "relocate Lawyers, "));
-							//result.append(item_report(false, "Search for Boss<br>"));
-							nts = $location[The Hidden Apartment Building].turns_spent;
-							if (nts<=9) {
-								result.append(" ["+(nts%9)+"/9], ");
-							} else {
-								result.append(" ["+((nts-9)%8)+"/8], ");
-							}
-							result.append(item_report((have_effect($effect[Thrice-Cursed])>0), "Thrice-Cursed"));
-							result.append("<br>");
-							break;
-						case "Office":
-							nts = $location[The Hidden Office Building].turns_spent;
-							if (nts<=6) {
-								result.append(" ["+(nts%6)+"/6], ");
-							} else {
-								result.append(" ["+((nts-6)%5)+"/5], ");
-							}
-							if(available_amount($item[McClusky file (complete)]) > 0)
-								result.append(item_report(false, "Kill Boss!"));
-							else {
-								int f = files();
-								if (f<5) {
-									result.append(item_report(f >=5, "McClusky files (" + f + "/5)"));
-								} else {
-									result.append(item_report($item[boring binder clip], "binder clip"));
-								}
-							}
-							result.append("<br>");
-							break;
-						case "Hospital":
-							result.append(item_report(false, "Surgeonosity ("+to_string(numeric_modifier("surgeonosity"), "%.0f")+"/5)<br>"));
-							break;
-						case "BowlingAlley":
-							//result.append(item_report($item[bowling ball]));
-							//result.append(", ");
-							result.append(item_report(false, "Bowled ("+(prog - 1)+"/5)<br>"));
-							break;
-						}
-					} else if(prog == 7)
-						result.append(item_report(false, "Use Sphere<br>"));
-					else
-						result.append(item_report(true, "Done!<br>"));
-				}
-				result.append("Tavern: ");
-				if(get_property("hiddenTavernUnlock") != my_ascensions()) {
-					result.append(item_report($item[book of matches]));
-					result.append("<br>");
-				} else
-					result.append(item_report(true, "Unlocked<br>"));
-			} else
-				result.append('<a target="mainpane" href="hiddencity.php">Hidden City</a>: Kill the Protector Spectre');
-		}
-		result.append("</td></tr>");
-	}
-	
-
-
-	//L11: questL11Desert
-	if(started("questL11Desert") && my_path()!="Actually Ed the Undying") {
-		result.append("<tr><td>");
-			result.append('Find the pyramid at the <a target="mainpane" href="beach.php">Beach</a><br>');
-			int desertExploration = get_property("desertExploration").to_int();
-			if(desertExploration < 10)
-				result.append('Find Gnasir at the <a target="mainpane" href="beach.php">Desert</a><br>');
-			if(desertExploration < 100) {
-				result.append("Exploration: "+desertExploration+"%<br>");
-				int gnasirProgress = get_property("gnasirProgress").to_int();
-				buffer gnasir;
-				if((gnasirProgress & 4) == 0)
-					gnasir.comma(item_report($item[killing jar]));
-				if((gnasirProgress & 2) == 0)
-					gnasir.comma(item_report($item[can of black paint]));
-				if((gnasirProgress & 1) == 0)
-					gnasir.comma(item_report($item[stone rose]));
-				if((gnasirProgress & 8) == 0) {
-					gnasir.comma(item_report($item[worm-riding manual page], 15));
-					gnasir.comma(item_report($item[drum machine]));
-				} else if((gnasirProgress & 16) == 0) {
-					gnasir.comma(item_report($item[drum machine]));
-					gnasir.comma(item_report($item[worm-riding hooks]));
-					gnasir.append('<br><a target="mainpane" href="place.php?whichplace=desertbeach&action=db_pyramid1&pwd='+my_hash()+'">Ride the Worm !</a>');
-					#gnasir.append('<br><a target="mainpane" href="inv_use.php?which=3&whichitem=2328&pwd='+my_hash()+'">Ride the Worm !</a>');
-				}
-				result.append(gnasir);
-			}
-		result.append("</td></tr>");
-
-	}
-
-	//L11: questL11Desert
-	if(get_property("questL11Desert")=="finished" && get_property("questL11Pyramid")=="unstarted") {
-		result.append("<tr><td>");
-		result.append('Open the <a target="mainpane" href="beach.php">Pyramid</a>:<br>');
-				result.append(item_report($item[Staff of Fats], "Staff of Fats, "));
-				result.append(item_report($item[ancient amulet], "amulet, "));
-				result.append(item_report($item[Eye of Ed], "Eye of Ed"));
-				result.append("<br>");
-		result.append("</td></tr>");
-
-	}
-	
-	//L11: questL11Pyramid
-	if(started("questL11Pyramid")) {
-		string questL11Pyramid = get_property("questL11Pyramid");
-		result.append("<tr><td>");
-		switch(questL11Pyramid) {
-		case "started":
-			result.append('Unlock the <a target="mainpane" href="pyramid.php">Middle Chamber</a><br>');
-			break;
-		case "step1": case "step2":
-			result.append('Unlock the <a target="mainpane" href="pyramid.php">Control Room</a><br>');
-			break;
-		}
-			if(get_property("pyramidBombUsed")=="false") {
-				result.append('Find Ed in the <a target="mainpane" href="pyramid.php">Pyramid</a><br>');
-			result.append(item_report($item[tomb ratchet], "tomb ratchets: "+item_amount($item[tomb ratchet]))+"<br>");
-			result.append(item_report($item[crumbling wooden wheel], "wooden wheels: "+item_amount($item[crumbling wooden wheel])));
-				result.append("<br>");
-				if(item_amount($item[ancient bomb]) == 0) {
-					boolean token = item_amount($item[ancient bronze token]) > 0;
-					if(!token) {
-						if(get_property("pyramidPosition") != "4")
-							result.append("Turn wheel for ");
-						else result.append('<a target="mainpane" href="pyramid.php">Get</a> ');
-						result.append(item_report(token, "ancient token"));
-						result.append("<br>Wait for ");
-					} else {
-						result.append("Have ");
-						result.append(item_report(token, "ancient token"));
-						if(get_property("pyramidPosition") != "3")
-							result.append("<br>Turn wheel for ");
-						else result.append("<br>Get ");
-					}
-					result.append(item_report($item[ancient bomb]));
-				} else {
-					if(get_property("pyramidPosition") == "1")
-						result.append(item_report(false, "Blow up Lower Chamber now!"));
-					else
-						result.append("Turn wheel to blow up chamber");
-				}
-		} else {
-				result.append('<a target="mainpane" href="pyramid.php">Pyramid</a>: Kill Ed');
-		}
-
-		result.append("</td></tr>");
-	}
-	
-	
-	//L12: War, questL12War
-	if(started("questL12War")) {
-		result.append("<tr><td>");
-		result.append('Fight the <a target="mainpane" href="island.php">Island</a> War:');
-		if(get_property("questL12War") == "started") {
-			result.append("<br>Start the War... somehow");
-		} else {
-			result.append('<br><span style="color:purple">Fratboys</span> defeated: '+get_property("fratboysDefeated")+'<br>');
-			result.append('<span style="color:green">Hippies</span> defeated: '+get_property("hippiesDefeated"));
-		}
-		
-		if(item_amount($item[jam band flyers]) + item_amount($item[rock band flyers]) > 0 ) {
-			float flyers = to_float(get_property("flyeredML"))/100.0;
-			result.append('<br><a target="mainpane" href="bigisland.php?place=concert">Arena</a> Flyering: ');
-			result.append(item_report(flyers >= 100, to_string(flyers,"%.2f")+'%'));
-		}
-		
-		if(item_amount($item[molybdenum magnet])>0 && get_property("sidequestJunkyardCompleted")=="none" )
-			result.append('<br>Find some tools in the <a target="mainpane" href="bigisland.php?place=junkyard">Junkyard</a>');
-		
-		if(item_amount($item[barrel of gunpowder]) > 0 && get_property("sidequestLighthouseCompleted")=="none" ) {
-			result.append('<br><a target="mainpane" href="bigisland.php?place=lighthouse">SonofaBeach</a> ');
-			result.append(item_report($item[barrel of gunpowder], "barrels", 5));
-		}
-		
-		if ( get_property("sidequestOrchardCompleted")=="none" && (item_amount($item[filthworm hatchling scent gland])>0 || have_effect($effect[Filthworm Larva Stench])>0 || item_amount($item[filthworm drone scent gland])>0 ||have_effect($effect[Filthworm Drone Stench])>0 ||item_amount($item[filthworm royal guard scent gland])>0 ||have_effect($effect[Filthworm Guard Stench])>0) ) {
-			result.append('<br>Destroy the Filthworms in the <a target="mainpane" href="bigisland.php?place=orchard">Orchard</a>');
-		}
-		
-		if ( to_int(get_property("currentNunneryMeat"))>0 && get_property("sidequestNunsCompleted")=="none" ) {
-			result.append('<br><a target="mainpane" href="bigisland.php?place=nunnery">Nunnery</a> Meat found: '+to_string(to_int(get_property("currentNunneryMeat")),"%,d"));
-		}
-		
-		result.append("</td></tr>");
-	}
-	
-	
-	//L13: NS, questL13Final
-	// check for lair items, tower items, wand
-	if (started("questL13Final")) {
-		result.append("<tr><td>");
-		result.append('Go defeat the <a target="mainpane" href="lair.php">Naughty Sorceress</a>');
-
-		//Gate item
-		if ( $strings[started, step1, step2, step3] contains get_property("questL13Final")) {
-			result.append("<br>");
-			if ( get_property("telescopeUpgrades")=="0" || in_bad_moon()) {
-				result.append("no telescope");
-			}
-			else if (get_property("lastTelescopeReset") != my_ascensions()) {
-				result.append("no current telescope info");
-			}
-			else {
-				result.append("Contests: Init, ");
-				result.append(decomods(get_property("nsChallenge1")));
-				result.append(", ");
-				result.append(decomods(get_property("nsChallenge2")));
-				result.append("<br>");
-				result.append("Hedges: ");
-				result.append(decomods(get_property("nsChallenge3")));
-				result.append(", ");
-				result.append(decomods(get_property("nsChallenge4")));
-				result.append(", ");
-				result.append(decomods(get_property("nsChallenge5")));
-			}
-		}
-		
-		//Entryway items, "nsTowerDoorKeysUsed"
-		if ( $strings[started, step1, step2, step3, step4, step5, step6, step7, step8] contains get_property("questL13Final") ) {
-			boolean key_used(item it) {
-				return contains_text(get_property("nsTowerDoorKeysUsed"),to_string(it));
-			}
-			result.append("<br>Door Keys: ");
-			foreach kk in $items[Boris's key, Jarlsberg's key, Sneaky Pete's key, digital key, skeleton key, Richard's star key] {
-				if (!key_used(kk)) { result.append(item_report(kk)+", "); }
-			}
-		}
-		
-		if($strings[started, step1, step2, step3, step4, step5, step6, step7, step8] contains get_property("questL13Final") ) {
-			result.append("<br>Tower: ");
-			result.append(item_report($item[beehive]));
-			result.append(", ");
-			result.append("Meat: +"+to_string(to_int(meat_drop_modifier()))+"%");
-			result.append(", ");
-			result.append(item_report($item[electric boning knife], "boning knife"));
-		}
-		
-		boolean NSfight = !($strings[Avatar of Boris, Bugbear Invasion, Zombie Slayer, Avatar of Jarlsberg, Heavy Rains] contains my_path());
-		if ( NSfight && $strings[started, step1, step2, step3, step4, step5, step6, step7, step8, step9] contains get_property("questL13Final")) {
-			if( my_path()=="Bees Hate You" ) {
-				result.append("<br>GMOB: ");
-				result.append(item_report($item[antique hand mirror]));
-			} else  {
-				result.append("<br>NS: ");
-				result.append(item_report($item[Wand of Nagamar]));
-			}
-			result.append("</td></tr>");
-		}
-	}
-	
-	//HITS: stars and lines and charts
-	if ( item_amount($item[steam-powered model rocketship])>0 && item_amount($item[Richard's star key])==0 && !contains_text(get_property("nsTowerDoorKeysUsed"),"Richard's star key") ) {
-		result.append("<tr><td>");
-		result.append('<a target="mainpane" href="place.php?whichplace=beanstalk">HITS</a>: ');
-		result.append(item_report($item[star], 8));
-		result.append(", ");
-		result.append(item_report($item[line], 7));
-		result.append(", ");
-		result.append(item_report($item[star chart],"chart"));
-		result.append("</td></tr>");
-	}
-	
-	//Daily Dungeon
-	if (!to_boolean(get_property("dailyDungeonDone"))&& get_property("questL13Final")!="finished" ) {
-		int havekeys = available_amount($item[fat loot token]);
-		int needkeys = 3;
-		foreach kk in $items[Boris's key, Jarlsberg's key, Sneaky Pete's key] {
-			havekeys = havekeys + available_amount(kk);
-			needkeys = needkeys - to_int(contains_text(get_property("nsTowerDoorKeysUsed"),to_string(kk)));
-		}
-		if (havekeys<needkeys) {
-			result.append("<tr><td>");
-			result.append("Get ");
-			result.append('<a target="mainpane" href="da.php">Daily Dungeon</a>');
-			result.append(" keys ("+havekeys+"/"+needkeys+")");
-			result.append("</td></tr>");
-		}
-	}
-	
-	//questM13Escape, Subject 37
-	if (started("questM13Escape") && can_interact()) {
-	//if (contains_text(source,"Subject 37")) {
-		result.append("<tr><td>");
-		result.append('Help <a target="mainpane" href="cobbsknob.php?level=3">Subject 37</a> escape');	
-		result.append("</td></tr>");
-	}
-	
-	
-	//L99: questM15Lol (facsimile dictionary)
-	if (started("questM15Lol") && my_level()>=9 && can_interact()) {
-		result.append("<tr><td>");
-		result.append('Find the 64735 of <a target="mainpane" href="mountains.php">Rof Lm Fao</a>');	
-		result.append("</td></tr>");
-	}
-	
-	
-	//Xiblaxian holo-wrist-puter
-	/*
-	if (have_equipped($item[Xiblaxian holo-wrist-puter])) {
-		int xidrops = get_property("_holoWristDrops").to_int();
-		int xiprog = get_property("_holoWristProgress").to_int() + 1;
-		int xinext = 11 + 5*xidrops;
-		result.append("<tr><td>");
-		result.append("<b>Xiblaxian</b> drop: "+xiprog+"/"+xinext);
-		if (xiprog>=xinext) {
-			result.append("<br><span style=color:fuchsia>");
-			result.append("circuitry ("+available_amount($item[Xiblaxian circuitry])+") ");
-			result.append("[indoors]");
-			result.append("<br>");
-			result.append("polymer ("+available_amount($item[Xiblaxian polymer])+") ");
-			result.append("[outdoors]");
-			result.append("<br>");
-			result.append("alloy ("+available_amount($item[Xiblaxian alloy])+") ");
-			result.append("[underground]");
-			result.append("</span>");
-		}
-		result.append("</td></tr>");
-	}
-	*/
-	
-	
-	//L99: Nemesis stuff ?
-	//Sea quests
-	
-	
-	//challenge path stuff
-	/*
-	if(my_path() == "Bees Hate You") 
-		honeypot for gate in NS tower
-
-	if(my_path() == "Avatar of Boris") 
-		No star weapon is needed at the lair
-	
-	if (my_path() == "Avatar of Jarlsberg") 
-
-
-	if(my_path() == "Trendy") 
-	
-	
-	if (my_path() == "Way of the Surprising Fist" ) 
-		No star weapon is needed at the lair
-	
-	if (my_path() == "Zombie Slayer")
-	
-	
-	if (my_path() == "Bugbear Invasion")
-		//Bugbear biodata
-		bio [int] biodata;
-		biodata[count(biodata)] = new bio("Sleazy Back Alley", "biodataWasteProcessing", 3);
-		biodata[count(biodata)] = new bio("Spooky Forest", "biodataMedbay", 3);
-		biodata[count(biodata)] = new bio("Bat Hole", "biodataSonar", 3);
-		biodata[count(biodata)] = new bio("Knob Laboratory", "biodataScienceLab", 6);
-		biodata[count(biodata)] = new bio("The Defiled Nook", "biodataMorgue", 6);
-		biodata[count(biodata)] = new bio("Ninja Snowmen", "biodataSpecialOps", 6);
-		biodata[count(biodata)] = new bio("Haunted Gallery", "biodataNavigation", 9);
-		biodata[count(biodata)] = new bio("Fantasy Airship", "biodataEngineering", 9);
-		biodata[count(biodata)] = new bio("Battlefield (Frat Outfit)", "biodataGalley", 9);
-
-	 mothershipProgress goes from 0 to 3 as levels are cleared.
-	 statusMedbay (for example) is 0-x (insufficient bodata collected), open (all
-	 biodata collected and zone accessible), unlocked (biodata collected but zone
-	 not yet accessible), or cleared (zone has been cleared.
-	
-	
-	*/
-
-
-	result.append("</table>");
-	
-	if(length(result) > 184) { // 184 is the size of an empty table
-		chitBricks["tracker"] = result;
-		chitTools["tracker"] = "Tracker|tracker.png";
-	}
-
-}
-
+$(document).ready(function () {\
+	if (sessionStorage.getItem('chit.scroll') !== '') {\
+		var scrolls = JSON.parse(sessionStorage.getItem('chit.scroll'));\
+		console.log(\"scrolls\", scrolls);\
+		for (var key in scrolls) {\
+			$('#' + key).scrollTop(scrolls[key])\
+		}\
+	}\
+});\
+</script><body ";
 
 void bakeHeader() {
 
@@ -5280,6 +3370,10 @@ void bakeHeader() {
 		replacefamfavs .replace_string("= [[[","= [[");
 		result.replace_string(famfavmatch.group(0),replacefamfavs);
 	}
+	
+	// Add javascript for remembering autoscroll if desired
+	if(to_boolean(vars["chit.autoscroll"]))
+		result.replace_string("<body ", autoscrollScript);
 	
 	chitBricks["header"] = result.to_string();
 		
@@ -5329,7 +3423,7 @@ boolean parsePage(buffer original) {
 		// delete all matches
 		source = parse.replace_first("");
 	} else return vprint("CHIT: Error parsing start of charpane", "red", -1);
-
+	
 	//Footer: Includes everything after the close body tag
 	parse = create_matcher("(</body></html>.*)", source);
 	if(find(parse)) {
@@ -5368,6 +3462,7 @@ boolean parsePage(buffer original) {
 		chitSource["trail"] = chitSource["trail"]
 			.replace_string("The Castle in the Clouds in the Sky", "Giant's Castle")
 			.replace_string(" Floor)", ")")  										// End of Castle
+			.replace_string("McMillicancuddy's Farm", "Farm") 						// McMillicancuddy's aftercore location
 			.replace_string("McMillicancuddy", "Farm") 								// McMillicancuddy's various farm locations
 			.replace_string("Haunted Wine Cellar", "Wine Cellar")
 			.replace_string("The Enormous Greater-Than Sign", "Greater-Than Sign")
@@ -5540,7 +3635,7 @@ void bakeBricks() {
 
 	bakeHeader();
 	bakeFooter();
-
+	
 	// Standardize brick layouts
 	foreach layout in $strings[chit.roof.layout, chit.walls.layout, chit.floor.layout, chit.toolbar.layout, chit.stats.layout, chit.effects.layout]
 		vars[layout] = vars[layout].to_lower_case().replace_string(" ", "");
@@ -5570,6 +3665,9 @@ void bakeBricks() {
 						case "elements":	bakeElements();		break;
 						case "tracker":		bakeTracker();		break;
 						case "thrall":		bakeThrall();		break;
+						case "gear":		bakeGear();			break;
+						case "vykea":		bakeVYKEA();		break;
+						case "terminal":	bakeTerminal();		break;
 						
 						// Reserved words
 						case "helpers": case "update": break;
@@ -5677,6 +3775,7 @@ buffer buildCloset() {
 			case "elements":
 			case "tracker":
 			case "update":
+			case "gear":
 				if ((chitBricks contains brick) && (chitBricks[brick] != "")) {
 					result.append('<div id="chit_tool' + brick + '" class="chit_skeleton" style="display:none">');
 					result.append(chitBricks[brick]);
@@ -5707,7 +3806,9 @@ buffer spelunky(buffer source) {
 	int index = source.index_of("<center><p><b><font size=2>Effects");
 	if(index < 0) // Try compact charpane
 		index = source.index_of("<hr width=50%><font size=2 color=black>");
-	if(index <0) return source;
+	if(index < 0) // apathetic mood (Feature by Hellno)
+		index = source.index_of("</center><center><font size=1>[<a href=\"charpane.php\">refresh</a>]</font>");
+	if(index < 0) return source;
 	
 	// Add combat phase information
 	buffer spelunk;
@@ -5740,10 +3841,15 @@ buffer modifyPage(buffer source) {
 	if(vars["chit.disable"]=="true")
 		return source.replace_string('[<a href="charpane.php">refresh</a>]', '[<a href="'+ sideCommand('zlib chit.disable = false') +'">Enable ChIT</a>] &nbsp; [<a href="charpane.php">refresh</a>]');
 	//Set default values for zlib variables
-	setvar("chit.checkversion", true);
-	setvar("chit.disable",false);
+	setvar("chit.checkversion", false);
+	setvar("chit.autoscroll", true);
+	setvar("chit.disable", false);
+	setvar("chit.currencies", "rad,source essence,BACON,cop dollar");
+	setvar("chit.currencies.showmany", false);
 	setvar("chit.character.avatar", true);
 	setvar("chit.character.title", true);
+	setvar("chit.clan.display", "off"); // Valid values are on,off,away
+	setvar("chit.clan.home", "");
 	setvar("chit.quests.hide", false);
 	setvar("chit.familiar.hats", "spangly sombrero,sugar chapeau,Chef's Hat,party hat");
 	setvar("chit.familiar.pants", "spangly mariachi pants,double-ice britches,BRICKO pants,pin-stripe slacks,Studded leather boxer shorts,Monster pants,Sugar shorts");
@@ -5751,10 +3857,11 @@ buffer modifyPage(buffer source) {
 	setvar("chit.familiar.protect", false);
 	setvar("chit.familiar.showlock", false);
 	setvar("chit.familiar.anti-gollywog", true);
+	setvar("chit.familiar.hiddengear", "");
 	setvar("chit.effects.classicons", "none");
 	setvar("chit.effects.showicons", true);
 	setvar("chit.effects.modicons", true);
-	setvar("chit.effects.layout","songs,buffs,intrinsics");
+	setvar("chit.effects.layout", "songs,buffs,intrinsics");
 	setvar("chit.effects.usermap",false);
 	setvar("chit.effects.describe",true);
 	setvar("chit.helpers.wormwood", "stats,spleen");
@@ -5762,35 +3869,55 @@ buffer modifyPage(buffer source) {
 	setvar("chit.helpers.semirare", true);
 	setvar("chit.helpers.spookyraven", true);
 	setvar("chit.helpers.xiblaxian", true);
-	setvar("chit.roof.layout","character,stats");
-	setvar("chit.walls.layout","helpers,thrall,effects");
-	setvar("chit.floor.layout","update,familiar");
-	setvar("chit.stats.showbars",true);
-	setvar("chit.stats.layout","muscle,myst,moxie|hp,mp,axel|mcd|trail,florist");
-	setvar("chit.toolbar.layout","trail,quests,modifiers,elements,organs");
-	setvar("chit.toolbar.moods","true");
-	setvar("chit.kol.coolimages",true);
+	setvar("chit.kol.coolimages", true);
+	setvar("chit.roof.layout", "character,stats,gear");
+	setvar("chit.walls.layout", "helpers,thrall,vykea,effects");
+	setvar("chit.floor.layout", "update,familiar");
+	setvar("chit.stats.showbars", true);
+	setvar("chit.stats.layout", "muscle,myst,moxie|hp,mp,axel|mcd|trail,florist");
+	setvar("chit.toolbar.layout", "trail,quests,modifiers,elements,organs");
+	setvar("chit.toolbar.moods", "true");
+	string gearDispInRunDefault = "favorites:amount=all:pull=true:create=true, astral:amount=all, item, -combat, +combat, quest:amount=all:pull=true:create=true, today:amount=all:create=false, ML, path:amount=all, prismatic, res, charter:amount=all, rollover, DRUNK:amount=all, Wow:amount=all, resistance:amount=3";
+	setvar("chit.gear.display.in-run", gearDispInRunDefault);
+	setvar("chit.gear.display.aftercore", "favorites:amount=all, quest:amount=all, charter:amount=all, today:amount=all:create=false, rollover, DRUNK:amount=all");
+	setvar("chit.gear.display.in-run.defaults", "create=false, pull=false, amount=1");
+	setvar("chit.gear.display.aftercore.defaults", "create=true, pull=true, amount=1");
+	setvar("chit.gear.layout", "default");
+	setvar("chit.gear.favorites", "");
+	setvar("chit.thrall.showname", false);
 	
 	// Check var version.
-	if(get_property("chitVarVer").to_int() < 1) {
-		if(!vars["chit.stats.layout"].contains_text("florist") && vars["chit.stats.layout"].contains_text("trail"))
-			vars["chit.stats.layout"] = vars["chit.stats.layout"].replace_string("trail", "trail,florist");
-		if(!contains_text(vars["chit.walls.layout"], "thrall")) {
-			if(length(vars["chit.walls.layout"]) >= 7 && substring(vars["chit.walls.layout"], 0, 7) == "helpers")
-				vars["chit.walls.layout"] = vars["chit.walls.layout"].replace_string("helpers", "helpers,thrall");
-			else vars["chit.walls.layout"] = "thrall,"+vars["chit.stats.layout"];
+	int varVer = get_property("chitVarVer").to_int();
+	if(varVer < 3) {
+		if(!vars["chit.walls.layout"].contains_text("vykea")) {
+			if(vars["chit.walls.layout"].contains_text("effects"))
+				vars["chit.walls.layout"] = vars["chit.walls.layout"].replace_string("effects", "vykea,effects");
+			else 
+				vars["chit.walls.layout"] += ",vykea";
 		}
+		if(!(vars["chit.roof.layout"].contains_text("gear") || vars["chit.stats.layout"].contains_text("gear")))
+			vars["chit.roof.layout"] += ",gear";
 		updatevars();
-		set_property("chitVarVer", "1");
+		set_property("chitVarVer", "3");
+	}
+	// Update in-run gear display IF it has not been changed from the old default
+	if(varVer < 4) {
+		if(vars["chit.gear.display.in-run"] == "favorites:amount=all:pull=true:create=true, astral:amount=all, item, meat, ML, exp, initiative, quest:amount=all:pull=true:create=true, path:amount=all, prismatic, res, charter:amount=all, today:amount=all:create=false, rollover, DRUNK:amount=all, Wow:amount=all") {
+			vars["chit.gear.display.in-run"] = gearDispInRunDefault;
+			updatevars();
+		}
+		set_property("chitVarVer", "4");
 	}
 	
 	//Check for updates (once a day)
-	if(vars["chit.checkversion"]=="true" && svn_exists("mafiachit")) {
-		if(get_property("_svnUpdated") == "false" && !svn_at_head("mafiachit")) {
+	if(vars["chit.checkversion"]=="true" && svn_exists("mafiachit") && get_property("_svnUpdated") == "false") {
+		if(get_property("_chitSVNatHead").length() == 0)
+			set_property("_chitSVNatHead", svn_at_head("mafiachit"));
+		if(get_property("_chitSVNatHead") == "false") {
 			if(get_property("_chitChecked") != "true")
 				print("Character Info Toolbox has become outdated. It is recommended that you update it from SVN...", "red");
-			bakeUpdate(svn_info("mafiachit").revision, "Revision ", svn_info("mafiachit").last_changed_rev);
 			set_property("_chitChecked", "true");
+			bakeUpdate(svn_info("mafiachit").revision, "Revision ", svn_info("mafiachit").last_changed_rev);
 		}
 	}
 	
@@ -5801,9 +3928,16 @@ buffer modifyPage(buffer source) {
 		break;
 	case "spelunky":	// Needs special handling for the Spelunkin' minigame
 		return source.spelunky();
+	case "batman":		// Bat-folk mini-game
+		if(!source.contains_text("<b>You're Batfellow</b>"))
+			break;
 	default:			// Unknown limit mode could be dangerous
 		return source;
 	}
+	
+	// KoL still has a bug where it doesn't always detect limit mode for batman
+	if(source.contains_text("<b>You're Batfellow</b>"))
+		return source;
 	
 	if( index_of(source, 'alt="Karma" title="Karma"><br>') > 0 )
 		inValhalla = true;

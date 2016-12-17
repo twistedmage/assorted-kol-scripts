@@ -227,16 +227,31 @@ void stock_hagnks()
 	buy_item($item[star hat],1);
 	buy_item($item[wa],1);
 	buy_item($item[nd],1);
+	buy_item($item[Daily dungeon malware],3);
+	buy_item($item[Dramatic&trade; range],1); //useful in nuclear autumn
+	buy_item($item[can of black paint],3); //useful in nuclear autumn
+	buy_item($item[mouth-watering mayolus],10);
+	buy_item($item[Agitated Turkey],10);
+	buy_item($item[Ambitious Turkey],10);
+	buy_item($item[nasty snuff],30);
+	buy_item($item[dingy planks],1);
+	buy_item($item[perfect cosmopolitan],30);
+	buy_item($item[perfect mimosa],30);
+	buy_item($item[perfect paloma],30);
+	
 	
 	//stuff for twistedmage
 	if(my_name()=="twistedmage")
 	{
 		//fold loathing legion screwdriver
-		if(item_amount($item[loathing legion universal screwdriver])<1)
+		if(available_amount($item[loathing legion universal screwdriver])<1)
 			cli_execute("fold loathing legion universal screwdriver");
-		if(item_amount($item[Sneaky Pete's leather jacket (collar popped)])<1)
+		if(available_amount($item[Sneaky Pete's leather jacket (collar popped)])<1)
+		{
+			outfit("birthday suit");
 			cli_execute("fold Sneaky Pete's leather jacket (collar popped)");
-		if(item_amount($item[boris's helm])>0)
+		}
+		if(available_amount($item[boris's helm])>0)
 			cli_execute("fold boris's helm (askew)");
 		//make grogtini
 		get_item($item[grogtini],1);
@@ -310,18 +325,25 @@ void main()
 	//fill up empty capacity with pvp food/drink
 	if(my_name()=="twistedmage")
 	{
+		//drink
+		while(my_inebriety() <= inebriety_limit() && item_amount($item[beery blood])>0)
+			drink(1,$item[beery blood]);
 		while(my_inebriety() <= inebriety_limit())
 		{
 			if(item_amount($item[used beer])==0)
 				buy(1,$item[used beer]);
 			drink(1,$item[used beer]);
 		}
+		//eat
+		while(fullness_limit() - my_fullness() > 2 && item_amount($item[Gunpowder burrito])>0)
+			eat(1,$item[Gunpowder burrito]);
 		while(fullness_limit() - my_fullness() > 1)
 		{
 			if(item_amount($item[nailswurst])==0)
 				buy(1,$item[nailswurst]);
 			eat(1,$item[nailswurst]);
 		}
+		//spleen
 		while(spleen_limit() - my_spleen_use() > 2)
 		{
 			if(spleen_limit() - my_spleen_use() > 5)
@@ -423,7 +445,7 @@ void main()
 	}
 	cli_execute("burn *");
 	cli_execute("mood execute");
-	cli_execute("snapshot");
+	cli_execute("cc_snapshot");
 //ascend=====================================================
 	int karmas=item_amount($item[instant karma]);
 	if(karmas>3)

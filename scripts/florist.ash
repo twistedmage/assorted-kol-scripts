@@ -16,7 +16,7 @@ record plant
 int zone_type(location loc)
 {
 	//outdoor
-	if($locations[pandamonium slums, the sleazy back alley, Sonofa Beach, The Battlefield (hippy uniform), 8-bit realm, The Obligatory Pirate's Cove, The Goatlet, The eXtreme Slope, The F'c'le, The Smut Orc Logging Camp, A-Boo Peak, The Spooky Forest, Oil Peak, The Penultimate Fantasy Airship, The Black Forest, The Poop Deck, Inside the Palindome, Whitey's Grove, The Arid\, Extra-Dry Desert, The Oasis, wartime Frat House, McMillicancuddy's Pond, mcmillicancuddy's back 40, mcmillicancuddy's other back 40, The Themthar Hills, Over Where the Old Tires Are, Out By that Rusted-Out Car, The Hole in the Sky, the outskirts of cobb's knob, The Dark Elbow of the Woods, The Dark Heart of the Woods, The Dark Neck of the Woods, Hippy Camp, The Valley of Rof L'm Fao, Next to that Barrel with Something Burning in it, Near an Abandoned Refrigerator, Twin Peak, Fear Man's Level, The Hidden Park,An Overgrown Shrine (Northwest), A Massive Ziggurat] contains loc)
+	if($locations[the very unquiet garves, pandamonium slums, the sleazy back alley, Sonofa Beach, The Battlefield (hippy uniform), 8-bit realm, The Obligatory Pirate's Cove, The Goatlet, The eXtreme Slope, The F'c'le, The Smut Orc Logging Camp, A-Boo Peak, The Spooky Forest, Oil Peak, The Penultimate Fantasy Airship, The Black Forest, The Poop Deck, Inside the Palindome, Whitey's Grove, The Arid\, Extra-Dry Desert, The Oasis, wartime Frat House, McMillicancuddy's Pond, mcmillicancuddy's back 40, mcmillicancuddy's other back 40, The Themthar Hills, Over Where the Old Tires Are, Out By that Rusted-Out Car, The Hole in the Sky, the outskirts of cobb's knob, The Dark Elbow of the Woods, The Dark Heart of the Woods, The Dark Neck of the Woods, Hippy Camp, The Valley of Rof L'm Fao, Next to that Barrel with Something Burning in it, Near an Abandoned Refrigerator, Twin Peak, Fear Man's Level, The Hidden Park,An Overgrown Shrine (Northwest), A Massive Ziggurat] contains loc)
 		return 0;
 	
 	//indoor
@@ -24,7 +24,7 @@ int zone_type(location loc)
 		return 1;
 	
 	//underground
-	if($locations[The Batrat and Ratbat Burrow, Guano Junction, The Upper Chamber, The Middle Chamber, Cobb's Knob Barracks, Cobb's Knob Kitchens, The Defiled Nook, The Defiled Alcove, The Defiled Cranny, The Defiled Niche, Itznotyerzitz Mine, The Enormous Greater-Than Sign, The Dungeons of Doom, The Beanbat Chamber, The Castle in the Clouds in the Sky (Basement), Cobb's Knob Laboratory, The Royal Guard Chamber, The Filthworm Queen's Chamber, The Bat Hole Entrance, The Boss Bat's Lair, The Feeding Chamber,Cobb's Knob Harem,The hatching chamber, cobb's knob menagerie\, level 1, The Haiku Dungeon] contains loc)
+	if($locations[The Batrat and Ratbat Burrow, Guano Junction, The Upper Chamber, The Middle Chamber, Cobb's Knob Barracks, Cobb's Knob Kitchens, The Defiled Nook, The Defiled Alcove, The Defiled Cranny, The Defiled Niche, Itznotyerzitz Mine, The Enormous Greater-Than Sign, The Dungeons of Doom, The Beanbat Chamber, The Castle in the Clouds in the Sky (Basement), Cobb's Knob Laboratory, The Royal Guard Chamber, The Filthworm Queen's Chamber, The Bat Hole Entrance, The Boss Bat's Lair, The Feeding Chamber,Cobb's Knob Harem,The hatching chamber, cobb's knob menagerie\, level 1, cobb's knob menagerie\, level 2, The Haiku Dungeon] contains loc)
 		return 2;
 		
 	//underwater
@@ -74,6 +74,7 @@ location mafia_style_zone(string loc)
 		loc="Video Game Level 1";
 	else if(loc=="The Cola Wars Battlefield")
 		loc="battlefield (no uniform)";
+		
 	
 		
 		
@@ -227,7 +228,7 @@ int choose_best_plant(string type, location loc, plant[int] plants)
 			}
 			else if(contains_text(plants[pli].bonus_type,"spooky"))
 			{
-				if(loc!=$location[The Ancient Hobo Burial Ground] && loc!=$location[McMillicancuddy's Family Plot] && loc!=$location[post-cyrpt cemetary] && loc!=$location[pre-cyrpt cemetary] && loc!=$location[The Spooky Gravy Burrow] && loc!=$location[the bugbear pen] && loc!=$location[post-quest bugbear pens] && loc!=$location[The Haunted library] && loc!=$location[The Haunted billiards room] && loc!=$location[the \"fun\" house] && loc!=$location[The Marinara Trench] && loc!=$location[The Wreck of the Edgar Fitzsimmons] && loc!=$location[The Haunted gallery] && loc!=$location[The Haunted ballroom] && loc!=$location[Spectral Pickle Factory] && loc!=$location[the knob shaft] && loc!=$location[The Haunted bathroom] && loc!=$location[The Haunted bedroom] && loc!=$location[The Haunted conservatory] && loc!=$location[The Haunted kitchen] && loc!=$location[The Spooky Forest] && loc!=$location[The Haunted pantry] && loc!=$location[The Oasis] && loc!=$location[The Middle Chamber] && loc!=$location[The Upper Chamber] && loc!=$location[The Defiled nook] && loc!=$location[The Defiled niche] && loc!=$location[The Defiled cranny] && loc!=$location[The Defiled alcove])
+				if(loc!=$location[The Ancient Hobo Burial Ground] && loc!=$location[McMillicancuddy's Family Plot] && loc!=$location[the very unquiet garves] && loc!=$location[the unquiet garves] && loc!=$location[The Spooky Gravy Burrow] && loc!=$location[the bugbear pen] && loc!=$location[post-quest bugbear pens] && loc!=$location[The Haunted library] && loc!=$location[The Haunted billiards room] && loc!=$location[the \"fun\" house] && loc!=$location[The Marinara Trench] && loc!=$location[The Wreck of the Edgar Fitzsimmons] && loc!=$location[The Haunted gallery] && loc!=$location[The Haunted ballroom] && loc!=$location[Spectral Pickle Factory] && loc!=$location[the knob shaft] && loc!=$location[The Haunted bathroom] && loc!=$location[The Haunted bedroom] && loc!=$location[The Haunted conservatory] && loc!=$location[The Haunted kitchen] && loc!=$location[The Spooky Forest] && loc!=$location[The Haunted pantry] && loc!=$location[The Oasis] && loc!=$location[The Middle Chamber] && loc!=$location[The Upper Chamber] && loc!=$location[The Defiled nook] && loc!=$location[The Defiled niche] && loc!=$location[The Defiled cranny] && loc!=$location[The Defiled alcove])
 					return pli;
 			}
 			else if(contains_text(plants[pli].bonus_type,"weapon"))
@@ -248,7 +249,8 @@ void choose_all_plants(string type, location loc)
 	//get friars html
 	string friar_str=visit_url("place.php?whichplace=forestvillage&action=fv_friar");
 	//string friar_str=visit_url("choice.php?option=4&whichchoice=720");
-	if(contains_text(friar_str,"go scout out an appropriate location for me to plant something"))
+	if(contains_text(friar_str,"go scout out an appropriate location for me to plant something")
+	|| contains_text(friar_str,"You can't get there") || contains_text(friar_str,"bakery.gif"))
 	{
 		print("No current zone");
 		//force mafia to recognise that we quit the choiceadv?

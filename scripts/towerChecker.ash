@@ -142,7 +142,7 @@ void checkDDKeys()
 		if ( token > 0 )
 		{
 			if ( needComma ) message += " and ";
-			message += token + " " + "token" + ( token > 1 ? "s" : "" );
+			message += token + " token" + ( token > 1 ? "s" : "" );
 		}
 		message += ".";
 		printColor( message, haveColor );
@@ -168,7 +168,7 @@ void checkDDKeys()
 		if ( needComma ) message += ", ";
 		message += " sneaky pete's key";
 	}
-	message += ".  You have " + token + "token" + ( token > 1 ? "s" : "" );
+	message += ".  You have " + token + " token" + ( token != 1 ? "s" : "" ) + ".";
 	printColor( message, needColor );
 }
 
@@ -235,7 +235,8 @@ void checkBoss()
 		path == "Avatar of Jarlsberg" ||
 		path == "KOLHS" ||
 		path == "Avatar of Sneaky Pete" ||
-		path == "Heavy Rains"
+		path == "Heavy Rains" ||
+		path == "The Source"
 	  )
 	{
 		return;
@@ -259,29 +260,46 @@ void checkBoss()
 	printColor("You need " + article + bossItem, needColor );
 }
 
-void checkMonsters()
+void checkMonsters( int step )
 {
-	string setting = get_property( "questL13Final" );
-	int step = 0;
-	if ( setting == "finished" ) return;
-	if ( setting != "unstarted" ) step = setting.substring( 4 ).to_int();
-	
-	if ( step <= 5 )
+	if ( step <= 6 )
 	{
 		if ( item_amount( $item[beehive] ) > 0 ) printColor( "You have a beehive.", haveColor );
 		else printColor( "You need a beehive.", needColor );
 	}
 	
-	if ( step <= 7 )
+	if ( step <= 8 )
 	{
 		if ( item_amount( $item[electric boning knife] ) > 0 ) printColor( "You have an electric boning knife.", haveColor );
 		else printColor( "You need an electric boning knife.", needColor );
 	}
 }
 
+void checkHealing( int step )
+{
+	if ( step >= 11 ) return;
+	# This checks for red pixel potions, gauze garters, and filthy poultices
+	int rpp = item_amount( $item[red pixel potion] );
+	if ( rpp >= 4 )
+	{
+		printColor( "You have enough red pixel potions for the shadow.", haveColor );
+		return;
+	}
+	
+	int warheal = item_amount( $item[gauze garter] ) + item_amount( $item[filthy poultice] );
+	if ( rpp + warheal >= 5 )
+	{
+		printColor( "You have enough healing items for the shadow.", haveColor );
+		return;
+	}
+	
+	printColor( "You have " + (rpp + warheal) + " healing items for the shadow.", needColor );
+}
+
 void specialPathHandling()
 {
-	if( my_path() == "Bugbear Invasion" )
+	if( $strings[Bugbear Invasion,Actually Ed the Undying,Community Service]
+	    contains my_path() )
 	{
 		printColor( "This path doesn't have a tower.", plainColor );
 		exit;
@@ -292,19 +310,31 @@ void checkForKnownPath()
 {
 	if( !($strings[None, Teetotaler, Boozetafarian, Oxygenarian,
 	    Bees Hate You, Way of the Surprising Fist, Trendy,
-	    Avatar of Boris, Bugbear Invasion,Zombie Slayer,Class Act,
+	    Avatar of Boris,Zombie Slayer,Class Act,One Crazy Random Summer,
 	    Avatar of Jarlsberg,BIG!,KOLHS,Class Act II: A Class For Pigs,
-		Avatar of Sneaky Pete,Slow and Steady,Heavy Rains,Picky,Standard] contains my_path()) )
+		Avatar of Sneaky Pete,Slow and Steady,Heavy Rains,Picky,Standard,
+		Avatar of West of Loathing,The Source,Nuclear Autumn]
+		contains my_path()) )
 	{
 		printColor( "Your current challenge path is not recognized by this script.  Proceed with caution.", "red" );
 		wait(2);
 	}
 }
 
+int getStep()
+{
+	string setting = get_property( "questL13Final" );
+	int step = 0;
+	if ( setting == "finished" ) return 99;
+	if ( setting == "started" || setting == "unstarted" ) return 0;
+	step = setting.substring( 4 ).to_int();
+	return step;
+}
+
 void main()
 {
-	checkForKnownPath();
 	specialPathHandling();
+	checkForKnownPath();
 	updateScope();
 	listStatTests();
 	listElementTests();
@@ -312,6 +342,8 @@ void main()
 	checkStarKey();
 	checkDigitalKey();
 	checkSkeletonKey();
-	checkMonsters();
+	int step = getStep();
+	checkMonsters( step );
+	checkHealing( step );
 	checkBoss();
 }

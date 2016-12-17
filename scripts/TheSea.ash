@@ -265,38 +265,20 @@ void MonkeeQuest()
 				print("Finding Little Brother in the Octopus\'s Garden.");
 				if (TS_FAX_NEPTUNE && !get_property("_photocopyUsed").to_boolean() && item_amount($item[wriggling flytrap pellet]) < 1)
 				{
-					if(!is_online("faxbot"))
+					if(!faxbot($monster[neptune flytrap]))
 					{
-						print("Faxbot is offline! Try the script again later.");
+						print("Faxbot failed! Try the script again later.");
 						return;
-					}
-					loopcounter = 0;
-					while (get_property( "photocopyMonster" ) != "neptune flytrap" && loopcounter < 5)
-					{
-						loopcounter += 1;
-						if (item_amount ( $item[photocopied monster] ) != 0)
-						{
-							cli_execute ("fax put");
-						}
-						chat_private ("faxbot", "neptune_flytrap" );
-						wait (60);
-						cli_execute ("fax get");
 					}
 					if (my_adventures() > 1 && item_amount($item[wriggling flytrap pellet]) < 1)
 					{
-						if (item_amount($item[photocopied monster]) < 1) cli_execute ("fax get");
-						if (item_amount($item[photocopied monster]) > 0 && !contains_text(to_lower_case(visit_url("desc_item.php?whichitem=835898159")), "neptune flytrap"))
-						{
-							print("Someone else hijacked your fax machine. Re-run the script to try again.");
-							return;
-						}
-						use (1, $item[photocopied monster]);
+						use(1, $item[photocopied monster]);
 					}
-#					if (item_amount($item[wriggling flytrap pellet]) < 1)
-#					{
-#						print("You have failed to get the wriggling flytrap pellet in 15 attempts, or ran out of adventures.");
-#						return;
-#					}
+					if (item_amount($item[wriggling flytrap pellet]) < 1)
+					{
+						print("You have failed to get the wriggling flytrap pellet, or ran out of adventures.");
+						return;
+					}
 				}
 				if (obtain(1,"wriggling flytrap pellet",$location[An Octopus's Garden]))
 				{
@@ -1540,45 +1522,24 @@ void GetAeratedHelmet()
 			{
 				getsome(1, $item[rusty diving helmet]);
 			}
-			else if (my_adventures() > 1 && available_amount($item[rusty diving helmet]) < 1)
+			while (my_adventures() > 1 && available_amount($item[rusty diving helmet]) < 1)
 			{
 				if (count(get_goals()) > 0)
 				{
 					cli_execute("conditions clear");
 				}
 				add_item_condition(1, $item[rusty diving helmet]);
-				if (TS_GET_HELMET == 3)
+				if (TS_GET_HELMET == 3 && !get_property("_photocopyUsed").to_boolean() && item_amount($item[rusty diving helmet]) < 1)
 				{
-					int loopcounter = 0;
-					if(!is_online("faxbot"))
+					if(!faxbot($monster[unholy diver]))
 					{
-						print("Faxbot is offline! Try the script again later.");
+						print("Faxbot failed! Try the script again later.");
 						return;
 					}
-					while (get_property( "photocopyMonster" ) != "unholy diver" && loopcounter < 5)
+					if (my_adventures() > 1 && creatable_amount($item[rusty diving helmet]) < 1)
 					{
-						loopcounter += 1;
-						if (item_amount ( $item[photocopied monster] ) != 0)
-						{
-							cli_execute ("fax put");
-						}
-						chat_private ("faxbot", "unholy_diver" );
-						wait (60);
-						cli_execute ("fax get");
+						use(1, $item[photocopied monster]);
 					}
-					loopcounter = 0;
-					while (my_adventures() > 1 && loopcounter < 15 && creatable_amount($item[rusty diving helmet]) < 1)
-					{
-						loopcounter += 1;
-						if (item_amount($item[photocopied monster]) < 1) cli_execute ("fax get");
-						if (item_amount($item[photocopied monster]) > 0 && !contains_text(to_lower_case(visit_url("desc_item.php?whichitem=835898159")), "unholy diver"))
-						{
-							print("Someone else hijacked your fax machine. Re-run the script to try again.");
-							return;
-						}
-						use (1, $item[photocopied monster]);
-					}
-					loopcounter = 0;
 				}
 				else
 				{

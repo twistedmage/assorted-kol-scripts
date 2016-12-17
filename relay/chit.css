@@ -31,36 +31,45 @@ a:hover {
 	padding:0px;
 	border-spacing:0px;
 }
+a .warning-link {
+	color:red;
+}
+a.warning-link:hover {
+	color:crimson;
+}
+a.blue-link {
+	color:blue;
+}
+a.blue-link:hover {
+	color:red !important;
+}
+
+.descline {
+	color:#707070;
+}
 
 #chit_house {
 }
 #chit_roof {
-	position:absolute;
 	overflow-x:hidden;
 	overflow-y:auto;
-	margin:0px;
-	top:4px;
-	left:4px;
-	right:4px
+	margin:2px 2px -2px 2px;
 }
 #chit_walls {
 	border-top:1px solid #E0E0E0;
 	border-bottom:1px solid #E0E0E0;
-	margin:0px;
-	left:4px;
-	right:4px;
-	position:absolute;
+	margin:-2px 2px 0px 2px;
 	overflow-x:hidden;
 	overflow-y:auto;
+	position:absolute;
+	width:99%;
 }
 #chit_floor {
 	position:absolute;
 	overflow-x:hidden;
 	overflow-y:auto;
-	margin:0px;
-	left:4px;
-	right:4px;
-	bottom:4px
+	margin:-2px 2px 2px 2px;
+	width:98%;
 }
 #chit_toolbar {
 	border-collapse:separate;
@@ -190,6 +199,11 @@ table.chit_brick tr td.motorcycle  img{
 	text-align:center;
 	height:70px;
 	margin:-3px 0px -9px 0px;
+}
+table.chit_brick tr td.vykea  img{
+	border:0px;
+	padding:0px 0px 10px 0px;
+	max-width:40px;
 }
 
 /* section adds the light grey bar above the table row */
@@ -357,6 +371,10 @@ tr.florist :first-line {
 }
 #chit_stats tr td.history a:hover {
 	color:blue;
+}
+
+td.ghostbust {
+	display:block;
 }
 
 div.progressbox {
@@ -570,6 +588,11 @@ table.chit_picker td {
 	border-top:0px solid #DDDDDD;
 	border-bottom:1px solid white;
 }
+
+table.chit_picker tr.currentitem td {
+	background-color:#E2E2E2;
+}
+
 table.chit_picker tr.pickitem td {
 }
 table.chit_picker tr.picknone td.info {
@@ -581,7 +604,7 @@ table.chit_picker td.icon {
 	background-color:white;
 }
 table.chit_picker td.icon img {
-	border:2px solid white;
+	border:0px solid white;
 }
 table.chit_picker td.item {
 	padding:0px 6px;
@@ -625,7 +648,7 @@ table.chit_picker tr.pickitem a:hover {
 }
 
 /* Familiar Panel */
-#chit_pickerfam tr:hover td {
+#chit_pickerfamgear tr:hover td {
 	background-color:#F0F0F0;
 }
 
@@ -768,19 +791,35 @@ img#fam_equip {
 	padding:0px 0px 0px 0px;
 }
 
-/* Fancy Currency by DeadNed (#1909053) 
-   Not curently being used, but maybe... if I put in some time */
-#chit_currency ul {
+.walford_done{
+	color:green;
+}
+.walford_nobucket {
+	color:red;
+}
+.walford_noquest {
+	color:red;
+}
+
+/* Modified from Fancy Currency by DeadNed (#1909053) */
+#chit_currency {
 	margin:0;
 	padding:0;
 	list-style:none;
 }
+#chit_currency span {
+	color:darkred;
+	vertical-align:middle;
+}
 #chit_currency ul li {
 	display:block;
 	position:relative;
-	float:left;
+	z-index:12;
 }
 #chit_currency li ul {
+	margin:0;
+	padding:0;
+	text-align: right;
 	display:none;
 }
 #chit_currency ul li a {
@@ -793,16 +832,81 @@ img#fam_equip {
 	font-weight:bold;
 	color:black;
 	font-size:smaller;
+	font-size:14px;
+}
+#chit_currency ul li img {
+	max-width:14px;
+	max-height:14px;
+}
+#chit_currency ul li.current a {
+	background:#dddddd;
 }
 #chit_currency ul li a:hover {
-	background:#eeeeee;
+	background:#bbbbbb;
 }
 #chit_currency li:hover ul {
 	display:block;
 	position:absolute;
+	border:1px solid gray;
 }
 #chit_currency li:hover li {
 	float:none;
 	font-size:12px;
+	border-bottom:1px solid gray;
+}
+#chit_currency li:hover li.currency_edit {
+	border-bottom:none;
+}
+#chit_currency span.currency_block {
+	margin-left:0.3em;
+	margin-right:0.3em;
+}
+#chit_currency span.currency_amount {
+	margin-right:0em;
+}
+#chit_currency img.currency_icon {
+	margin-left:0em;
+	padding-left:0.1em;
+	padding-right:0.2em;
 }
 
+img.chit_icon {
+  border:1px solid #D0D0D0 !important;
+  margin:1px !important;
+}
+img.chit_icon.alldrops {
+	border-color:#B300FF !important;
+}
+img.chit_icon.hasdrops {
+	border-color:blue !important;
+}
+img.chit_icon.good {
+	border-color:green !important;
+}
+img.chit_icon.warning {
+	border-color:orange !important;
+}
+img.chit_icon.danger {
+	border-color:red !important;
+}
+table.chit_picker tr.chit_pickerblock {
+	background:white;
+}
+table.chit_picker tr.chit_pickerblock  .chit_icon {
+	float:left;
+}
+
+.chit_flexcontainer {
+	display:flex;
+	flex-wrap:wrap;
+}
+.chit_flexitem {
+	
+}
+
+.chit_favbutton {
+	vertical-align:middle;
+}
+.chit_favbutton img {
+	float:left;
+}

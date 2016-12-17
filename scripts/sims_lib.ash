@@ -353,7 +353,7 @@ item my_epic()
 	}
 	else if(my_class()==$class[pastamancer])
 	{
-		epic=$item[Pasta of Peril];
+		epic=$item[pasta spoon of peril];
 	}
 	else
 	{
@@ -383,7 +383,7 @@ item my_legendary()
 	}
 	else if(my_class()==$class[pastamancer])
 	{
-		legendary=$item[Greek Pasta of Peril];
+		legendary=$item[Greek pasta spoon of peril];
 	}
 	else
 	{

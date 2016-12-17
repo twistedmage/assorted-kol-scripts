@@ -169,6 +169,249 @@ void safe_fam_equip()
 	}
 }
 
+#Elite's Dmg Calc
+int dmg (string monstername, skill thrust) {
+	//Dual weilding
+	//Crits? 
+	//Range bonus stuff
+	boolean debug = false;
+   monster mon = to_monster(monstername);
+   int muscle = my_buffedstat(current_hit_stat());
+   float attack_type_Multi;
+   float weapon_type_multi;
+   int attack_type_weapon_multi;
+   boolean smacking, elemental;
+   float bonus_weapon_damage_number;
+   string color;
+  float bonus_weapon_damage_percent = 1+(numeric_modifier("Weapon Damage Percent")/100.0);
+   int elemental_damage;
+  float weapon_damage, weapon_damage_low, weapon_damage_high;
+   int def = max(0, monster_defense(mon));
+   boolean [element] weak_elements;
+   boolean bonus_cold;
+	int lung_smack = 0;
+	if (thrust == $skill[Clobber]) {
+		//print("This skill sucks, why would you use it?", "red");
+		return 0;
+	}
+	if (thrust == $skill[lunge smack])
+		lung_smack = 5;
+   float reduction = max(1 - (monster_level_adjustment()*.004), .50);
+   if (have_skill($skill[Cold Shoulder])) {
+		foreach it in $skills[Lunge Smack, Thrust-Smack, Lunging Thrust-Smack, Northern Explosion] {
+			if (thrust == it) {
+				bonus_cold = true;
+				break;
+			}
+		}
+   }
+   if (monster_element(mon) != $element[none])
+		elemental = true;
+	if (elemental) {
+		switch (monster_element(mon))
+		{
+		   case $element[cold]:   weak_elements = $elements[spooky, hot];    break;
+		   case $element[spooky]: weak_elements = $elements[hot, stench];    break;
+		   case $element[hot]:    weak_elements = $elements[stench, sleaze]; break;
+		   case $element[stench]: weak_elements = $elements[sleaze, cold];   break;
+		   case $element[sleaze]: weak_elements = $elements[cold, spooky];   break;
+		}
+	}
+	//Smacking
+   if (my_class() == $class[seal clubber]){
+		if (thrust == $skill[Thrust-Smack] || thrust == $skill[Lunging Thrust-Smack] || thrust == $skill[Northern Explosion])
+			smacking = true;
+	}
+	//First: Attack - Type Muscle/Mox Multiplier
+	if (my_class() != $class[seal clubber] && thrust == $skill[Lunging Thrust-Smack])
+		attack_type_Multi = 1.25;
+	else if (my_class() == $class[seal clubber] && (thrust == $skill[Lunging Thrust-Smack] || thrust == $skill[Northern Explosion]))
+		attack_type_Multi = 1.3;
+	else if (thrust == $skill[Bashing Slam Smash]) 
+		attack_type_Multi = 1.4;
+	else attack_type_Multi = 1;
+	
+	//Second: Weapon-type Mus/Mox Multiplier
+	if (item_type(equipped_item($slot[weapon])) == "" )
+		weapon_type_multi = .25;
+	else if (current_hit_stat() == $stat[moxie])	 
+		 weapon_type_multi = .78;
+	else weapon_type_multi = 1.0;
+	
+	//Third: Attack-Type Weapon Damage Multiplier
+   if (thrust == $skill[Thrust-Smack] || thrust == $skill[mighty axing])
+		attack_type_weapon_multi = 2;
+   else if (thrust == $skill[Lunging Thrust-Smack] || thrust == $skill[Northern Explosion])
+		attack_type_weapon_multi = 3;
+   else if (thrust == $skill[Bashing Slam Smash] || thrust == $skill[Cleave])
+		attack_type_weapon_multi = 5;
+	else attack_type_weapon_multi = 1;
+	
+	if (smacking) {
+		weapon_damage = numeric_modifier("weapon damage");
+		if (debug) {
+			weapon_damage_low = numeric_modifier("weapon damage") - get_power(equipped_item($slot[weapon]))*.05;
+			weapon_damage_high = numeric_modifier("weapon damage") + get_power(equipped_item($slot[weapon]))*.05;
+		}
+		foreach it in $elements[]{
+			if (debug) {
+				switch (it) {
+					case $element[hot]:
+						color = "red";
+						break;
+					case $element[cold]:
+						color = "blue";
+						break;
+					case $element[spooky]:
+						color = "gray";
+						break;
+					case $element[stench]:
+						color = "#008000";
+						break;
+					case $element[sleaze]:
+						color = "#660066";
+						break;
+					case $element[slime]:
+						color = "#00ff00";
+						break;
+					case $element[supercold]:
+						color = "#7fffd4";
+						break;
+					default: color = "black";
+					
+				}
+			}
+				
+			string dmg = it+" damage";
+			
+			if (elemental) {
+				float temp;
+				if (monster_element(mon) == it)
+					if (numeric_modifier(dmg) > 0)
+						temp = 1;
+				else if (weak_elements contains it) {
+					if (bonus_cold && it == $element[cold])
+						temp = ceil(2 * numeric_modifier(dmg) * attack_type_weapon_multi * reduction + 5 * 2 * reduction);
+					else temp = ceil(2 * numeric_modifier(dmg) * attack_type_weapon_multi * reduction);
+				}
+				else {
+					if (bonus_cold && it == $element[cold])
+						temp = ceil(numeric_modifier(dmg) * attack_type_weapon_multi * reduction + 5 * reduction);
+					else temp = ceil(numeric_modifier(dmg) * attack_type_weapon_multi * reduction);
+				}
+				if (temp > 0 && debug)
+					print(dmg+" should do: "+temp, color);
+				elemental_damage += temp;
+			}
+			else elemental_damage += ceil(numeric_modifier(dmg) * attack_type_weapon_multi * reduction);
+		}
+		if (debug)
+			print("Total Elemental Damge: "+elemental_damage, "blue");
+		
+   }
+   else {
+		bonus_weapon_damage_number = numeric_modifier("weapon damage") - get_power(equipped_item($slot[weapon]))*.15;
+		weapon_damage = (get_power(equipped_item($slot[weapon]))*.15 * attack_type_weapon_multi) + bonus_weapon_damage_number;
+		if (debug) {
+			weapon_damage_low = (get_power(equipped_item($slot[weapon]))*.10 * attack_type_weapon_multi) + bonus_weapon_damage_number;
+			weapon_damage_high = (get_power(equipped_item($slot[weapon]))*.20 * attack_type_weapon_multi) + bonus_weapon_damage_number;
+		}
+		foreach it in $elements[]{
+			if (debug) {
+				switch (it) {
+					case $element[hot]:
+						color = "red";
+						break;
+					case $element[cold]:
+						color = "blue";
+						break;
+					case $element[spooky]:
+						color = "gray";
+						break;
+					case $element[stench]:
+						color = "#008000";
+						break;
+					case $element[sleaze]:
+						color = "#660066";
+						break;
+					case $element[slime]:
+						color = "#00ff00";
+						break;
+					case $element[supercold]:
+						color = "#7fffd4";
+						break;
+					default: color = "black";
+					
+				}
+			}
+				
+			string dmg = it+" damage";
+			if (elemental) {
+				float temp;
+				if (monster_element(mon) == it)
+					if (numeric_modifier(dmg) > 0)
+						temp = 1;
+				else if (weak_elements contains it) {
+					if (bonus_cold && it == $element[cold])
+						temp = ceil(2 * numeric_modifier(dmg) * reduction + 5 * 2 * reduction);
+					else temp = ceil(2 * numeric_modifier(dmg) * reduction);
+				}
+				else {
+					if (bonus_cold && it == $element[cold])
+						temp = ceil(numeric_modifier(dmg) * reduction + 5 * reduction);
+					else temp = ceil(numeric_modifier(dmg) * reduction);
+				}
+				if (temp > 0 && debug)
+					print(dmg+" should do: "+temp, color);
+				elemental_damage += temp;
+			}
+			else elemental_damage += ceil(numeric_modifier(dmg) * reduction);
+		}
+		if (debug)
+			print("Total Elemental Damge: "+elemental_damage, "blue");
+		
+   }
+	
+   float total_dmg;
+   float physical_dmg, physical_dmg_low, physical_dmg_high;
+	
+		if (debug) {
+			print("Muscle: "+muscle+" attack_type_Multi: "+attack_type_Multi+" weapon_type_multi: "+weapon_type_multi+" weapon_damage: "+weapon_damage+" attack_type_weapon_multi: "+attack_type_weapon_multi+" bonus_weapon_damage_percent: "+bonus_weapon_damage_percent);
+			physical_dmg_low = (max(0, (floor(muscle * attack_type_Multi * weapon_type_multi) - def)) + weapon_damage_low * attack_type_weapon_multi) * bonus_weapon_damage_percent * reduction + lung_smack * reduction;
+			physical_dmg_high = (max(0, (floor(muscle * attack_type_Multi * weapon_type_multi) - def)) + weapon_damage_high * attack_type_weapon_multi) * bonus_weapon_damage_percent * reduction + lung_smack * reduction;
+			if (thrust == $skill[Northern Explosion]) {
+				if (weak_elements contains $element[cold]) {
+					physical_dmg_low = physical_dmg_low * 2;
+					physical_dmg_high = physical_dmg_high * 2;
+				}
+				else if (monster_element(mon) == $element[cold]) {
+					physical_dmg_low = 1;
+					physical_dmg_high = 1;
+				}
+			}
+		}
+		physical_dmg = (max(0, (floor(muscle * attack_type_Multi * weapon_type_multi) - def)) + weapon_damage * attack_type_weapon_multi) * bonus_weapon_damage_percent * reduction + lung_smack * reduction;
+		if (thrust == $skill[Northern Explosion]) {
+			if (weak_elements contains $element[cold]) {
+				physical_dmg = physical_dmg * 2;
+			}
+			else if (monster_element(mon) == $element[cold]) {
+				physical_dmg = 1;
+			}
+		}
+		else { //I don't trust Mafias physical_resistance for monsters physical_dmg = max (1, physical_dmg * (1- mon.physical_resistance/100.0));
+			if (to_int(mon.physical_resistance) == 100)
+				physical_dmg = 1;
+		}
+		total_dmg = ceil(physical_dmg) + elemental_damage;
+		if (debug) {
+			print("Skill: ["+thrust+"]. Physical damage: "+round(physical_dmg)+". Elemental damage: "+elemental_damage+" Total: "+total_dmg, "blue");
+			print("Lowest Phys Damage: "+round(physical_dmg_low)+". Highest Phys Damage: "+round(physical_dmg_high)+". Low Total: "+(round(physical_dmg_low) + elemental_damage)+" High Total: "+(round(physical_dmg_high) + elemental_damage), "purple");
+		}
+		return total_dmg;
+		
+}
+
 # stolen from Bale
 #*****************
 int max_at() { return (boolean_modifier("Four Songs").to_int() + boolean_modifier("additional song").to_int() + 3); }
@@ -193,7 +436,7 @@ int current_at() {
 string [ class ] LEWs;
 LEWs[ $class[ Seal Clubber ] ] 		= "Hammer of Smiting" ;
 LEWs[ $class[ Turtle Tamer ] ] 		= "Chelonian Morningstar" ;
-LEWs[ $class[ Pastamancer ] ] 		= "Greek Pasta of Peril" ;
+LEWs[ $class[ Pastamancer ] ] 		= "Greek Pasta Spoon of Peril" ;
 LEWs[ $class[ Sauceror ] ] 			= "17-alarm Saucepan" ;
 LEWs[ $class[ Disco Bandit ] ] 		= "Shagadelic Disco Banjo" ;
 LEWs[ $class[ Accordion Thief ] ] 	= "Squeezebox of the Ages" ;
@@ -263,13 +506,14 @@ boolean get_clownosity()
 
 		if ( s == $slot[ none ] ) continue;
 
-		retrieve_item( 1,clown[ i ].it );
+		buy( 1,clown[ i ].it );
 		if ( available_amount( clown[ i ].it ) > 0 )
 			clownosity_needed -= clown[ i ].clownosity;
 
 		i += 1;
 	}
-	return maximize( "4 clownosity -familiar -tie", true );
+	
+	return maximize( "-combat, 4 clownosity -familiar -tie",true);
 }
 
 // get Funhouse item
@@ -279,8 +523,9 @@ boolean get_FUN( item FUN )
 	if ( my_adventures() == 0 ) return vprint( "Out of adventures.",-1 );
 	vprint( "Acquiring Funhouse item...","green",2 );
 
+	maximize("-combat",0,0, false, false );
 	// get 4 Clownosity. This could use some optimisation (and taking into account no mall access)
-	if ( !maximize( "4 clownosity -familiar -tie", true ) || !get_clownosity() || !maximize( "4 clownosity -familiar -tie", false ) )
+	if (!get_clownosity() ||  !maximize( "-combat, 4 clownosity -familiar -tie", false ) )
 		return vprint( "More Clownosity needed!",-1 );
 
 	// crude mood
@@ -294,7 +539,7 @@ boolean get_FUN( item FUN )
 
 	cli_execute ( "mood apathetic" );
 	use_familiar( previous_familiar );
-
+	
 	return ( test_combat( $location[ The "Fun" House ] ) && obtain( 1,to_string(FUN),$location[ The "Fun" House ] ) );
 }
 
@@ -307,16 +552,35 @@ boolean get_LEW()
 
 	// make sure you unlock your class NPC
 	if ( !visit_url( "guild.php" ).contains_text( "place=scg" ) )
+	{
+		if (have_familiar($familiar[artistic goth kid]))
+			use_familiar($familiar[artistic goth kid]);
 		cli_execute( "guild" );
+	}
+	visit_url( "guild.php?place=scg" );
+	visit_url( "guild.php?place=scg" );
 
-	item EW ; item FUN ;
+	item EW ; item FUN ; item W;
+	switch (my_class()) 
+	{
+		case $class[ Seal Clubber ]		:	W = $item[seal-clubbing club]; EW = $item[Bjorn's Hammer]; break;
+		case $class[ Turtle Tamer ]		:	W = $item[turtle totem]; EW = $item[Mace of the Tortoise]; break;
+		case $class[ Pastamancer ]		:	W = $item[pasta spoon]; EW = $item[Pasta Spoon of Peril]; break;
+		case $class[ Sauceror ]			:	W = $item[saucepan]; EW = $item[5-Alarm Saucepan]; break;
+		case $class[ Disco Bandit ]		:	W = $item[disco ball]; EW = $item[Disco Banjo]; break;
+		case $class[ Accordion Thief ]	:	W = $item[stolen accordion]; EW = $item[Rock and Roll legend]; break;
+	}
+	retrieve_item( 1,W );
+	
 	foreach it in get_ingredients( LEW )
 	{
-		if ( count( get_ingredients( it ) ) > 0 ) EW = it ;
-		else FUN = it ;
+		if ( !( it == EW )) 
+			FUN = it ;
 	}
-
-	if ( !retrieve_item( 1,EW ) ) return vprint( "Unable to obtain your Epic Weapon, please craft/buy one.",-1 ) ;
+	cli_execute("conditions clear");
+	while ( item_amount( EW ) == 0 ) 
+		adventure(1, $location[The Unquiet Garves]);
+	//if ( !retrieve_item( 1,EW ) ) return vprint( "Unable to obtain your Epic Weapon, please craft/buy one.",-1 ) ;
 
 	// visit guild NPC to make sure you have the quest
 	visit_url( "guild.php?place=scg" );
@@ -391,6 +655,7 @@ boolean startCaveQuest()
 	vprint( "Opening Nemesis Cave...","green",2 );
 
 	// visit guild NPC to get the quest
+	visit_url( "guild.php?place=scg" );
 	string response = visit_url( "guild.php?place=scg" );
 
 	// check if the cave is available
@@ -402,7 +667,7 @@ boolean startCaveQuest()
 
 	return vprint( "Could not unlock the Nemesis Cave Quest for some reason.", -1 );
 }
-
+/*
 boolean caveDoors()
 {
 	// find what the current closed door is
@@ -441,7 +706,9 @@ boolean caveDoors()
 				if ( current_at() >=  max_at() )
 					return vprint( "You have too many AT songs to get Polka of Plenty for door n°3", -1 );
 				if ( !have_skill( $skill[ The Polka of Plenty ] ) )
-					return vprint( "You need to get buffed with 15 turns of Polka of Plenty to open door n°3.",-1 );
+					visit_url("guild.php?action=buyskill&skillid=6");
+				if ( !have_skill( $skill[ The Polka of Plenty ] ) )
+					return vprint( "Something went wrong when learning how to Polka. You need to get buffed with 15 turns of Polka of Plenty to open door n°3.",-1 );
 				use_skill( 1, $skill[ The Polka of Plenty ] ) ;
 				if ( have_effect( $effect[ Polka of Plenty ] ) < 15 )
 					return vprint( "Something happened when trying to cast Polka of Plenty.",-1 );
@@ -599,6 +866,149 @@ boolean nemesisCave()
 {
 	return ( startCaveQuest() && caveDoors() && caveLastDoor() );
 }
+*/
+
+boolean newcave(){
+	print("We should do the cave....", "blue");
+	buffer page;
+	void cave_door() { //Cave Door
+					
+		skill caveSkill;
+		string skillid;
+		string skillurl = "guild.php?action=buyskill&skillid=";
+		string text;
+		//matcher choice;
+		
+		switch (my_class()) 
+		{
+			case $class[ Seal Clubber ]		:	caveSkill = $skill[wrath of the wolverine]; skillid = "29"; text = "Freak"; break;
+			case $class[ Turtle Tamer ]		:	caveSkill = $skill[amphibian sympathy]; skillid = "14"; text = "Sympathize"; break;
+			case $class[ Pastamancer ]		:	caveSkill = $skill[entangling noodles]; skillid = "4"; text = "Entangle"; break;
+			case $class[ Sauceror ]			:	caveSkill = $skill[stream of sauce]; skillid = "3"; text = "Shoot"; break;
+			case $class[ Disco Bandit ]		:	caveSkill = $skill[disco state of mind]; skillid = "26"; text = "Focus"; break;
+			case $class[ Accordion Thief ]	:	caveSkill = $skill[accordion bash]; skillid = "32"; text = "Bash"; break;
+		}
+		skillurl += skillid;
+		if(!have_skill(caveSkill))
+			visit_url(skillurl);
+		visit_url( "guild.php?place=scg" );
+		visit_url( "guild.php?place=scg" );
+		print("going to the cave", "blue");
+		cli_execute("goal clear");
+		page = visit_url("place.php?whichplace=mountains&action=mts_caveblocked");
+		cli_execute("choice-goal");
+	}
+	
+	void cave_rubble() { //Rubble
+		vprint( "Removing Rubble",6 );
+		if (!cli_execute("find 6 Fizzing spore pod")) {
+			vprint( "Getting fizzing spore pods",6 );
+			if (my_level() < 8)
+				cli_execute("maximize "+my_primestat()+", 2 items");
+			else cli_execute("maximize items -tie");
+			while (item_amount($item[fizzing spore pod]) < 6 && my_adventures() > 0 && my_inebriety() < inebriety_limit())
+				adventure(1, $location[The Fungal Nethers]);
+		}
+		page = visit_url("place.php?whichplace=nemesiscave&action=nmcave_rubble");
+		if (contains_text(page, "Blast the tunnel clear with fizzing spore pods")) {
+			page = visit_url("choice.php?whichchoice=1088&option=1");
+			if (contains_text(page, "carefully place six fizzing spore pods"))
+				vprint( "Blew up the rubble!",6 );	
+			else abort("Something went wrong with blowing up the rubble");
+		}
+	}
+	
+	boolean cave_boss() { //Boss
+		cli_execute("maximize "+my_primestat()+" -tie");
+		cli_execute("restore hp");
+		visit_url("place.php?whichplace=nemesiscave&action=nmcave_boss");
+		run_combat();
+		if (have_effect($effect[beaten up]) > 0)
+			abort("The sauce boss killed you....");
+		else vprint( "You killed the boss!",6 );
+		visit_url("guild.php?place=scg");
+		visit_url("guild.php?place=scg");
+		return true;
+	}
+	//Cave Quest
+	page = visit_url("place.php?whichplace=mountains");
+	if (contains_text(page, "place.php?whichplace=mountains&action=mts_caveblocked")) {	
+		cave_door();
+		cave_rubble();
+		if (cave_boss())
+			return true;
+	}
+	else if (contains_text(page, "place.php?whichplace=nemesiscave")) {	
+		page = visit_url("place.php?whichplace=nemesiscave");
+		if (contains_text(page, "nemcave_rubble.gif")) {
+			cave_rubble();
+			if (cave_boss())
+				return true;
+		}
+		else if (cave_boss())
+			return true;
+	}
+	else if (contains_text(page, "adventure.php?snarfblat=452"))
+		return true;
+	return false;
+}
+	//Old stuff 
+	/*
+	choice = create_matcher("value=(\\d+)><input  class=button type=submit value=..?"+text, page);
+
+	choice.find();
+	run_choice(choice.group(1).to_int());
+	run_choice(1);
+	//fungal nethers
+	
+	if( !can_interact() && item_amount($item[fizzing spore pod]) < 6)
+	{
+		if ( my_adventures() == 0 ) return vprint( "Out of adventures.",-1 );
+		vprint( "Gathering Fungi...","green",2 );
+
+		use_familiar( best_fam("items") );
+		maximize( "item drop -familiar -tie", false );
+		set_location( $location[ The Fungal Nethers ] );
+		cli_execute( "conditions clear; conditions set 6 fizzing spore pod" );
+
+		if ( !test_combat( $location[ The Fungal Nethers ] ) )
+			return vprint( "Fungi have not been gathered",-1 );
+		if(item_amount($item[fizzing spore pod]) < 6)
+		if ( adventure( my_adventures(),$location[ The Fungal Nethers ] ) )
+			return vprint( "Out of adventures, exiting...",-1 );
+	}
+	else cli_execute("find 6 fizzing spore pod");
+	visit_url( "place.php?whichplace=nemesiscave&action=nmcave_rubble");
+	run_choice(1);
+
+	if ( my_adventures() == 0 ) return vprint( "Out of adventures.",-1 );
+	vprint( "Fighting the Nemesis in the Cave...","green",2 );
+
+	switch ( my_primestat() )
+	{
+		case $stat[ Muscle ]:
+		case $stat[ Mysticality ]:
+			maximize( "Muscle, -familiar -tie", false );
+			break;
+		case $stat[ Moxie ]:
+			maximize( "Moxie, -familiar -tie", false );
+			break;
+	}
+	use_familiar( best_fam("combat") );
+	set_property( "battleAction", "attack with weapon" );
+	cli_execute( "mood apathetic" );
+	restore_hp( 0 );
+	restore_mp( 0 );
+	
+	visit_url( "place.php?whichplace=nemesiscave&action=nmcave_boss" );
+	string response;
+	response = run_combat();
+	if ( !response.contains_text( "WINWINWIN" ) )
+		return vprint( "Failed to beat your Nemesis in the cave!",-1 );
+
+	set_property( "battleAction", previous_battleaction );
+	return vprint( "Nemesis Cave quest done!","green",1 );
+	*/
 
 
 #/*****************************************************************************************\#
@@ -679,17 +1089,27 @@ AT:
 
 boolean getVolcanoMap()
 {
+	string [ class ] LEHs;
+	LEHs[ $class[ Seal Clubber ] ] 		= "Scalp of Gorgolok" ;
+	LEHs[ $class[ Turtle Tamer ] ] 		= "Elder Turtle Shell" ;
+	LEHs[ $class[ Pastamancer ] ] 		= "Colander of Em-er'il" ;
+	LEHs[ $class[ Sauceror ] ] 			= "Ancient Saucehelm" ;
+	LEHs[ $class[ Disco Bandit ] ] 		= "Disco 'Fro Pick" ;
+	LEHs[ $class[ Accordion Thief ] ] 	= "El Sombrero De Lopez" ;
+	item LEH = LEHs[ my_class() ].to_item() ;
+
 	if ( available_amount( MAP ) > 0 ) return vprint( "Volcano Map already obtained",6 );
 
 	// make sure the quest has been given by the guild NPC
+	
+	visit_url( "guild.php?place=scg" );
 	string response = visit_url("guild.php?place=scg");
 	matcher finishCaveQuest = create_matcher( "secret tropical island volcano lair or something",response );
 	matcher beforeHitmen = create_matcher( "t (located|found) your Nemesis",response );
 	matcher afterHitmen = create_matcher( "Yeah, I had a run-in with some of them",response );
-
-	if ( !finishCaveQuest.find() && !beforeHitmen.find() && !afterHitmen.find() )
+	
+	if ( !finishCaveQuest.find() && !beforeHitmen.find() && !afterHitmen.find() && item_amount(LEH) == 0)
 		return vprint( "You have to finish the Nemesis Cave quest before continuing",-1 );
-
 	if ( my_adventures() == 0 ) return vprint( "Out of adventures.",-1 );
 	if ( !can_interact() ) return vprint( "You are still in-run, please run this script again once you obtain the Volcano Map.", -1 );
 	if ( !vars[ "nemesis_farm" ].to_boolean() ) die( "Please run this script again once you obtain the Volcano Map." );
@@ -717,8 +1137,7 @@ boolean getVolcanoMap()
 	}
 	else
 	{
-		cli_execute( "outfit checkpoint" );
-		cli_execute( "checkpoint" );
+		cli_execute("maximize 1.3 item -tie, 1 meat, .2 "+my_primestat()+"");
 	}
 
 	if ( farm_mood != "" ) cli_execute( "mood "+farm_mood );
@@ -887,13 +1306,16 @@ passive_damage_map passive_damage_sources()
 }
 */
 
-float LTS_damage( int mother_level, item wpn )
+int LTS_damage( int mother_level, item wpn )
 {
+	
+	
 	if ( wpn.item_type() != "club" ) return 0;
 	if ( wpn.weapon_hands() != 2 ) return 0;
 
 	cli_execute( "speculate equip " + wpn + "; quiet;" );
-
+	
+	/*
 	// calculate minimum damage due to difference between attack and defense
 	float mus = numeric_modifier( "_spec", "Buffed Muscle" );
 	float musadj = 1.0;
@@ -911,11 +1333,12 @@ float LTS_damage( int mother_level, item wpn )
 
 	// add elemental damage
 	foreach el in $elements[] dam += numeric_modifier( "_spec", el + " Damage" );
+	*/
 
-	vprint( "LTS damage against a level " + mother_level + " Mother with a " + wpn + ": " + dam, 10 );
-	return dam;
+	//vprint( "LTS damage against a level " + mother_level + " Mother with a " + wpn + ": " + dam, 10 );
+	return dmg ("mother hellseal", $skill[lunging thrust-smack]);
 }
-float LTS_damage( int mother_level ) { return LTS_damage( mother_level, equipped_item( $slot[ weapon ] ) ); }
+int LTS_damage( int mother_level ) { return LTS_damage( mother_level, equipped_item( $slot[ weapon ] ) ); }
 
 float mother_damage( int mother_level, item wpn )
 {
@@ -1030,8 +1453,9 @@ boolean equip_2h_club()
 
 item choose_stasis()
 {
-	foreach it in $items[ spices, seal tooth, dictionary, spectre scepter ]
+	foreach it in $items[  seal tooth, spices, spectre scepter ]
 	{
+		if (cli_execute("find 1 "+it)) {}
 		if ( available_amount( it ) > 0 && retrieve_item( 1, it ) ) return it;
 	}
 	foreach it in $items[ spices, seal tooth ]
@@ -1110,17 +1534,33 @@ boolean get_hellseal_disguise()
 	// use whatever +HP or +damage buffs you have
 	cli_execute ( "mood apathetic" );
 	skill [ int ] buffs;
+
 	foreach sk in $skills[ Rage of the Reindeer, Snarl of the Timberwolf, Holiday Weight Gain, Reptilian Fortitude, Tenacity of the Snapper ]
 	{
 		if ( !have_skill( sk ) ) continue;
 		buffs[ buffs.count() ] = sk;
 	}
-
+	
 	void maintain_buffs()
 	{
 		foreach i, sk in buffs
 		{
 			if ( have_effect( sk.to_effect() ) < 0 ) use_skill( 1, sk );
+		}
+		if(have_effect($effect[Phorcefullness])==0)
+		{
+			retrieve_item(1, $item[philter of phorce]);
+			use(1, $item[philter of phorce]);
+		}
+		if(have_effect($effect[Temporary Lycanthropy])==0)
+		{
+			retrieve_item(1, $item[blood of the wereseal]);
+			use(1, $item[blood of the wereseal]);
+		}
+		if(have_effect($effect[Tomato Power])==0)
+		{
+			retrieve_item(1, $item[tomato juice of powerful power]);
+			use(1, $item[tomato juice of powerful power]);
 		}
 	}
 	maintain_buffs();
@@ -1298,6 +1738,7 @@ boolean nemesis_Turtle_Tamer()
 	if (	npc.contains_text( "compound swings open" )
 		||	npc.contains_text( "practice their backflips" ) )
 	{
+		use_familiar($familiar[Untamed Turtle]);
 		return vprint( "Nemesis Lair unlocked!","green",1 );
 	}
 	return vprint( "Something happened while unlocking the Nemesis Lair, exiting...",-1 );
@@ -1498,8 +1939,22 @@ boolean nemesis_sauceror()
 	// unlock the Lair
 	if ( my_adventures() == 0 ) return vprint( "Out of adventures.",-1 );
 	if ( visit_url( "volcanoisland.php?action=tniat" ).contains_text( "wobble up" ) )
+	{
+		if ( !have_skill( $skill[ elemental saucesphere ] ) )
+			visit_url("guild.php?action=buyskill&skillid=7");
+		if ( !have_skill( $skill[ Jalape&ntilde;o Saucesphere ] ) )
+			visit_url("guild.php?action=buyskill&skillid=8");
+		if ( !have_skill( $skill[ antibiotic saucesphere ] ) )
+			visit_url("guild.php?action=buyskill&skillid=33");
+		use_skill( $skill[ elemental saucesphere ] );
+		use_skill( $skill[ Jalape&ntilde;o Saucesphere ] );
+		use_skill( $skill[ antibiotic saucesphere ] );
+		if ( have_skill( $skill[scarysauce] ) )
+			use_skill( $skill[ scarysauce ] );
 		return vprint( "Nemesis Lair unlocked!","green",2 );
+	}
 	return vprint( "Something happened while unlocking the Nemesis Lair, exiting...",-1 );
+	
 }
 
 
@@ -2283,7 +2738,6 @@ void nemesisQuest()
 		set_property( "nemesis_lastReset", get_property( "knownAscensions" ) );
 	}
 	int step = get_property("nemesis_Step").to_int();
-
 	// go through the steps
 	if ( step == 0 ) // LEW quest
 	{
@@ -2292,7 +2746,8 @@ void nemesisQuest()
 	}
 	if ( step == 1 ) // Nemesis Cave
 	{
-		if ( !nemesisCave() ) die( "Problem occured while doing the Nemesis Cave, exiting..." );
+		startCaveQuest();
+		if ( !newcave() ) die( "Problem occured while doing the Nemesis Cave, exiting..." );
 		step = 2; set_property( "nemesis_Step", "2" );
 	}
 	if ( step == 2 ) // Open the Volcano island

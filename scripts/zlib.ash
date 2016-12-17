@@ -61,7 +61,7 @@ boolean vprint_html(string message, int level) {
 }
 
 // returns mixvar normalized to the specified basic ASH type, also normalizes comma-delimited lists of same
-string normalized(string mixvar, string type) {
+string normalized(string mixvar, string type, string glue) {
    switch (type) {
       case "boolean": return to_string(to_boolean(mixvar));
       case "bounty": return to_string(to_bounty(mixvar));
@@ -83,15 +83,16 @@ string normalized(string mixvar, string type) {
       case "string": return mixvar;
    }
    if (index_of(type,"list of ") == 0) {
-       string[int] bits = split_string(mixvar,", ");
+       string[int] bits = split_string(mixvar,glue);
        mixvar = "";
        foreach n,bit in bits {
-          if (n > 0) mixvar += ", ";
-          mixvar += normalized(bit,excise(type,"list of ",""));
+          if (n > 0) mixvar += glue;
+          mixvar += normalized(bit,excise(type,"list of ",""), glue);
        }
    } else vprint("Unable to normalize type '"+type+"'.",-3);
    return mixvar;
 }
+string normalized(string mixvar, string type) { return normalized(mixvar, type, ", "); }
 
 // the opposite of split_string(); useful for working with comma-delimited lists
 string join(string[int] pieces, string glue) {
@@ -185,7 +186,7 @@ float eval(string expr, float[string] values) {
    m.append_tail(b);
    m = create_matcher("[a-z]",b);
    vprint("Evaluating '"+b.to_string()+"'...",10+(m.find() ? 0 : 1+to_int(is_integer(b))));
-   return modifier_eval(b.to_string());
+   return modifier_eval(b.to_string()); 
 }
 
 
@@ -196,6 +197,7 @@ record {
    string vdate;
 }[string] zv;
 
+// SVN version of below.  soft = human-readable script name; proj = svn name; thread = thread number on kolmafia.us
 string check_version(string soft, string proj, int thread) { buffer msg;
    if (count(zv) == 0) file_to_map("zversions.txt",zv);
    if (zv[proj].vdate == today_to_string()) return "";
@@ -336,7 +338,10 @@ boolean be_good(item johnny) {
       case "Trendy": if (!is_trendy(johnny)) return false; break;
       case "Avatar of Boris": if (johnny == $item[trusty]) return true;
       case "Way of the Surprising Fist": if ($slots[weapon,off-hand] contains johnny.to_slot()) return false; break;
+      case "KOLHS": if (johnny.inebriety > 0 && !contains_text(johnny.notes, "KOLHS")) return false; break;
+      case "Zombie Slayer": if (johnny.fullness > 0 && !contains_text(johnny.notes, "Zombie Slayer")) return false; break;
    }
+   if (class_modifier(johnny,"Class") != $class[none] && class_modifier(johnny,"Class") != my_class()) return false;
    return is_unrestricted(johnny);
 }
 boolean be_good(familiar johnny) {
@@ -344,7 +349,8 @@ boolean be_good(familiar johnny) {
       case "Trendy": if (!is_trendy(johnny)) return false; break;
       case "Avatar of Boris":
       case "Avatar of Jarlsberg":
-      case "Avatar of Sneaky Pete": return false;
+      case "Avatar of Sneaky Pete": 
+      case "Actually Ed the Undying": return false;
    }
    return is_unrestricted(johnny);
 }
@@ -353,6 +359,31 @@ boolean be_good(skill johnny) {
       case "Trendy": if (!is_trendy(johnny)) return false; break;
    }
    return is_unrestricted(johnny);
+}
+
+// check a quest property, e.g. qprop("questL11MacGuffin >= step3")
+boolean qprop(string test) {
+   if (!test.contains_text(" ")) return get_property(test) == "finished";
+   int numerize(string progress) {
+      if (is_integer(progress)) return progress.to_int();
+      switch (progress) {
+         case "unstarted": return -1;
+         case "started": return 0;
+         case "finished": return 999;
+      }
+      return excise(progress,"step","").to_int();
+   }
+   string[int] tbits = split_string(test," ");
+   if (count(tbits) != 3) return vprint("'"+test+"' not valid parameter for qprop().  Syntax is '<property> <relational operator> <value>'",-3);
+   if (get_property(tbits[0]) == "") return vprint("'"+tbits[0]+"' is not a valid quest property.",-3);
+   switch (tbits[1]) {
+      case "==": return numerize(get_property(tbits[0])) == numerize(tbits[2]);
+      case "!=": return numerize(get_property(tbits[0])) != numerize(tbits[2]);
+      case ">": return numerize(get_property(tbits[0])) > numerize(tbits[2]);
+      case "=>": case ">=": return numerize(get_property(tbits[0])) >= numerize(tbits[2]);
+      case "<": return numerize(get_property(tbits[0])) < numerize(tbits[2]);
+      case "=<": case "<=": return numerize(get_property(tbits[0])) <= numerize(tbits[2]);
+   } return vprint("'"+tbits[1]+"' is not a valid relational operator.", -3);
 }
 
 // check the mall price of an item
@@ -391,6 +422,19 @@ item braindrop(monster patient) {
    if (monster_attack(patient) + monster_level_adjustment() >= 100) return $item[good brain];
    if (monster_attack(patient) + monster_level_adjustment() > 50) return $item[decent brain];
    return $item[crappy brain];
+}
+// returns the amount of ka dropped by a given monster
+float kadrop(monster m) {
+   if (my_class() != $class[ed]) return 0;
+   float res;
+   switch (m.phylum) {
+      case $phylum[dude]: case $phylum[hippy]: case $phylum[hobo]: case $phylum[pirate]: res = 1;
+      case $phylum[beast]: case $phylum[bug]: case $phylum[elf]: case $phylum[fish]: case $phylum[goblin]: case $phylum[humanoid]: 
+      case $phylum[mer-kin]: case $phylum[orc]: case $phylum[penguin]: case $phylum[elemental]: res += 1;
+         if (res > 0 && my_servant() == $servant[priest] && $servant[priest].level >= 14) res += 1; break;
+      case $phylum[undead]: if (have_equipped($item[the crown of ed the undying])) return 0.2;   // total guess
+   }
+   return res;
 }
 
 // returns true if the given stat is a goal (from setting "level X" or "<stat> X" as a condition)
@@ -470,7 +514,9 @@ float has_goal(monster m, boolean usespec) {                      // chance of g
             res += temp*minmax(max(rec.rate,0.001)*((usespec ? numeric_modifier("Generated:_spec","Pickpocket Chance") :
                    numeric_modifier("Pickpocket Chance"))+100)/100.0,0,100)/100.0; continue;
          case "c": if (item_type(rec.drop) == "shirt" && !have_skill($skill[torso awaregness])) continue;
-            if (item_type(rec.drop) == "pasta guardian" && my_class() != $class[pastamancer]) continue;  // skip pasta guardians for non-PMs
+            if (item_type(rec.drop) == "pasta guardian" && my_class() != $class[pastamancer]) continue;  // skip these for non-PMs
+            if (m == $monster[pygmy witch accountant] && contains_text(rec.drop.to_string(),"McClusky") &&            
+               item_amount(rec.drop) + item_amount($item[McClusky file (page 5)]) + item_amount($item[McClusky file (complete)]) > 0) continue;
             if (rec.drop == $item[bunch of square grapes] && my_level() < 11) continue;  // grapes drop at 11
          case "":                                // TODO: pp chance
          case "n": res += temp*minmax(max(rec.rate,0.001)*((usespec ? numeric_modifier("Generated:_spec","Item Drop") :
@@ -483,6 +529,7 @@ float has_goal(monster m, boolean usespec) {                      // chance of g
       default: res += minmax((have_skill($skill[skullcracker]) ? 0.6 : 0.3)*((usespec ? numeric_modifier("Generated:_spec","Item Drop") :
          numeric_modifier("Item Drop"))+100)/100.0,0,100)/100.0;
    }
+   if (is_goal($item[ka coin])) res += kadrop(m);
    return res;
 }
 float has_goal(monster m) { return has_goal(m,false); }
@@ -503,7 +550,7 @@ float has_goal(location l) { return has_goal(l,false); }
 // gets n (-existing) of cond, either by purchasing, pulling from Hangk's, or
 // adventuring at the given location.  also works with choiceadvs
 boolean obtain(int n, string cond, location locale, string filter) {
-   if ($strings[choiceadv, autostop, arena flyer ml, pirate insult] contains cond || to_item(cond) == $item[none])
+   if ($strings[choiceadv, autostop, arena flyer ml, pirate insult, factoid] contains cond || to_item(cond) == $item[none])
       cli_execute("conditions clear; conditions set "+n+" "+cond);
    else {
       if (retrieve_item(n, to_item(cond))) return vprint("You have "+n+" "+cond+", no adventuring necessary.",5);

@@ -69,8 +69,8 @@ item [location] semi_rare;
 	semi_rare[$location[The Castle in the Clouds in the Sky (Basement)]] = $item[Super Weight-Gain 9000];
 	semi_rare[$location[Guano Junction]] = $item[Eau de Guaneau];
 	semi_rare[$location[Cobb's Knob Laboratory]] = $item[bottle of Mystic Shell];
-	semi_rare[$location[Pre-Cyrpt Cemetary]] = $item[poltergeist-in-the-jar-o];
-	semi_rare[$location[Post-Cyrpt Cemetary]] = $item[poltergeist-in-the-jar-o];
+	semi_rare[$location[The Unquiet Garves]] = $item[poltergeist-in-the-jar-o];
+	semi_rare[$location[The VERY Unquiet Garves]] = $item[poltergeist-in-the-jar-o];
 	semi_rare[$location[South of The Border]] = $item[donkey flipbook];
 	semi_rare[$location[Pandamonium Slums]] = $item[SPF 451 lip balm];
 	semi_rare[$location[The Hidden Park]] = $item[shrinking powder];
@@ -163,12 +163,11 @@ boolean canadv(location loc) {
 	}
 
 	switch(loc) {
+	case $location[The Haunted Pantry]:
+	case $location[The Limerick Dungeon]:
 	case $location[The Outskirts of Cobb's Knob]:
 	case $location[The Sleazy Back Alley]:
-	case $location[The Haunted Pantry]:
 		return true;
-	case $location[The Limerick Dungeon]:
-		return my_buffedstat(my_primestat()) > 20;
 	case $location[The Haunted Kitchen]:
 	case $location[The Haunted Conservatory]:
 		return available_amount($item[telegram from Lady Spookyraven]) == 0 & (my_ascensions() > 0 || my_level() >= 4);
@@ -189,7 +188,7 @@ boolean canadv(location loc) {
 	case $location[The Haunted Boiler Room]:
 	case $location[The Haunted Laundry Room]:
 	case $location[The Haunted Wine Cellar]:
-		return get_property("questL11Manor") == "step1";
+		return get_property("questL11Manor") != "unstarted";
 	case $location[Cobb's Knob Laboratory]:
 		return available_amount($item[Cobb's Knob lab key]) > 0;
 	case $location[Cobb's Knob Menagerie\, Level 2]:
@@ -216,27 +215,33 @@ boolean canadv(location loc) {
 		foreach it in $items[pumpkin carriage,desert bus pass, bitchin' meatcar, tin lizzie]
 			if(available_amount(it) > 0) return true;
 		return false;
-	case $location[Pre-Cyrpt Cemetary]:
-		return my_buffedstat(my_primestat()) >= 11 && get_property("questL07Cyrptic") != "finished"
+	case $location[The Unquiet Garves]:
+		return get_property("questL07Cyrptic") != "finished"
 		  && get_property("questG03Ego") != "unstarted";
-	case $location[Post-Cyrpt Cemetary]:
-		return my_buffedstat(my_primestat()) >= 40 && get_property("questL07Cyrptic") == "finished";
+	case $location[The VERY Unquiet Garves]:
+		return get_property("questL07Cyrptic") == "finished";
 	case $location[The Dark Elbow of the Woods]:
 	case $location[The Dark Heart of the Woods]:
 	case $location[The Dark Neck of the Woods]:
 		return get_property("questL06Friar") == "started";
 	case $location[Pandamonium Slums]:
-		return my_buffedstat(my_primestat()) >= 29 && get_property("questL06Friar") == "finished";
+		return get_property("questL06Friar") == "finished";
 	case $location[The Hidden Park]:
 		return get_property("questL11Worship") != "unstarted";
 	case $location[8-Bit Realm]:
-		return my_buffedstat(my_primestat()) >= 20 && available_amount($item[continuum transfunctioner]) > 0;
+		return available_amount($item[continuum transfunctioner]) > 0;
 	case $location[Vanya's Castle Chapel]:
 		return available_amount($item[continuum transfunctioner]) > 0 && available_amount($item[map to Vanya's Castle]) > 0
 			&& (available_amount($item[pixel whip]) > 0 || available_amount($item[pixel chain whip]) > 0 || available_amount($item[pixel morning star]) > 0);
 	case $location[The Spooky Forest]:
 		return get_property("questL02Larva") != "unstarted";
 	case $location[Whitey's Grove]:
+		// Ed the Undying needs extra work to open Whitey's Grove
+		if(get_property("questL13Warehouse") != "unstarted" && can_interact() && get_property("questG02Whitecastle") == "unstarted" && available_amount($item[bitchin' meatcar]) == 0 && retrieve_item(1, $item[bitchin' meatcar])) {
+			visit_url("guild.php?place=paco"); // Show way to beach
+			visit_url("guild.php?place=paco"); // Get Whitey's Quest
+			run_choice(1); // Show the way to Whitey's Grove
+		}
 		return get_property("questG02Whitecastle") != "unstarted" 
 		  || $strings[finished, step3, step4] contains get_property("questL11Palindome");
 	case $location[Hippy Camp]:
@@ -334,9 +339,11 @@ void eat_cookie() {
 			}
 		return count_counters() < 1;
 	}
-	if(item_amount($item[Clan VIP Lounge key]) > 0 && npc_price($item[Lucky Lindy]) > 0 && my_inebriety() < inebriety_limit() && my_meat() >= 500) // if npc_price($item[Lucky Lindy]) > 0 then get_property("_speakeasyDrinksDrunk") < 3
+	if(item_amount($item[Clan VIP Lounge key]) > 0 && npc_price($item[Lucky Lindy]) > 0 && my_inebriety() < inebriety_limit() && my_meat() >= 500) { // if npc_price($item[Lucky Lindy]) > 0 then get_property("_speakeasyDrinksDrunk") < 3
+		if(have_skill($skill[The Ode to Booze]))
+			use_skill(1, $skill[The Ode to Booze]);
 		cli_execute("drink lucky lindy");
-	else if(my_path() == "Zombie Slayer")
+	} else if(my_path() == "Zombie Slayer")
 		vprint("You can not find a brain flavored fortune cookie and you cannot drink a Lucky Lindy.", -3);
 	else if(my_fullness() >= fullness_limit())
 		vprint("If I ate even a fortune cookie I'd burst! Remember to eat a fortune cookie when the tummy is emptier.", -3);
@@ -388,8 +395,8 @@ void get_semirare() {
 	case $location[The Haunted Kitchen]:
 	case $location[The Haunted Library]:
 	case $location[Cobb's Knob Laboratory]:
-	case $location[Pre-Cyrpt Cemetary]:
-	case $location[Post-Cyrpt Cemetary]:
+	case $location[The Unquiet Garves]:
+	case $location[The VERY Unquiet Garves]:
 	case $location[South of The Border]:
 	case $location[The Spooky Forest]:
 	case $location[Hippy Camp]:

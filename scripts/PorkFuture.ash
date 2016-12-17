@@ -17,6 +17,13 @@
  Wumpinator and is actually slightly better at finding the Wumpus. *happy dance*
 */
 
+/* Updates made by Bale
+ Don't equip the Space Trip safety headphones because they make monsters in the future too fragile to survive until they give up the essence.
+ Handle ghost dog adventures and any future problems with unexpected choice adventures.
+ Fixed moods so that it will maintain your current mood even as it does its non-combat thing.
+ Fix wumpus killing -- KoL added a second space in the choice form. Ick!
+*/
+
 script "PorkFuture.ash";
 notify guyy;
 
@@ -25,6 +32,7 @@ boolean wumpus_hunt;
 int wumpus_delay = 0;   // seconds to wait between steps in wumpus-hunting procedure (for debugging)
 
 string advstring;
+string charMood = get_property("currentMood"); // This is the character's mood when he started running the script. Maintain all these buffs!
 
 string tween_text(string searchme, string pre, string post)
 {
@@ -38,13 +46,14 @@ string tween_text(string searchme, string pre, string post)
 		return "";
 }
 
-void noncombat_mood()
+void noncombat_mood(boolean no_headphones)
 {
 	if (my_familiar() == $familiar[Jumpsuited Hound Dog])
 		use_familiar($familiar[none]);
-	cli_execute("maximize -combat -tie");
-	cli_execute("mood porkfuture");
-	cli_execute("mood clear");
+	cli_execute("maximize -combat -tie" + (no_headphones? " -equip Space Trip safety headphones": "") ); // Headphones have -100 ML that causes monsters to die before they give up the essence
+	cli_execute("mood "+charMood+", porkfuture");  // Extend charMood without removing it.
+	cli_execute("mood clear"); // Clear anything in porkfuture. This won't delete anything in charMood
+	cli_execute("trigger lose_effect, fresh scent, use either 1 chunk of rock salt, 1 deodorant");
 	if (have_skill($skill[smooth movement]))
 		cli_execute("trigger lose_effect, smooth movements, cast 1 smooth movement");
 	if (have_skill($skill[the sonata of sneakiness]))
@@ -52,6 +61,7 @@ void noncombat_mood()
 	cli_execute("trigger gain_effect, musk of the moose, uneffect musk of the moose");
 	cli_execute("trigger gain_effect, cantata of confrontation, uneffect cantata of confrontation");
 }
+void noncombat_mood() { noncombat_mood(false); }
 
 boolean in_combat()
 {
@@ -81,7 +91,7 @@ void bottle_iku(int past_present_fuschia)
 		return contains_text(advstring,"You break the bottle on the ground, and stomp it to powder");
 	}
 	
-	if (my_hp() < (my_maxhp() / 10) || have_effect($effect[beaten up]) > 0)
+	if (my_hp() < (my_maxhp() / 2) || have_effect($effect[beaten up]) > 0)
 	{
 		cli_execute("recover hp");
 		cli_execute("uneffect beaten up");
@@ -117,18 +127,24 @@ void set_autoheal()
 
 string manual_noncom(int choice_number, int valyew)
 {
-	if (choice_number <= 0)
-	{
-		matcher comat = create_matcher("whichchoice[^>]*?value=.?([0-9]+)",advstring);
-		if (find(comat))
-			choice_number = group(comat,1).to_int();
-		else
-			abort("Can't find the choice adventure number.");
+	int choice_adv, mafiaopt;
+	matcher comat = create_matcher("whichchoice value=(\\d+)", advstring);
+	while(true) {
+		if(find(comat))
+			choice_adv = group(comat,1).to_int();
+		else if(advstring == "")
+			choice_adv = choice_number;
+		else break;
+		if(!wumpus_hunt)
+			bottle_bouncer();
+		if(choice_number == choice_adv || choice_number <= 0) {
+			advstring = visit_url("choice.php?whichchoice=" + choice_adv + "&option=" + valyew + "&pwd=" + my_hash());
+			break;
+		}
+		mafiaopt = get_property("choiceAdventure"+choice_adv).to_int();
+		advstring = run_choice(mafiaopt);
+		reset(comat, advstring);
 	}
-
-	if (!wumpus_hunt)
-		bottle_bouncer();
-	advstring = visit_url("choice.php?whichchoice=" + choice_number + "&option=" + valyew + "&pwd=" + my_hash());
 	return advstring;
 }
 
@@ -143,7 +159,7 @@ boolean in_wumpus_cave()
 // If it fails, it will remember the cave and its error(s) for next time.
 boolean Wumpwn()
 {
-	string namae = replace_string(my_name()," ","_");
+	string namae = replace_string(my_name()," ","_").to_lower_case();
 	string wumpus_rooms = "ABCDEFGHILMNOPQRSUVW";
 	string wumpus_room_suffix = " Chamber";
 	string[string] wumpus_room_names;
@@ -482,9 +498,10 @@ boolean Wumpwn()
 		return to_upper_case(substring(tween_text(advstring, 'bgcolor=blue><b>The ',' Chamber'),0,1));
 	}
 	
+	# name=option value=1><input  class=button type=submit value="Enter the moaning chamber">
 	string extract_adj_letter(int d)
 	{
-		return to_upper_case(substring(tween_text(advstring, 'value='+d+'><input class=button type=submit value="Enter the ', ' chamber'),0,1));
+		return to_upper_case(substring(tween_text(advstring, 'value='+d+'><input  class=button type=submit value="Enter the ', ' chamber'),0,1));
 	}
 	
 	void enter_chamber()
@@ -532,6 +549,7 @@ boolean Wumpwn()
 		wumpus_etc[2] = item_amount($item[wumpus hair]);
 		wumpus_etc[3] = my_ascensions();
 		wumpus_etc[4] = "four";  // make sure it loaded something
+		wumpus_etc[5] = namae;
 		map_to_file(wumpus_etc,"porkfuture/"+namae+"/wumpus_etc.txt");
 	}
 	
@@ -558,7 +576,7 @@ boolean Wumpwn()
 	{
 		file_to_map("porkfuture/"+namae+"/wumpus_etc.txt",wumpus_etc);
 		if (wumpus_etc[4] == "four" && wumpus_etc[1] != "" && substring(wumpus_etc[1],0,1) == extract_room_letter() && 
-		wumpus_etc[2].to_int() == item_amount($item[wumpus hair]) && wumpus_etc[3].to_int() == my_ascensions())
+		wumpus_etc[2].to_int() == item_amount($item[wumpus hair]) && wumpus_etc[3].to_int() == my_ascensions() && wumpus_etc[5] == namae)
 		{
 			print("This looks like the same cave as last time. If it isn't, delete the folder data/porkfuture/"+namae+".","blue");
 			wumpus_explored = wumpus_etc[1];
@@ -784,8 +802,9 @@ void futurella()
 		print("You remember having been going to have saved the future. Already.","green");
 	else
 	{
-		cli_execute("mood porkfuture");
+		cli_execute("mood "+charMood+", porkfuture");  // Extend charMood without removing it.
 		cli_execute("mood clear");
+		cli_execute("mood "+charMood);  // Restore default mood.
 	
 		if (item_amount($item[empty agua de vida bottle]) <= 0)
 			abort("You have no agua de vida bottles!");
@@ -796,7 +815,7 @@ void futurella()
 		if (item_amount($item[empty agua de vida bottle]) < 10 || my_adventures() < 100)
 		{
 			print("Warning: This quest is long! At least 10 empty agua de vida bottles (you have "+item_amount($item[empty agua de vida bottle])+") and 100 adventures (you have "+my_adventures()+") are recommended for completing it.","red");
-			wait(20);
+			wait(10);
 		}
 		print("Initiating quest to ruin the past, save the past, and save the future, in that order.","blue");
 		wait(5);
@@ -1302,7 +1321,9 @@ void futurella()
 				else
 					manual_noncom(0, 1);
 			}
+			cli_execute("mood "+charMood+", porkfuture");  // Extend charMood without removing it.
 			cli_execute("mood clear");
+			cli_execute("mood "+charMood);  // Restore default mood.
 			
 			if (krakrox_complete)
 			{
@@ -1360,8 +1381,7 @@ void futurella()
 		
 		boolean future_complete = false;
 		
-		cli_execute("mood clear");
-		noncombat_mood();  // supposedly noncombats here are scheduled, but I haven't observed this, so we might as well
+		noncombat_mood(true);  // supposedly noncombats here are scheduled, but I haven't observed this, so we might as well
 		
 		/*for derp from 352 to 363
 			if (derp != 360)
@@ -1416,6 +1436,11 @@ void futurella()
 		familiar old_fam = my_familiar();
 		if (old_fam != $familiar[black cat])
 			use_familiar($familiar[none]);   // we're trying to stasis, and familiars cause endless problems with that.
+		if (my_buffedstat($stat[moxie]) < 200)   // also, try not to die
+		{
+			cli_execute("trigger lose_effect, butt-rock hair, use 1 hair spray");
+			cli_execute("trigger lose_effect, gr8tness, use 1 potion of temporary gr8tness");
+		}
 		while(item_amount($item[essence of kink]) <= 0 || item_amount($item[essence of fright]) <= 0 ||
 		item_amount($item[essence of stench]) <= 0 || item_amount($item[essence of cold]) <= 0 || 
 		item_amount($item[essence of heat]) <= 0 || item_amount($item[essence of cute]) <= 0)

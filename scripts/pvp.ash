@@ -80,26 +80,15 @@ void do_fights()
 	}
 	if(fights_left()!=0)
 	{
-		//equip best, hobo and stats?
-		string max_string="maximize 0.1 "+my_primestat();
-		foreach s in $stats[]
-		{
-			if(s!=my_primestat())
-				max_string+=", 0.05 "+s;
-		}
-		if(my_path()!="Avatar of Jarlsberg")
-			max_string+=", switch disembodied hand";
-		//season specific
-		max_string+=", stench res, +sleaze damage, +sleaze spell damage, -combat, item";
-		print(max_string);
-		cli_execute(max_string);
+		//equip best
+		cli_execute("UberPvPOptimizer.ash");
 	}
 	
 	//loop until done
 	if(can_interact())
-		cli_execute("pvp loot");
+		cli_execute("pvp loot 0");
 	else
-		cli_execute("pvp flowers");
+		cli_execute("pvp flowers 0");
 //	while(fights_left()>0)
 //	{
 		//fight person
@@ -107,8 +96,8 @@ void do_fights()
 //	}	
 	print("Done with pvp today");
 	int swagger=check_swagger();
-//	if(swagger>1193 && can_interact())
-//		abort("buy Antagonistic Snowman Kit");
+	if(swagger>1000 && can_interact())
+		abort("buy seasonal pvp item?");
 	
 	if(swagger>10000 && available_amount($item[cursed microwave])<1 && can_interact())
 		abort("buy cursed microwave");
@@ -122,8 +111,8 @@ void do_fights()
 		abort("buy hairshirt");
 	if(swagger>2000 && available_amount($item[How to Tolerate Jerks])<1 && can_interact())
 		abort("buy How to Tolerate Jerks");
-	if(swagger>5000 && available_amount($item[slap and slap again recipe])<1 && can_interact())
-		abort("buy slap and slap again recipe");
+//	if(swagger>5000 && available_amount($item[slap and slap again recipe])<1 && can_interact())
+//		abort("buy slap and slap again recipe");
 	if(swagger>5000 && available_amount($item[fettucini &eacute;pines Inconnu recipe])<1 && can_interact())
 		abort("buy fettucini épines Inconnu recipe");
 	if(swagger>5000 && !have_skill($skill[Summon Annoyance]) && can_interact())

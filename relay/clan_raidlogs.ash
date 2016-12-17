@@ -1341,7 +1341,7 @@ void pageHeader(){
  writeln("function openContext(e,d){var div=document.getElementById('context'+d); div.style.display='inline'; div.style.position='absolute'; div.style.top=e.clientY+2; div.style.left=e.clientX; div.style.overflowy='auto';}");
  writeln("function updateTots(area){var td=document.getElementById(area+\"Ps\"); var allIs=document.getElementById(area+\"Table\").getElementsByTagName(\"input\"); var t=0; for(i=0;i<allIs.length;i++){ t=t+Number(allIs[i].value); } td.innerHTML=t;}</script>");
  int i=page.index_of("</head>");
- matcher m=create_matcher("(http://images\\.kingdomofloathing\\.com|images)/scripts/jquery.+?js",page.substring(12,i));
+ matcher m=create_matcher("(//images\\.kingdomofloathing\\.com|images)/scripts/jquery.+?js",page.substring(12,i));
  if(m.find())write(m.replace_first("jquery-1.10.2.min.js"));
  writeln("<link rel=\"stylesheet\" type=\"text/css\" href=\"jquery.contextMenu.css\">");
  writeln("<script type='text/javascript' src=\"jquery.contextMenu.js\"></script>");

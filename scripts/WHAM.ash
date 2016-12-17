@@ -366,17 +366,6 @@ void WHAM_round(string extra) {
 	vprint("WHAM: WHAM added the following to BatRound: " + batround_insert,9);
 }
 
-/*    This function is unneccessary!  BatBrain already accounts for this when building opts.
-Count happenings to avoid items that have already been enqueued as many as we have
-int times_happened(string occurrence) {
-	if (count(happenings) == 0)
-		file_to_map("happenings_"+replace_string(my_name()," ","_")+".txt",happenings);
-	if (happenings contains occurrence && happenings[occurrence].turn == turncount)
-		return happenings[occurrence].queued + happenings[occurrence].done;
-	return 0;
-}
-*/
-
 //Function to return skills and items that are usable
 boolean ok(advevent a) {
 	boolean no_cunctatitis() {
@@ -474,7 +463,7 @@ boolean ok(advevent a) {
 				if(!no_bears())
 					return false; //Don't try multiple bear skills in one combat
 			case "skill 7135":	//Bear Hug should only be used against plural monsters if you are a zombie slayer
-				if (my_path() == "Zombie Slayer" && monster_stat("howmany") > 1 && no_bears()) return true;
+				if (my_path() == "Zombie Slayer" && mdata.howmany > 1 && no_bears()) return true;
 				else if (my_path() != "Zombie Slayer" && no_bears()) return true;
 				else return false;
 			case "jiggle":
@@ -583,7 +572,7 @@ advevent attack_option(boolean noitems) {
 			continue;
 		}
 		//Reduce RNG risk for stasisy actions
-		if (kill_rounds(opt) > min(min(maxround, WHAM_maxround) - round - 1,drnd)) {
+		if (kill_rounds(opt) > min(min(mdata.maxround, WHAM_maxround) - round - 1,drnd)) {
 			vprint("Skipping " + opt.id + " since it is too risky.", "purple", 9);
 			continue;
 		}
@@ -593,7 +582,7 @@ advevent attack_option(boolean noitems) {
 			continue;
 		}
 		//Don't attempt to overstay our welcome
-		if(kill_rounds(opt) + round + WHAM_safetymargin > maxround)	{
+		if(kill_rounds(opt) + round + WHAM_safetymargin > mdata.maxround)	{
 			vprint("Skipping " + opt.id + " since it is will take too long to kill the monster.", "purple", 9);
 			continue;
 		}
@@ -655,7 +644,7 @@ advevent item_option() {
 			continue; //Ignore skills (only looking at items for this one)
 		if(hitchance(opt.id) < hitchance)
 			continue;
-		if(kill_rounds(opt) > min(min(maxround, WHAM_maxround) - round - 1,drnd))
+		if(kill_rounds(opt) > min(min(mdata.maxround, WHAM_maxround) - round - 1,drnd))
 			continue;   // reduce RNG risk for stasisy actions
 		if(opt.stun < 1 && to_profit(opt) < -runaway_cost())
 			continue;  // don't choose actions worse than fleeing
@@ -676,7 +665,7 @@ advevent stasis_option() {  // returns most profitable lowest-damage option
 	}
 
 	sort opts by -to_profit(value,ignoredelevel);
-	sort opts by -min(kill_rounds(value),max(0,maxround - round - (5 + WHAM_safetymargin)));	
+	sort opts by -min(kill_rounds(value),max(0,mdata.maxround - round - (5 + WHAM_safetymargin)));	
 	foreach i,opt in opts {  // skip multistuns and non-multi-usable items
 		if(!ok(opt))
 			continue;
@@ -694,7 +683,7 @@ advevent stasis_option() {  // returns most profitable lowest-damage option
 
 // returns cheapest multi-round stun
 advevent stun_option(float rounds, boolean foritem) {
-	if(my_location().kisses <= 1 && (rounds < 0.90 || die_rounds() > maxround - round || monster_stat("hp") <= 10)) { //Don't stun if we will kill it directly (add a ~10% buffer for swingy actions)
+	if(my_location().kisses <= 1 && (rounds < 0.90 || die_rounds() > mdata.maxround - round || monster_stat("hp") <= 10)) { //Don't stun if we will kill it directly (add a ~10% buffer for swingy actions)
 		vprint("WHAM: No need to stun this monster", "purple", 8);													  //Always attempt to stun if kisses is larger than 1
 		buytime = new advevent;
 		return buytime;
@@ -734,9 +723,9 @@ actions[int] Calculate_Options(float base_hp) {
 	
 	killer = attack_option();
 	foreach ele in $elements[] {
-		dam = dam + killer.dmg[ele] * (mres[ele] == -1 ? 2 : (mres[ele] == 0 ? 1 : 0));
+		dam = dam + killer.dmg[ele] * (mdata.res[ele] == -1 ? 2 : (mdata.res[ele] == 0 ? 1 : 0));
 	}
-	dam = dam + killer.dmg[$element[none]] * (mres[$element[none]] == -1 ? 2 : (mres[$element[none]] == 0 ? 1 : 0));
+	dam = dam + killer.dmg[$element[none]] * (mdata.res[$element[none]] == -1 ? 2 : (mdata.res[$element[none]] == 0 ? 1 : 0));
 	stun = stun_option(to_float(monster_stat("hp")) / max(dam,0.0001), contains_text(killer.id, "use"));
 	vprint("Monster HP is " + monster_hp() + " according to Mafia and " + monster_stat("hp") + " according to BatBrain.", 9);
 	
@@ -789,7 +778,7 @@ actions[int] Calculate_Options(float base_hp) {
 					delevel = delevel_option((m == $monster[Shub-Jigguwatt, Elder God of Violence] ? true : false));
 					killer = attack_option();
 					i += 1;
-					if(my_stat("hp") < m_dpr(0,0) || i >= min(to_int(vars["WHAM_round_limit"]),maxround))
+					if(my_stat("hp") < m_dpr(0,0) || i >= min(to_int(vars["WHAM_round_limit"]),mdata.maxround))
 						break;
 				}
 				if(killer.id == "") {
@@ -1055,7 +1044,7 @@ void build_custom_WHAM() {
 	
 	//Disco Dances for Dicso Bandits
 	if(my_class() == $class[Disco Bandit]) {
-		if(have_skill($skill[Disco State of Mind]) && have_skill($skill[Disco Greed]) && have_skill($skill[Flashy Dancer]) && monster_stat("nostagger") < 1) {
+		if(have_skill($skill[Disco State of Mind]) && have_skill($skill[Disco Greed]) && have_skill($skill[Flashy Dancer]) && mdata.nostagger < 1) {
 			if(has_option(get_action($skill[Disco Dance of Doom])))
 				encustom(get_action($skill[Disco Dance of Doom]));
 			if(has_option(get_action($skill[Disco Dance II: Electric Boogaloo])))
@@ -1320,7 +1309,7 @@ string stasis_repeat_WHAM(int turns) {       // the string of repeat conditions 
       (my_stat("hp") < my_maxhp() ? " && hpbelow "+my_maxhp() : "")+
       " && !mpbelow "+my_stat("mp")+                                                        // mp
       (my_stat("mp") < min(expskill(),my_maxmp()) ? " && mpbelow "+min(expskill(),my_maxmp()) : "")+
-      " && !pastround "+(turns == 0 ? floor(maxround - (3 + WHAM_safetymargin) - kill_rounds(smacks)) : (turns + round - (3 + WHAM_safetymargin))) +     // time to kill
+      " && !pastround "+(turns == 0 ? floor(mdata.maxround - (3 + WHAM_safetymargin) - kill_rounds(smacks)) : (turns + round - (3 + WHAM_safetymargin))) +     // time to kill
       ((have_equipped($item[crown of thrones])) ? " && !match \"acquire an item\"" : "")+   // CoT
       ((my_fam() == $familiar[hobo monkey]) ? " && !match \"hands you some Meat\"" : "")+   // famspent
       ((my_fam() == $familiar[gluttonous green ghost]) ? " && match ggg.gif" : "")+
@@ -1336,7 +1325,7 @@ string stasis_WHAM() {
 	stasis_option();
 	attack_option();
 	while ((to_profit(plink) > to_float(vars["BatMan_profitforstasis"]) + (can_interact() ? WHAM_roundcost_aftercore : WHAM_roundcost_ronin) || is_our_huckleberry() || train_skills()) &&
-	  (round < maxround - (3 + WHAM_safetymargin) - kill_rounds(smacks) && die_rounds() > kill_rounds(smacks))) {
+	  (round < mdata.maxround - (3 + WHAM_safetymargin) - kill_rounds(smacks) && die_rounds() > kill_rounds(smacks))) {
 		vprint("Top of the stasis loop.",9);
 		matcher optid = create_matcher("(skill |use |jiggle|attack)(?:(\\d+),?(\\d+)?)?",plink.id);
 		matcher smackid = create_matcher("(skill |use |jiggle|attack)(?:(\\d+),?(\\d+)?)?",smacks.id);
@@ -1358,7 +1347,7 @@ string stasis_WHAM() {
 			case (plink.id == "skill 7062"):
 			case (plink.id == "skill 7063"):
 			case (plink.id == "skill 7064"):
-				turns = count(queue) + min(1, equipped_amount($item[haiku katana]) - (happened(plink.id) ? count(happenings[m, turncount, plink.id]) : 0));
+				turns = count(queue) + min(1, equipped_amount($item[haiku katana]) - (happened(plink.id) ? count(happenings[m, cid, plink.id]) : 0));
 				break;
 			case (optid.find() && contains_text(factors[(optid.group(1) == "use " ? "item" : (optid.group(1) == "skill " ? "skill" : "chef")), (optid.group(1) != "jiggle" ? to_int(optid.group(2)) : to_int(equipped_item($slot[weapon])))].special, "once")):
 				turns = count(queue) + 1;	//Options that can only be used once, should only be used once before recalculating
@@ -1366,7 +1355,7 @@ string stasis_WHAM() {
 			case (contains_text(plink.id, "skill")):
 				int mpcost = (smackid.find() && smackid.group(1) == "skill" ? mp_cost(to_skill(to_int(smackid.group(2)))) *  kill_rounds(smacks) : 0);
 				int uses = (my_mp() - mpcost) / max(1,mp_cost(to_skill(to_int(optid.group(2)))));
-				turns = (uses > (maxround - (WHAM_safetymargin + 3)) ? 0 : count(queue) + uses);	//Don't try to stasis for more turns than we have MP for
+				turns = (uses > (mdata.maxround - (WHAM_safetymargin + 3)) ? 0 : count(queue) + uses);	//Don't try to stasis for more turns than we have MP for
 				break;																				//Relies on stasis_option to have already removed skills we cannot cast more than once
 			default:
 				turns = 0;
@@ -1458,7 +1447,7 @@ void main(int initround, monster foe, string pg) {
 		//Call SmartStasis to do fun and complicated stuff
 		vprint("WHAM: Running SmartStasis", "purple", 3);
 		SmartStasis();
-		WHAM_maxround = min(maxround, WHAM_maxround + round);
+		WHAM_maxround = min(mdata.maxround, WHAM_maxround + round);
 		vprint("WHAM: Running SmartStasis took " + (to_string(to_float(gametime_to_int() - starttime)/1000, "%.2f")) + " seconds.", "purple", 9);
 		
 		if(finished()) { //Exit the script if SS ended the fight
@@ -1492,12 +1481,12 @@ void main(int initround, monster foe, string pg) {
 		//Debug info
 		vprint("WHAM: We currently think that the round number is: " + round + " and that the turn number is " + my_turncount() + ".", "purple", 9);
 		
-		if(round >= min(maxround, WHAM_maxround) && !finished())
+		if(round >= min(mdata.maxround, WHAM_maxround) && !finished())
 			quit("The fight has gone on for longer than your WHAM_maxround setting. Reverting power to manual.");
 			
 		//Debug info
 		vprint("WHAM: We currently think that the round number is: " + round + " and that the turn number is " + my_turncount() + ".", "purple", 9);
-	} until(finished() || die_rounds() <= 1 || round >= min(maxround, WHAM_maxround));
+	} until(finished() || die_rounds() <= 1 || round >= min(mdata.maxround, WHAM_maxround));
 
 	if(foe == $monster[wild seahorse] && happened($item[sea lasso]))
 		quit("You've tamed a Sea Horse. Aborting so you can decide how to continue.");

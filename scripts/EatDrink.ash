@@ -1,4 +1,4 @@
-// ----------------------------------------------------------------------------
+//// ----------------------------------------------------------------------------
 // EatDrink.ash
 // by 
 // dj_d
@@ -8,7 +8,7 @@
 // ----------------------------------------------------------------------------
 script "EatDrink.ash"
 notify "Theraze"
-since r15466;
+since r15804;
 
 import <zlib.ash>;
 
@@ -77,6 +77,9 @@ boolean EAT_ACCURATE = to_boolean(vars["eatdrink_accurateMake"]);
 setvar("eatdrink_accordionGet", false);
 boolean EAT_ACCORDION = to_boolean(vars["eatdrink_accordionGet"]) && have_skill($skill[the ode to booze]);
 
+// If true, you will try to only get the items and not actually consume them. This always starts false, but can be overridden in aliases and imports.
+boolean EAT_NOPE = false;
+
 // Do you want to invoke Song of the Glorious Lunch before eating?
 // This only works if you actually possess the skill
 setvar("eatdrink_gloriousLunch", true);
@@ -90,6 +93,10 @@ boolean wants_ode = have_skill($skill[the ode to booze]) ? to_boolean(vars["eatd
 // Do you want to shrug your cheapest re-castable Accordion buff if you have too many?
 setvar("eatdrink_shrug", false);
 boolean ode_shrug = wants_ode ? to_boolean(vars["eatdrink_shrug"]) : false;
+
+// If you have an appropriate barrel buff available, do you want to automatically use it?
+setvar("eatdrink_barrelBuff", true);
+boolean barrel_buff = get_property("barrelShrineUnlocked").to_boolean() && !get_property("_barrelPrayer").to_boolean() ? to_boolean(vars["eatdrink_barrelBuff"]) : false;
 
 // If shopping, ignore items that cost more than PRICE FLEXIBILITY * this 
 // (another safety precaution, but not as reliable as closeting your meat). 
@@ -158,8 +165,6 @@ setvar("eatdrink_noNoodles", false);
 // turn on SIM_CONSUME, then set these to your favorite diet and see if it 
 // finds something better than your favorite diet. Will probalby not work for
 // items with wierd characters, e.g. Genelen(tm) bottles.
-setvar("eatdrink_fav_"+replace_string(to_string($item[pr0n chow mein])," ","_"),
-       true);
 setvar("eatdrink_fav_"+replace_string(to_string($item[rockin' wagon])," ","_"), 
        true);
 setvar("eatdrink_fav_"+replace_string(to_string($item[twinkly wad])," ","_"), 
@@ -181,7 +186,7 @@ setvar("eatdrink_avoid_"+replace_string(to_string($item[wet stew])," ","_"), tru
 // The difference between the two numbers is the relative value of adventures 
 // and stats. Setting them both high means you're willing to spend more cash; 
 // setting them both low means you're thrifty. 100/20 may put you on sausage 
-// pizzas, for example, while 200/40 may get you bat wing chow mein. 
+// pizzas, for example, while 200/40 may get you something better. 
 // A reasonable way to set this is "how much meat would I pay for one adventure"
 
 //IMPORTANT: valueOfAdventures is stored in \settings\charname.txt. You have to
@@ -246,6 +251,23 @@ boolean SIM_RONIN = to_boolean(vars["eatdrink_simRonin"]);
 // if 0, then use your actual level. If you'd like to simulate a different level (e.g. ascension planning), set it to that level.
 setvar("eatdrink_simLevel", 0);
 int SIM_LEVEL = to_int(vars["eatdrink_simLevel"]);
+
+// If we have less than this meat currently on hand, ignore the value of mayoClinic. The MAYO_CLINIC still allows overriding this.
+setvar("eatdrink_mayoMeat", 25000);
+int MAYO_MEAT = to_int(vars["eatdrink_mayoMeat"]);
+
+// Bit mask for choices: 1 is Mayodiol - drink/inebriety. 2 is Mayostat - items/mayoli. 3 [4] is Mayozapine - stats/effects. 4 [8] is Mayoflex - adventures.
+setvar("eatdrink_mayoClinic", 13);
+int MAYO_CLINIC = 0;
+if (npc_price($item[Mayodiol]) == 0 || my_meat() < MAYO_MEAT);
+else if (vars["eatdrink_mayoClinic"].length() < 3) MAYO_CLINIC = to_int(vars["eatdrink_mayoClinic"]);
+else
+{
+  if (vars["eatdrink_mayoClinic"].to_lower_case().contains_text("mayodiol") || vars["eatdrink_mayoClinic"].to_lower_case().contains_text("drink") || vars["eatdrink_mayoClinic"].to_lower_case().contains_text("inebriety")) MAYO_CLINIC += 1;
+  if (vars["eatdrink_mayoClinic"].to_lower_case().contains_text("mayostat") || vars["eatdrink_mayoClinic"].to_lower_case().contains_text("item") || vars["eatdrink_mayoClinic"].to_lower_case().contains_text("mayol")) MAYO_CLINIC += 2;
+  if (vars["eatdrink_mayoClinic"].to_lower_case().contains_text("mayozapine") || vars["eatdrink_mayoClinic"].to_lower_case().contains_text("stat") || vars["eatdrink_mayoClinic"].to_lower_case().contains_text("effect")) MAYO_CLINIC += 4;
+  if (vars["eatdrink_mayoClinic"].to_lower_case().contains_text("mayoflex") || vars["eatdrink_mayoClinic"].to_lower_case().contains_text("adventure")) MAYO_CLINIC += 8;
+}
 
 /////////////////////////////////////////////////////////////////////////////
 
@@ -325,6 +347,7 @@ record range
 record con_rec
 {
   item it; //the consumable in question
+  item helper; //the item modifying the consumable
   string type; //"food", "booze", or "spleen" ("overdrink" is invalid here)
   range consumptionGain; //fullness, inebriety, whatever
   int level; //min level required
@@ -342,6 +365,7 @@ record con_rec
   boolean mustMall;//to get it, you have to buy it from players
   boolean mustPull;//to get it, you have to pull it
   boolean mustShop;//to get it, you have to buy it from NPCs
+  boolean mustSpeak;//to get it, you have to buy it from the Speakeasy
   boolean canDaily;//to get it, you can buy it from the daily shop
   boolean canShop;//to get it, you can buy it from NPCs
 };
@@ -367,6 +391,7 @@ int makeusedmeat = 0;
 int makeveryusedmeat = 0;
 int maybeusedmeat = 0;
 int stepusedmeat = 0;
+int speakeasyqueue = 0;
 
 int [item] usingMake;
 
@@ -478,8 +503,8 @@ int get_accordion()
 {
   int turns = turns_per_cast($skill[the ode to booze]);
   if (turns > 5 || !EAT_ACCORDION || my_meat() < 250) return turns;
-  if (my_meat() > 2500 && npc_price($item[antique accordion]) > 0) buy(1, $item[antique accordion]);
-  else if (my_meat() > 250 && turns == 0 && npc_price($item[toy accordion]) > 0) buy(1, $item[toy accordion]);
+  if (npc_price($item[antique accordion]) > 0 && my_meat() > (npc_price($item[antique accordion]) * 2)) buy(1, $item[antique accordion]);
+  else if (turns == 0 && npc_price($item[toy accordion]) > 0 && my_meat() > (npc_price($item[toy accordion]) * 2)) buy(1, $item[toy accordion]);
   return (turns_per_cast($skill[the ode to booze]));
 }
 
@@ -548,7 +573,7 @@ boolean get_ronin()
 
 //will be defined later
 boolean getone(item it, int price);
-float value(con_rec con, boolean overdrink, boolean breakfast, boolean speculating);
+float value(con_rec con, boolean overdrink, boolean breakfast, boolean speculating, item helper);
 boolean consumeone(con_rec con, string type, int iteration, int step);
 string format_entry(con_rec entry);
 
@@ -599,37 +624,37 @@ int special_prices(item it, int startprice)
   TPS = (item_amount($item[tiny plastic sword]) > 0);
 
   boolean checked = false;
-  if (it == $item[bodyslam] && (TPS || (item_amount(it) > 0)))
+  if (it == $item[bodyslam] && (TPS || (item_amount(it) > 0) || (item_amount($item[skewered lime]) > 0)))
   {
     price1 = mall_price($item[bottle of tequila]);
     price2 = mall_price($item[lime]); 
     checked = true;
   }
-  if (it == $item[cherry bomb] && (TPS || (item_amount(it) > 0)))
+  if (it == $item[cherry bomb] && (TPS || (item_amount(it) > 0) || (item_amount($item[skewered cherry]) > 0)))
   {
     price1 = mall_price($item[bottle of whiskey]);
     price2 = mall_price($item[cherry]);
     checked = true;
   }
-  if (it == $item[dirty martini] && (TPS || (item_amount(it) > 0)))
+  if (it == $item[dirty martini] && (TPS || (item_amount(it) > 0) || (item_amount($item[skewered jumbo olive]) > 0)))
   {
     price1 = mall_price($item[bottle of gin]);
     price2 = mall_price($item[jumbo olive]); 
     checked = true;
   }
-  if (it == $item[grogtini] && (TPS || (item_amount(it) > 0)))
+  if (it == $item[grogtini] && (TPS || (item_amount(it) > 0) || (item_amount($item[skewered lime]) > 0)))
   {
     price1 = mall_price($item[bottle of rum]);
     price2 = mall_price($item[lime]);
     checked = true;
   }
-  if (it == $item[sangria del diablo] && (TPS || (item_amount(it) > 0)))
+  if (it == $item[sangria del diablo] && (TPS || (item_amount(it) > 0) || (item_amount($item[skewered cherry]) > 0)))
   {
     price1 = mall_price($item[boxed wine]);
     price2 = mall_price($item[cherry]);
     checked = true;
   }
-  if (it == $item[vesper] && (TPS || (item_amount(it) > 0)))
+  if (it == $item[vesper] && (TPS || (item_amount(it) > 0) || (item_amount($item[skewered jumbo olive]) > 0)))
   {
     price1 = mall_price($item[bottle of vodka]);
     price2 = mall_price($item[jumbo olive]);
@@ -1440,8 +1465,9 @@ con_rec set_price(con_rec con)
   con.price = effective_price(con);
   con.canDaily = false;
   con.canShop = false;
-  con.mustDaily = false;
   con.mustShop = false;
+  con.mustSpeak = false;
+  con.mustDaily = false;
   con.mustMall = false;
   con.mustCoinmaster = false;
   if (fail contains con.it)
@@ -1449,7 +1475,7 @@ con_rec set_price(con_rec con)
     available = false;
     return con;
   }
-  if (EAT_SHOP && npc_price(con.it) > 0)
+  if (EAT_SHOP && npc_price(con.it) > 0 && (con.it.to_int() < 7589 || con.it.to_int() > 7599))
   {
     if (!available)
     {
@@ -1457,6 +1483,15 @@ con_rec set_price(con_rec con)
       con.mustShop = true;
     }
     con.canShop = true;
+  }
+  else if (EAT_SHOP && npc_price(con.it) > 0)
+  {
+    if (get_property("_speakeasyDrinksDrunk").to_int() + speakeasyqueue < 3)
+	{
+	  available = true;
+	  con.mustSpeak = true;
+	}
+	else available = false;
   }
   if (EAT_SHOP && daily_special() == con.it)
   {
@@ -1672,7 +1707,7 @@ void get_choc() {
                 foreach i in grub {
                     grub[i].adv.max = chocval(grub[i].it); 
                     grub[i].adv.min = grub[i].adv.max;
-                    grub[i].value = value(grub[i], false, false, false);
+                    grub[i].value = value(grub[i], false, false, false, $item[none]);
                 }
                 to_consume = best(false);
                 if(to_consume == 0) {
@@ -1683,7 +1718,7 @@ void get_choc() {
             } else {
                 choc.adv.max = chocval(choc.it);
                 choc.adv.min = choc.adv.max;
-                choc.value = value(choc, false, false, false);
+                choc.value = value(choc, false, false, false, $item[none]);
             }
             if(choc.value > 0) {
                 vprint("Attempting to consume a "+choc.it,6);
@@ -1725,8 +1760,10 @@ void get_choc() {
 
 string format_entry(con_rec entry)
 {
+  int price = entry.price;
   string output;
   output = "<b>"+entry.it+"</b>";
+  if (entry.helper != $item[none]) output += " using <b>"+entry.helper+"</b>";
   output += " lev:"+entry.level;
   output += " gain:"+averange(entry.consumptionGain);
   if (my_class() == $class[Avatar of Jarlsberg] && entry.type == "food" && have_skill($skill[The Most Important Meal]) && get_fullness() == 0)
@@ -1736,6 +1773,14 @@ string format_entry(con_rec entry)
     output += " myst:"+(averange(entry.mysticality)*3);
     output += " mox:"+(averange(entry.moxie)*3);
   }
+  else if (entry.helper != $item[none])
+  {
+    price += mall_price(entry.helper);
+    output += " adv:"+(entry.helper == $item[Mayoflex] ? averange(entry.adv) + 1 : averange(entry.adv));
+    output += " musc:"+(entry.helper == $item[Mayozapine] ? averange(entry.muscle) * 2 : averange(entry.muscle));
+    output += " myst:"+(entry.helper == $item[Mayozapine] ? averange(entry.mysticality) * 2 : averange(entry.mysticality));
+    output += " mox:"+(entry.helper == $item[Mayozapine] ? averange(entry.moxie) * 2 : averange(entry.moxie));
+  }
   else
   {
     output += " adv:"+averange(entry.adv);
@@ -1743,14 +1788,14 @@ string format_entry(con_rec entry)
     output += " myst:"+averange(entry.mysticality);
     output += " mox:"+averange(entry.moxie);
   }
-  output += " meat:"+entry.price;
+  output += " meat:"+price;
   output += " own:"+entry.have;
 //  output += " pull:"+entry.mustPull;
 //  output += " make:"+entry.mustMake;
 //  output += " mall:"+entry.mustMall;
 //  output += " shop:"+entry.mustShop;
 //  output += " daily:"+entry.mustDaily;
-  if (my_class() == $class[Avatar of Jarlsberg] && entry.type == "food" && have_skill($skill[The Most Important Meal]) && get_fullness() == 0) output += " value:"+to_int(value(entry, false, true, false))/averange(entry.consumptionGain);
+  if (my_class() == $class[Avatar of Jarlsberg] && entry.type == "food" && have_skill($skill[The Most Important Meal]) && get_fullness() == 0) output += " value:"+to_int(value(entry, false, true, false, $item[none]))/averange(entry.consumptionGain);
   else output += " value:"+to_int(entry.value);
   return output;
 }
@@ -1775,6 +1820,19 @@ con_rec extra_items(con_rec con)
   {
     con.adv.min += con.it.fullness;
     con.adv.max += con.it.fullness;
+  }
+  if ($items[cold hi mein, hot hi mein, sleazy hi mein, spooky hi mein, stinky hi mein, hell ramen, fettucini Inconnu, gnocchetti di Nietzsche, spaghetti with Skullheads, spaghetti con calaveras, fleetwood mac 'n' cheese, linguini immondizia bianco, shells a la shellfish] contains con.it && have_skill($skill[saucemaven]))
+  {
+    if (my_class() == $class[Sauceror] || my_class() == $class[Pastamancer])
+    {
+      con.adv.min += 5;
+      con.adv.max += 5;
+    }
+    else
+    {
+      con.adv.min += 3;
+      con.adv.max += 3;
+    }
   }
   if (tuxworthy(con.it))
   {
@@ -1828,27 +1886,31 @@ void update_from_mafia(string type)
         if (it.inebriety > 0 || it.spleen > 0) continue;
         if (my_class() == $class[Zombie Master] && !it.plural.contains_text("brains")) continue;
         if (my_class() == $class[Avatar of Jarlsberg] && (it.to_int() < 6176 || it.to_int() > 6236)) continue;
+        if (my_path() == "Nuclear Autumn" && it.fullness > 1) continue;
         if (skipnoodles)
         {
-           boolean badnoodles = false;
-           if ($items[carob chunk noodles, dry noodles, evil noodles] contains it) badnoodles = true;
-           foreach ing in get_ingredients(it) if ($items[dry noodles, evil noodles] contains ing) badnoodles = true;
-           if (badnoodles) continue;
+          boolean badnoodles = false;
+          if ($items[carob chunk noodles, spaghetti breakfast] contains it) badnoodles = true;
+          foreach ing in get_ingredients(it) if ($items[dry noodles, evil noodles, savory dry noodles, fleetwood macaroni] contains ing) badnoodles = true;
+          if (badnoodles) continue;
         }
         totalcost = it.fullness;
         gainadv = totalcost > 0 ? (averange(set_range(it.adventures)) / totalcost) : 0;
         break;
       case "booze":
         if ((special_values(it, 1) == 1 && get_quality(it) < MINIMUM_QUALITY)) continue;
-        if (it.fullness > 0 || it.spleen > 0) continue;
+		if ((MAYO_CLINIC & 1) == 1 && it.fullness == 1);
+        else if (it.fullness > 0 || it.spleen > 0) continue;
         if (my_class() == $class[Avatar of Jarlsberg] && (it.to_int() < 6176 || it.to_int() > 6236)) continue;
         if (my_class() == $class[Avatar of Jarlsberg] && (it.to_int() < 6176 || it.to_int() > 6236)) continue;
         if (my_path() == "KOLHS" && !it.notes.contains_text("KOLHS") && special_values(it, 1) == 1) continue;
+        if (my_path() == "Nuclear Autumn" && it.inebriety > 1) continue;
         totalcost = it.inebriety;
         gainadv = totalcost > 0 ? (averange(set_range(it.adventures)) / totalcost) : 0;
         break;
       case "spleen":
         if (it.fullness > 0 || it.inebriety > 0) continue;
+        if (my_path() == "Nuclear Autumn" && it.spleen > 1) continue;
         totalcost = it.spleen;
         gainadv = totalcost > 0 ? (averange(set_range(it.adventures)) / totalcost) : 0;
         break;
@@ -1868,7 +1930,13 @@ void update_from_mafia(string type)
       basegrub[gc].mysticality = set_range(it.mysticality);
       basegrub[gc].moxie = set_range(it.moxie);
       basegrub[gc].using = simitem[it];
+	  basegrub[gc].helper = (type == "booze" && it.fullness == 1) ? $item[Mayodiol] : $item[none];
       basegrub[gc] = extra_items(basegrub[gc]);
+	  if (my_path() == "Nuclear Autumn" && ((type == "food" && have_skill($skill[extra gall bladder])) || (type == "booze" && have_skill($skill[extra kidney]))))
+	  {
+	    basegrub[gc].adv.max *= 2;
+	    basegrub[gc].adv.min *= 2;
+	  }
       gc += 1;
     }
     else
@@ -1916,12 +1984,13 @@ if (my_primestat() == $stat[moxie])
   moxiescore = VALUE_OF_PRIME_STAT;
 if (my_primestat() == $stat[mysticality])
   mysticalityscore = VALUE_OF_PRIME_STAT;
-float value(con_rec con, boolean overdrink, boolean breakfast, boolean speculating)
+float value(con_rec con, boolean overdrink, boolean breakfast, boolean speculating, item helper)
 {
   boolean lunch;
   boolean milk;
   boolean ode;
-  if (con.type == "food")
+  if (helper == $item[none] && con.helper != $item[none]) helper = con.helper;
+  if (con.type == "food" || helper == $item[Mayodiol])
   {
     lunch = wants_lunch ? lunch_do_body_good(averange(con.consumptionGain), true) : false;
     milk = wants_milk ? milk_do_body_good(averange(con.consumptionGain), true) : false;
@@ -1945,18 +2014,49 @@ float value(con_rec con, boolean overdrink, boolean breakfast, boolean speculati
   float advscore = 0;
   float statscore = 0;
   float costscore = 0;
+  float extrascore = 0;
   //TODO: Munchies & Opossum
   if (full != 0)
   {
-    advscore = (averange(con.adv) 
+    int price = con.price;
+    if (helper != $item[none])
+	{
+	  if (mall_price(helper) < 1) return mall_price(helper);
+	  price += mall_price(helper);
+	}
+    if (helper == $item[Mayoflex] && averange(con.adv) > 0) advscore = ((averange(con.adv) + 1)
                   * VALUE_OF_ADVENTURE) / full;
-    statscore = ((averange(con.muscle) * musclescore / full) + 
+	else advscore = (averange(con.adv) 
+                  * VALUE_OF_ADVENTURE) / full;
+    if (helper == $item[Mayozapine]) statscore = ((averange(con.muscle) * 2 * musclescore / full) + 
+                 (averange(con.mysticality) * 2 * mysticalityscore / full ) +
+                 (averange(con.moxie) * 2 * moxiescore / full));
+    else statscore = ((averange(con.muscle) * musclescore / full) + 
                  (averange(con.mysticality) * mysticalityscore / full ) +
                  (averange(con.moxie) * moxiescore / full));
+    if (helper == $item[Mayostat] && full > 1) {
+	  switch (con.it.quality) {
+	    case "decent":
+		  extrascore += mall_price($item[uninteresting mayolus]) / full;
+		  break;
+	    case "good":
+		  extrascore += mall_price($item[acceptable mayolus]) / full;
+		  break;
+	    case "awesome":
+		  extrascore += mall_price($item[enticing mayolus]) / full;
+		  break;
+	    case "epic":
+		  extrascore += mall_price($item[mouth-watering mayolus]) / full;
+		  break;
+	    default:
+		  extrascore += mall_price($item[unappetizing mayolus]) / full;
+		  break;
+	  }
+	}
     if (con.mustPull)
-      costscore = (con.price + COST_OF_PULL) / to_float(full);
+      costscore = (price + COST_OF_PULL) / to_float(full);
     else
-      costscore = con.price / to_float(full);
+      costscore = price / to_float(full);
   }
   if (overdrink)
   {
@@ -1971,9 +2071,37 @@ float value(con_rec con, boolean overdrink, boolean breakfast, boolean speculati
     advscore = ((averange(con.adv) + (3 * full)) * VALUE_OF_ADVENTURE);
     statscore *= 3;
   }
-  float val = advscore + statscore - costscore;
+  float val = advscore + statscore + extrascore - costscore;
   val = special_values(con.it, val);
-  vprint(con.it+" full "+full+" advscore "+advscore+" statscore "+statscore+" costscore "+costscore+" val "+val+" od "+overdrink,8);
+  vprint(con.it+" full "+full+" advscore "+advscore+" statscore "+statscore+" costscore "+costscore+" val "+val+" od "+overdrink+" helper "+helper,8);
+  if (helper == $item[none])
+  {
+// Bit mask for choices: 1 is Mayodiol - drink/inebriety. 2 is Mayostat - items/mayolus. 3 [4] is Mayozapine - stats/effects. 4 [8] is Mayoflex - adventures.
+    if (MAYO_CLINIC != 0) {
+	  float testval = 0;
+	  if ((MAYO_CLINIC & 2) == 2 && con.type == "food") {
+	    testval = value(con, overdrink, breakfast, speculating, $item[Mayostat]);
+		if (testval > val) {
+		  val = testval;
+		  con.helper = $item[Mayostat];
+		}
+      }
+	  if ((MAYO_CLINIC & 4) == 4 && con.type == "food") {
+	    testval = value(con, overdrink, breakfast, speculating, $item[Mayozapine]);
+		if (testval > val) {
+		  val = testval;
+		  con.helper = $item[Mayozapine];
+		}
+      }
+	  if ((MAYO_CLINIC & 8) == 8 && con.type == "food") {
+	    testval = value(con, overdrink, breakfast, speculating, $item[Mayoflex]);
+		if (testval > val) {
+		  val = testval;
+		  con.helper = $item[Mayoflex];
+		}
+      }
+    }
+  }
   return val;
 }
 
@@ -2120,7 +2248,7 @@ boolean getone(item it, int price)
   int initialamount = item_amount(it);
   boolean gotit = true;
   int needed = 0;
-  foreach i in position { if (position[i].it == it) needed += 1; }
+  foreach i in position { if (position[i].it == it) needed += 1; if (position[i].helper == it) needed += 1; }
   if (needed == 0) needed = 1;
   gotit = getitem(needed, it, price);
   if (!gotit && needed == 1 && price > 0)
@@ -2151,20 +2279,33 @@ boolean getone(item it, int price)
 
 void stackone(con_rec con, string type, boolean speculative)
 {
+  int helpercount = 0;
   if (con.it == $item[none])
     abort("Can't stack null item.");
   if (speculative)
   {
     specposition[specmaxposition] = con;
+    if (con.helper != $item[none])
+	  for i from 0 to specmaxposition
+	    if (specposition[i].helper == con.helper) helpercount += 1;
     specmaxposition += 1;
   }
   else
   {
     position[maxposition] = con;
+    if (con.helper != $item[none])
+	  for i from 0 to maxposition
+	    if (position[i].helper == con.helper) helpercount += 1;
     maxposition += 1;
   }
   if (!con.mustMake && !con.mustShop && !con.mustDaily && !con.mustMall && !con.mustCoinmaster) con.using += 1;
   if (con.mustPull || con.mustShop || con.mustDaily || con.mustMall || con.mustCoinmaster) stepusedmeat += con.price;
+  if (con.helper != $item[none] && available_amount(con.helper) < helpercount) stepusedmeat += mall_price(con.helper);
+  if (con.mustSpeak)
+  {
+    speakeasyqueue += 1;
+	set_prices();
+  }
 }
 
 boolean consumeone(con_rec con, string type, int iteration, int step)
@@ -2185,23 +2326,30 @@ boolean consumeone(con_rec con, string type, int iteration, int step)
         if ($items[fishy fish lasagna, gnat lasagna, long pork lasagna] contains position[i].it)
           foodlasagna += 1;
       }
-      //See if you should be getting milk
-      if (!get_milk(averange(con.consumptionGain)))
-        milk_do_body_good(foodadventures, false);
       //See if you're Gar-ish-ly hungry
       if (foodlasagna > 0 && !get_gar())
         lasagna_do_garfield_good(foodlasagna, false);
+      //See if you should be getting milk
+      if (!get_milk(averange(con.consumptionGain)))
+        milk_do_body_good(foodadventures, false);
       //SEE IF YOU SHOULD BE SHOUTING THE SONG OF THE GLORIOUS LUNCH
       if (wants_lunch && !get_lunch(averange(con.consumptionGain)))
         lunch_do_body_good(foodadventures, false);
+      //See if you should get the barrel buff
+      if (!SIM_CONSUME && barrel_buff && !get_property("_barrelPrayer").to_boolean() && my_class() == $class[Turtle Tamer])
+        cli_execute("barrelprayer buff");
     }                
-    else if ((!get_ode(averange(con.consumptionGain))) && (type == "booze") && wants_ode)
+    else if (type == "booze")
     {
-      //See if you should be getting ode
       int odeadventures = 0;
       for i from step to maxposition
         odeadventures += averange(position[i].consumptionGain);
-      ode_do_liver_good(odeadventures, false);
+      //See if you should be getting ode
+      if ((!get_ode(averange(con.consumptionGain))) && wants_ode)
+        ode_do_liver_good(odeadventures, false);
+      //See if you should get the barrel buff
+      if (!SIM_CONSUME && barrel_buff && !get_property("_barrelPrayer").to_boolean() && my_class() == $class[Accordion Thief])
+        cli_execute("barrelprayer buff");
     }                
 
     if (!SIM_CONSUME)
@@ -2211,6 +2359,8 @@ boolean consumeone(con_rec con, string type, int iteration, int step)
       int moxie_before = get_moxie();
       int mysticality_before = get_mysticality();
       int item_amount_before = item_amount(con.it);
+	  
+	  if (con.helper != $item[none]) use(1, con.helper);
 
       if (type == "food") {
         if (SUPRESS_NOMILK) {
@@ -2398,11 +2548,8 @@ int eatdrink(int foodMax, int drinkMax, int spleenMax, boolean overdrink)
   if (!can_drink())
     begin += " You're on a pathed ascension, so you won't drink.";
   summarize(begin);
-  if (SIM_CONSUME)
-  {
-    summarize("<b>Simulating only</b>; no purchases or "
-              +"food/drink/spleen consumption.");
-  }
+  if (SIM_CONSUME) summarize("<b>Simulating only</b>; no purchases or food/drink/spleen consumption.");
+  else if (EAT_NOPE) summarize("<b>Collecting only</b>; no food/drink/spleen consumption.");
   boolean giveup = false;
 
   string type = "";
@@ -2424,6 +2571,7 @@ int eatdrink(int foodMax, int drinkMax, int spleenMax, boolean overdrink)
     specmaxposition = 0;
     nowposition = 0;
     nomposition = 0;
+	speakeasyqueue = 0;
     clear(position);
     clear(ingredients);
     bestvoa[iteration] = VALUE_OF_ADVENTURE;
@@ -2432,15 +2580,15 @@ int eatdrink(int foodMax, int drinkMax, int spleenMax, boolean overdrink)
     maybeusedmeat = 0;
     if (iteration == 1)
     {
-      type = "food";
-      conmax = foodMax;
-      can_do = can_eat();
-    }
-    else if (iteration == 2)
-    {
       type = "booze";
       conmax = drinkMax;
       can_do = can_drink();
+    }
+    else if (iteration == 2)
+    {
+      type = "food";
+      conmax = foodMax;
+      can_do = can_eat();
     }
     else if (iteration == 3)
     {
@@ -2478,7 +2626,7 @@ int eatdrink(int foodMax, int drinkMax, int spleenMax, boolean overdrink)
       vprint("Finding prices",6);
       set_prices();
       vprint("Setting values",6);
-      foreach i in grub { grub[i].value = value(grub[i], (iteration == 4), breakfast, false); }
+      foreach i in grub { grub[i].value = value(grub[i], (iteration == 4), breakfast, false, $item[none]); }
       ConsumptionReportIndex = 1;
       giveup = false;
       boolean triedmojo = false;
@@ -2486,7 +2634,7 @@ int eatdrink(int foodMax, int drinkMax, int spleenMax, boolean overdrink)
       while (!(giveup || (predoneness(type, false) >= conmax) || 
                ((predoneness(type, false) > inebriety_limit()) && (iteration == 4)))) 
       {
-        if (breakfast) { breakfast = false; foreach i in grub { grub[i].value = value(grub[i], (iteration == 4), breakfast, false); } }
+        if (breakfast) { breakfast = false; foreach i in grub { grub[i].value = value(grub[i], (iteration == 4), breakfast, false, $item[none]); } }
         boolean itemsfound = (best(false) > 0);
         vprint("Finding prices",6);
         set_prices();
@@ -2528,11 +2676,13 @@ int eatdrink(int foodMax, int drinkMax, int spleenMax, boolean overdrink)
       int ORIGINAL_VOA = VALUE_OF_ADVENTURE;
       while ((ORIGINAL_VOA / 2) < VALUE_OF_ADVENTURE && ORIGINAL_VOA > 100)
       {
+	    boolean gartest = simgar;
         breakfast = (my_class() == $class[Avatar of Jarlsberg] && iteration == 1 && have_skill($skill[The Most Important Meal]) && get_fullness() == 0 && count(position) == 0);
         VALUE_OF_ADVENTURE -= ORIGINAL_VOA / 9;
         specrepeatingstep = false;
         //Nuke grub so you can reload it
         clear(grub);
+		speakeasyqueue = 0;
         vprint("Copying "+type+" map using Mafia's data for speculation",9);
         update_using_mafia(type);
         vprint("Filtering by type for speculation",9);
@@ -2540,7 +2690,7 @@ int eatdrink(int foodMax, int drinkMax, int spleenMax, boolean overdrink)
         vprint("Finding prices for speculation",9);
         set_prices();
         vprint("Setting values for speculation",9);
-        foreach i in grub { grub[i].value = value(grub[i], (iteration == 4), breakfast, true); }
+        foreach i in grub { grub[i].value = value(grub[i], (iteration == 4), breakfast, true, $item[none]); }
         ConsumptionReportIndex = 1;
         giveup = false;
         boolean triedmojo = false;
@@ -2549,7 +2699,7 @@ int eatdrink(int foodMax, int drinkMax, int spleenMax, boolean overdrink)
         while (!(giveup || (predoneness(type, true) >= conmax) || 
                  ((predoneness(type, true) > inebriety_limit()) && (iteration == 4)))) 
         {
-          if (breakfast) { breakfast = false; foreach i in grub { grub[i].value = value(grub[i], (iteration == 4), breakfast, true); } }
+          if (breakfast) { breakfast = false; foreach i in grub { grub[i].value = value(grub[i], (iteration == 4), breakfast, true, $item[none]); } }
           vprint("Choosing "+type+" to consume.",9);
           filter_final(conmax, predoneness(type, true));
           int to_consume = best(true);
@@ -2613,7 +2763,11 @@ int eatdrink(int foodMax, int drinkMax, int spleenMax, boolean overdrink)
           maybeusedmeat = stepusedmeat;
           repeatingstep = specrepeatingstep;
         }
-        else vprint("Since "+specaveragetest+" is not more than "+averagetest+" we are using the normal stack instead of "+VALUE_OF_ADVENTURE+".",9);
+        else
+		{
+		  vprint("Since "+specaveragetest+" is not more than "+averagetest+" we are using the normal stack instead of "+VALUE_OF_ADVENTURE+".",9);
+		  simgar = gartest;
+		}
         clear(specposition);
         clear(specingredients);
         specmaxposition = 0;
@@ -2623,7 +2777,7 @@ int eatdrink(int foodMax, int drinkMax, int spleenMax, boolean overdrink)
       update_using_mafia(type);
       filter_type(type);
       set_prices();
-      foreach i in grub { grub[i].value = value(grub[i], (iteration == 4), false, false); }
+      foreach i in grub { grub[i].value = value(grub[i], (iteration == 4), false, false, $item[none]); }
       ConsumptionReportIndex = 1;
       VALUE_OF_ADVENTURE = ORIGINAL_VOA;
       if (SIM_CONSUME) foreach ingred,x in ingredients { simingredients[ingred] += x; }
@@ -2647,13 +2801,39 @@ int eatdrink(int foodMax, int drinkMax, int spleenMax, boolean overdrink)
             giveup = true;
             repeatingstep = true;
           }
-          else nowposition += 1;
+          else if (position[nowposition].helper != $item[none] && !getone(position[nowposition].helper, mall_price(position[nowposition].helper)))
+          {
+            vprint("Something went wrong with getting "+position[nowposition].helper+" for "+mall_price(position[nowposition].helper)+". Recalculating.",3);
+            giveup = true;
+            repeatingstep = true;
+          }
+          else
+		  {
+		    if (EAT_NOPE)
+			{
+              string consume_entry = format_entry(position[nowposition]);
+              vprint("Collected for later consume...",3);
+              summarize(ConsumptionReportIndex+": "+consume_entry);
+              ConsumptionReportIndex += 1;
+			}
+            nowposition += 1;
+		  }
         }
-        else nowposition += 1;
+        else
+		{
+		  if (EAT_NOPE)
+		  {
+            string consume_entry = format_entry(position[nowposition]);
+            vprint("Collected for later consume...",3);
+            summarize(ConsumptionReportIndex+": "+consume_entry);
+            ConsumptionReportIndex += 1;
+		  }
+          nowposition += 1;
+        }
       }
       if (!repeatingstep) giveup = false;
-      //each pass, consume until full. Aborts when you giveup, when you eat up to conmax, or when you drink past inebreity limit & are overdrinking.
-      while (!(giveup || (nomposition >= maxposition)))
+      //each pass, consume until full. Aborts when you giveup, when you eat up to conmax, or when you drink past inebriety limit & are overdrinking.
+      while (!(giveup || (nomposition >= maxposition) || EAT_NOPE))
       {
         if (position[nomposition].it == $item[none])
         {
@@ -2692,7 +2872,7 @@ int eatdrink(int foodMax, int drinkMax, int spleenMax, boolean overdrink)
             }
           }
           //you might have learned something (e.g. price)
-          position[nomposition].value = value(position[nomposition], (iteration == 4), false, false);
+          position[nomposition].value = value(position[nomposition], (iteration == 4), false, false, $item[none]);
           //if you're spleening and partway done, consider mojo filters, 
           //based on the quality of your last spleenable.
           if ((iteration == 3) && (get_spleen() > 5) && !triedmojo && !mojogiveup)

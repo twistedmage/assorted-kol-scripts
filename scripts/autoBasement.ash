@@ -58,6 +58,7 @@ Version History:
 2014-12-04: DOn't consider equipment when maximizing for HP after having maximized for resistance first
 2014-12-06: Allow "prime" as a stat-code word
 2015-02-23: _spec is now Generated:_spec, needs r15467 or later
+2015-07-12: The stat-code word "prime" is now correctly identified with the second letter r because that's how spelling works. Thanks billybobfred.
 */
 
 since r15467;
@@ -82,6 +83,7 @@ setvar("autoBasement_break_on_reward", false);
 setvar("autoBasement_break_on_floor", 500);
 setvar("autoBasement_break_on_level", 30);
 setvar("autoBasement_break_on_mp_amount", 2000);
+setvar("autoBasement_break_on_telescope", 7);
 
 // Whether mp can be restored with a Jumbo Dr. Lucifer, and how much mp needs to be restored before using it.
 setvar("autoBasement_use_dr_lucifer", false);
@@ -127,6 +129,7 @@ boolean break_on_reward = vars["autoBasement_break_on_reward"].to_boolean();
 int break_on_floor = vars["autoBasement_break_on_floor"].to_int();
 int break_on_level = vars["autoBasement_break_on_level"].to_int();
 int break_on_mp_amount = vars["autoBasement_break_on_mp_amount"].to_int();
+int break_on_telescope = vars["autoBasement_break_on_telescope"].to_int();
 
 boolean use_dr_lucifer = vars["autoBasement_use_dr_lucifer"].to_boolean();
 int use_dr_lucifer_amount = vars["autoBasement_use_dr_lucifer_amount"].to_int();
@@ -145,7 +148,7 @@ switch(char_at(combat_stat_string, 1))
 	case "u":	combat_stat = $stat[muscle]; break;
 	case "y":	combat_stat = $stat[mysticality]; break;
 	case "o":	combat_stat = $stat[moxie]; break;
-	case "i":	combat_stat = my_primestat(); break;
+	case "r":	combat_stat = my_primestat(); break;
 }
 
 boolean get_familiar_drops = vars["autoBasement_get_familiar_drops"].to_boolean();
@@ -280,6 +283,8 @@ boolean ok(item it, string command, effect ef) {
 		return false;
 	if(contains_text(command, "gong"))	//Don't use buffs that take turns to get
 		return false;
+	if(contains_text(command, "play"))	//Don't waste precious cards
+		return false;
 	if(command == "")	//Don't try things that Mafia doesn't think we can do
 		return false;
 	if(!use_percentage_potions && (numeric_modifier(ef, "Maximum HP Percent") > 0 || numeric_modifier(ef, "Maximum MP Percent") > 0 || numeric_modifier(ef, "Moxie Percent") > 0 || numeric_modifier(ef, "Muscle Percent") > 0 || numeric_modifier(ef, "Mysticality Percent") > 0))
@@ -401,13 +406,13 @@ void cache_outfits()
 	}
 //	cli_execute("refresh equip");
 	string command = "MP" + maximize_familiar;
-	foreach it in $items[]
-	{
-		if (it.boolean_modifier("Moxie May Control MP") || it.boolean_modifier("Moxie Controls MP"))
-		{
-			command = command + ", -equip " + it.to_string();
-		}
-	}
+#	foreach it in $items[]
+#	{
+#		if (it.boolean_modifier("Moxie May Control MP") || it.boolean_modifier("Moxie Controls MP"))
+#		{
+#			command = command + ", -equip " + it.to_string();
+#		}
+#	}
 	maximize(command, false);
 	cli_execute("outfit save MPDrain");
 	familiarCache["MP"].f = my_familiar();
@@ -435,10 +440,8 @@ void cache_outfits()
 		}
 	}
 	command = command + ", -familiar";
-	if(combat_stat.to_string() == "muscle")
-		command = command + ", +melee";
-	else if(combat_stat.to_string() == "moxie")
-		command = command + ", -melee";
+	if(combat_stat.to_string() != "mysticality")
+		command = command + ", +effective";
 
 	if (outfit_exists(custom_outfits, "Damage"))
 	{
@@ -458,7 +461,7 @@ void cache_outfits()
 		if(outfit("Elemental Resistance")) {} //Make sure we don't abort if we cannot equip the outfit
 	}
 //	cli_execute("refresh equip");
-	maximize("all res" + maximize_familiar, false);
+	maximize(".01 hp, 5 all res" + maximize_familiar, false);
 	cli_execute("outfit save Elemental Resistance");
 	familiarCache["Elemental Resistance"].f = my_familiar();
 	familiarCache["Elemental Resistance"].i = familiar_equipped_equipment(my_familiar());	
@@ -698,7 +701,7 @@ boolean elemental_test(int level, element elem1, element elem2)
 	}
 	for i from 0 to j-1 {
 		cli_execute("whatif " + perform_whatif[i] + "; quiet");
-		if(elemental_damage(level, elem1) + elemental_damage(level, elem2) < my_maxhp() && !contains_text(perform_whatif[i], "phial of")) {
+		if(elemental_damage(level, elem1) + elemental_damage(level, elem2) < numeric_modifier("Generated:_spec", "Buffed HP Maximum") && !contains_text(perform_whatif[i], "phial of")) {
 			cli_execute(perform[i]);
 			vprint(6, "purple", 7);
 			break;
@@ -790,14 +793,14 @@ boolean mp_test(int goal)
 		equip_cached_outfit("MPDrain");
 	}
 	string command = "MP" + maximize_familiar;
-	foreach it in $items[]
-	{
-		if (it.boolean_modifier("Moxie May Control MP") || it.boolean_modifier("Moxie Controls MP"))
-		{
-			print(it);
-			command = command + ", -equip " + it.to_string();
-		}
-	}
+#	foreach it in $items[]
+#	{
+#		if (it.boolean_modifier("Moxie May Control MP") || it.boolean_modifier("Moxie Controls MP"))
+#		{
+#			print(it);
+#			command = command + ", -equip " + it.to_string();
+#		}
+#	}
 	if(maximize_wrap(command, goal, my_maxmp(), true))
 		return true;
 	else
@@ -818,7 +821,7 @@ void basement(int num_turns)
 	{
 		num_turns = my_adventures();
 	}
-
+	
 	int total_num_turns = num_turns;
 
 	string mp_recovery = get_property("mpAutoRecovery");
@@ -840,7 +843,12 @@ void basement(int num_turns)
 			vprint("You're too drunk to screw around in a basement, quitting", "red", 0);
 			break;
 		}
-					
+		if (break_on_telescope > 0 && get_property("telescopeUpgrades").to_int() >= break_on_telescope)
+		{
+			vprint("Current telescope count (" + get_property("telescopeUpgrades") + ") >= autoBasement_break_on_telescope (" + break_on_telescope.to_string() + "), quitting", "red", 1);
+			break;
+		}
+
 		int level = 0;
 	
 		if (page.contains_text("<b>Fernswarthy's Basement, Level "))
@@ -1116,7 +1124,10 @@ void basement(int num_turns)
 				increase_stat(goal, combat_stat);
 			} else {
 				command = combat_stat.to_string() + (autoBasement_combat_maximizer_string != "" ? ", " + autoBasement_combat_maximizer_string : "");
-					
+
+				if(combat_stat.to_string() != "mysticality")
+					command = command + ", +effective";
+				
 				foreach i in combat_equipment
 				{
 					item equipment = combat_equipment[i].to_item();

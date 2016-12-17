@@ -10,7 +10,7 @@ function redeet(dbox) {  // load monster details box
 }
 cliComplete = function(data) {  // extend CLI Links' complete function to reload monster details if fax was requested
    oldComplete.apply(this, arguments);
-   if ($(this).hasClass('fax')) redeet($(this).parent());
+   if ($(this).hasClass('fax')) { redeet($(this).closest('.deets')); }
    return false;
 };
 var cancan;
@@ -40,5 +40,22 @@ jQuery(function($) {
          dbox.slideUp(1000);
       }
       return false;
+   });
+   $('img[data-phylum]').hover(function() {
+//      $('img[data-phylum="'+$(this).data('phylum')+'"]').addClass("highlit");
+      if ($(this).hasClass('mon')) {
+         $('.mon:not([data-phylum="'+$(this).data('phylum')+'"])').parent('.montile').addClass('dimmed');
+      } else {
+         $('.mon:not([data-phylum="'+$(this).data('phylum')+'"])').parent('.montile').hide();
+         $(".monbox:not(:has(.montile:visible))").hide();
+      }
+   }, function() {
+//      $('img[data-phylum="'+$(this).data('phylum')+'"]').removeClass("highlit");
+      if ($(this).hasClass('mon')) {
+         $('.mon:not([data-phylum="'+$(this).data('phylum')+'"])').parent('.montile').removeClass('dimmed');
+      } else {
+         $('.monbox').show();
+         $('.montile').show();
+      }
    });
 });

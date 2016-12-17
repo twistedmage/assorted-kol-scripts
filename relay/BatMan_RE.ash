@@ -74,15 +74,23 @@ string quote() {
    void enbw(string mess) { bw[count(bw)] = mess; }
    switch (m) {
 //      case $monster[]: enbw(""; break;
+      case $monster[War hippy baker]:
       case $monster[Mutant Cookie-Baking Elf]:
       case $monster[Cookie-baking Thing from Beyond Time]: enbw("Lisa: \"Would you like to come in for a glass of milk and cookies?\"<br>"+
          "Bruce: \"I'm afraid it's rather late. Why, it's 10:30!\"");
          enbw( "Bruce: \"Milk and cookies, did you say?\"<br>Lisa: \"I made the cookies myself.\"<br>Bruce: \"Man cannot live by crime-fighting alone.\""); break;
       case $monster[normal hobo]: enbw("\"A reporter's lot is not easy, making exciting stories out of plain, average, ordinary people like Robin and me.\""); break;
-      case $monster[clingy pirate]: enbw("Marsha: \"You mean you're not in love with me?\"<br>Batman: \"I'm not even mildly interested.\""); break;
+      case $monster[clingy pirate (female)]:
+      case $monster[clingy pirate (male)]: enbw("Marsha: \"You mean you're not in love with me?\"<br>Batman: \"I'm not even mildly interested.\""); break;
+      case $monster[batburglar]:   // thick as these guys
+      case $monster[Mer-kin burglar]: 
+      case $monster[dirty thieving brigand]:
       case $monster[rotten dolphin thief]: enbw("\"There's a method to his misdemeanors.\"");
          enbw("\"I'm certain this is the first stitch in a large tapestry of crime.\""); break;
       case $monster[suckubus]: enbw("Olga: \"You find me attractive?\"<br>Batman: \"I'd find you much more attractive if you were on the right side of the law, Olga.\""); break;
+      case $monster[judgmental eye]:
+      case $monster[eye in the darkness]:
+      case $monster[creepy eye-stalk tentacle monster]:
       case $monster[beast with x eyes]: enbw("\"It's staring us right in our masks.\""); break;
       case $monster[mob penguin hitman]: enbw("\"Judging from the trajectory of the angle, and figuring the wind at six knots per hour north by northeast as per this morning's weather report...X times six squared...over...logarithm of that...yes! You see? It came from that room on that floor!\""); break;
       case $monster[giant bird-creature]: enbw("Bruce: \"Yes, Dick, your bird calls are close to perfect. If more people practiced them, someday we might have a chance for real communication with our feathered friends.\"<br>Dick: \"In that case I think I'll polish up my ruby-crowned kinglet and my rose-breasted yellow-tailed grouse-beak calls.\""); break;
@@ -94,7 +102,7 @@ string quote() {
    }
    if (contains_text(to_lower_case(to_string(m)),"guard")) enbw("\"It's obvious. Only a criminal would disguise himself as a licensed, bonded guard yet callously park in front of a fire hydrant!\"");
    if (contains_text(to_string(m),"Tooth")) enbw("Robin: \"Holy molars! Am I ever glad I take good care of my teeth!\"<br>Batman: \"True. You owe your life to dental hygiene.\"");
-   switch (my_location()) {
+   switch (where) {
 //      case $location[]: enbw(""; break;
       case $location[the lower chambers]: enbw("\"Out of the sarcophagus and back into the saddle.\"");
          enbw("\"Oda wabba simba. Six o'clock in our nomenclature. In the 14th dynasty, the hour of the hyena. The time when ancient Egyptian supercriminals invariably struck!\""); break;
@@ -114,7 +122,7 @@ string quote() {
       case $location[south of the border]: enbw("Batman: \"The green button will turn the car <i>a la izquierda o a la derecha</i>.\"<br>Robin: \"To the left or right. Threw in a little Spanish on me, huh, Batman?\"<br>Batman: \"One should always keep abreast of foreign tongues, Robin.\"");
          enbw("Batman: \"Let's go Robin, we've nary a second to lose! <i>Vamanos!</i>\"<br>Robin: \"Right <i>amigo!</i>\""); break;
       case $location[none]: break;
-      default: enbw("To the Bat-"+my_location()+"!");
+      default: enbw("To the Bat-"+where+"!");
    }
    switch (m.phylum) {
 //      case $phylum[]: enbw(""; break;
@@ -127,12 +135,12 @@ string quote() {
       case $phylum[plant]: enbw("\"Man-eating lilacs have no teeth, Robin. It's a process of ingestion through their tentacles.\""); break;
       case $phylum[hippy]: enbw("\"You're far from mod, Robin. And many hippies are older than you are.\"");
          enbw("Batman: \"Go back outside and calm the flower children.\"<br>Robin: \"They'll mob me!\"<br>Batman: \"Groovy.\""); break;
-      case $phylum[penguin]: enbw("\"It's beddy-bye for you, Penquin.\""); break;
+      case $phylum[penguin]: enbw("\"It's beddy-bye for you, Penguin.\""); break;
    }
    if (have_effect($effect[temporary blindness]) > 0) enbw("Robin: \"If we close our eyes, we can't see anything.\"<br>Batman: \"A sound observation, Robin.\"");
    if (have_effect($effect[form of...bird!]) > 0) enbw("Bruce: \"Yes, Dick, your bird calls are close to perfect. If more people practiced them, someday we might have a chance for real communication with our feathered friends.\"<br>Dick: \"In that case I think I'll polish up my ruby-crowned kinglet and my rose-breasted yellow-tailed grouse-beak calls.\"");
    if (have_effect($effect[beaten up]) > 0) enbw("\"The best-laid plans of mice and men oft gong agley.\"");
-   if (my_location().zone == "The Sea") enbw("Robin: \"Where'd you get a live fish, Batman?\"<br>Batman: \"The true crimefighter always carries everything he needs in his utility belt, Robin.\"");
+   if (where.environment == "underwater") enbw("Robin: \"Where'd you get a live fish, Batman?\"<br>Batman: \"The true crimefighter always carries everything he needs in his utility belt, Robin.\"");
    if (smack.id == "" && !finished()) {
       enbw("\"I'd rather die than beg for such a small favor as my life.\"");
       enbw("Robin: \"That's an impossible shot, Batman.\"<br>Batman: \"That's a negative attitude, Robin.\"");
@@ -180,7 +188,7 @@ string to_html(advevent a, int i, boolean shorty) {
    buffer res;
    if (!shorty) res.append("\n  <tr><td><span style='cursor:help; font-size: 2.0em; color: "+to_htmlcolor(hitchance(a.id))+"' title='Hit chance: "+rnum(hitchance(a.id)*100)+"%'>&bull;</span> ");
   // Action
-   if (kill_rounds(a) <= min(die_rounds(),maxround-round)) res.append("<form name=spam"+random(999999)+" style='display: inline' action=fight.php method=post><input type=hidden name=action value='macro'>"+
+   if (kill_rounds(a) <= min(die_rounds(),mdata.maxround-round)) res.append("<form name=spam"+random(999999)+" style='display: inline' action=fight.php method=post><input type=hidden name=action value='macro'>"+
       "<input type='hidden' name='macrotext' value='"+batround()+"sub main; "+a.id+"; call batround; endsub; call main; repeat'><input type=image src='images/itemimages/sammich.gif'"+
       " width=18 height=18 title='Spam "+a.id+"! (kills monster in "+kill_rounds(a)+" rounds)' onclick='return bjilgt(this);'></form>");
    if (my_fam() == $familiar[black cat]) {
@@ -275,7 +283,7 @@ string to_html(advevent a, int i) { return to_html(a,i,false); }
 void batman_enhance() {
    if (!(post contains "page")) { write("No page submitted."); print("This script is not intended to be run from the CLI."); }
    int offset = to_int(post["turnflag"]);
-   if (offset != 0 && turncount != offset && vprint("Adjusting turncount by -1.","olive",8)) turncount = offset;
+   int turncount = (offset != 0 && total_turns_played() != offset && vprint("Adjusting turncount by -1.","olive",8)) ? offset : total_turns_played();
    act(post["page"]);
    actbox.append("<div id='actbox'>");
    if (!finished()) {
@@ -290,7 +298,7 @@ void batman_enhance() {
          actbox.append("   </div>");
       }
      // disco combos
-      if (round > realround) reset_queue();
+      if (count(queue) > 0) reset_queue();
       build_combos();
       enqueue_combos();
       if (count(queue) > 0) {
@@ -301,10 +309,10 @@ void batman_enhance() {
          actbox.append("</div>");
       }
      // cache stun/stasis/attack
-      if (round > realround) reset_queue();
+      if (count(queue) > 0) reset_queue();
       stun_action(false);
       foreach i,o in opts stundex[o.id] = i;
-      stasis_action();
+      stasis_action(is_our_huckleberry());
       foreach i,o in opts stasdex[o.id] = i;
       attack_action();
      // stasis!
@@ -315,17 +323,17 @@ void batman_enhance() {
          actbox.append(to_html(plink,0,true)+"<p><span id='stasissort' class='littlesort'><img src='images/itemimages/bgecalendar.gif'> Sort by stasis_action()</span></div>");
       }
      // stun!
-      if (adj.stun < 1 && (buytime.stun > 1 || buytime.profit >= 0) && kill_rounds(smack) > 1 &&
-          min(buytime.stun - 1, kill_rounds(smack)-1)*m_dpr(0,0)*meatperhp > buytime.profit) {
+      if (adj.stun < 1 && (buytime.stun > 1 || buytime.profit > 0) && kill_rounds(smack) > 1 &&
+          min(buytime.stun - 1, kill_rounds(smack))*m_dpr(0,0)*-meatperhp < buytime.profit) {
          actbox.append("\n   <div class='onemenu'><form name='batstun' style='display: inline' action=fight.php method=post><input type=hidden name=action value='macro'>"+
-           "<input type='hidden' name='macrotext' value='"+batround()+buytime.id+"; call batround"+"'><input type=image src='images/itemimages/bananapeel.gif' "+
+           "<input type='hidden' name='macrotext' value='"+batround()+buytime.id+"; call batround'><input type=image src='images/itemimages/bananapeel.gif' "+
            "title='Stun with "+buytime.id+"' height=22 width=22 onclick='return bjilgt(this);'></form></div>\n<div class='popout'>");
          actbox.append(to_html(buytime,0,true)+"<p><span id='stunsort' class='littlesort'><img src='images/itemimages/bgecalendar.gif'> Sort by stun_action()</span></div>");
       }
      // attack
       if (smack.id != "") {
          actbox.append("\n   <div class='onemenu'><form name='batattack' style='display: inline' action=fight.php method=post><input type=hidden name=action value='macro'>"+
-           "<input type='hidden' name='macrotext' value='"+batround()+smack.id+"; call batround"+"'><input type=image src='images/itemimages/"+
+           "<input type='hidden' name='macrotext' value='"+batround()+smack.id+"; call batround'><input type=image src='images/itemimages/"+
            (current_hit_stat() == $stat[moxie] ? "crossbow" : "nicesword")+".gif' title='"+smack.id+"' height=22 width=22 onclick='return bjilgt(this);'></form></div>\n<div class='popout'>");
          actbox.append(to_html(smack,0,true)+"<p><span id='attacksort' class='littlesort'><img src='images/itemimages/bgecalendar.gif'> Sort by attack_action()</span></div>");
       }
@@ -333,7 +341,7 @@ void batman_enhance() {
       if (my_fam() == $familiar[happy medium] && !happened("skill 7117") && get_spirit() != $item[none]) {
          item whichspirit = get_spirit();
          actbox.append("\n   <div class='onemenu'><form name='siphon' style='display: inline' action=fight.php method=post><input type=hidden name=action value='macro'>"+
-           "<input type='hidden' name='macrotext' value='"+batround()+"skill 7117; call batround"+"'><input type=image src='images/itemimages/"+whichspirit.image+
+           "<input type='hidden' name='macrotext' value='"+batround()+"skill 7117; call batround'><input type=image src='images/itemimages/"+whichspirit.image+
            "' title='skill 7117' height=22 width=22 onclick='return bjilgt(this);'></form></div>\n<div class='popout'>");
          actbox.append("Siphon a <span style='color: "+($familiar[happy medium].charges == 1 ? "blue" : ($familiar[happy medium].charges == 2 ? "orange" : "red"))+
             "'><b>"+whichspirit+"</b></span> ("+whichspirit.quality+")<p><small>Adventures: "+whichspirit.adventures+(whichspirit.levelreq > my_level() ? 
@@ -347,31 +355,65 @@ void batman_enhance() {
          "title='Automate' height=22 width=22 onclick='return bjilgt(this);'></form></div>\n<div class='popout'>Hand this combat over to mafia.<p>"+
          round+". "+get_ccs_action(round)+"</div>");
      // macros
-      matcher mac = create_matcher("option value=\"(\\d+)\" picurl=.+?\\>(.+?)\\<\\/option",excise(page,"macrotext",""));
+      string[int] prevcom;   // your previous fight according to happenings tracking
+      if (happenings contains m) {
+         int lastcid;
+         foreach tct in happenings[m] if (tct != cid) lastcid = tct;
+         foreach aid,rnd,plr in happenings[m,lastcid] if (plr) {
+            if (prevcom contains rnd) aid += ","+to_int(prevcom[rnd]);
+            prevcom[rnd] = aid;
+         }
+      }
+      if (count(prevcom) > 0) {
+         buffer prevmac; buffer prevlist;
+         prevmac.append(batround());
+         foreach r,aid in prevcom {
+            prevmac.append(aid+"; call batround; ");
+            prevlist.append("<li><form name='toprevround"+r+"' action=fight.php method=post><input type=hidden name=action value='macro'>"+
+               "<input type='hidden' name='macrotext' value='"+prevmac.to_string()+"'><input type=submit title='submit combat up to this point' "+
+               "class='buttlink' value=\""+aid+"\" onclick='return bjilgt(this);'></form></li>");
+         }
+         actbox.append("\n   <div class='onemenu'><form name='prevmac' style='display: inline' action=fight.php method=post><input type=hidden name=action "+
+            "value='macro'><input type='hidden' name='macrotext' value='"+prevmac.to_string()+"'><input type=image src='images/itemimages/braces.gif' "+
+            "title='Macros -- click to submit previous fight vs this monster' height=22 width=22 onclick='return bjilgt(this);'></form></div>\n<div class='popout'>");
+         actbox.append("Previous fight vs. this monster:<ul>");
+         actbox.append(prevlist);
+      }
+      matcher mac = create_matcher("option value=\"(\\d+)\" picurl=.+?\\>(.+?)\\<\\/option",excise(page,"textarea name=\"macrotext",""));
       boolean ncheese;
       while (mac.find()) {
-         if (!ncheese) { actbox.append("\n   <div class='onemenu'><img src='images/itemimages/braces.gif' "+
-         "title='Macros' height=22 width=22></div>\n<div class='popout'>Saved combat macros:<ul>"); ncheese = true; }
+         if (!ncheese) { 
+            if (count(prevcom) > 0) actbox.append("</ul><p>"); else actbox.append("\n   <div class='onemenu'><img src='images/itemimages/braces.gif' title='Macros' height=22 width=22></div>\n<div class='popout'>");
+            actbox.append("Saved combat macros:<ul>"); 
+            ncheese = true;
+         }
          actbox.append("<li><form name='macro"+mac.group(1)+"' action=fight.php method=post><input type=hidden name=action value='macro'>"+
             "<input type='hidden' name='whichmacro' value='"+mac.group(1)+"'><input type=submit title='macro "+mac.group(1)+
             "' class='buttlink' value=\""+mac.group(2)+"\" onclick='return bjilgt(this);'></form></li>");
-      } if (ncheese) actbox.append("</ul></div>");
-   } else if (my_location() != $location[none] && my_adventures() > 0 && contains_text(page,to_url(my_location()))) {
+      } if (ncheese || count(prevcom) > 0) actbox.append("</ul></div>");
+   } else if (where != $location[none] && my_adventures() > 0 && contains_text(page,replace_string(to_url(where),"&","&amp;"))) {
      // adventure again link, includes location info?
-      actbox.append("\n   <div class='onemenu'><a href='"+to_url(my_location())+(my_location() == $location[the boss bat's lair] ? "&confirm2=on" : "")+"'>"+
+      actbox.append("\n   <div class='onemenu'><a href='"+to_url(where)+(where == $location[the boss bat's lair] ? "&confirm2=on" : "")+"'>"+
         "<img src='../images/itemimages/hourglass.gif' height=22 width=22 border=0></a></div><div class='popout' id='again'></div>");
      // semirare helper!
-      if (get_counters("Semirare window begin",0,6) != "" || get_counters("Fortune Cookie",0,6) != "" ||     // if either window/counter is nigh
-          get_counters("Semirare window end",0,my_path() == "Oxygenarian" ? 20 : 40) != "") {                // or we're IN the window, show
+      if (!($classes[avatar of jarlsberg, zombie master] contains my_class()) && limit_mode() == "" && (get_counters("Semirare window begin",0,6) != "" || get_counters("Fortune Cookie",0,6) != "" ||     // if either window/counter is nigh
+          get_counters("Semirare window end",0,my_path() == "Oxygenarian" ? 20 : 40) != "")) {                // or we're IN the window, show
          actbox.append("\n   <div class='onemenu'><a href='relay_Sera.ash'><img src='images/itemimages/fortune.gif' height=22 width=22 border=0 title='Semirare helper'></a></div>"+
             "\n<div class='popout' id='srhelper'></div>");
       }
    }
-  // special case for opening nightstands 
-   if (my_location() == $location[the haunted bedroom] && happened("win") && contains_text(page,"You investigate the now-still"))
-      actbox.append("\n   <div class='onemenu'><a href='choice.php' id='againlink'>"+
-         "<img src='../images/itemimages/openpadlock.gif' height=22 width=22 border=0></a></div>"+
-         "<div class='popout'>Open the freshly-defeated nightstand for great justice.</div>");
+  // special cases for continuing fights
+   if (happened("win") && contains_text(page,"againlink")) {
+      actbox.append("\n   <div class='onemenu'><a href='fight.php'><img src='../images/itemimages/");
+      if (where == $location[the haunted bedroom] && contains_text(page,"You investigate the now-still"))
+         actbox.append("openpadlock.gif' height=22 width=22 border=0></a></div>"+
+            "<div class='popout'>Open the freshly-defeated nightstand for great justice.</div>");
+       else if (my_path() == "One Crazy Random Summer" && contains_text(page,"Don't leave me!"))
+         actbox.append("stick.gif' height=22 width=22 border=0></a></div>"+   // stick, because it's sticky
+            "<div class='popout'>Fight the clingy monster again!</div>");
+       else actbox.append("footprints.gif' height=22 width=22 border=0></a></div>"+  // silent testimony
+            "<div class='popout'>But wait, there's more!  Continue onward.</div>");
+   }
   // bat-menu
    string BMRver = check_version("BatMan RE","batman-re",10042);
    string verstuff;
@@ -382,14 +424,15 @@ void batman_enhance() {
       "<div class='popout'><a href='http://kolmafia.us/showthread.php?10042' title='Official thread' target='_new'>BatMan RE</a> "+
       "is powered by <a href='http://kolmafia.us/showthread.php?6445' title='Official thread' target='_new'>BatBrain</a>.<p>");
    if (to_boolean(vars["BatMan_RE_enabled"])) actbox.append("<form name=disablebatman action=fight.php method=post><input type=hidden name=enabletoggle value=off>"+
-      "<input class=button type=submit value='Disable BatMan RE'></form><p>");
+      "<input class=button type=submit value='Disable BatMan RE'> <span title='You may disable BatMan RE on a per-character basis without uninstalling the script "+
+      "and losing access to awesome parts like Factroid! and Sera.  It can be re-enabled by clicking the Enable button located underneath the Run Away button during a fight.'>?</span></form><p>");
    actbox.append((verstuff == "" ? "<div id='batquote'>"+quote()+"</div>" : verstuff)+"</div></div>");
   // Add unknown_ml editor if any stats are unknown
    if (!havemanuel && (m.raw_attack == -1 || m.raw_defense == -1 || m.raw_hp == -1) && contains_text(page,"monname"))
       actbox.append("<div id='undermon'><form name='changeml' action=fight.php method=post>Unknown monster stats treated as "+
       "<input name=setml type=text size=4 value='"+vars["unknown_ml"]+"'>.</form></div>");
   // Actions table
-   if (!finished() && my_location() != $location[unleash your inner wolf]) {
+   if (!finished()) {
       if (round > realround) reset_queue();
       actbox.append("<table id='battable' width='100%'>\n"+
         "<thead><tr><th>Action</th><th>Damage</th>"+
@@ -403,46 +446,46 @@ void batman_enhance() {
         "<th>A</th><th>...</th><th>S</th><th>U</th></tr></thead>\n<tbody>");
       foreach i,ev in opts actbox.append(to_html(ev,i));
       actbox.append("\n</tbody></table>\n   ");
-  // enhanced Manuel box
-      actbox.append("<div id='manuelbox'><table><tr><td width=22><img src=images/itemimages/nicesword.gif title='This monster has a "+  // attack
-         rnum(m_hit_chance()*100.0,2)+"% chance of hitting you for "+rnum(dmg_taken(m_regular()))+" damage, death in "+rnum(die_rounds())+
-         " rounds.'></td><td width=50 valign=center align=left><b><span style='font-size: 1.2em; color: "+to_htmlcolor(1.0-m_hit_chance())+";'>"+
-         rnum(monster_stat("att"))+"</span></b></td>");
-      actbox.append("<td><img src='images/itemimages/"+m.phylum.image+"' title='Phylum: "+m.phylum+"'></td></tr>");  // phylum
-      if (havemanuel && m.phylum == $phylum[none]) vprint_html(m+"'s phylum is unknown to mafia!  Please make a bug report <a href='http://kolmafia.us/forumdisplay.php?24'>here</a>.",-2);
-      actbox.append("<tr><td width=22><img src=images/itemimages/whiteshield.gif title='You have a "+   // defense
-         rnum(hitchance("attack")*100.0)+"% chance of hitting for "+rnum(dmg_dealt(regular(1)))+" damage.'></td>"+
-         "<td width=50 valign=center align=left><b><span style='font-size: 1.2em; color: "+to_htmlcolor(hitchance("attack"))+";'>"+
-         rnum(monster_stat("def"))+"</span></b></td>");
-      actbox.append("<td><img src='images/itemimages/"+monster_element(m).image+"' title='Monster resistances: ");  // element
-      string[int] resses;
-      foreach e,v in mres if (v != 0) resses[count(resses)] = e+": "+rnum(v);
-      actbox.append(count(resses) == 0 ? "none" : join(resses,", "));
-      actbox.append("'></td></tr>");
-      actbox.append("<tr><td width=22><img src=images/itemimages/hp.gif title='This monster typically starts with "+  // hp
-         monster_hp(m)+" hit points.'></td><td width=50 valign=center align=left><b><span style='font-size: 1.2em; color: "+
-         to_htmlcolor(monster_stat("hp")/max(1.0,to_float(monster_hp(m))))+";'>"+rnum(monster_stat("hp"))+"</span></b></td>");
-      actbox.append("<td><img src='images/itemimages/");  // initiative
-         switch (monster_initiative(m)) {
-            case -1: actbox.append("obnoxious.gif' title='Initiative unknown"); break;
-            case -10000: actbox.append("snail.gif' title='Never wins initiative"); break;
-            case 10000: actbox.append("lightningbolt.gif' title='Always wins initiative"); break;
-            default: actbox.append("watch.gif' title='Initiative +"+monster_initiative(m)+"%"); break;
-         }
-      actbox.append("'></td></tr>");
-      actbox.append("<tr><td width=22><img src=images/itemimages/meatstack.gif title='Monster value: "+
-         rnum(to_float(my_path() == "Way of the Surprising Fist" ? max(meat_drop(m),12) : meat_drop(m)) * (max(0,meat_drop_modifier()+100))/100.0)
-         +" meat + "+rnum(stat_value(m_stats()))+" in substats + item drops'></td>"+
-         "<td width=50 valign=center align=left colspan=2><b><span style='font-size: 1.2em; color: green;'>"+rnum(monstervalue())+"&mu;</span></b></td></tr>");
-      if (havemanuel) {
-         int[string] fs;
-         file_to_map("factoids_"+replace_string(my_name()," ","_")+".txt",fs);
-         actbox.append("<tr><td colspan=3 align=center>");
-         for i from 1 to 3 actbox.append(i > fs[m.to_string()] ? " <span class='dimmed'>&bull;</span> " : " <big>&bull;</big> ");
-         actbox.append("</td></tr>");
-      }
-      actbox.append("</table></div>\n");
    }
+  // enhanced Manuel box
+   actbox.append("<div id='manuelbox'><table><tr><td width=22><img src=images/itemimages/nicesword.gif title='This monster has a "+  // attack
+      rnum(m_hit_chance()*100.0,2)+"% chance of hitting you for "+rnum(dmg_taken(m_regular()))+" damage, death in "+rnum(die_rounds())+
+      " rounds.'></td><td width=50 valign=center align=left><b><span style='font-size: 1.2em; color: "+to_htmlcolor(1.0-m_hit_chance())+";'>"+
+      rnum(monster_stat("att"))+"</span></b></td>");
+   actbox.append("<td><img src='images/itemimages/"+m.phylum.image+"' title='Phylum: "+m.phylum+"'></td></tr>");  // phylum
+   if (havemanuel && m.phylum == $phylum[none]) vprint_html(m+"'s phylum is unknown to mafia!  Please make a bug report <a href='http://kolmafia.us/forumdisplay.php?24'>here</a>.",-2);
+   actbox.append("<tr><td width=22><img src=images/itemimages/whiteshield.gif title='You have a "+   // defense
+      rnum(hitchance("attack")*100.0)+"% chance of hitting for "+rnum(dmg_dealt(regular(1)))+" damage.'></td>"+
+      "<td width=50 valign=center align=left><b><span style='font-size: 1.2em; color: "+to_htmlcolor(hitchance("attack"))+";'>"+
+      rnum(monster_stat("def"))+"</span></b></td>");
+   actbox.append("<td class='showelements'><img src='images/itemimages/"+monster_element(m).image+"' title='Monster resistances: ");  // element
+   string[int] resses;
+   foreach e,v in mdata.res if (v != 0) resses[count(resses)] = e+": "+rnum(v);
+   actbox.append(count(resses) == 0 ? "none" : join(resses,", "));
+   actbox.append("'></td></tr>");
+   actbox.append("<tr><td width=22><img src=images/itemimages/hp.gif title='This monster typically starts with "+  // hp
+      monster_hp(m)+" hit points.'></td><td width=50 valign=center align=left><b><span style='font-size: 1.2em; color: "+
+      to_htmlcolor(monster_stat("hp")/max(1.0,to_float(monster_hp(m))))+";'>"+rnum(monster_stat("hp"))+"</span></b></td>");
+   actbox.append("<td><img src='images/itemimages/");  // initiative
+      switch (monster_initiative(m)) {
+         case -1: actbox.append("obnoxious.gif' title='Initiative unknown"); break;
+         case -10000: actbox.append("snail.gif' title='Never wins initiative"); break;
+         case 10000: actbox.append("lightningbolt.gif' title='Always wins initiative"); break;
+         default: actbox.append("watch.gif' title='Initiative +"+monster_initiative(m)+"%"); break;
+      }
+   actbox.append("'></td></tr>");
+   actbox.append("<tr><td width=22><img src=images/itemimages/meatstack.gif title='Monster value: "+
+      rnum(to_float(my_path() == "Way of the Surprising Fist" ? min(meat_drop(m),12) : meat_drop(m)) * (max(0,meat_drop_modifier()+100))/100.0)
+      +" meat + "+rnum(stat_value(m_stats()))+" in substats + item drops'></td>"+
+      "<td width=50 valign=center align=left colspan=2><b><span style='font-size: 1.2em; color: green;'>"+rnum(monstervalue())+"&mu;</span></b></td></tr>");
+   if (havemanuel) {
+      int[int] fs;
+      file_to_map("factoids_"+replace_string(my_name()," ","_")+".txt",fs);
+      actbox.append("<tr><td colspan=3 align=center>");
+      for i from 1 to 3 actbox.append(i > fs[m.id] ? " <span class='dimmed'>&bull;</span> " : " <big>&bull;</big> ");
+      actbox.append("</td></tr>");
+   }
+   actbox.append("</table></div>\n");
    actbox.write();
 }
 

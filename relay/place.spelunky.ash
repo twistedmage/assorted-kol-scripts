@@ -25,7 +25,7 @@ phasetab.append("<table>");
 phasetab.append("<tr><th>Location</th><th width=28% class=phase1>Phase 1</th><th width=28% class=phase2>Phase 2</th><th width=28% class=phase3>Phase 3</th></tr>");
 phasetab.append("<tr>");
 phasetab.append("<td><a href=http://kol.coldfront.net/thekolwiki/index.php/The_Mines target=_blank>The Mines</a></td>");
-phasetab.append("<td class=phase1><a href=http://kol.coldfront.net/thekolwiki/index.php/An_Old_Clay_Pot target=_blank>An Old Clay Pot</a><li>~20 Gold</li><li><a href=http://kol.coldfront.net/thekolwiki/index.php/Pot target=_blank>pot</a> (off-hand throwable)</li></td>");
+phasetab.append("<td class=phase1><a href=http://kol.coldfront.net/thekolwiki/index.php/An_Old_Clay_Pot target=_blank>An Old Clay Pot</a><li>15-20 Gold</li><li><a href=http://kol.coldfront.net/thekolwiki/index.php/Pot target=_blank>pot</a> (off-hand throwable)</li></td>");
 phasetab.append("<td class=phase2><a href=http://kol.coldfront.net/thekolwiki/index.php/A_Shop target=_blank>A Shop</a></td>");
 if(level1_unlocked)
 	phasetab.append("<td class=phase3>&nbsp;</td>");
@@ -36,7 +36,7 @@ phasetab.append("</tr>");
 phasetab.append("<tr>");
 phasetab.append("<td> <a href=http://kol.coldfront.net/thekolwiki/index.php/The_Jungle target=_blank title=The Jungle>The Jungle</a></td>");
 phasetab.append("<td class=phase1> <a href=http://kol.coldfront.net/thekolwiki/index.php/A_Shop target=_blank title=A Shop>A Shop</a></td>");
-phasetab.append("<td class=phase2> <a href=http://kol.coldfront.net/thekolwiki/index.php/A_Tombstone target=_blank title=A Tombstone>A Tombstone</a><li>~25 Gold</li><li><a href=http://kol.coldfront.net/thekolwiki/index.php/Shotgun target=_blank title=Shotgun>shotgun</a> (with <a href=http://kol.coldfront.net/thekolwiki/index.php/Heavy_pickaxe target=_blank title=Heavy pickaxe>heavy pickaxe</a>)</li><li><a href=http://kol.coldfront.net/thekolwiki/index.php/The_Clown_Crown target=_blank title=The Clown Crown>The Clown Crown</a> (with <a href=http://kol.coldfront.net/thekolwiki/index.php/X-ray_goggles target=_blank title=X-ray goggles>x-ray goggles</a>)</li></td>");
+phasetab.append("<td class=phase2> <a href=http://kol.coldfront.net/thekolwiki/index.php/A_Tombstone target=_blank title=A Tombstone>A Tombstone</a><li>20-25 Gold or Buddy</li><li><a href=http://kol.coldfront.net/thekolwiki/index.php/Shotgun target=_blank title=Shotgun>shotgun</a> (with <a href=http://kol.coldfront.net/thekolwiki/index.php/Heavy_pickaxe target=_blank title=Heavy pickaxe>heavy pickaxe</a>)</li><li><a href=http://kol.coldfront.net/thekolwiki/index.php/The_Clown_Crown target=_blank title=The Clown Crown>The Clown Crown</a> (with <a href=http://kol.coldfront.net/thekolwiki/index.php/X-ray_goggles target=_blank title=X-ray goggles>x-ray goggles</a>)</li></td>");
 if(level2_unlocked)
 	phasetab.append("<td class=phase3>&nbsp;</td>");
 else
@@ -46,7 +46,7 @@ phasetab.append("</tr>");
 phasetab.append("<tr>");
 phasetab.append("<td> <a href=http://kol.coldfront.net/thekolwiki/index.php/The_Ice_Caves target=_blank title=The Ice Caves>The Ice Caves</a></td>");
 phasetab.append("<td class=phase1> <a href=http://kol.coldfront.net/thekolwiki/index.php/A_Shop target=_blank title=A Shop>A Shop</a></td>");
-phasetab.append("<td class=phase2> <a href=http://kol.coldfront.net/thekolwiki/index.php/A_Big_Block_of_Ice target=_blank title=A Big Block of Ice>A Big Block of Ice</a><li>50-60 Gold</li><li>Gain a <a href=http://kol.coldfront.net/thekolwiki/index.php/Template:Spelunkybuddies target=_blank title=Template:Spelunkybuddies>buddy</a> (with a <a href=http://kol.coldfront.net/thekolwiki/index.php/Torch target=_blank title=Template:Spelunkybuddies>torch</a>)</li></td>");
+phasetab.append("<td class=phase2> <a href=http://kol.coldfront.net/thekolwiki/index.php/A_Big_Block_of_Ice target=_blank title=A Big Block of Ice>A Big Block of Ice</a><li>50-60 Gold</li><li>Gain a <a href=http://kol.coldfront.net/thekolwiki/index.php/Template:Spelunkybuddies target=_blank title=Template:Spelunkybuddies>buddy</a> or 60-70 gold (with a <a href=http://kol.coldfront.net/thekolwiki/index.php/Torch target=_blank title=Template:Spelunkybuddies>torch</a>)</li></td>");
 if(level3_unlocked)
 	phasetab.append("<td class=phase3>&nbsp;</td>");
 else
@@ -66,7 +66,7 @@ phasetab.append("</tr>");
 if(!get_property("spelunkyStatus").contains_text("Snake Pit")) {
 	phasetab.append("<tr>");
 	phasetab.append("<td> <a href=http://kol.coldfront.net/thekolwiki/index.php/The_Spider_Hole target=_blank title=The Spider Hole>The Spider Hole</a></td>");
-	phasetab.append("<td class=level1 colspan=3> <a href=http://kol.coldfront.net/thekolwiki/index.php/A_Wicked_Web target=_blank title=A Wicked Web>A Wicked Web</a><li>15-20 Gold</li><li>35-50 Gold (with a <a href=http://kol.coldfront.net/thekolwiki/index.php/Torch target=_blank title=Template:Spelunkybuddies>torch</a>)</li><li>Gain a <a href=http://kol.coldfront.net/thekolwiki/index.php/Template:Spelunkybuddies target=_blank title=Template:Spelunkybuddies>buddy</a> (with <a href=http://kol.coldfront.net/thekolwiki/index.php/Sturdy_machete target=_blank title=Sturdy machete>sturdy machete</a>)</li></td>");
+	phasetab.append("<td class=level1 colspan=3> <a href=http://kol.coldfront.net/thekolwiki/index.php/A_Wicked_Web target=_blank title=A Wicked Web>A Wicked Web</a><li>10-20 Gold</li><li>30-50 Gold (with a <a href=http://kol.coldfront.net/thekolwiki/index.php/Torch target=_blank title=Template:Spelunkybuddies>torch</a>)</li><li>Gain a <a href=http://kol.coldfront.net/thekolwiki/index.php/Template:Spelunkybuddies target=_blank title=Template:Spelunkybuddies>buddy</a> or 20-30 gold (with <a href=http://kol.coldfront.net/thekolwiki/index.php/Sturdy_machete target=_blank title=Sturdy machete>sturdy machete</a>)</li></td>");
 	phasetab.append("</tr>");
 }
 
@@ -100,7 +100,7 @@ if(!get_property("spelunkyStatus").contains_text("Altar")) {
 
 phasetab.append("<tr>");
 phasetab.append("<td> <a href=http://kol.coldfront.net/thekolwiki/index.php/The_City_of_Goooold target=_blank title=The City of Goooold>The City of Goooold</a></td>");
-phasetab.append("<td class=level4 colspan=3> <a href=http://kol.coldfront.net/thekolwiki/index.php/A_Golden_Chest target=_blank title=A Golden Chest>A Golden Chest</a><li>150 Gold (with key)</li><li>~75 Gold (with bomb)</li><li>~50 Gold and lose HP</li></td>");
+phasetab.append("<td class=level4 colspan=3> <a href=http://kol.coldfront.net/thekolwiki/index.php/A_Golden_Chest target=_blank title=A Golden Chest>A Golden Chest</a><li>150 Gold (with key)</li><li>80-100 Gold (with bomb)</li><li>60 Gold and lose 20 HP</li></td>");
 phasetab.append("</tr>");
 
 phasetab.append("</table>");
