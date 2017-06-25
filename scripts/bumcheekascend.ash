@@ -11629,7 +11629,7 @@ void bcascNaughtySorceress() {
 				}
 				else if(!contains_text(page, "You win the fight"))
 				{
-					abort("Something went wrong autofighting wall of bones");
+					abort("Something went wrong autofighting wall of meat");
 				}
 				else if(contains_text(page, "Looks like that was the last"))
 				{
@@ -11640,6 +11640,7 @@ void bcascNaughtySorceress() {
 		}
 		
 		//bone wall
+		abort("Try to code fighting the wall of bones using garbage nova, max myst and spell damage. No passives");
 		while(i_a("electric boning knife")==0)
 		{
 			bumAdv($location[The Castle in the Clouds in the Sky (Ground Floor)], "", "", "1 electric boning knife", "getting electric boning knife", "");
