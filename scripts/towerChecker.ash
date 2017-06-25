@@ -236,7 +236,8 @@ void checkBoss()
 		path == "KOLHS" ||
 		path == "Avatar of Sneaky Pete" ||
 		path == "Heavy Rains" ||
-		path == "The Source"
+		path == "The Source" ||
+		path == "License to Adventure"
 	  )
 	{
 		return;
@@ -313,7 +314,8 @@ void checkForKnownPath()
 	    Avatar of Boris,Zombie Slayer,Class Act,One Crazy Random Summer,
 	    Avatar of Jarlsberg,BIG!,KOLHS,Class Act II: A Class For Pigs,
 		Avatar of Sneaky Pete,Slow and Steady,Heavy Rains,Picky,Standard,
-		Avatar of West of Loathing,The Source,Nuclear Autumn]
+		Avatar of West of Loathing,The Source,Nuclear Autumn,Gelatinous Noob,
+		License to Adventure,]
 		contains my_path()) )
 	{
 		printColor( "Your current challenge path is not recognized by this script.  Proceed with caution.", "red" );

@@ -2,8 +2,7 @@
 // http://kolmafia.us/showthread.php?t=1780
 script "Universal_recovery.ash";
 notify "Bale";
-since r17118; // Nuclear Autumn skill: Internal Soda Machine
-string thisver = "3.15";		// This is the script's version!
+since r17808; // Gelatinous Noob skill: Gelatinous Reconstruction
 
 // To use this script, put Universal_recovery in the /script directory. 
 // Then in the Graphical CLI type:
@@ -148,44 +147,56 @@ boolean get_newmap(string curr) {
 
 // Set values for all restoratives usable out of combat.
 void restore_values() {
-	// Set all simple restorative values from an external file.
-	if(!file_to_map(fname+".txt",heal) || count(heal) == 0)
-		if(!get_newmap(visit_url("http://zachbardon.com/mafiatools/autoupdate.php?f="+fname+"&act=getver")))
-			abort("Restorative data is corrupted or missing. Troublesome!");
+	# static {
+		// Set all simple restorative values from an external file.
+		if(!file_to_map(fname+".txt",heal) || count(heal) == 0)
+			if(!get_newmap(visit_url("http://zachbardon.com/mafiatools/autoupdate.php?f="+fname+"&act=getver")))
+				abort("Restorative data is corrupted or missing. Troublesome!");
+		if(have_equipped($item[Dyspepsi-Cola-issue canteen])) { // This item doubles cola effectiveness
+			heal[$item[Cloaca-Cola]] = new restorative_info(0, 0, 20, 28, 0.0, 24.0);
+			heal[$item[Dyspepsi-Cola]] = new restorative_info(0, 0, 20, 28, 0.0, 24.0);
+		}
+		if(to_item("potion of healing") != $item[none]) 	// This is the Dungeon of Doom healing potion.
+			heal[to_item("potion of healing")] = new restorative_info(4, 16, 4, 16, 10.0, 10.0);
+		// Get rid of those oyster eggs so that I don't waste time with them later.
+		foreach egg in $items[blue paisley oyster egg, blue polka-dot oyster egg, blue striped oyster egg, 
+		  red paisley oyster egg, red polka-dot oyster egg, red striped oyster egg]
+			remove heal [egg];
+		// Add pseudo items that can be used to MAKE recovery items.
+		heal[$item[Palm frond]] = new restorative_info(18, 22, 18, 22, 20.0, 20.0);
+		if(!bees && (mallcore || contains_text(hpAutoRecoveryItems, "really thick bandage")))
+			heal[$item[mummy wrapping]] = new restorative_info(50, 60, 0, 0, 55.0, 0.0);
+		if(mallcore)  // This is only handled freely in mallcore mode
+			heal[$item[six-pack of New Cloaca-Cola]] = new restorative_info(0, 0, 840, 960, 0.0, 900.0);
+		if(buy_mmj && !guild_store_available() && !fist_safely) {
+			if(my_level() > 3 && start_type == "MP") 	// Best remind the player he should open his guild store already
+				if((my_primestat() == $stat[mysticality] && Verbosity > 0) || Verbosity > 1)
+					{}#print("You'd be able to purchase magical mystery juice if you opened your guild store", "red");
+			buy_mmj = false;
+		}
+		if(item_amount($item[Azazel's unicorn]) > 0 || have_skill($skill[Liver of Steel]) 
+		  || have_skill($skill[Stomach of Steel]) || have_skill($skill[Spleen of Steel])) {
+			heal[$item[beer-scented teddy bear]] = new restorative_info(0, 0, 15, 20, 0.0, 17.5);
+			heal[$item[comfy pillow]] = new restorative_info(20, 30, 0, 0, 25.0, 0.0);
+		}
+		foreach it in heal
+			if(!is_unrestricted(it) || (bees && it.to_string().to_lower_case().index_of("b") != -1))
+				remove heal[it];
+		heal[null] = new restorative_info(0, 0, 0, 0, 0.0, 0.0);
+		
+		// Remove sweets if they might be synthesized.
+		boolean [item] candy;
+		if(have_skill($skill[Sweet Synthesis]) && !can_interact())
+			foreach key in heal
+				if(key.candy) candy[key] = true;
+		foreach c in candy
+			remove heal[c];
+	# }
+	
+	// This is based on current level. Not static!
 	heal[$item[magical mystery juice]].minmp = floor(my_level() * 1.5 + 4.0);
 	heal[$item[magical mystery juice]].avemp =       my_level() * 1.5 + 5.0;
 	heal[$item[magical mystery juice]].maxmp = ceil (my_level() * 1.5 + 6.0);
-	if(have_equipped($item[Dyspepsi-Cola-issue canteen])) { // This item doubles cola effectiveness
-		heal[$item[Cloaca-Cola]] = new restorative_info(0, 0, 20, 28, 0.0, 24.0);
-		heal[$item[Dyspepsi-Cola]] = new restorative_info(0, 0, 20, 28, 0.0, 24.0);
-	}
-	if(to_item("potion of healing") != $item[none]) 	// This is the Dungeon of Doom healing potion.
-		heal[to_item("potion of healing")] = new restorative_info(4, 16, 4, 16, 10.0, 10.0);
-	// Get rid of those oyster eggs so that I don't waste time with them later.
-	foreach egg in $items[blue paisley oyster egg, blue polka-dot oyster egg, blue striped oyster egg, 
-	  red paisley oyster egg, red polka-dot oyster egg, red striped oyster egg]
-		remove heal [egg];
-	// Add pseudo items that can be used to MAKE recovery items.
-	heal[$item[Palm frond]] = new restorative_info(18, 22, 18, 22, 20.0, 20.0);
-	if(!bees && (mallcore || contains_text(hpAutoRecoveryItems, "really thick bandage")))
-		heal[$item[mummy wrapping]] = new restorative_info(50, 60, 0, 0, 55.0, 0.0);
-	if(mallcore)  // This is only handled freely in mallcore mode
-		heal[$item[six-pack of New Cloaca-Cola]] = new restorative_info(0, 0, 840, 960, 0.0, 900.0);
-	if(buy_mmj && !guild_store_available() && !fist_safely) {
-		if(my_level() > 3 && start_type == "MP") 	// Best remind the player he should open his guild store already
-			if((my_primestat() == $stat[mysticality] && Verbosity > 0) || Verbosity > 1)
-				{}#print("You'd be able to purchase magical mystery juice if you opened your guild store", "red");
-		buy_mmj = false;
-	}
-	if(item_amount($item[Azazel's unicorn]) > 0 || have_skill($skill[Liver of Steel]) 
-	  || have_skill($skill[Stomach of Steel]) || have_skill($skill[Spleen of Steel])) {
-		heal[$item[beer-scented teddy bear]] = new restorative_info(0, 0, 15, 20, 0.0, 17.5);
-		heal[$item[comfy pillow]] = new restorative_info(20, 30, 0, 0, 25.0, 0.0);
-	}
-	foreach it in heal
-		if(!is_unrestricted(it) || (bees && it.to_string().to_lower_case().index_of("b") != -1))
-			remove heal[it];
-	heal[null] = new restorative_info(0, 0, 0, 0, 0.0, 0.0);
 }
 
 // This ensures the safety of ammunition to attack the shadow with.
@@ -216,7 +227,7 @@ boolean beset(boolean [effect] badstuff) {
 int mpcost(skill sk) {
 	int cost;
 	if(sk==$skill[lasagna bandages]) // Dang in-combat vs out of combat mp cost reduction for Astral Bracers
-		cost = max(1,6 - mana_cost_modifier());
+		cost = max(1,6 + mana_cost_modifier());
 	else cost = mp_cost(sk);
 	if(have_effect($effect[Chilled to the Bone]) > 0)
 		cost = 3 ** (my_location().kisses - 1) + mp_cost(sk);
@@ -322,6 +333,7 @@ boolean populate_skills(int target) {
 	if(have_skill($skill[Bite Minion])) skills[$skill[Bite Minion]].ave =max(my_maxhp()/10, 10);
 	if(have_skill($skill[Devour Minions])) skills[$skill[Devour Minions]].ave =max(my_maxhp()/2, 20);
 	if(have_skill($skill[Shake It Off])) skills[$skill[Shake It Off]].ave = 999999999;
+	if(have_skill($skill[Gelatinous Reconstruction])) skills[$skill[Gelatinous Reconstruction]].ave = 13.5;
 	foreach key in skills
 		skills[key].mp = max(mpcost(key) + mana_mod, 1);
 	return true;
@@ -1267,6 +1279,8 @@ boolean cheapest_beatup() {
 	}
 	if(have_skill($skill[Tongue of the Walrus]) && my_maxmp() >= skills[$skill[Tongue of the Walrus]].mp)
 		price["Tongue of the Walrus"] = mp_to_meat(skills[$skill[Tongue of the Walrus]].mp);
+	if(have_skill($skill[Gelatinous Reconstruction]) && my_maxmp() >= skills[$skill[Gelatinous Reconstruction]].mp)
+		price["Gelatinous Reconstruction"] = mp_to_meat(skills[$skill[Gelatinous Reconstruction]].mp);
 	string best = "";
 	price[best] = 999999999;
 	foreach it in price
@@ -1276,8 +1290,9 @@ boolean cheapest_beatup() {
 	case "":
 		break;
 	case "Tongue of the Walrus":
-		if(my_mp() >= skills[$skill[Tongue of the Walrus]].mp || mp_heal(skills[$skill[Tongue of the Walrus]].mp))
-			cast(1, $skill[Tongue of the Walrus]);
+	case "Gelatinous Reconstruction":
+		if(my_mp() >= skills[ to_skill(best) ].mp || mp_heal(skills[ to_skill(best) ].mp))
+			cast(1, to_skill(best));
 		break;
 	default:
 		use_mall(1, best.to_item(), 1);
@@ -1745,58 +1760,7 @@ void reserve_healing() {
 	}
 }
 
-// My rendition of zarqon's version checker
-// checks script version once daily, returns empty string, OR div with update message inside
-string check_version() {
-	string soft = "Universal Recovery";
-	string prop = "_version_BalesUniversalRecovery";
-	int thread = 1780;
-	int w; string page;
-	boolean sameornewer(string local, string server) {
-		if (local == server) return true;
-		string[int] loc = split_string(local,"\\.");
-		string[int] ser = split_string(server,"\\.");
-		for i from 0 to max(count(loc)-1,count(ser)-1) {
-			if (i+1 > count(loc)) return false;
-			if (i+1 > count(ser)) return true;
-			if (loc[i].to_int() < ser[i].to_int()) return false;
-			if (loc[i].to_int() > ser[i].to_int()) return true;
-		}
-		return local == server;
-	}
-	switch(get_property(prop)) {
-	case thisver: return "";
-	case "":
-		print("Checking for updates (running "+soft+" ver. "+thisver+")...");
-		page = visit_url("http://kolmafia.us/showthread.php?t="+thread);
-		matcher find_ver = create_matcher("<b>"+soft+" (.+?)</b>",page);
-		if (!find_ver.find()) {
-			print("Unable to load current version info.", "red");
-			set_property(prop,thisver);
-			return "";
-		}
-		w=19;
-		set_property(prop,find_ver.group(1));
-		default:
-		if(sameornewer(thisver,get_property(prop))) {
-			set_property(prop,thisver);
-			print("You have a current version of "+soft+".");
-			return "";
-		}
-		string msg = "<big><font color=red><b>New Version of "+soft+" Available: "+get_property(prop)+"</b></font></big>"+
-		"<br><a href='http://kolmafia.us/showthread.php?t="+thread+"' target='_blank'><u>Upgrade from "+thisver+" to "+get_property(prop)+" here!</u></a><br>"+
-		"<small>Think you are getting this message in error?  Force a re-check by typing \"set "+prop+" =\" in the CLI.</small><br>";
-		find_ver = create_matcher("\\[requires revision (.+?)\\]",page);
-		if (find_ver.find() && find_ver.group(1).to_int() > get_revision())
-		msg += " (Note: you will also need to <a href='http://builds.kolmafia.us/' target='_blank'>update mafia to r"+find_ver.group(1)+" or higher</a> to use this update.)";
-		print_html(msg);
-		if(w > 0) wait(w);
-		return "<div class='versioninfo'>"+msg+"</div>";
-	}
-	return "";
-}
-
-// Once per day check to see if the version is current, data is current and pricelist updating for mallcore mode
+// Once per day check to see if the data is current and pricelist updating for mallcore mode
 // Much of this routine is very much owed to zarqon
 void daily_handling() {
 	if(get_property("_version_BalesUniversalRecovery") == "") {
@@ -1814,11 +1778,6 @@ void daily_handling() {
 		// Set _meatpermp and meatperhp today so they can be used by other scripts right away
 		restore_values();
 		meatper();
-		if(svn_exists("mafiarecovery")) {
-			set_property("_version_BalesUniversalRecovery", thisver);
-			cli_execute("svn update mafiarecovery");
-		}
-		else check_version();
 	}
 }
 
@@ -1838,7 +1797,7 @@ void manaburn_healing() {
 // Returns false if cannot fully heal.
 boolean restore(string type, int amount) {
 	daily_handling(); 	// This will do some stuff on the first run of the day
-	if(Verbosity > 2) print("Calling Universal Recovery "+thisver+" for type="+type+", amount="+amount,"red");
+	if(Verbosity > 2) print("Calling Universal Recovery for type="+type+", amount="+amount,"red");
 	// If you are Unhydrated or mining, then only 1 HP is needed and status effects are irrelevant.
 	// If you are Unhydrated or mining, then only 1 HP is needed, no MP necessary and status effects are irrelevant.
 	if(amount == 0 && noncom()) {
@@ -1913,5 +1872,7 @@ void check_restore(string type, int amount) {
 // Passes all restoration logic to restore() to improve inclusion in another restoreScript.
 boolean main(string type, int amount) {
 	check_restore(type, amount);
+	# if(have_effect($effect[Overheated]) > 0 && my_mp() < (mp_cost($skill[Awesome Balls of Fire]) * 5)) # + mp_cost($skill[Cannelloni Cocoon]))
+		# cli_execute("uneffect Overheated");
 	return true;	// This ensures that mafia does not attempt to heal with resources that are being conserved.
 }

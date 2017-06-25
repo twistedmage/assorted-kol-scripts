@@ -238,6 +238,7 @@ void stock_hagnks()
 	buy_item($item[perfect cosmopolitan],30);
 	buy_item($item[perfect mimosa],30);
 	buy_item($item[perfect paloma],30);
+	buy_item($item[ice house],3);
 	
 	
 	//stuff for twistedmage
@@ -297,7 +298,7 @@ void main()
 	stock_hotdogs();
 	
 	//do elf quest
-	if(my_adventures()> 40 && my_inebriety()<=inebriety_limit())
+	if(my_adventures()> 4000 && my_inebriety()<=inebriety_limit())
 	{
 		cli_execute("spaaace.ash");
 		print("spaaace should be done now","lime");
@@ -311,7 +312,7 @@ void main()
 			abort("spaaace doesn't seem to be done!");
 	}
 	cli_execute("guild unlock");
-	if(my_adventures()>30 && my_inebriety()<=inebriety_limit())
+	if(my_adventures()>3000 && my_inebriety()<=inebriety_limit())
 	{
 		if(my_name()=="twistedmage")
 			abort("Farm some manuel monsters!");
@@ -460,6 +461,9 @@ void main()
 	}
 	cli_execute("Tourguide 0.9.ash");
 	visit_url("ascend.php");
+	
+	abort("SIMONS NOTE: Remember to take astral shirt and use the floundry pants?");
+	
 //	if(my_name()=="twistedmage")
 //	{
 		abort("Choose the familiar yourself!");

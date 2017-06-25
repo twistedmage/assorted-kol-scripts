@@ -1,8 +1,15 @@
 //This script is in the public domain.
-string version = "1.0.13";
+string version = "1.0.17";
 
 boolean setting_ignore_tatter_problem = false;
 
+
+boolean mafiaIsPastRevision(int revision_number)
+{
+    if (get_revision() <= 0) //get_revision reports zero in certain cases; assume they're on a recent version
+        return true;
+    return (get_revision() >= revision_number);
+}
 
 void preAdventure()
 {
@@ -23,19 +30,24 @@ void postAdventure()
 
 void main(int turns_to_spend)
 {
+	boolean fight_boss = user_confirm("Fight Sssshhsssblllrrggghsssssggggrrgglsssshhssslblgl?");
 	boolean should_throw_item = false;
 	item throwing_item = $item[flaregun];
 	if (throwing_item.item_amount() > 0 && false) //disabled, because currently unimplemented
 	{
 		boolean yes = user_confirm("Should we throw flareguns? (until the council reward)");
 	}
+	if (turns_to_spend < 0)
+	{
+		turns_to_spend = my_adventures() + turns_to_spend;
+	}
 	int starting_turncount = my_turncount();
 	print_html("Eldritch Fissures version " + version);
 	int last_adventures = my_adventures();
 	int limit = 1000;
-	
+	visit_url("place.php?whichplace=town");
 	location fissure_location = "an eldritch fissure".to_location();
-	if (fissure_location != $location[none] && inebriety_limit() - my_inebriety() >= 0) //mafia will not let you adventure in the fissure if you're overdrunk; bug
+	if (fissure_location != $location[none] && inebriety_limit() - my_inebriety() >= 0 && mafiaIsPastRevision(17727) && !fight_boss) //mafia will not let you adventure in the fissure if you're overdrunk; bug, unless that was fixed already
 	{
 		adventure(turns_to_spend, fissure_location);
 	}
@@ -44,7 +56,10 @@ void main(int turns_to_spend)
 		while (my_adventures() > 0 && limit > 0 && my_turncount() < starting_turncount + turns_to_spend)
 		{
 			limit -= 1;
-			foreach s in $strings[place.php?whichplace=town&action=town_eincursion,place.php?whichplace=town_wrong&action=townrwong_eincursion,place.php?whichplace=plains&action=plains_eincursion,place.php?whichplace=desertbeach&action=db_eincursion]
+			boolean [string] urls = $strings[place.php?whichplace=town&action=town_eincursion,place.php?whichplace=town_wrong&action=townrwong_eincursion,place.php?whichplace=plains&action=plains_eincursion,place.php?whichplace=desertbeach&action=db_eincursion];
+			if (fight_boss)
+				urls = $strings[place.php?whichplace=town&action=town_eicfight2];
+			foreach s in urls
 			{
 				int limit2 = 100;
 				while (limit2 > 0 && my_turncount() < starting_turncount + turns_to_spend) //fissures stay open for a while
@@ -60,7 +75,7 @@ void main(int turns_to_spend)
 					if (should_throw_item && throwing_item.item_amount() > 0 && get_auto_attack() == 0)
 						throw_item(throwing_item);
 					run_combat();
-					if (page_text.contains_text("Eldritch Tentacle"))
+					if (page_text.contains_text("Eldritch Tentacle") || page_text.contains_text("Sssshhsssblllrrggghsssssggggrrgglsssshhssslblgl"))
 						postAdventure();
 					else if (last_adventures_2 == my_adventures())
 						break;

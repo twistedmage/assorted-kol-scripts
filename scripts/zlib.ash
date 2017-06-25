@@ -13,7 +13,8 @@ since r15467;
 
 // stuff that has to be at the top
 float abs(float n) { return n < 0 ? -n : n; }
-string[string] vars;
+string getvar(string varname);
+string[string] vars;     // user's script settings that differ from defaults
 
 //                             STRING ROUTINES
 
@@ -35,7 +36,7 @@ boolean equals(string s1, string s2) {
 }
 
 /*
-wraps print(), prints message depending on vars["verbosity"] setting
+wraps print(), prints message depending on getvar("verbosity") setting
 has boolean return value -- replaces { print(message); return t/f; }
 level == 0: abort error
 level > 0: prints message if verbosity >= level, returns true
@@ -50,13 +51,13 @@ level < 0: prints message if verbosity >= abs(level), returns false
 */
 boolean vprint(string message, string color, int level) {
    if (level == 0) abort(message);
-   if (to_int(vars["verbosity"]) >= abs(level)) print(message,color);
+   if (to_int(getvar("verbosity")) >= abs(level)) print(message,color);
    return (level > 0);
 }
 boolean vprint(string message, int level) { if (level > 0) return vprint(message,"black",level); return vprint(message,"red",level); }
 boolean vprint_html(string message, int level) {
    if (level == 0) { print_html(message); abort(); }
-   if (to_int(vars["verbosity"]) >= abs(level)) print_html(message);
+   if (to_int(getvar("verbosity")) >= abs(level)) print_html(message);
    return (level > 0);
 }
 
@@ -79,6 +80,8 @@ string normalized(string mixvar, string type, string glue) {
       case "servant": return (to_string(to_servant(mixvar)));
       case "skill": return to_string(to_skill(mixvar));
       case "stat": return to_string(to_stat(mixvar));
+      case "thrall": return to_string(to_thrall(mixvar));
+      case "vykea": return to_string(to_vykea(mixvar));
       case "list of string":
       case "string": return mixvar;
    }
@@ -202,11 +205,12 @@ string check_version(string soft, string proj, int thread) { buffer msg;
    if (count(zv) == 0) file_to_map("zversions.txt",zv);
    if (zv[proj].vdate == today_to_string()) return "";
    vprint_html("Checking for updates (running <a href='http://kolmafia.us/showthread.php?t="+thread+"' target='_blank'>"+soft+"</a> rev. "+svn_info(proj).revision+")...",1);
+   zv[proj].vdate = today_to_string();
+   map_to_file(zv,"zversions.txt");
    if (!svn_at_head(proj)) {
       cli_execute("svn update " + proj);
       msg.append(soft+" has been updated from r"+zv[proj].ver+" to r"+svn_info(proj).revision+".  The next time it is run, it will be current.");
    }
-   zv[proj].vdate = today_to_string();
    if (to_int(zv[proj].ver) == svn_info(proj).revision) { map_to_file(zv,"zversions.txt"); return ""; }
    if (length(msg) == 0) msg.append(soft+" has been updated from r"+zv[proj].ver+" to r"+svn_info(proj).revision+" since you last ran it.");
    msg.insert(0,"<big><font color=red><b>"+soft+" Updated!</b></font></big><br>");	  
@@ -280,14 +284,45 @@ boolean load_current_map(string fname, aggregate dest) {
 }
 
 
-//                                 WOSSMAN
+//                                 Script Settings
 
+/*
+vars_<myname>
+    [name] => value
+
+vars_documentation
+    [source,name] => documentation  (source can include "user" and "global" for mafia properties)
+
+vars_defaults
+    [name] => record
+        type
+        default value
+        maker
+*/
+
+record singlesettingdefault {
+   string type;         // int, string, boolean, etc. (later can be "list of X" or filter/mask)
+   string val;          // default value as initialized in setvar
+   string init;         // use date for now to form groups; ideally establishing script
+};
+static {
+   singlesettingdefault[string] vardefaults;  // stores all script setting default values
+   file_to_map("vars_defaults.txt",vardefaults);
+}
+if (count(vardefaults) == 0) file_to_map("vars_defaults.txt",vardefaults);
 file_to_map("vars_"+replace_string(my_name()," ","_")+".txt",vars);
+foreach key,rec in vardefaults if (!(vars contains key)) vars[key] = rec.val;   // Add all defaults back into vars[], not just those initialized by setvar.  WILL REMOVE LATER!
 
 // writes local vars map
 boolean updatevars() {
-   return map_to_file(vars,"vars_"+replace_string(my_name()," ","_")+".txt");
+   string[string] newvars;
+   foreach pref,val in vars {    // won't need this later
+      if (vardefaults contains pref && val == vardefaults[pref].val) continue;
+      newvars[pref] = val;
+   }
+   return map_to_file(newvars,"vars_"+replace_string(my_name()," ","_")+".txt");
 }
+
 void setvar(string varname,string dfault,string type) {
    varname = replace_string(varname," ","_");
    if (vars contains varname) {
@@ -296,11 +331,14 @@ void setvar(string varname,string dfault,string type) {
          vars[varname] = normalized(vars[varname],type);
          updatevars();
       }
-      return;
    }
-   vars[varname] = dfault;
-   vprint("New ZLib "+type+" setting: "+varname+" => "+dfault,"purple",4);
-   updatevars();
+   if (!(vardefaults contains varname) || vardefaults[varname].val != dfault || vardefaults[varname].type != type) {
+      vardefaults[varname].type = type;
+      vardefaults[varname].val = dfault;
+      vardefaults[varname].init = today_to_string()+" "+time_to_string();
+      vprint("New default value for ZLib "+type+" setting: "+varname+" => "+dfault,"purple",4);
+      map_to_file(vardefaults,"vars_defaults.txt");
+   }
 }
 
 void setvar(string varname,string dfault)  {  setvar(varname,dfault,"string");  }
@@ -320,6 +358,15 @@ void setvar(string varname,phylum dfault)  {  setvar(varname,to_string(dfault),"
 void setvar(string varname,servant dfault) {  setvar(varname,to_string(dfault),"servant");  }
 void setvar(string varname,skill dfault)   {  setvar(varname,to_string(dfault),"skill");  }
 void setvar(string varname,stat dfault)    {  setvar(varname,to_string(dfault),"stat");  }
+void setvar(string varname,thrall dfault)  {  setvar(varname,to_string(dfault),"thrall");  }
+void setvar(string varname,vykea dfault)   {  setvar(varname,to_string(dfault),"vykea");  }
+
+string getvar(string varname) {   // this should replace using a direct vars[] lookup
+   if (vars contains varname) return vars[varname];
+   if (vardefaults contains varname) return vardefaults[varname].val;
+   vprint("Attempt to access missing script setting '"+varname+"'!","purple",4);
+   return "";
+}
 
 
 //                           ADVENTURING ROUTINES
@@ -340,6 +387,7 @@ boolean be_good(item johnny) {
       case "Way of the Surprising Fist": if ($slots[weapon,off-hand] contains johnny.to_slot()) return false; break;
       case "KOLHS": if (johnny.inebriety > 0 && !contains_text(johnny.notes, "KOLHS")) return false; break;
       case "Zombie Slayer": if (johnny.fullness > 0 && !contains_text(johnny.notes, "Zombie Slayer")) return false; break;
+      case "License to Adventure": if (johnny.inebriety > 0 && johnny.image != "martini.gif") return false; break;
    }
    if (class_modifier(johnny,"Class") != $class[none] && class_modifier(johnny,"Class") != my_class()) return false;
    return is_unrestricted(johnny);
@@ -350,7 +398,8 @@ boolean be_good(familiar johnny) {
       case "Avatar of Boris":
       case "Avatar of Jarlsberg":
       case "Avatar of Sneaky Pete": 
-      case "Actually Ed the Undying": return false;
+      case "Actually Ed the Undying":
+      case "License to Adventure": return false;
    }
    return is_unrestricted(johnny);
 }
@@ -377,8 +426,8 @@ boolean qprop(string test) {
    if (count(tbits) != 3) return vprint("'"+test+"' not valid parameter for qprop().  Syntax is '<property> <relational operator> <value>'",-3);
    if (get_property(tbits[0]) == "") return vprint("'"+tbits[0]+"' is not a valid quest property.",-3);
    switch (tbits[1]) {
-      case "==": return numerize(get_property(tbits[0])) == numerize(tbits[2]);
-      case "!=": return numerize(get_property(tbits[0])) != numerize(tbits[2]);
+      case "==": case "=": return numerize(get_property(tbits[0])) == numerize(tbits[2]);
+      case "!=": case "<>": return numerize(get_property(tbits[0])) != numerize(tbits[2]);
       case ">": return numerize(get_property(tbits[0])) > numerize(tbits[2]);
       case "=>": case ">=": return numerize(get_property(tbits[0])) >= numerize(tbits[2]);
       case "<": return numerize(get_property(tbits[0])) < numerize(tbits[2]);
@@ -663,16 +712,16 @@ int get_safemox(location wear) {
 
 // if 'automcd' is true, adjusts your MCD for the specified safemox based on your threshold
 boolean auto_mcd(int safemox) {
-   if (!to_boolean(vars["automcd"]) || my_ascensions() < 1 || in_bad_moon()) return true;
+   if (!to_boolean(getvar("automcd")) || my_ascensions() < 1 || in_bad_moon()) return true;
    if ((knoll_available() && !retrieve_item(1,$item[detuned radio])) ||
      (gnomads_available() && item_amount($item[bitchin' meatcar]) + item_amount($item[desert bus pass]) +
       item_amount($item[pumpkin carriage]) == 0))
       return vprint("MCD: unavailable","olive",5);
    if (safemox == 0) {
-      vprint("MCD: Using your 'unknown_ml' value ("+vars["unknown_ml"]+").","olive",2);
-      safemox = to_int(vars["unknown_ml"]) + 7;
+      vprint("MCD: Using your 'unknown_ml' value ("+getvar("unknown_ml")+").","olive",2);
+      safemox = to_int(getvar("unknown_ml")) + 7;
    }
-   int adj = minmax(my_defstat() + to_int(vars["threshold"]) - safemox, 0, 10+canadia_available().to_int());
+   int adj = minmax(my_defstat() + to_int(getvar("threshold")) - safemox, 0, 10+canadia_available().to_int());
    if (current_mcd() == adj) return true;
    else return (vprint("MCD: adjusting to "+adj+"...","olive",2) && change_mcd(adj));
 }
@@ -689,7 +738,7 @@ boolean auto_mcd(location place) {                            // automcd for loc
 
 // returns your heaviest familiar of a given type (currently possible: items, meat, produce, stat, dodge, delevel, restore hp, restore mp, elemental damage, water)
 familiar best_fam(string ftype) {
-   if (to_familiar(vars["is_100_run"]) != $familiar[none]) return to_familiar(vars["is_100_run"]);
+   if (to_familiar(getvar("is_100_run")) != $familiar[none]) return to_familiar(getvar("is_100_run"));
    familiar result = $familiar[none];
    string[familiar] fams;
    if (!load_current_map("bestfamiliars",fams)) return result;
@@ -724,7 +773,7 @@ record kmessage {
    string type;              // possible values observed thus far: normal, giftshop
    int fromid;               // sender's playerid (0 for npc's)
    int azunixtime;           // KoL server's unix timestamp
-   string message;           // message (not including items/meat)
+   string message;           // message (including items/meat)
    int[item] items;          // items included in the message
    int meat;                 // meat included in the message
    string fromname;          // sender's playername
@@ -733,10 +782,8 @@ record kmessage {
 kmessage[int] mail;
 void load_kmail(string calledby) { // loads all of your inbox (up to 100) into the global "mail"
    mail.clear();                   // optionally, specify your script in "calledby"
-//   matcher k = create_matcher("'id' =\\> '(\\d+)',\\s+'type' =\\> '(.+?)',\\s+'fromid' =\\> '(-?\\d+)',\\s+'azunixtime' =\\> '(\\d+)',\\s+'message' =\\> '(.+?)',\\s+'fromname' =\\> '(.+?)',\\s+'localtime' =\\> '(.+?)'"
-//      ,visit_url("api.php?pwd&what=kmail&format=php&count=100&for="+url_encode(calledby)));
-// heeheehee's JSON matcher
-    matcher k = create_matcher('"id":"(\\d+)","type":"(.+?)","fromid":"(-?\\d+)","azunixtime":"(\\d+)","message":"(.+?)","fromname":"(.+?)","localtime":"(.+?)"'
+  // heeheehee's JSON matcher
+   matcher k = create_matcher('"id":"(\\d+)","type":"(.+?)","fromid":"(-?\\d+)","azunixtime":"(\\d+)","message":"(.+?)","fromname":"(.+?)","localtime":"(.+?)"'
       ,visit_url("api.php?pwd&what=kmail&count=100&for="+url_encode(calledby)));
    int n;
    while (k.find()) {
@@ -749,7 +796,7 @@ void load_kmail(string calledby) { // loads all of your inbox (up to 100) into t
       if (mbits.find()) {
          mail[n].meat = extract_meat(mbits.group(2));
          mail[n].items = extract_items(mbits.group(2));
-         mail[n].message = mbits.group(to_int(mail[n].meat > 0 || count(mail[n].items) > 0));
+         mail[n].message = mbits.group(0);
       } else mail[n].message = k.group(5);
       mail[n].fromname = k.group(6);
       mail[n].localtime = replace_string(k.group(7),"\\","");
@@ -782,12 +829,11 @@ boolean send_gift(string to, string message, int meat, int[item] goodies, string
    int j = 0;
    int[item] extra;
    foreach i in goodies {
-      if (is_tradeable(i) || is_giftable(i)) {
-         j += 1;
-         if (j < 3)
-           itemstring += "&howmany"+j+"="+goodies[i]+"&whichitem"+j+"="+to_int(i);
-         else extra[i] = goodies[i];
-      }
+      if (!is_tradeable(i) && !is_giftable(i)) continue;
+      j += 1;
+      if (j < 3)
+        itemstring += "&howmany"+j+"="+goodies[i]+"&whichitem"+j+"="+to_int(i);
+       else extra[i] = goodies[i];
    }
    int pnum = minmax(count(goodies),1,2);
    int shipping = 50*pnum;
@@ -807,14 +853,13 @@ boolean kmail(string to, string message, int meat, int[item] goodies, string ins
    int j = 0;
    string[int] itemstrings;
    foreach i in goodies {
-      if (is_tradeable(i) || is_giftable(i)) {
-         j += 1;
-         itemstring += "&howmany"+j+"="+goodies[i]+"&whichitem"+j+"="+to_int(i);
-         if (j > 10) {
-            itemstrings[count(itemstrings)] = itemstring;
-            itemstring = '';
-            j = 0;
-         }
+      if (!is_tradeable(i) && !is_giftable(i)) continue;
+      j += 1;
+      itemstring += "&howmany"+j+"="+goodies[i]+"&whichitem"+j+"="+to_int(i);
+      if (j > 10) {
+         itemstrings[count(itemstrings)] = itemstring;
+         itemstring = '';
+         j = 0;
       }
    }
    if (itemstring != "") itemstrings[count(itemstrings)] = itemstring;
@@ -822,7 +867,7 @@ boolean kmail(string to, string message, int meat, int[item] goodies, string ins
     else vprint(count(goodies)+" item types split into "+count(itemstrings)+" separate kmails.",5);
   // send message(s)
    foreach q in itemstrings {
-      string url = visit_url("sendmessage.php?pwd=&action=send&towho="+to+"&message="+message+"&savecopy=on&sendmeat="+meat+itemstrings[q]);
+      string url = visit_url("sendmessage.php?pwd=&action=send&towho="+to+"&message="+message+"&savecopy=on&sendmeat="+(q == 0 ? meat : 0)+itemstrings[q]);
       if (contains_text(url,"That player cannot receive Meat or items"))
         return (vprint("That player cannot receive stuff, sending gift instead...",4) && send_gift(to, message, meat, goodies, insidenote));
       if (!contains_text(url,"Message sent.")) return vprint("The message didn't send for some reason.",-2);
@@ -831,10 +876,10 @@ boolean kmail(string to, string message, int meat, int[item] goodies, string ins
 }
 boolean kmail(string to, string message, int meat, int[item] goodies) { return kmail(to,message,meat,goodies,""); }
 boolean kmail(string to, string message, int meat) { int[item] nothing; return kmail(to,message,meat,nothing,""); }
-boolean kmail(kmessage km) { return kmail(km.fromname, km.message, km.meat, km.items, ""); }
+boolean kmail(kmessage km) { return kmail(km.fromname, km.message, km.meat, km.items, ""); }  // 'fromname' is your intended recipient in this case
 
-// NOTE: after running this script, changing these variables here in the script will have no
-// effect.  You can view ("zlib vars") or edit ("zlib <settingname> = <value>") values in the CLI.
+// NOTE: This code sets variable defaults in vars_defaults.txt.  To edit these variables for your character,
+// you can view ("zlib vars") or edit ("zlib <settingname> = <value>") values in the CLI, or run Prefref Plus.
 setvar("verbosity",3);
 setvar("automcd",true);
 setvar("threshold",4);
@@ -845,20 +890,29 @@ check_version("ZLib","zlib",2072);
 
 void main(string setval) {
    if (!setval.contains_text(" = ")) {
+      boolean[string] matches;
+      foreach key in vardefaults if (setval == "vars" || setval == "" || key.to_lower_case().contains_text(setval.to_lower_case()) || getvar(key).to_lower_case().contains_text(setval.to_lower_case()))
+         matches[key] = false;
+      foreach key in vars {
+         if (matches contains key) continue;
+         if (setval == "vars" || setval == "" || key.to_lower_case().contains_text(setval.to_lower_case()) || getvar(key).to_lower_case().contains_text(setval.to_lower_case()))
+            matches[key] = true;
+      }
+      if (count(matches) == 0) { print("(No settings or values matched your input text. Type \"zlib vars\" to see all.)","gray"); return; }
       print_html("<b>Copy/paste/modify/enter any of the following lines in the CLI to edit settings:</b><br>");
-      foreach key,val in vars if (setval == "vars" || setval == "" || key.to_lower_case().contains_text(setval.to_lower_case()) || 
-         val.to_lower_case().contains_text(setval.to_lower_case())) print("zlib "+key+" = "+val);
-      print("(If no values were shown, no settings or values matched your input text. Type \"zlib vars\" to see all.)","gray"); return;
+      foreach key,val in matches print("zlib "+key+" = "+getvar(key), val ? "#1f5c1d" : "#666");
+      return;
    }
    string n = excise(setval,""," = ");
-   if (!(vars contains n)) { print("No setting named '"+n+"' exists.","olive"); return; }
+   if (!(vars contains n) && !(vardefaults contains n)) { print("No setting named '"+n+"' exists.","olive"); return; }
    string v = excise(setval," = ","");
    print("Previous value of "+n+": "+vars[n]);
    if (vars[n] == v) return;
    if (n == "threshold") {
-      if (v == "up") v = to_string(to_int(vars["threshold"])+1);
-      if (v == "down") v = to_string(to_int(vars["threshold"])-1);
+      if (v == "up") v = to_string(to_int(getvar("threshold"))+1);
+      if (v == "down") v = to_string(to_int(getvar("threshold"))-1);
    }
+   if (vardefaults contains n) v = normalized(v,vardefaults[n].type);
    vars[n] = v;
    if (updatevars()) print("Changed to "+v+".");
 }

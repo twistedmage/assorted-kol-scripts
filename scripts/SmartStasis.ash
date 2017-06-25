@@ -10,6 +10,7 @@
    Want to say thanks?  Send me a bat! (Or bat-related item)
 
 ******************************************************************************/
+since r18076;   // villain lair daily properties
 import <BatBrain.ash>
 
 boolean should_mayfly() {                // TODO: make this return an advevent
@@ -125,10 +126,10 @@ void set_autoputtifaction() {
       bounty thisb = to_bounty(get_property(s));
       if (thisb.number == 0) continue;
       if (m == thisb.monster && (!($locations[the "fun" house, the goatlet, lair of the ninja snowmen, cobb's knob laboratory] contains where) ||
-          (list_contains(vars["BatMan_attract"],m)))) {
-         if (thisb.number <= to_int(vars["BatMan_puttybountiesupto"]) && item_amount(ihunt) < ihunt.bounty_count-1) should_putty = true;
+          (list_contains(getvar("BatMan_attract"),m)))) {
+         if (thisb.number <= to_int(getvar("BatMan_puttybountiesupto")) && item_amount(ihunt) < ihunt.bounty_count-1) should_putty = true;
          should_olfact = true;
-      } else if (list_contains(vars["BatMan_attract"],m) && ihunt.bounty != where)
+      } else if (list_contains(getvar("BatMan_attract"),m) && ihunt.bounty != where)
          should_olfact = true;
   } else
   */
@@ -143,7 +144,7 @@ void set_autoputtifaction() {
       if (has_goal(mon) == 0) continue;
       sources += 1;
    }
-   if (list_contains(vars["BatMan_attract"],m) && (belongs || where == $location[none])) should_olfact = true;
+   if (list_contains(getvar("BatMan_attract"),m) && (belongs || where == $location[none])) should_olfact = true;
    if (sources == 0) return;
    print(sources+"/"+count(get_monsters(where))+" monsters drop goals here.");
    if (sortm[0] == m) {
@@ -160,10 +161,14 @@ void build_custom() {
    vprint("Building custom actions...",9);
    boolean encustom(advevent which) { if (which.id == "" || (blacklist contains which.id && blacklist[which.id] == 0)) return false; 
       custom[count(custom)] = copy(which); return true; }
-   void encustom(item which, boolean finisher) { advevent toque = get_action(which);
-      if (encustom(toque) && finisher) custom[count(custom)-1].endscombat = true; }
-   void encustom(item which) { encustom(which, false); }
-   void encustom(skill which) { advevent toque = get_action(which); encustom(toque); }
+   boolean encustom(item which, boolean finisher) {
+      advevent toque = get_action(which);
+      if (!encustom(toque)) return false;
+      if (finisher) custom[count(custom)-1].endscombat = true;
+      return true;
+   }
+   boolean encustom(item which) { return encustom(which, false); }
+   boolean encustom(skill which) { advevent toque = get_action(which); return encustom(toque); }
   // stealing! add directly to queue[] rather than custom actions
    boolean needlove = have_skill($skill[catchphrase]) && my_audience() < 30 + (have_equipped($item[sneaky pete's leather jacket]) ||
       have_equipped($item[sneaky pete's leather jacket (collar popped)]) ? 20 : 0);
@@ -183,22 +188,20 @@ void build_custom() {
        min(round(to_float(get_property("hpAutoRecoveryTarget"))*to_float(my_maxhp())) - my_stat("hp"),12)*meatperhp > mp_cost($skill[saucy salve])*meatpermp))
       encustom(get_action($skill[saucy salve]));
   // weaksauce
-   if (m_hit_chance() > 0.4 || my_location().zone == "Dreadsylvania") encustom($skill[curse of weaksauce]);
-  // a few tunnelling aids
-   if (where == $location[mt. molehill]) {
-      if (is_goal($item[climate colada])) encustom(get_action($skill[tunnel upwards]));
-       else if (is_goal($item[digital underground potion])) encustom(get_action($skill[tunnel downwards]));
+//   if ((m_hit_chance() > 0.4 && kill_rounds(attack_action()) > 1) || $strings[Dreadsylvania, Junkyard] contains my_location().zone) 
+//      encustom($skill[curse of weaksauce]);  // needs better logic before being added to public version
+   switch (where) {
+      case $location[mt. molehill]: if (is_goal($item[climate colada])) encustom(get_action($skill[tunnel upwards]));  // a few tunnelling aids
+         else if (is_goal($item[digital underground potion])) encustom(get_action($skill[tunnel downwards])); break;
+      case $location[a mob of zeppelin protesters]: if (get_property("zeppelinProtestors").to_int() < 79 && !encustom($item[bomb of unknown origin]))  // speed up protester removal
+         encustom($item[cigarette lighter]); break;
    }
   // ghost hunting
-   if (have_equipped($item[protonic accelerator pack]) && where == get_property("ghostLocation").to_location() && m.phylum == $phylum[undead])
-      for i from 1 to 3 encustom($skill[shoot ghost]);
-   encustom($skill[trap ghost]);   // if you have this skill, you want to use it
-  // siphoning spirits
-   if (my_fam() == $familiar[happy medium] && !happened("skill 7117") && should_siphon())
-      encustom(to_event("skill 7117","stun 1, item "+get_spirit(),1));
+   if (have_equipped($item[protonic accelerator pack]) && m.sub_types contains "ghost")
+      for i from 1 to 3 encustom($skill[shoot ghost]);  // this fails if the skill is unavailable; also Trap Ghost is a BatBrain autoreaction whenever available
   // flyers
    foreach flyer in $items[jam band flyers, rock band flyers] if (item_amount(flyer) > 0 && !qprop("questL12War") && be_good(flyer) && get_property("flyeredML").to_int() < 10050 &&
-      (to_boolean(vars["BatMan_flyereverything"]) || m.base_attack.to_int() >= 10000 - get_property("flyeredML").to_int()) && !happened(flyer) &&
+      (to_boolean(getvar("BatMan_flyereverything")) || m.base_attack.to_int() >= 10000 - get_property("flyeredML").to_int()) && !happened(flyer) &&
       !($locations[the battlefield (hippy uniform), the battlefield (frat uniform)] contains where))
      encustom(to_event("use "+to_int(flyer),to_spread(0),to_spread(to_string(m_dpr(0,0)*(1-m_hit_chance()))),"!! flyeredML +"+monster_attack(m),1));
   // putty
@@ -243,20 +246,28 @@ void build_custom() {
          encustom(get_action($item[tin snips]));
          break;
    }
-  // yellow ray actions
-   if (have_effect($effect[everything looks yellow]) == 0 && list_contains(vars["BatMan_yellow"],m) && 
-       my_fam() != $familiar[he-boulder]) encustom(custom_action("yellow"));
-  // release the boots!
-   if (my_familiar() == $familiar[pair of stomping boots] && where != $location[none] && get_property("bootsCharged") == "true" && 
+   switch (my_fam()) {
+     // siphoning spirits
+      case $familiar[happy medium]: if (!happened("skill 7117") && should_siphon())
+         encustom(to_event("skill 7117","stun 1, item "+get_spirit(),1)); break;
+     // release the boots!
+      case $familiar[pair of stomping boots]: if (where != $location[none] && get_property("bootsCharged") == "true" && 
        count(get_monsters(where)) > 1 && !($items[none,gooey paste] contains to_paste(m))) {
-      boolean[item] pastegoals;
-      for i from 5198 to 5219 if (is_goal(to_item(i))) pastegoals[to_item(i)] = true;
-     // TODO: if there are other monsters in the zone that have paste goals, wait to stomp them
-      if (appearance_rates(where)[m] > 0 && (is_goal(to_paste(m)) || has_goal(m) == 0))
-         encustom($skill[release the boots]);
+         boolean[item] pastegoals;
+         for i from 5198 to 5219 if (is_goal(to_item(i))) pastegoals[to_item(i)] = true;
+        // TODO: if there are other monsters in the zone that have paste goals, wait to stomp them
+         if (appearance_rates(where)[m] > 0 && (is_goal(to_paste(m)) || has_goal(m) == 0))
+            encustom($skill[release the boots]);
+       } break;
+     // extract jelly
+      case $familiar[space jellyfish]: if (!m.boss && m.attack_element != $element[none])
+        encustom($skill[extract jelly]); break;
    }
+  // yellow ray actions
+   if (have_effect($effect[everything looks yellow]) == 0 && list_contains(getvar("BatMan_yellow"),m) && 
+       my_fam() != $familiar[he-boulder]) encustom(custom_action("yellow"));
   // banishing actions
-   if (list_contains(vars["BatMan_banish"],m)) encustom(custom_action("banish"));
+   if (list_contains(getvar("BatMan_banish"),m)) encustom(custom_action("banish"));
   // summon mayflies (toward the end since it can result in free runaways)
    if (should_mayfly()) encustom(get_action($skill[summon mayfly swarm]));
   // vibrato punchcards
@@ -304,36 +315,40 @@ void build_custom() {
          encustom(to_event("runaway","endscombat",1)); break;
       case $monster[racecar bob]: case $monster[bob racecar]: if (get_property("questL11Palindome") == "started" && item_amount($item[photograph of a dog]) == 0)
          encustom($item[disposable instant camera]); break;
+      case $monster[villainous minion]: if (my_path() != "License to Adventure" || get_property("_villainLairProgress").to_int() > 900) break;
+         if (!get_property("_villainLairCanLidUsed").to_boolean()) encustom($item[razor-sharp can lid]);
+         if (!get_property("_villainLairFirecrackerUsed").to_boolean()) encustom($item[knob goblin firecracker]);
+         if (!get_property("_villainLairWebUsed").to_boolean()) encustom($item[spider web]); break;
      // upgrading abstractions                           TODO: are these triggered by goals?  if not, add is_goal() check
       case $monster[thinker of thoughts]: if (have_familiar($familiar[machine elf])) encustom($item[abstraction: action]); break;
       case $monster[perceiver of sensations]: if (have_familiar($familiar[machine elf])) encustom($item[abstraction: thought]); break;
       case $monster[performer of actions]: if (have_familiar($familiar[machine elf])) encustom($item[abstraction: sensation]); break;
      // pretentious artist's psychoses depend on target effect specified in BatMan_pretentioustarget
-      case $monster[bag of Potatoes of Security]: switch (to_effect(vars["BatMan_pretentioustarget"])) {
+      case $monster[bag of Potatoes of Security]: switch (to_effect(getvar("BatMan_pretentioustarget"))) {
          case $effect[my breakfast with andrea]: encustom($item[artist's butterknife of regret],true); break;
          case $effect[the champion's breakfast]: encustom($item[artist's cr&egrave;me brul&eacute;e torch of fury],true); break;
          case $effect[tiffany's breakfast]: encustom($item[artist's whisk of misery],true); break;
          case $effect[breakfast clubbed]: encustom($item[artist's cookie cutter of loneliness],true); encustom($item[artist's spatula of despair],true); break;
       } break;
-      case $monster[box of Batter Mix of Hope]: switch (to_effect(vars["BatMan_pretentioustarget"])) {
+      case $monster[box of Batter Mix of Hope]: switch (to_effect(getvar("BatMan_pretentioustarget"))) {
          case $effect[my breakfast with andrea]: encustom($item[artist's spatula of despair],true); break;
          case $effect[the champion's breakfast]: encustom($item[artist's whisk of misery],true); break;
          case $effect[tiffany's breakfast]: encustom($item[artist's cookie cutter of loneliness],true); break;
          case $effect[breakfast clubbed]: encustom($item[artist's butterknife of regret],true); encustom($item[artist's cr&egrave;me brul&eacute;e torch of fury],true); break;
       } break;
-      case $monster[bundle of Meat of Happiness]: switch (to_effect(vars["BatMan_pretentioustarget"])) {
+      case $monster[bundle of Meat of Happiness]: switch (to_effect(getvar("BatMan_pretentioustarget"))) {
          case $effect[my breakfast with andrea]: encustom($item[artist's butterknife of regret],true); break;
          case $effect[the champion's breakfast]: encustom($item[artist's cookie cutter of loneliness],true); break;
          case $effect[tiffany's breakfast]: encustom($item[artist's spatula of despair],true); break;
          case $effect[breakfast clubbed]: encustom($item[artist's cr&egrave;me brul&eacute;e torch of fury],true); encustom($item[artist's whisk of misery],true); break;
       } break;
-      case $monster[carton of Eggs of Confidence]: switch (to_effect(vars["BatMan_pretentioustarget"])) {
+      case $monster[carton of Eggs of Confidence]: switch (to_effect(getvar("BatMan_pretentioustarget"))) {
          case $effect[my breakfast with andrea]: encustom($item[artist's whisk of misery],true); break;
          case $effect[the champion's breakfast]: encustom($item[artist's cr&egrave;me brul&eacute;e torch of fury],true); break;
          case $effect[tiffany's breakfast]: encustom($item[artist's spatula of despair],true); break;
          case $effect[breakfast clubbed]: encustom($item[artist's cookie cutter of loneliness],true); encustom($item[artist's butterknife of regret],true); break;
       } break;
-      case $monster[loaf of Bread of Wonder]: switch (to_effect(vars["BatMan_pretentioustarget"])) {
+      case $monster[loaf of Bread of Wonder]: switch (to_effect(getvar("BatMan_pretentioustarget"))) {
          case $effect[my breakfast with andrea]: encustom($item[artist's butterknife of regret],true); break;
          case $effect[the champion's breakfast]: encustom($item[artist's cr&egrave;me brul&eacute;e torch of fury],true); break;
          case $effect[tiffany's breakfast]: encustom($item[artist's cookie cutter of loneliness],true); break;
@@ -357,6 +372,8 @@ void build_custom() {
          encustom(to_event("runaway","endscombat",1)); break;
       case $monster[the big wisniewski]:
       case $monster[the man]: if (get_property("hippiesDefeated") == "999" && get_property("fratboysDefeated") == "999") encustom($item[flaregun],true); break;
+      case $monster[guard turtle]: if (!contains_text(page,"frenchturtle.gif")) break;       
+      case $monster[french guard turtle]: if (have_equipped($item[fouet de tortue-dressage])) for i from 1 to 5 encustom($skill[apprivoisez la tortue]); break;
       case $monster[thug 1 and thug 2]: if (item_amount($item[jar full of wind]) > 9) for i from 1 to 10 encustom($item[jar full of wind]); break;
       case $monster[the bat in the spats]: if (item_amount($item[clumsiness bark]) > 9) for i from 1 to 10 encustom($item[clumsiness bark]); break;
       case $monster[the large-bellied snitch]: if (item_amount($item[dangerous jerkcicle]) > 7) for i from 1 to 10 encustom($item[dangerous jerkcicle]); break;
@@ -399,7 +416,7 @@ void build_custom() {
       return new advevent;
    }
    encustom(unknown_rave());
-   if (to_boolean(vars["BatMan_onlycustomitems"])) foreach i,v in opts 
+   if (to_boolean(getvar("BatMan_onlycustomitems"))) foreach i,v in opts 
       if (index_of(v.id,"use ") == 0 && v.custom == "") remove opts[i];
    vprint("Custom actions built! ("+count(custom)+" actions)",9);
 }
@@ -429,7 +446,7 @@ boolean is_our_huckleberry() {
       case $location[the clumsiness grove]: if (m == $monster[the thorax] && item_amount($item[clumsiness bark]) > 0) return true; break;
    }
    if (my_fam() == $familiar[he-boulder] && have_effect($effect[everything looks yellow]) == 0 &&
-         contains_text(vars["BatMan_yellow"],m.to_string())) return vprint("Monsters in BatMan_yellow are your huckleberry.",9);
+         contains_text(getvar("BatMan_yellow"),m.to_string())) return vprint("Monsters in BatMan_yellow are your huckleberry.",9);
    return vprint("This monster is not your huckleberry.","black",-9);
 }
 
@@ -508,7 +525,7 @@ void build_combos() {
    if (meat_drop(m) > 0) encombo($effect[rave nirvana]);
    if ((should_pp && get_property("_raveStealCount").to_int() < 30) || where == $location[outside the club]) encombo($effect[none]);
    if (count(item_drops(m)) > 1 && !(my_fam() == $familiar[he-boulder] && have_effect($effect[everything looks yellow]) == 0 &&
-       contains_text(vars["BatMan_yellow"],m.to_string())))             // no need for +items if you're going to yellow ray
+       contains_text(getvar("BatMan_yellow"),m.to_string())))             // no need for +items if you're going to yellow ray
       encombo($effect[rave concentration]);
    sort combos by -to_profit(value);
    vprint("Combos built! ("+count(combos)+" combos)",9);
@@ -540,20 +557,21 @@ string stasis_repeat() {       // the string of repeat conditions for stasising
       ((my_fam() == $familiar[slimeling]) ? " && match slimeling.gif" : "");
 }
 
+boolean is_once(string id) {  // hackish but a big improvement over false repeats for once items
+   if (!contains_text(id," ")) return false;
+   string cat = excise(id,""," "); if (cat == "use") cat = "item";
+   if (!(factors contains cat)) return vprint("Factors does not contain '"+cat+"'.",-3);
+   if (!(factors[cat] contains to_int(excise(id," ","")))) return vprint("Factors["+cat+"] does not contain '"+excise(id," ","")+"'.",-3);
+   return list_contains(factors[cat,to_int(excise(id," ",""))].special, "once");
+}
+
 string stasis() {
    if ($monsters[naughty sorority nurse, naughty sorceress, naughty sorceress (2),
        pufferfish, bonerdagon, toxic beastie, Daisy the Unclean] contains m) return page;    // never stasis these monsters
    if (m == $monster[quantum mechanic] && m_hit_chance() > 0.08) return page;  // avoid teleportitis
-   boolean is_once(string id) {  // hackish but a big improvement over false repeats for once items
-      if (!contains_text(id," ")) return false;
-      string cat = excise(id,""," "); if (cat == "use") cat = "item";
-      if (!(factors contains cat)) return vprint("Factors does not contain '"+cat+"'.",-3);
-      if (!(factors[cat] contains to_int(excise(id," ","")))) return vprint("Factors["+cat+"] does not contain '"+excise(id," ","")+"'.",-3);
-      return factors[cat,to_int(excise(id," ",""))].special.contains_text("once");
-   }
    stasis_action(is_our_huckleberry());
    attack_action();
-   while ((to_profit(plink) > to_float(vars["BatMan_profitforstasis"]) || is_our_huckleberry()) &&
+   while ((to_profit(plink) > to_float(getvar("BatMan_profitforstasis")) || is_our_huckleberry()) &&
          (round < mdata.maxround - 3 - kill_rounds(smack) && die_rounds() > kill_rounds(smack))) {
       vprint("Top of the stasis loop.",9);
      // special actions
@@ -577,9 +595,9 @@ setvar("BatMan_flyereverything",true);
 setvar("BatMan_puttybountiesupto",19);
 setvar("BatMan_pretentioustarget",$effect[my breakfast with andrea]);
 setvar("BatMan_onlycustomitems",false);
-setvar("BatMan_attract","blooper, dairy goat, zombie waltzers, goth giant, dirty old lihc, hellion, violent fungus","list of monster");
-setvar("BatMan_banish","senile lihc, slick lihc, A.M.C. gremlin","list of monster");
-setvar("BatMan_yellow","knob goblin harem girl, 7-foot dwarf foreman","list of monster");
+setvar("BatMan_attract","blooper, dairy goat, zombie waltzers, dirty old lihc, violent fungus","list of monster");
+setvar("BatMan_banish","senile lihc, slick lihc, A.M.C. gremlin, pygmy orderlies","list of monster");
+setvar("BatMan_yellow","knob goblin harem girl, 7-foot dwarf foreman, orcish frat boy spy, war hippy spy","list of monster");
 string SSver = check_version("SmartStasis","smartstasis",1715);
 
 void main(int initround, monster foe, string pg) {

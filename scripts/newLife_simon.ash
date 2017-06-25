@@ -45,6 +45,7 @@ boolean good(string it) {
 	case "Avatar of Boris":
 	case "Avatar of Jarlsberg":
 	case "Avatar of Sneaky Pete":
+	case "License to Adventure":
 		if(it == "familiar") return false;
 		break;
 	case "Actually Ed the Undying":
@@ -431,9 +432,14 @@ void buy_stuff() {
 	// Don't get the toy accordion if I have a Deck of Every Card because I'll probably prefer to sell a Mickey Mantle card and buy an antique accordion.
 	if(available_amount($item[Deck of Every Card]) > 0 && be_good($item[Deck of Every Card]))
 	{
-		if(available_amount($item[1952 Mickey Mantle card])==0)
-			cli_execute("cheat Mantle");
-		autosell(1,$item[1952 Mickey Mantle card]);
+		if(!contains_text(get_property("_deckCardsSeen"), "Mickey"))
+		{
+			if(available_amount($item[1952 Mickey Mantle card])==0)
+			{
+				cli_execute("cheat Mantle");
+				autosell(1,$item[1952 Mickey Mantle card]);
+			}
+		}
 		if(need_accordion())
 			buy(1, $item[antique accordion]);
 	}
@@ -518,7 +524,7 @@ familiar start_familiar() {
 	if(my_path() == "Zombie Slayer" && have_familiar($familiar[Hovering Skull]))
 		return $familiar[Hovering Skull];
 	
-	foreach f in $familiars[He-Boulder, galloping grill, baby sandworm, hovering sombrero, Frumious Bandersnatch, Baby Bugged Bugbear, Bloovian Groose, Gluttonous Green Ghost, 
+	foreach f in $familiars[galloping grill, He-Boulder, baby sandworm, slimeling, hovering sombrero, Frumious Bandersnatch, Baby Bugged Bugbear, Bloovian Groose, Gluttonous Green Ghost, 
 	  Spirit Hobo, Fancypants Scarecrow, Ancient Yuletide Troll, Cheshire Bat, Cymbal-Playing Monkey, Nervous Tick, 
 	  Hunchbacked Minion, Uniclops, Chauvinist Pig, Dramatic Hedgehog, Blood-Faced Volleyball, Reagnimated Gnome, 
 	  Jill-O-Lantern]
@@ -595,7 +601,7 @@ void handle_starting_items() {
 	if(fam == $familiar[none] || !good(fam) || !have_familiar(fam))
 		fam = start_familiar();
 	use_familiar(fam);
-	equip_stuff();
+//	equip_stuff();
 }
 
 // Optimal restoration settings for level 1. These will need to be changed by level 4
@@ -747,13 +753,22 @@ boolean pull_if_good(item it)
 	{
 		//check for unrecognised type69
 		print("pulling "+it);
-		if(available_amount(it)==0)
+		if(available_amount(it)==0 && !in_hardcore())
 			take_storage(1,it);
 		if(available_amount(it)==0)
 		{
-			if(!contains_text(it,"astral") && it!=$item[none]) //ignore when we fail to pull astrals
-				abort("Failed to pull "+it);
-			return false;
+			if(contains_text(it,"astral") || it==$item[none]) //ignore when we fail to pull astrals
+				return false;
+			
+			// floundry
+			if(it==$item[carpe] || it==$item[codpiece] || it==$item[troutsers] || it==$item[bass clarinet] || it==$item[fish hatchet] || it==$item[tunac])
+			{
+				cli_execute("make "+it);
+				set_property("bumcheek_floundry_gear", it); 
+				return true;
+			}
+			
+			abort("Failed to pull "+it);
 		}
 		return true;
 	}
@@ -868,6 +883,16 @@ void special(boolean bonus_actions) {
 					break;
 			}
 		}
+		//get floundry gear anyway
+/*		if(be_good($item[clan floundry]))
+		{
+			if(my_primestat()==$stat[moxie] && !get_property("_floundryItemUsed").to_boolean())
+				pull_and_wear_if_good( $item[bass clarinet]);
+			if(my_primestat()==$stat[muscle] && !get_property("_floundryItemUsed").to_boolean())
+				pull_and_wear_if_good( $item[fish hatchet]);
+			if(!get_property("_floundryItemUsed").to_boolean())
+				pull_and_wear_if_good( $item[Troutsers]);
+		}*/
 	}
 	else
 	{
@@ -921,6 +946,8 @@ void special(boolean bonus_actions) {
 				fam_list[count(fam_list)] = $item[moveable feast];
 				fam_list[count(fam_list)] = $item[snow suit];
 				fam_list[count(fam_list)] = $item[astral pet sweater];
+				fam_list[count(fam_list)] = $item[filthy child leash];
+				
 				pull_and_wear_from_list(fam_list);
 			}
 			
@@ -963,9 +990,13 @@ void special(boolean bonus_actions) {
 			pants_list[count(pants_list)] = $item[greatest american pants];
 			if(my_class()==$class[disco bandit])
 				pants_list[count(pants_list)] = $item[The Sagittarian's leisure pants];
+			if(!get_property("_floundryItemUsed").to_boolean())
+				pants_list[count(pants_list)] = $item[Troutsers];
 			if(my_basestat($stat[muscle])>=5)
 				pants_list[count(pants_list)] = $item[stylish swimsuit];
 			pants_list[count(pants_list)] = $item[toy Crimbot rocket legs];
+			pants_list[count(pants_list)] = $item[discarded swimming trunks];
+			
 			pull_and_wear_from_list(pants_list);
 			
 			//shirt
@@ -976,6 +1007,8 @@ void special(boolean bonus_actions) {
 				shirt_list[count(shirt_list)] = $item[Sneaky Pete's leather jacket (collar popped)];
 				shirt_list[count(shirt_list)] = $item[Sneaky Pete's leather jacket];
 				shirt_list[count(shirt_list)] = $item[cane-mail shirt];
+				shirt_list[count(shirt_list)] = $item[KoL Con 13 T-shirt];
+				
 				pull_and_wear_from_list(shirt_list);
 				//post shirt stuff...
 				if(available_amount($item[sneaky pete's leather jacket])>0)
@@ -1014,30 +1047,49 @@ void special(boolean bonus_actions) {
 			wep_list[count(wep_list)] = $item[saucepanic];
 			wep_list[count(wep_list)] = $item[thor's pliers];
 			wep_list[count(wep_list)] = $item[ice sickle];
+			if(my_class()==$class[disco bandit])
+				wep_list[count(wep_list)] = $item[wicker sticker];
+			if(my_class()==$class[accordion thief] || my_path()=="Gelatinous Noob")
+			{
+				wep_list[count(wep_list)] = $item[Aerogel accordion];
+				wep_list[count(wep_list)] = $item[baritone accordion]; //kinda crappy...
+			}
+			wep_list[count(wep_list)] = $item[ice sickle];
+			if(my_primestat()==$stat[moxie] && !get_property("_floundryItemUsed").to_boolean())
+				wep_list[count(wep_list)] = $item[bass clarinet];
+			if(my_primestat()==$stat[muscle] && !get_property("_floundryItemUsed").to_boolean())
+				wep_list[count(wep_list)] = $item[fish hatchet];
+			if(my_primestat()==$stat[mysticality])
+				wep_list[count(wep_list)] = $item[polyester peeler];
+			wep_list[count(wep_list)] = $item[wicker sticker]; //even for non db it's quite good
+			wep_list[count(wep_list)] = $item[reindeer hammer]; //even for non db it's quite good
 			pull_and_wear_from_list(wep_list);
 			
 			//offhand
 			item [int] off_list;
-			off_list[count(off_list)] = $item[astral shield];
-			off_list[count(off_list)] = $item[Astral statuette];
-			//myst classes want a pan offhand
-			if(my_primestat()==$stat[mysticality] && my_path()!="Bees Hate You" && my_path()!="BIG!")
+			if(weapon_hands(equipped_item($slot[weapon]))<2)
 			{
-				off_list[count(off_list)] = $item[Jarlsberg's pan (Cosmic portal mode)];
-				off_list[count(off_list)] = $item[Jarlsberg's pan];
-			}
-			off_list[count(off_list)] = $item[operation patriot shield];
-			if(my_class()==$class[seal clubber])
-				off_list[count(off_list)] = $item[Meat Tenderizer is Murder];
-			else if(my_class()==$class[disco bandit])
-				off_list[count(off_list)] = $item[Frankly Mr. Shank];
-			off_list[count(off_list)] = $item[Shield of Icy Fate];
-			off_list[count(off_list)] = $item[hypnodisk];
-			pull_and_wear_from_list(off_list, $slot[off-hand]);
-			//post OH actions
-			if(available_amount($item[Jarlsberg's pan])>0)
-			{
-				cli_execute("fold Jarlsberg's pan (Cosmic portal mode)");
+				off_list[count(off_list)] = $item[astral shield];
+				off_list[count(off_list)] = $item[Astral statuette];
+				//myst classes want a pan offhand
+				if(my_primestat()==$stat[mysticality] && my_path()!="Bees Hate You" && my_path()!="BIG!")
+				{
+					off_list[count(off_list)] = $item[Jarlsberg's pan (Cosmic portal mode)];
+					off_list[count(off_list)] = $item[Jarlsberg's pan];
+				}
+				off_list[count(off_list)] = $item[operation patriot shield];
+				if(my_class()==$class[seal clubber])
+					off_list[count(off_list)] = $item[Meat Tenderizer is Murder];
+				else if(my_class()==$class[disco bandit])
+					off_list[count(off_list)] = $item[Frankly Mr. Shank];
+				off_list[count(off_list)] = $item[Shield of Icy Fate];
+				off_list[count(off_list)] = $item[hypnodisk];
+				pull_and_wear_from_list(off_list, $slot[off-hand]);
+				//post OH actions
+				if(available_amount($item[Jarlsberg's pan])>0)
+				{
+					cli_execute("fold Jarlsberg's pan (Cosmic portal mode)");
+				}
 			}
 			
 			//accessories
@@ -1057,6 +1109,7 @@ void special(boolean bonus_actions) {
 					buy(1,$item[wrist-boy]);
 				acc_list[count(acc_list)] = $item[wrist-boy];
 			}
+			acc_list[count(acc_list)] = $item[Kremlin's Greatest Briefcase];
 			acc_list[count(acc_list)] = $item[loathing legion necktie];
 			acc_list[count(acc_list)] = $item[juju mojo mask];
 			acc_list[count(acc_list)] = $item[plastic vampire fangs];
@@ -1135,19 +1188,22 @@ void start_quests()
 }
 
 void new_ascension() {
+	//reset floundry gear list
+	set_property("bumcheek_floundry_gear",""); 
+
 	boolean extra_stuff = vars["newLife_Extras"].to_boolean();  // Do extra stuff if this is true
 	set_choice_adventures();
 	campground(extra_stuff);
 	visit_toot();
 	get_stuff();
-	if(my_turncount() < 1) {
+//	if(my_turncount() < 1) {
 		recovery_settings();
 		path_skills(extra_stuff);	// Always learn skills if true
 		handle_starting_items();
 		free_barrels();
 		special(extra_stuff);		// Only executes if true
 		//equip_stuff(); //SIMON: don't mess up intended set
-	}
+//	}
 	check_breakfast();
 	start_quests();
 	cli_execute("outfit save Backup");  // Accidently equiping Backup after ascending cases error. No more oops.

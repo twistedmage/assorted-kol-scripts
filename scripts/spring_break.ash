@@ -24,7 +24,8 @@ void fun_guy()
 {
 	print("Doing fun-guy quest","green");
 	use_familiar($familiar[fancypants scarecrow]);
-	string max_str = "maximize items, -equip gravy-covere";
+	string max_str = "maximize items, -equip gravy-covere, +equip pantsgiving";
+	print(max_str + ", +equip mayfly bait necklace");
 	cli_execute(max_str + ", +equip mayfly bait necklace");
 	set_combat_macro();
 	setMood("i");
@@ -57,7 +58,8 @@ void diner()
 	use_familiar($familiar[Pair of Stomping Boots]);
 	if(i_a("moveable feast")>0)
 		use(1,$item[moveable feast]);
-	string max_str = "maximize familiar weight, +equip paradais";
+	string max_str = "maximize familiar weight, +equip paradais, +equip pantsgiving";
+	print(max_str + ", +equip mayfly bait necklace");
 	cli_execute(max_str + ", +equip mayfly bait necklace");
 	set_combat_macro("cheeseburger");
 	while(my_adventures()>0 && !contains_text(visit_url("questlog.php?which=7"), "Take the ingredients back to "))
@@ -68,6 +70,7 @@ void diner()
 			if(my_path()!="Avatar of Sneaky Pete")
 				use_familiar($familiar[artistic goth kid]);
 			max_str = "maximize +equip paradais, +equip greatest american pants";
+			print(max_str + ", +equip mayfly bait necklace");
 			cli_execute(max_str + ", +equip mayfly bait necklace");
 		}
 		//done with mayfly?
@@ -97,6 +100,7 @@ void ship()
 	if(i_a("moveable feast")>0)
 		use(1,$item[moveable feast]);
 	string max_str = "maximize ml, +sea, +equip greatest american";
+	print(max_str + ", +equip mayfly bait necklace");
 	cli_execute(max_str + ", +equip mayfly bait necklace");
 	
 	setMood("l");
@@ -143,7 +147,8 @@ void conspiracy()
 	{
 		if(my_path()!="Avatar of Sneaky Pete")
 			use_familiar($familiar[disembodied hand]);
-		string max_str = "maximize mysticality, +equip encrypted micro-cassette recorder";
+		string max_str = "maximize mysticality, +equip encrypted micro-cassette recorder, +equip pantsgiving";
+		print(max_str + ", +equip mayfly bait necklace");
 		cli_execute(max_str + ", +equip mayfly bait necklace");
 		set_combat_macro("warbear");
 		setMood("");
@@ -187,7 +192,8 @@ void conspiracy()
 	{
 		if(my_path()!="Avatar of Sneaky Pete")
 			use_familiar($familiar[disembodied hand]);
-		string max_str = "maximize init, +equip GPS-tracking wristwatch, -equip helps-you-sleep";
+		string max_str = "maximize init, +equip GPS-tracking wristwatch, -equip helps-you-sleep, +equip pantsgiving";
+		print(max_str + ", +equip mayfly bait necklace");
 		cli_execute(max_str + ", +equip mayfly bait necklace");
 		set_combat_macro();
 		setMood("");
@@ -202,7 +208,8 @@ void conspiracy()
 	{
 		if(my_path()!="Avatar of Sneaky Pete")
 			use_familiar($familiar[disembodied hand]);
-		string max_str = "maximize mainstat";
+		string max_str = "maximize mainstat, +equip pantsgiving";
+		print(max_str + ", +equip mayfly bait necklace");
 		cli_execute(max_str + ", +equip mayfly bait necklace");
 		clear_combat_macro();
 		setMood("");
@@ -297,25 +304,184 @@ void diner_farm()
 	{
 		adventure(1,$location[sloppy seconds diner]);
 	}
+	set_combat_macro();
+}
+
+void garbage_handin()
+{
+	if(!get_property("_dinseyGarbageDisposed").to_boolean())
+	{
+		if(i_a("bag of park garbage")<1)
+			buy(1,$item[bag of park garbage]);
+		visit_url("place.php?whichplace=airport_stench&action=airport3_tunnels");
+		visit_url("choice.php?pwd&whichchoice=1067&option=6&choiceform6=Waste+Disposal");
+	}
+	
+}
+
+void volcano()
+{
+	//try to hand in
+	if(!get_property("_volcanoItemRedeemed").to_boolean())
+		abort("Hand in at volcano (pref loot, then travoltron, fused fuse is least desirable to hand in)");
+	
+	//try to get another voltron drop
+/*******************quest items
+	if(i_a("Saturday Night thermometer")<1 && !get_property("_infernoDiscoVisited").to_boolean())
+	{
+		cli_execute("familiar disembodied");
+		print("maximize mainstat, +equip smooth velvet pocket, +equip smooth velvet socks, +equip smooth velvet hat");
+		cli_execute("maximize mainstat, +equip smooth velvet pocket, +equip smooth velvet socks, +equip smooth velvet hat");
+		//fight travoltron
+		visit_url("place.php?whichplace=airport_hot&action=airport4_zone1");
+		visit_url("choice.php?pwd&whichchoice=1090&option=4&choiceform4=Go+to+the+third+floor");
+	}
+	
+	//try to get another fused fuse
+	if(i_a("fused fuse")<1)
+	{
+		cli_execute("familiar disembodied");
+		print("maximize 0.01 mainstat, -combat, +equip pantsgiving; cast 3 smooth; cast 3 sonata");
+		cli_execute("maximize 0.01 mainstat, -combat, +equip pantsgiving; cast 3 smooth; cast 3 sonata");
+		
+		while(i_a("fused fuse")<1)
+		{
+			set_property("choiceAdventure1091","7");
+			adventure(1, $location[LavaCo Lamp Factory]);
+		}
+	}
+	*/
+	//get buyable items
+	if(i_a("gooey lava globs")< 5)
+		buy(5, $item[gooey lava globs]);
+	if(i_a("New Age healing crystal")< 5)
+		buy(5, $item[New Age healing crystal]);
+	if(i_a("superduperheated metal")< 1)
+		buy(1, $item[superduperheated metal]);
+//	if(i_a("SMOOCH bracers")< 3)
+//		buy(3, $item[SMOOCH bracers]);
+	if(i_a("smooth velvet bra")< 3)
+	{
+		buy(9, $item[unsmoothed velvet]);
+		create(3, $item[smooth velvet bra]);
+	}
+
+if(my_path()!="Gelatinous Noob")
+{	
+	//if we didn't fight travoltron today, get an extra volcoino
+	if(!get_property("_infernoDiscoVisited").to_boolean())
+	{
+		cli_execute("familiar disembodied");
+		print("maximize mainstat, +equip smooth velvet pocket, +equip smooth velvet socks, +equip smooth velvet hat, +equip smooth velvet shirt, +equip smooth velvet hanky, +equip smooth velvet pants");
+		cli_execute("maximize mainstat, +equip smooth velvet pocket, +equip smooth velvet socks, +equip smooth velvet hat, +equip smooth velvet shirt, +equip smooth velvet hanky, +equip smooth velvet pants");
+		//visit disco
+		visit_url("place.php?whichplace=airport_hot&action=airport4_zone1");
+		visit_url("choice.php?pwd&whichchoice=1090&option=7&choiceform7=Go+to+the+sixth+floor");
+	}
+}
+}
+
+void dinsey()
+{
+	garbage_handin();
+	//get a quest
+	//http://127.0.0.1:60082/place.php?whichplace=airport_stench&action=airport3_kiosk
+	//if(i_a("")<
+	/* 
+	electrucak maintenance - 0!
+	compulsory fun - 15
+	waterway debris - 20
+	feed tourists - 18
+	bears - (84% encounter after olfact... somehwere around 10 turns)
+	rollercoaster maintenance - ~20 turns (15 after maintenance)
+	sexism - 15 tusn?
+	racism - 15 turns?
+	*/
+	abort("do dinsey then glaciest");
+}
+
+void glaciest()
+{
+	abort("do glaciest");
 }
 
 void main()
 {
-	if(i_a("beach buck")>=1000)
-		abort("buy SPRING BREAK TATTOO then stop farming bucks");
+	if(i_a("beach buck")>=500)
+		abort("buy airport duty free tattoo then stop farming bucks");
+	
 	if(i_a("coinspiracy")>=50 && i_a("mercenary rifle")<1)
 		abort("buy mercenary rifle wtih coinspiracy");
 	if(i_a("coinspiracy")>=50 && i_a("mercenary pistol")<3)
 		abort("buy mercenary pistol wtih coinspiracy");
-	if(i_a("coinspiracy")>=300 && !have_skill($skill[Intimidating Mien]))
+/*	if(i_a("coinspiracy")>=300 && !have_skill($skill[Intimidating Mien]))
 		abort("buy Intimidation Techniques book wtih coinspiracy");
 	if(i_a("coinspiracy")>=300 && !have_skill($skill[Hypersane]))
-		abort("buy Sanity Maintenance book wtih coinspiracy");
-	if(i_a("coinspiracy")>=1000)
-		abort("buy tattoo wtih coinspiracy THEN STOP FARMING");
+		abort("buy Sanity Maintenance book wtih coinspiracy");*/
+//	if(i_a("coinspiracy")>=1000)
+//		print("buy tattoo wtih coinspiracy THEN STOP FARMING","red");
 	if(i_a("Merc Core Field Manual: Sanity Maintenance")>0 || i_a("Merc Core Field Manual: Intimidation Techniques ")>0)
 		print("READ MERC BOOKS","red");
+//	if(i_a("coinspiracy")>=300)
+//		abort("FINISHED SAVING FOR DUTY FREE, STOP FARMING coinspiracy");
+		
+	if(i_a("FunFunds")>=50 && !have_skill($skill[Dinsey Operations Expert]))
+		abort("buy Dinsey Maintenance Manual with FunFunds");
+	if(i_a("FunFunds")>=50 && !have_skill($skill[Olfactory Burnout]))
+		abort("buy Scratch-and-Sniff Guide to Dinseylandfill with FunFunds");
+	if(i_a("FunFunds")>=50 && !have_skill($skill[Garbage Nova]))
+		abort("buy Trash, a Memoir with FunFunds");
+	if(have_skill($skill[Garbage Nova]) && have_skill($skill[Olfactory Burnout]) &&  have_skill($skill[Dinsey Operations Expert]))
+	{
+		if(i_a("FunFunds")>=25 && i_a("Stinky fannypack")<3)
+			abort("buy Stinky fannypack with FunFunds");
+			//------------------------------
+		if(i_a("FunFunds")>=25 && i_a("Garbage sticker")<3)
+			abort("buy Garbage sticker with FunFunds");
+		if(i_a("FunFunds")>=25 && i_a("Hazmat helmet")<2)
+			abort("buy Hazmat helmet with FunFunds");
+	}
+	if(i_a("FunFunds")>=100)
+		abort("buy dinsey tattoo with FunFunds then uncomment below");
+	//if(i_a("funfunds")>=)
+	//	abort("buy airport duty free tattoo then stop farming funfunds");
+		
+/*	if(i_a("Volcoino")>=10 && !have_skill($skill[Asbestos Heart]))
+		abort("buy Lava Miner's Daughter with Volcoino");
+	if(i_a("Volcoino")>=10 && !have_skill($skill[Firegate]))
+		abort("buy 	The Firegate Tapes with Volcoino");
+	if(i_a("Volcoino")>=10 && !have_skill($skill[Pyromania]))
+		abort("buy Psycho From The Heat with Volcoino");
+*/	if(have_skill($skill[Asbestos Heart]) && have_skill($skill[Pyromania]) &&  have_skill($skill[Firegate]))
+	{
+		if(i_a("Volcoino")>=5 && i_a("Biker's hat")<2)
+			abort("buy Biker's hat with Volcoino");
+		if(i_a("Volcoino")>=5 && i_a("Feathered headdress")<2)
+			abort("buy Feathered headdress with Volcoino");
+		if(i_a("Volcoino")>=5 && i_a("Electrician's hardhat")<2)
+			abort("buy Electrician's hardhat with Volcoino");
+	}
+	if(i_a("Volcoino")>=30)
+		abort("buy volcano tattoo with valcoino then uncomment below");
+	//if(i_a("Volcoino")>=)
+	//	abort("buy airport duty free tattoo then stop farming funfunds");
+		
+
+	if(i_a("Wal-Mart gift certificate")>=75 && i_a("Wal-Mart snowglobe")<1)
+		abort("buy Wal-Mart snowglobe with Wal-Mart gift certificate");
+	if(i_a("Wal-Mart gift certificate")>=75 && i_a("Wal-Mart nametag")<3)
+		abort("buy Wal-Mart nametag with Wal-Mart gift certificate");
+	if(i_a("Wal-Mart gift certificate")>=75 && i_a("Wal-Mart overalls")<2)
+		abort("buy Wal-Mart overalls with Wal-Mart gift certificate");
+//	if(i_a("Wal-Mart gift certificate")>=250)
+//		abort("buy volcano tattoo with Wal-Mart gift certificate then uncomment below");
+	if(i_a("Wal-Mart gift certificate")>=200)
+		abort("buy airport duty free tattoo then stop farming Wal-Mart gift certificate");
+		
 	spring_break();
-	conspiracy();
+	//conspiracy();
+	volcano();
 	diner_farm();
+	dinsey();
+	glaciest();
 }

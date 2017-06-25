@@ -3,15 +3,15 @@
 
 script "newLife.ash"
 notify "Bale";
-since r16944; // Track Enlightenment points for The Source
+since r17807; // Basic Gelatinous Noob tracking
 import "zlib.ash";
 
 if(!($strings[None, Standard, Teetotaler, Boozetafarian, Oxygenarian, Bees Hate You, Way of the Surprising Fist, Trendy,
 Avatar of Boris, Bugbear Invasion, Zombie Slayer, Class Act, Avatar of Jarlsberg, BIG!, KOLHS, Class Act II: A Class For Pigs, 
 Avatar of Sneaky Pete, Slow and Steady, Heavy Rains, Picky, Actually Ed the Undying, One Crazy Random Summer, Community Service,
-Avatar of West of Loathing, The Source, Nuclear Autumn] 
-  contains my_path()) && user_confirm("Your current challenge path is unknown to this script!\nUnknown and unknowable errors may take place if it is run.\nDo you want to abort?")) {
-	vprint("Your current path is unknown to this script! A new version of this script should be released very soon.", -1);
+Avatar of West of Loathing, The Source, Nuclear Autumn, Gelatinous Noob, License to Adventure] 
+  contains my_path()) && user_confirm("Your current challenge path is unknown to newLife!\nUnknown and unknowable errors may take place if it is run.\nDo you want to abort?")) {
+	vprint("Your current path is unknown to newLife! A new version of this script should be released very soon.", -1);
 	exit;
 }
 
@@ -19,7 +19,7 @@ Avatar of West of Loathing, The Source, Nuclear Autumn]
 // It's no longer necessary for old paths however I may need it in the future.
 stat primestat = my_primestat();
 class myclass = my_class();
-# if(my_path() == "17") {
+# if(my_path() == "29") {
 	# primestat = $stat[moxie];
 	# myclass = $class[Avatar of Sneaky Pete];
 # }
@@ -36,6 +36,9 @@ boolean good(string it) {
 		break;
 	case "Actually Ed the Undying":
 		if(it == "familiar"|| it == "Hippy Stone") return false;
+		break;
+	case "License to Adventure":
+		if(it == "familiar") return false;
 		break;
 	}
 	return be_good(it);
@@ -66,6 +69,8 @@ boolean good(item it) {
 }
 
 boolean good(familiar f) {
+	if(my_path() == "License to Adventure")
+		return false;
 	return be_good(f); 
 }
 
@@ -170,8 +175,10 @@ void set_choice_adventures() {
 		set_choice("violetFogGoal", 8, "Violet Fog is great place to get the munchies.");
 	else
 		set_choice("violetFogGoal", 0, "Violet Fog is too out of date to care about.");
+	
 	// Ghost Dog
-	# set_choice(1106, 2, 'Ghost Dog says, "Wooof! Wooooooof!": Get buff'); // 1 is stats, 2 is buff, 3 is Ghost Dog food
+	if(my_path() == "License to Adventure")
+		set_choice(1106, 2, 'Ghost Dog says, "Wooof! Wooooooof!": Get buff since you don\'t need dog food or stats.'); // 1 is stats, 2 is buff, 3 is Ghost Dog food
 	set_choice(1107, 1, "Play Fetch with your Ghost Dog: Get 1 tennis ball");
 	set_choice(1108, my_ascensions() % 2 + 1, "Your Dog Found Something Again: Get food or booze"); // 1 is food, 2 is booze - Alternate
 	
@@ -278,7 +285,7 @@ void set_choice_adventures() {
 		set_choice(876, 1, "Bedroom, White Nightstand: old leather wallet");
 		break;
 	}
-	if(vars["newLife_SetupGuyMadeOfBees"].to_boolean())
+	if(getvar("newLife_SetupGuyMadeOfBees").to_boolean())
 		set_choice(105, 3, "Bathroom, Having a Medicine Ball: Say, \"Guy made of Bees.\"");
 	else if(primestat == $stat[mysticality] && !skipStatNCs)
 		set_choice(105, 1, "Bathroom, Having a Medicine Ball: Get Mysticality stats");
@@ -304,7 +311,7 @@ void set_choice_adventures() {
 
 void campground(boolean softBoo) {
 	// Break the hippy stone?
-	if(vars["newLife_SmashHippyStone"] == "true" && !hippy_stone_broken() && good("Hippy Stone")) {
+	if(getvar("newLife_SmashHippyStone") == "true" && !hippy_stone_broken() && good("Hippy Stone")) {
 		vprint("Smashing that hippy-dippy crap so you can have some violent fun!", "olive", 3);
 		string pvp = visit_url("peevpee.php?confirm=on&action=smashstone&pwd");
 		if(pvp.contains_text("Pledge allegiance to"))
@@ -314,7 +321,7 @@ void campground(boolean softBoo) {
 	if(get_dwelling() != $item[big rock])
 		return;  // If dwelling is something other than a big rock, we're done here.
 	boolean tent = available_amount($item[Newbiesport&trade; tent]) > 0 && good($item[Newbiesport&trade; tent])
-	  && vars["newLife_UseNewbieTent"].to_boolean();
+	  && getvar("newLife_UseNewbieTent").to_boolean();
 	// If the player is in Hardcore Nation it is time to send a "Please brick me" announcement!
 	// I only announce it if I am ascending hardcore. Silly, but that's me.
 	if( (in_hardcore() || !softBoo) && (tent || my_turncount() < 1) && get_clan_id() == 41543) {  // 41543 is the ID for HCN
@@ -415,8 +422,11 @@ void buy_stuff() {
 	if(my_path() == "Heavy Rains")
 		garner = trade_pork4item($item[miniature life preserver]).and_string(garner);
 	
+	// Seal teeth used to be useful, but good play doesn't really need them anymore.
+	// Leaving the code here in case things change or they become useful again in some future path.
+	boolean sealtooth = false;
 	// For disco bandits, Suckerpunch is better than seal tooth
-	if(myclass != $class[Disco Bandit] && item_amount($item[seal tooth]) == 0 && good($item[seal tooth]) && good($item[chewing gum on a string])) {
+	if(sealtooth && myclass != $class[Disco Bandit] && item_amount($item[seal tooth]) == 0 && good($item[seal tooth]) && good($item[chewing gum on a string])) {
 		while(!worthless() && meat4pork($item[chewing gum on a string]))
 			use(1, $item[chewing gum on a string]);
 		if(worthless() && (available_amount($item[hermit permit]) > 0 || meat4pork($item[hermit permit]))) {
@@ -431,7 +441,7 @@ void buy_stuff() {
 
 void get_stuff() {
 	get_bugged_balaclava();
-	if(vars["newLife_SellPorkForStuff"].to_boolean()) {
+	if(getvar("newLife_SellPorkForStuff").to_boolean()) {
 		if(item_amount($item[pork elf goodies sack]) > 0 && good($item[pork elf goodies sack]))
 			use(1, $item[pork elf goodies sack]);
 		if(item_amount($item[baconstone]) + item_amount($item[hamethyst]) + item_amount($item[porquoise]) + my_meat() > 0)
@@ -470,7 +480,7 @@ boolean use_shield() {
 }
 
 familiar start_familiar() {
-	familiar f100 = vars["is_100_run"].to_familiar();	// Is this a 100% familiar run?
+	familiar f100 = getvar("is_100_run").to_familiar();	// Is this a 100% familiar run?
 	// If player has used BCCAscend, normalize familiar settings with "is_100_run"
 	if(get_property("bcasc_lastCouncilVisit") != "") {
 		if(f100 == $familiar[none]) {
@@ -485,10 +495,8 @@ familiar start_familiar() {
 	if(my_path() == "Zombie Slayer" && have_familiar($familiar[Hovering Skull]))
 		return $familiar[Hovering Skull];
 	
-	foreach f in $familiars[He-Boulder, Frumious Bandersnatch, Baby Bugged Bugbear, Grim Brother, Bloovian Groose, Gluttonous Green Ghost, 
-	  Spirit Hobo, Fancypants Scarecrow, Ancient Yuletide Troll, Cheshire Bat, Cymbal-Playing Monkey, Nervous Tick, 
-	  Hunchbacked Minion, Uniclops, Chauvinist Pig, Dramatic Hedgehog, Blood-Faced Volleyball, Reagnimated Gnome, 
-	  Jill-O-Lantern, Hovering Sombrero]
+	foreach f in $familiars[Ms. Puck Man, Puck Man, Intergnat, Machine Elf, Optimistic Candle, Rockin' Robin, Frumious Bandersnatch, Baby Bugged Bugbear, 
+	  Fist Turkey, Golden Monkey, Grim Brother, Bloovian Groose, Gluttonous Green Ghost, Spirit Hobo, Fancypants Scarecrow, Mad Hatrack]
 		if(have_familiar(f) && good(f)) return f;
 	
 	return $familiar[none];
@@ -555,7 +563,7 @@ void handle_starting_items() {
 	// Put on the best stuff you've got.
 	vprint("Put on your best gear.", "olive", 3);
 	// First equip best familiar!
-	familiar fam = (vars contains "is_100_run")? to_familiar(vars["is_100_run"]): my_familiar();
+	familiar fam = (vars contains "is_100_run")? to_familiar(getvar("is_100_run")): my_familiar();
 	if(fam == $familiar[none] || !good(fam) || !have_familiar(fam))
 		fam = start_familiar();
 	use_familiar(fam);
@@ -787,7 +795,7 @@ void check_breakfast() {
 }
 
 void new_ascension() {
-	boolean extra_stuff = vars["newLife_Extras"].to_boolean();  // Do extra stuff if this is true
+	boolean extra_stuff = getvar("newLife_Extras").to_boolean();  // Do extra stuff if this is true
 	set_choice_adventures();
 	campground(extra_stuff);
 	visit_toot();
@@ -808,7 +816,7 @@ void new_ascension() {
 // These are default values here. To change for each character, edit their vars file in /data direcory or use the zlib commands.
 setvar("newLife_SetupGuyMadeOfBees", FALSE); // If you like to set up the guy made of bees set this TRUE. 
 setvar("newLife_SmashHippyStone", FALSE);	// Smash stone if you want to break it at level 1 for some PvPing!
-setvar("newLife_UseNewbieTent", TRUE);		// Use newbie tent if you don't want togive your clannes a fair shot at bricking you in the face!
+setvar("newLife_UseNewbieTent", TRUE);		// Use newbie tent if you don't want to give your clannes a fair shot at bricking you in the face!
 setvar("newLife_SellPorkForStuff", TRUE);	// Sell pork gems to purchase detuned radio, toy accordion & seal tooth
 setvar("newLife_Extras", FALSE); 			// Mixed bag of custom actions. This is personal to me, but maybe someone else will like it also
 

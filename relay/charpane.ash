@@ -1,13 +1,55 @@
 script "Character Info Toolbox";
 notify "Bale";
-since r17526; // handle proper item disambiguation for I Love Me, Staff of Fats, ancient amulet & Eye of Ed
-
-import "zlib.ash";
+since r18069; // KG Briefcase
 import "chit_global.ash";
 import "chit_brickFamiliar.ash"; // This has to be before chit_brickGear due to addItemIcon() and... weirdly enough pickerFamiliar()
 import "chit_brickGear.ash";
 import "chit_brickTracker.ash";
 import "chit_brickTerminal.ash";
+
+// Set default values for configuration properties. These values will be used if there is no existing property
+// For more information refer to documentation in /data/chit_ReadMe.txt
+setvar("chit.autoscroll", true);
+setvar("chit.checkversion", false);
+setvar("chit.currencies", "item", "rad,Source essence,BACON,cop dollar");
+setvar("chit.currencies.showmany", false);
+setvar("chit.character.avatar", true);
+setvar("chit.character.title", true);
+setvar("chit.clan.display", "away"); // Valid values are on,off,away. Away will only display clan if chit.clan.home is not blank.
+setvar("chit.clan.home", "");
+setvar("chit.disable", false);
+setvar("chit.familiar.anti-gollywog", true);
+setvar("chit.familiar.hiddengear", "");
+setvar("chit.familiar.protect", false);
+setvar("chit.familiar.showlock", false);
+setvar("chit.familiar.hats", "item", "spangly sombrero,sugar chapeau,chef's hat,party hat");
+setvar("chit.familiar.pants", "item", "spangly mariachi pants,double-ice britches,BRICKO pants,pin-stripe slacks,studded leather boxer shorts,monster pants,sugar shorts");
+setvar("chit.familiar.weapons", "item", "time sword,batblade,Hodgman's whackin' stick,astral mace,Maxwell's Silver Hammer,goatskin umbrella,grassy cutlass,dreadful glove,Stick-Knife of Loathing,Work is a Four Letter Sword");
+setvar("chit.effects.classicons", "none");
+setvar("chit.effects.describe", true);
+setvar("chit.effects.modicons", true);
+setvar("chit.effects.showicons", true);
+setvar("chit.effects.usermap",false);
+setvar("chit.gear.display.in-run", "favorites:pull=true:create=true, astral, item, -combat, +combat, quest:pull=true:create=true, today, ML:amount=2, path, prismatic, res, resistance:amount=2, charter, rollover, DRUNK, Wow, exp");
+setvar("chit.gear.display.aftercore", "favorites:amount=all, quest:amount=all, charter:amount=all, today:amount=all:create=false, rollover, DRUNK:amount=all");
+setvar("chit.gear.layout", "default");
+setvar("chit.gear.favorites", "item", "Pantsgiving,your cowboy boots,gold detective badge,Mr. Screege's spectacles,KoL Con 13 snowglobe,ghostly reins,training helmet,over-the-shoulder Folder Holder,Spelunker's whip,The Jokester's gun,protonic accelerator pack");
+setvar("chit.helpers.dancecard", true);
+setvar("chit.helpers.semirare", true);
+setvar("chit.helpers.spookyraven", true);
+setvar("chit.helpers.wormwood", "stats,spleen");
+setvar("chit.helpers.xiblaxian", true);
+setvar("chit.kol.coolimages", true);
+setvar("chit.effects.layout", "songs,buffs,intrinsics");
+setvar("chit.floor.layout", "update,familiar");
+setvar("chit.roof.layout", "character,stats,gear");
+setvar("chit.stats.layout", "muscle,myst,moxie|hp,mp,axel|mcd|trail,florist");
+setvar("chit.toolbar.layout", "trail,quests,modifiers,elements,organs");
+setvar("chit.walls.layout", "helpers,thrall,vykea,effects");
+setvar("chit.quests.hide", false);
+setvar("chit.stats.showbars", true);
+setvar("chit.thrall.showname", false);
+setvar("chit.toolbar.moods", "true");
 
 /************************************************************************************
 CHaracter Info Toolbox
@@ -654,7 +696,7 @@ buff parseBuff(string source) {
 	}
 	
 	// Check Mirror picker
-	if($effects[Slicked-Back Do, Pompadour, Cowlick, Fauxhawk] contains myBuff.eff)
+	if($effects[[1553]Slicked-Back Do, Pompadour, Cowlick, Fauxhawk] contains myBuff.eff)
 		columnTurns = '<a target="mainpane" href="skills.php?pwd='+my_hash()+'&action=Skillz&whichskill=15017&skillform=Use+Skill&quantity=1">&infin;</a>';
 
 	//Add spoiler info
@@ -835,7 +877,7 @@ void bakeEffects() {
 
 	// Sneaky Pete should check the mirror and fix his hair
 	boolean need_hairdo() {
-		foreach e in $effects[Slicked-Back Do, Pompadour, Cowlick, Fauxhawk]
+		foreach e in $effects[[1553]Slicked-Back Do, Pompadour, Cowlick, Fauxhawk]
 			if(have_effect(e) > 0) return false;
 		return true;
 	}
@@ -877,7 +919,7 @@ void bakeEffects() {
 		total += 1;
 	}
 	intrinsics.lack_effect($skill[Iron Palm Technique], $effect[Iron Palms], "Iron Palms");
-	intrinsics.lack_effect($skill[Blood Sugar Sauce Magic], $effect[Blood Sugar Sauce Magic], "Blood Sugar");
+	intrinsics.lack_effect($skill[Blood Sugar Sauce Magic], $effect[[1458]Blood Sugar Sauce Magic], "Blood Sugar");
 
 	if (length(intrinsics) > 0 ) {
 		intrinsics.insert(0, '<tbody class="intrinsics">');
@@ -896,7 +938,7 @@ void bakeEffects() {
 		result.append('<table id="chit_effects" class="chit_brick nospace">');
 		result.append('<thead><tr><th colspan="4"><img src="');
 		result.append(imagePath);
-		result.append('effects.png">Effects</th></tr></thead>');
+		result.append('effects.png" class="chit_walls_stretch">Effects</th></tr></thead>');
 		string [int] drawers = split_string(layout, ",");
 		for i from 0 to (drawers.count() - 1) {
 			switch (drawers[i]) {
@@ -1460,7 +1502,7 @@ void bakeToolbar() {
 	void addDisable(buffer result, int i) {
 		buffer button;
 		button.append('<li><a href="');
-		button.append(sideCommand("zlib chit.disable = true"));
+		button.append(sideCommand("set chit.disable = true"));
 		button.append('" title="Disable ChIT"><img');
 		if(i == 0)
 			button.append(' style="height:11px;width:11px;vertical-align:bottom;margin:0px -4px -3px -8px;"');
@@ -1564,7 +1606,7 @@ void bakeModifiers() {
 	result.append('<table id="chit_modifiers" class="chit_brick nospace">');
 	result.append('<thead><tr><th colspan="2"><img src="');
 	result.append(imagePath);
-	result.append('modifiers.png">');
+	result.append('modifiers.png" class="chit_walls_stretch">');
 	result.append('Modifiers</th></tr>');
 	result.append('</thead>');
 
@@ -2045,6 +2087,32 @@ void addKa(buffer result) {
 		result.append('<img title="Ka Coins" style="max-width:14px;padding-left:3px;" src="/images/itemimages/kacoin.gif"></td></tr>');
 }
 
+void addNoob(buffer result) {
+	int maxNoobSkills = min(my_level() + 2, 15);
+	string absorbDisplay = my_absorbs() + " / " + maxNoobSkills;
+	result.append('<tr><td class="label">Absorb</td><td class="info">');
+	result.append(absorbDisplay);
+	result.append('</td>');
+	if(to_boolean(vars["chit.stats.showbars"])) {
+		result.append('<td class="progress"><div class="progressbox" title="');
+		result.append(absorbDisplay);
+		result.append('"><div class="progressbar" style="width:');
+		result.append(to_string(100.0 * my_absorbs() / maxNoobSkills));
+		result.append('%"></div></div></td></td>');
+	}
+	result.append('</tr>');
+	matcher equipment = create_matcher('<a class="togglegnoob".*?none;">(.+)</div>.*</script>', chitSource["gelNoob"]);
+	// KoL change: Capture group is now empty when enchantments aren't absorbed. Probably should remove check on following line for contains_text().
+	if(find(equipment) && !equipment.group(0).contains_text("(You haven't absorbed any enchanted equipment.)")) {
+		string enchant = equipment.group(0)
+			.replace_string(' class="small nounder"', ' style="text-decoration:underline;"')
+			.replace_string('padding: 1em; ', 'padding: 0.4em; ');
+		result.append('<tr><td colspan="'+(to_boolean(vars["chit.stats.showbars"])? 3: 2)+'" class="label"><center>');
+		result.append(enchant);
+		result.append('</center></td></tr>');
+	}
+}
+
 void addRadSick(buffer result) {
 	int sickness = current_rad_sickness();
 	if(sickness > 0) {
@@ -2065,6 +2133,19 @@ void addRadSick(buffer result) {
 	}
 }
 
+void addLI_11(buffer result) {
+	matcher pounds = create_matcher("(\\d+ &pound; SC) to spend", chitSource["wtfisthis"]);
+	result.append('<tr><td class="label"><a target="mainpane" href="place.php?whichplace=town_right&action=town_bondhq" title="Visit LI-11">LI-11</a></td>');
+	if(pounds.find()) {
+		if(to_boolean(vars["chit.stats.showbars"]))
+			result.append('<td>&nbsp;</td>');
+		result.append('<td class="info" style="text-align:center;" title="social capital"><a target="mainpane" href="place.php?whichplace=town_right&action=town_bondhq">');
+		result.append(pounds.group(1));
+		result.append('</a></td>');
+	}
+	result.append('</tr>');
+}
+
 void addOrgan(buffer result, string organ, boolean showBars, int current, int limit, boolean eff) {
 	int sev = severity(organ, current, limit);
 	result.append('<tr><td class="label">'+organ+'</td>');
@@ -2081,7 +2162,8 @@ void addLiver(buffer result, boolean showBars) {
 		result.addOrgan("Liver", showBars, my_inebriety(), inebriety_limit(), have_effect($effect[Ode to Booze]) > 0);
 }
 void addSpleen(buffer result, boolean showBars) {
-	result.addOrgan("Spleen", showBars, my_spleen_use(), spleen_limit(), false);
+	if(spleen_limit() > 0)
+		result.addOrgan("Spleen", showBars, my_spleen_use(), spleen_limit(), false);
 }
 
 void bakeSubStats() {
@@ -2288,12 +2370,15 @@ void bakeOrgans() {
 	result.append('<table id="chit_organs" class="chit_brick nospace">');
 	result.append('<thead><tr><th colspan="3"><img src="');
 	result.append(imagePath);
-	result.append('organs.png">Consumption</th></tr>');
+	result.append('organs.png" class="chit_walls_stretch">Consumption</th></tr>');
 	result.append('</thead>');
 
-	result.addStomach(true);
-	result.addLiver(true);
-	result.addSpleen(true);
+	if(can_eat() || can_drink() || spleen_limit() > 0) {
+		result.addStomach(true);
+		result.addLiver(true);
+		result.addSpleen(true);
+	} else
+		result.append('<tr><td colspan="3">You have no real organs! <br> OMG!</td></tr>');
 	
 	result.append('</table>');
 	chitBricks["organs"] = result.to_string();
@@ -2342,9 +2427,9 @@ void bakeStats() {
 		if(vars["chit.kol.coolimages"].to_boolean() && index_of(health, "Extreme Meter:") > -1) {
 			matcher extreme = create_matcher("Extreme Meter.*?otherimages/(.*?)><", health);
 			if(find(extreme)) {
-				result.append('<tr style="height:'+(to_int(char_at(extreme.group(1), 8)) * 69 - 23)+'px;"><td colspan="'+ (showBars? 3: 2) +'"><center>');
+				result.append('<tr style="max-height:'+(to_int(char_at(extreme.group(1), 8)) * 69 - 23)+'px;"><td colspan="'+ (showBars? 3: 2) +'"><center>');
 				// extmeter1, extmeter2, extmeter3: width=200 height = 50,125,200 = 60x - 20. (176x44, 176x110, 176x176 = ) (height *.92 = 46, 115, 184 = 69x-23)
-				result.append('<img style="width:95%;border:0px" src=images/otherimages/'+extreme.group(1)+'>');
+				result.append('<img style="max-width:95%;border:0px" src=images/otherimages/'+extreme.group(1)+'>');
 				result.append('</center></td></tr>');
 			}
 		}
@@ -2537,6 +2622,9 @@ void bakeStats() {
 			case $class[Ed]:
 				result.addKa();
 				break;
+			case $class[Gelatinous Noob]:
+				result.addNoob();
+				break;
 			}
 			
 			switch(my_path()) {
@@ -2549,6 +2637,8 @@ void bakeStats() {
 			case "Nuclear Autumn":
 				result.addRadSick();
 				break;
+			case "License to Adventure":
+				result.addLI_11();
 			}
 			
 			if(numeric_modifier("Maximum Hooch") > 0)
@@ -2650,6 +2740,10 @@ void allCurrency(buffer result) {
 		if(link != "")
 			result.append('</a>');
 	}
+
+	void addCurrencyIcon(buffer result, item currency, string title, string url) {
+		result.addCurrencyIcon(currency, '<a title="' + title + '" target="mainpane" href="' + url + '">');
+	}
 	
 	void addCurrency(buffer result, item currency) {
 		if(displayedCurrencies[currency])
@@ -2670,35 +2764,47 @@ void allCurrency(buffer result) {
 				result.addCurrencyIcon(currency, item_amount($item[disassembled clover]) > 0 ? '<a title="assemble a clover" href="' + sideCommand("use 1 disassembled clover") + '">' : "");
 				result.addCurrency($item[disassembled clover]);
 				break;
+			case $item[hobo nickel]:
+				result.addCurrencyIcon(currency, "Wander on over to hobopolis", "clan_hobopolis.php");
+				break;
+			case $item[Freddy Kruegerand]:
+				result.addCurrencyIcon(currency, "Visit The Terrified Eagle Inn", "shop.php?whichshop=dv");
+				break;
 			case $item[Beach Buck]:
-				result.addCurrencyIcon(currency, '<a title="Take a trip to Spring Break Beach" target="mainpane" href="place.php?whichplace=airport_sleaze">');
+				result.addCurrencyIcon(currency, "Take a trip to Spring Break Beach", "place.php?whichplace=airport_sleaze");
 				break;
 			case $item[Coinspiracy]:
-				result.addCurrencyIcon(currency, '<a title="Down the hatch to the Conspiracy Island bunker" target="mainpane" href="place.php?whichplace=airport_spooky_bunker">');
+				result.addCurrencyIcon(currency, "Down the hatch to the Conspiracy Island bunker", "place.php?whichplace=airport_spooky_bunker");
 				break;
 			case $item[FunFunds&trade;]:
-				result.addCurrencyIcon(currency, '<a title="Buy some souvenirs at the Dinsey Company Store" target="mainpane" href="shop.php?whichshop=landfillstore">');
+				result.addCurrencyIcon(currency, "Buy some souvenirs at the Dinsey Company Store", "shop.php?whichshop=landfillstore");
 				break;
 			case $item[Volcoino]:
-				result.addCurrencyIcon(currency, '<a title="Boogie right on down to Disco GiftCo" target="mainpane" href="shop.php?whichshop=infernodisco">');
+				result.addCurrencyIcon(currency, "Boogie right on down to Disco GiftCo", "shop.php?whichshop=infernodisco");
 				break;
 			case $item[Wal-Mart gift certificate]:
-				result.addCurrencyIcon(currency, '<a title="Browse the goods at Wal-Mart" target="mainpane" href="shop.php?whichshop=glaciest">');
+				result.addCurrencyIcon(currency, "Browse the goods at Wal-Mart", "shop.php?whichshop=glaciest");
 				break;
 			case $item[rad]:
-				result.addCurrencyIcon(currency, '<a title="Fiddle with your genes" target="mainpane" href="shop.php?whichshop=mutate">');
+				result.addCurrencyIcon(currency, "Fiddle with your genes", "shop.php?whichshop=mutate");
 				break;
 			case $item[source essence]:
 				string termlink = 'campground.php?action=terminal';
 				if(my_path() == "Nuclear Autumn")
 					termlink = 'place.php?whichplace=falloutshelter&action=vault_term';
-				result.addCurrencyIcon(currency, '<a title="Boot up the Source Terminal" target="mainpane" href="' + termlink + '">');
+				result.addCurrencyIcon(currency, "Boot up the Source Terminal", "' + termlink + '");
 				break;
 			case $item[BACON]:
-				result.addCurrencyIcon(currency, '<a title="Born too late to explore the Earth&#013;Born too soon to explore the galaxy&#013;Born just in time to BROWSE DANK MEMES" target="mainpane" href="shop.php?whichshop=bacon">');
+				result.addCurrencyIcon(currency, "Born too late to explore the Earth&#013;Born too soon to explore the galaxy&#013;Born just in time to BROWSE DANK MEMES", "shop.php?whichshop=bacon");
 				break;
 			case $item[cop dollar]:
-				result.addCurrencyIcon(currency, '<a title="Visit the quartermaster" target="mainpane" href="shop.php?whichshop=detective">');
+				result.addCurrencyIcon(currency, "Visit the quartermaster", "shop.php?whichshop=detective");
+				break;
+			case $item[sprinkles]:
+				result.addCurrencyIcon(currency, "Take a tour of Gingerbread City", "place.php?whichplace=gingerbreadcity");
+				break;
+			case $item[Spacegate Research]:
+				result.addCurrencyIcon(currency, "Exchange your research at the Fabrication Facility", "shop.php?whichshop=spacegate");
 				break;
 			default:
 				result.addCurrencyIcon(currency, "");
@@ -2707,7 +2813,7 @@ void allCurrency(buffer result) {
 	}
 
 	boolean showMany = to_boolean(vars["chit.currencies.showmany"]);
-	string chitCurrency = showmany ? get_property("chitCurrency") : get_property("_chitCurrency");
+	string chitCurrency = showmany ? get_property("chit.currencies.showmany.choices") : get_property("_chit.currency");
 	string [int] dispCurrencies = split_string(chitCurrency, ",");
 	item current = to_item(dispCurrencies[0]);
 	
@@ -2720,21 +2826,21 @@ void allCurrency(buffer result) {
 	result.append('<ul>');
 	
 	boolean [item] currencies; // This is to ensure no duplication of currencies, perhaps due to ambiguous names being rectified by to_item().
-	foreach x,cur in split_string("none,"+vars["chit.currencies"], "\\s*(?<!\\\\),\\s*") {
+	foreach x,cur in split_string("none,"+vars["chit.currencies"], "\\s*(?<!\\\\)[,|]\\s*") {
 		item it = to_item(cur);
-		if(amount_of(it) > 0 && !(currencies contains it)) {
+		if((amount_of(it) > 0 || list_contains(chitCurrency,cur,",")) && !(currencies contains it)) {
 			currencies[it] = true;
 			result.append('<li');
 			if(displayedCurrencies[it]) result.append(' class="current"');
 			result.append('><a href="/KoLmafia/sideCommand?cmd=');
 			if(showMany) {
-				result.append(url_encode("set chitCurrency="));
+				result.append(url_encode("set chit.currencies.showmany.choices = "));
 				if(list_contains(chitCurrency,cur,","))
 					result.append(list_remove(chitCurrency,cur,","));
 				else
 					result.append(list_add(chitCurrency,cur,","));
 			} else {
-				result.append(url_encode("set _chitCurrency="));
+				result.append(url_encode("set _chit.currency = "));
 				result.append(it);
 			}
 			result.append('&pwd=');
@@ -2752,7 +2858,7 @@ void allCurrency(buffer result) {
 	}
 	result.append('<li class="currency_edit"><a onclick=\'var currencies = prompt("Edit displayed currencies: (Items that you have none of will not be displayed)", "');
 	result.append(vars["chit.currencies"]);
-	result.append('"); if(currencies!=null) { window.location.href = "/KoLmafia/sideCommand?cmd=zlib+chit.currencies+=+" + currencies.replace(/ /g,"+") + "&pwd=');
+	result.append('"); if(currencies!=null) { window.location.href = "/KoLmafia/sideCommand?cmd=set+chit.currencies+=+" + currencies.replace(/ /g,"+") + "&pwd=');
 	result.append(my_hash());
 	result.append('"; }\'>Edit List</a></li></ul>');
 	
@@ -3067,7 +3173,8 @@ void bakeCharacter() {
 	result.append(myName);
 	result.append('</a>');
 	result.append(myOutfit);
-	if(vars["chit.clan.display"] == "on" || vars["chit.clan.display"] == "true" || (vars["chit.clan.display"] == "away" && get_clan_name() != vars["chit.clan.home"])) {
+	if(vars["chit.clan.display"] == "on" || vars["chit.clan.display"] == "true" || 
+	  (vars["chit.clan.home"] != "" && vars["chit.clan.display"] == "away" && get_clan_name() != vars["chit.clan.home"])) {
 		result.append('<br /><span style="font-weight:normal">');
 		result.append(get_clan_name());
 		result.append('</span>');
@@ -3318,7 +3425,7 @@ $(window).unload(function () {\
 $(document).ready(function () {\
 	if (sessionStorage.getItem('chit.scroll') !== '') {\
 		var scrolls = JSON.parse(sessionStorage.getItem('chit.scroll'));\
-		console.log(\"scrolls\", scrolls);\
+		//console.log(\"scrolls\", scrolls);\
 		for (var key in scrolls) {\
 			$('#' + key).scrollTop(scrolls[key])\
 		}\
@@ -3425,15 +3532,13 @@ boolean parsePage(buffer original) {
 	} else return vprint("CHIT: Error parsing start of charpane", "red", -1);
 	
 	//Footer: Includes everything after the close body tag
-	parse = create_matcher("(</body></html>.*)", source);
-	if(find(parse)) {
+	if(find(parse = create_matcher("(</body></html>.*)", source))) {
 		chitSource["footer"] = parse.group(1);
 		source = parse.replace_first("");
 	} else return vprint("CHIT: Error parsing footer", "red", -1);
 	
 	// Quests: May or may not be present
-	parse = create_matcher('(<center id="nudgeblock">.*?(?:</script>|</tr></table><p></center>))', source);
-	if(find(parse)) {
+	if(find(parse = create_matcher('(<center id="nudgeblock">.*?(?:</script>|</tr></table><p></center>))', source))) {
 		chitSource["quests"] = parse.group(1);
 		source = parse.replace_first("");
 	}
@@ -3453,8 +3558,7 @@ boolean parsePage(buffer original) {
 		return get_property("lastAdventure").to_location();
 	}
 	// Recent Adventures: May or may not be present
-	parse = create_matcher('<center><font size=2>.+?Last Adventure:.+?target=mainpane href="[^"]+">([^<]+)</a>.+?</center>', source);
-	if(find(parse)) {
+	if(find(parse = create_matcher('<center><font size=2>.+?Last Adventure:.+?target=mainpane href="[^"]+">([^<]+)</a>.+?</center>', source))) {
 		chitSource["trail"] = parse.group(0);
 		lastLoc = parse.group(1).parseLoc();  // Parse out last location for use by other functions
 		source = parse.replace_first("");
@@ -3477,8 +3581,7 @@ boolean parsePage(buffer original) {
 	}
 
 	// Old Man's Bathtub Adventure. May or may not be present
-	parse = create_matcher("<table>(<tr><td class=small align=right><b>Crew:</b>.+?)</table>", source);
-	if(find(parse)) {
+	if(find(parse = create_matcher("<table>(<tr><td class=small align=right><b>Crew:</b>.+?)</table>", source))) {
 		chitSource["bathtub"] = parse.group(1);
 		source = parse.replace_first("");
 	}
@@ -3495,18 +3598,22 @@ boolean parsePage(buffer original) {
 	}
 	
 	// Pasta Thrall?
-	parse = create_matcher('(<center><font size=2><b>Pasta Thrall:</b></font>.+?</font>)', source);
-	if(find(parse)) {
+	if(find(parse = create_matcher('(<center><font size=2><b>Pasta Thrall:</b></font>.+?</font>)', source))) {
 		chitSource["thrall"] = parse.group(1);
 		source = parse.replace_first("");
 	}
 
 	// Refresh Link: <center><font size=1>[<a href="charpane.php">refresh</a>]</font>
-	parse = create_matcher("(<center><font.+?refresh.+?</font>)", source);
-	if(find(parse)) {
+	if(find(parse = create_matcher("(<center><font.+?refresh.+?</font>)", source))) {
 		chitSource["refresh"] = parse.group(1);
 		source = parse.replace_first("");
 	} else return vprint("CHIT: Error Parsing Refresh", "red", -1);
+	
+	// Gelatinous Noob
+	if(my_path() == "Gelatinous Noob" && find(parse = create_matcher('<span class=small><b>Absorptions:.+?</script><br>', source))) {
+		chitSource["gelNoob"] = parse.group(0);
+		source = parse.replace_first("");
+	}
 	
 	//Whatever is left
 	chitSource["wtfisthis"] = source;
@@ -3839,77 +3946,16 @@ buffer modifyPage(buffer source) {
 	if(source.length() < 6)
 		return source.append('<center><a href="charpane.php" title="Reload"><img src="' + imagePath + 'refresh.png"></a> &nbsp;Reload after cutscene...</center>');
 	if(vars["chit.disable"]=="true")
-		return source.replace_string('[<a href="charpane.php">refresh</a>]', '[<a href="'+ sideCommand('zlib chit.disable = false') +'">Enable ChIT</a>] &nbsp; [<a href="charpane.php">refresh</a>]');
-	//Set default values for zlib variables
-	setvar("chit.checkversion", false);
-	setvar("chit.autoscroll", true);
-	setvar("chit.disable", false);
-	setvar("chit.currencies", "rad,source essence,BACON,cop dollar");
-	setvar("chit.currencies.showmany", false);
-	setvar("chit.character.avatar", true);
-	setvar("chit.character.title", true);
-	setvar("chit.clan.display", "off"); // Valid values are on,off,away
-	setvar("chit.clan.home", "");
-	setvar("chit.quests.hide", false);
-	setvar("chit.familiar.hats", "spangly sombrero,sugar chapeau,Chef's Hat,party hat");
-	setvar("chit.familiar.pants", "spangly mariachi pants,double-ice britches,BRICKO pants,pin-stripe slacks,Studded leather boxer shorts,Monster pants,Sugar shorts");
-	setvar("chit.familiar.weapons", "time sword,batblade,Hodgman's whackin' stick,astral mace,Maxwell's Silver Hammer,goatskin umbrella,grassy cutlass,dreadful glove,Stick-Knife of Loathing,Work is a Four Letter Sword");
-	setvar("chit.familiar.protect", false);
-	setvar("chit.familiar.showlock", false);
-	setvar("chit.familiar.anti-gollywog", true);
-	setvar("chit.familiar.hiddengear", "");
-	setvar("chit.effects.classicons", "none");
-	setvar("chit.effects.showicons", true);
-	setvar("chit.effects.modicons", true);
-	setvar("chit.effects.layout", "songs,buffs,intrinsics");
-	setvar("chit.effects.usermap",false);
-	setvar("chit.effects.describe",true);
-	setvar("chit.helpers.wormwood", "stats,spleen");
-	setvar("chit.helpers.dancecard", true);
-	setvar("chit.helpers.semirare", true);
-	setvar("chit.helpers.spookyraven", true);
-	setvar("chit.helpers.xiblaxian", true);
-	setvar("chit.kol.coolimages", true);
-	setvar("chit.roof.layout", "character,stats,gear");
-	setvar("chit.walls.layout", "helpers,thrall,vykea,effects");
-	setvar("chit.floor.layout", "update,familiar");
-	setvar("chit.stats.showbars", true);
-	setvar("chit.stats.layout", "muscle,myst,moxie|hp,mp,axel|mcd|trail,florist");
-	setvar("chit.toolbar.layout", "trail,quests,modifiers,elements,organs");
-	setvar("chit.toolbar.moods", "true");
-	string gearDispInRunDefault = "favorites:amount=all:pull=true:create=true, astral:amount=all, item, -combat, +combat, quest:amount=all:pull=true:create=true, today:amount=all:create=false, ML, path:amount=all, prismatic, res, charter:amount=all, rollover, DRUNK:amount=all, Wow:amount=all, resistance:amount=3";
-	setvar("chit.gear.display.in-run", gearDispInRunDefault);
-	setvar("chit.gear.display.aftercore", "favorites:amount=all, quest:amount=all, charter:amount=all, today:amount=all:create=false, rollover, DRUNK:amount=all");
-	setvar("chit.gear.display.in-run.defaults", "create=false, pull=false, amount=1");
-	setvar("chit.gear.display.aftercore.defaults", "create=true, pull=true, amount=1");
-	setvar("chit.gear.layout", "default");
-	setvar("chit.gear.favorites", "");
-	setvar("chit.thrall.showname", false);
-	
-	// Check var version.
-	int varVer = get_property("chitVarVer").to_int();
-	if(varVer < 3) {
-		if(!vars["chit.walls.layout"].contains_text("vykea")) {
-			if(vars["chit.walls.layout"].contains_text("effects"))
-				vars["chit.walls.layout"] = vars["chit.walls.layout"].replace_string("effects", "vykea,effects");
-			else 
-				vars["chit.walls.layout"] += ",vykea";
-		}
-		if(!(vars["chit.roof.layout"].contains_text("gear") || vars["chit.stats.layout"].contains_text("gear")))
-			vars["chit.roof.layout"] += ",gear";
-		updatevars();
-		set_property("chitVarVer", "3");
-	}
-	// Update in-run gear display IF it has not been changed from the old default
-	if(varVer < 4) {
-		if(vars["chit.gear.display.in-run"] == "favorites:amount=all:pull=true:create=true, astral:amount=all, item, meat, ML, exp, initiative, quest:amount=all:pull=true:create=true, path:amount=all, prismatic, res, charter:amount=all, today:amount=all:create=false, rollover, DRUNK:amount=all, Wow:amount=all") {
-			vars["chit.gear.display.in-run"] = gearDispInRunDefault;
-			updatevars();
-		}
-		set_property("chitVarVer", "4");
+		return source.replace_string('[<a href="charpane.php">refresh</a>]', '[<a href="'+ sideCommand('set chit.disable = false') +'">Enable ChIT</a>] &nbsp; [<a href="charpane.php">refresh</a>]');
+		
+	if(property_exists("chitVarVer"))		// This is no longer being used since zlib vars were migrated to vProps.
+		remove_property("chitVarVer");
+	if(property_exists("chitCurrency")) {	// This is being given a new name in line with existing vProps.
+		set_property("chit.currencies.showmany.choices", get_property("chitCurrency"));
+		remove_property("chitCurrency");
 	}
 	
-	//Check for updates (once a day)
+	//Check for updates (once a day) if chit.checkversion is true.
 	if(vars["chit.checkversion"]=="true" && svn_exists("mafiachit") && get_property("_svnUpdated") == "false") {
 		if(get_property("_chitSVNatHead").length() == 0)
 			set_property("_chitSVNatHead", svn_at_head("mafiachit"));
@@ -3942,7 +3988,7 @@ buffer modifyPage(buffer source) {
 	if( index_of(source, 'alt="Karma" title="Karma"><br>') > 0 )
 		inValhalla = true;
 	
-	if( contains_text(source, "<hr width=50%>") ) {
+	if( contains_text(source, "<hr width=50%><table") ) { // In "License to Adventure" there is <hr width=50%><center>
 		isCompact = true;
 		vprint("CHIT: Compact Character Pane not supported", "blue", 1);
 	}

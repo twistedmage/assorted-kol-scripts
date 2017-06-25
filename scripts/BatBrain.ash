@@ -9,7 +9,7 @@
    Want to say thanks?  Send me (Zarqon) a bat! (Or bat-related item)
 
 ******************************************************************************/
-since r17306;
+since r17438;  // sub_types monster proxy field
 import <zlib.ash>
 typedef float[element] spread;
 typedef float[stat] substats;
@@ -19,7 +19,7 @@ monster m;
 record monster_data {
    int variable;           // the +ML currently being run; if the same, the monster will be reloaded from cache
    boolean nopotato;       // potatos are useless here
-   boolean nofamiliar;     // your familiar will not act
+   boolean nofamiliar;     // your familiar is useless here
    spread aura;            // passive damage dealt to you every round
    spread retal;           // damage dealt to you if you hit with a melee attack
    spread res;             // resistances to each element, expressed as -1.0 (vulnerability) to 1.0 (immunity)
@@ -49,6 +49,8 @@ int round, realround;             // round tracking
 float mvalcache, delevelenhance;
 boolean should_putty, should_olfact, should_pp;
 boolean havemanuel, functops;
+string[int] itemblocks;           // strings that indicate an item use was blocked
+string[int] skillblocks;          // strings that indicate a skill was blocked
 int[item] stolen;                 // all the items you grab during this combat
 string page;                      // most recent page load
 int cid = to_int(get_property("_lastCombatStarted")); // cache this for happenings
@@ -58,7 +60,7 @@ boolean finished() {              // returns true if the combat is over
 float[string] fvars;              // variables for batfactors formulas
 string eventscreated;             // list cache for prettier debug output
 void cleareventscreated() {
-   if (to_int(vars["verbosity"]) > 8 && eventscreated != "") print("Events created: "+eventscreated);
+   if (to_int(getvar("verbosity")) > 8 && eventscreated != "") print("Events created: "+eventscreated);
    eventscreated = "";
 }
 
@@ -255,7 +257,7 @@ for i from 189 to 193 if (have_effect(to_effect(i)) > 0) {
    eform = to_element(to_lower_case(excise(to_effect(i),"","form"))); break;
 }
 advevent to_event(string id, spread dmg, spread pdmg, string special, int howmanyrounds) {
-   if (to_int(vars["verbosity"]) > 8) eventscreated = list_add(eventscreated,id == "" ? "(blank)" : id);
+   if (to_int(getvar("verbosity")) > 8) eventscreated = list_add(eventscreated,id == "" ? "(blank)" : id);
    advevent res;
    res.id = id;
    res.rounds = howmanyrounds;
@@ -480,12 +482,13 @@ boolean set_happened(string occurrence, int when, boolean playeraction) {
          break;
       case "use 4603": mdata.autohit = 1; vprint("You are now handcuffed to this monster: its attacks will always hit.",8); break;
       case "factoid":
-         if (svn_exists("batman-re")) {   // track factoids using BatMan RE's mechanism
+         if (svn_exists("batman-re")) {   // track factoids using Factroid!'s mechanism
             matcher imgm = create_matcher("adventureimages\\/([^ ]+\\.gif)",page);
             if (imgm.find() && !(m.images contains imgm.group(1))) vprint("Warning: image '"+imgm.group(1)+"' does not match monster '"+m+"' ("+m.image+").","#8585FF",3);
             int[int] fs;
             file_to_map("factoids_"+replace_string(my_name()," ","_")+".txt",fs);
             if (!(fs contains m.id)) remove fs[-1];  // force refresh
+             else if (fs[m.id] >= 3) return false;   // you probably have "Eternal Manuel" enabled
             fs[m.id] += 1;  // save factoid
             vprint("Factoid saved: you now have found "+fs[m.id]+" factoids for "+m+".","#8585FF",5);
             map_to_file(fs,"factoids_"+replace_string(my_name()," ","_")+".txt");
@@ -507,7 +510,7 @@ float stat_value(substats s) {    // value of stat gain
    float res, i;
    foreach st,v in s {
       if (v == 0) continue;
-      i = v*to_float(vars["BatMan_baseSubstatValue"]);
+      i = v*to_float(getvar("BatMan_baseSubstatValue"));
       if (st == my_primestat()) i *= 2.0;
       if (st == current_hit_stat()) i *= 1.5;
       if (my_buffedstat(st) == my_defstat()) i *= 1.5;
@@ -660,7 +663,7 @@ advevent baseround() {                       // base round event
    if (m.random_modifiers contains "bacon" && round < 5) basecache.meat += item_val($item[BACON]);
    basecache.note = round;
    cleareventscreated();
-   if (round == 0 || vars["verbosity"].to_int() > 8) vprint_html("<b>Base round:</b> "+to_html(basecache.dmg)+" damage, "+to_html(basecache.pdmg)+" player damage, "+
+   if (round == 0 || getvar("verbosity").to_int() > 8) vprint_html("<b>Base round:</b> "+to_html(basecache.dmg)+" damage, "+to_html(basecache.pdmg)+" player damage, "+
      (basecache.att == 0 ? "" : rnum(basecache.att)+" attack, ")+(basecache.def == 0 ? "" : rnum(basecache.def)+" defense, ")+
      (basecache.stun == 0 ? "" : rnum(basecache.stun)+" stun, ")+(basecache.mp == 0 ? "" : rnum(basecache.mp)+" MP, ")+rnum(basecache.meat)+" meat",4);
    return basecache;
@@ -725,8 +728,8 @@ spread m_regular() {               // damage dealt by monster attack
    }
    spread res;
    res[m.attack_element] = max(1.0,max(0,max(0,monster_stat("att")) - my_defstat(true)) + 0.225*max(0,monster_stat("att")) - max(0,numeric_modifier("Damage Reduction") - mdata.drpen)) *
-      (1 - minmax((square_root(max(0,numeric_modifier("Damage Absorption"))/10) - 1)/10,0,0.9));
-   return factor(res,mdata.multiattack);
+      (1 - minmax((square_root(max(0,numeric_modifier("Damage Absorption"))/10) - 1)/10,0,0.9));    // TODO: glass pie plate halves damage from ghosts
+   return factor(res,mdata.multiattack*(m.phylum == $phylum[undead] && have_equipped($item[gravy boat]) ? 0.5 : 1.0));  // gravy boat halves damage from undead
 }
 advevent m_event(float att_mod, float stun_mod) {      // monster event -- attack + retal, factored by hitchance
    advevent res;                                       // allows prediction with attack and stun modifiers
@@ -1079,11 +1082,11 @@ void build_items() {
       switch (m) {
          case $monster[wall of bones]: if (it == 7970) break;  // don't check aoe for electric boning knife
          case $monster[zombie homeowners' association (hard mode)]:
-         case $monster[zombie homeowners' association]: if (!contains_text(fields.special,"aoe ")) continue; break; // only aoe items work
+         case $monster[zombie homeowners' association]: if (fields.dmg != "0" && !contains_text(fields.special,"aoe ")) continue; break; // avoid non-aoe damage sources
       }
       rate = item_val(to_item(it))*to_int(!to_item(it).combat_reusable);
       switch (it) {
-         case 1960: if (mdata.res[$element[none]] == 1 && mdata.res[$element[hot]] < 1) { fields.dmg = to_string(monster_stat("hp")*5)+" hot,cold,spooky,sleaze,stench"; 
+         case 1960: if (mdata.res[$element[none]] == 1 && m.sub_types contains "ghost") { fields.dmg = to_string(monster_stat("hp")*5)+" hot,cold,spooky,sleaze,stench"; 
             fields.special = list_add(fields.special,"endscombat"); } break;                  // scroll of AFUE insta-kills incorporeals
          case 2065: if (where != $location[the battlefield (frat uniform)] || get_counters("PADL Phone",0,10) != "" ||  // PADL phone
             string_modifier("Outfit") != "Frat Warrior Fatigues" || !(appearance_rates(where) contains m)) continue;
@@ -1094,7 +1097,7 @@ void build_items() {
             if (where != $location[the battlefield (hippy uniform)] || get_counters("Communications Windchimes",0,10) != "" ||
                 string_modifier("Outfit") != "War Hippy Fatigues" || !(appearance_rates(where) contains m)) continue; break;
          case 2453: if (my_fam() != $familiar[penguin goodfella] || my_meat() < fvars["fweight"]*3) continue; break;  // goodfella contract
-         case 2462: if (have_effect($effect[on the trail]) > 0) continue; break;              // odor extractor
+         case 2462: case 9481: if (have_effect($effect[on the trail]) > 0) continue; break;   // odor extractor, affirmation: interested
          case 2704: if ($monsters[Oscus, Zombo, Frosty, Chester, Hodgman\, The Hoboverlord, Ol' Scratch, mayor ghost, mayor ghost (hard mode)] contains m) continue; break;  // shrinking powder
          case 3101: rate *= 0.5; break;                                                       // rogue swarmer
          case 3195: if (dropspants()) {                                                       // naughty paper shuriken
@@ -1134,6 +1137,7 @@ void build_items() {
                case $monster[mountain lion]: fields.special = "once, item mountain lion skin"; break;
                default: continue;
             } break;
+         case 9217: if (where.zone != "Gingerbread City") return; break;  // gingerbread restraining order only works on gingerbread
          case 819: case 820: case 821: case 822: case 823: case 824: case 825: case 826: case 827: // ! potions
             fields = get_bang(get_property("lastBangPotion"+it)); break;
       }
@@ -1204,7 +1208,7 @@ void build_skillz() {
       switch (m) {
          case $monster[wall of bones]:
          case $monster[zombie homeowners' association (hard mode)]:
-         case $monster[zombie homeowners' association]: if (!contains_text(fields.special,"aoe ")) return; break; // only aoe skills work
+         case $monster[zombie homeowners' association]: if (fields.dmg != "0" && !contains_text(fields.special,"aoe ")) return; break; // avoid damage from non-aoe sources
          case $monster[source agent]: if (sk < 21000 || sk > 21011) return; break;  // only Source skills work
       }
       fvars["elembonus"] = spell_elem_bonus(excise(fields.dmg," ",""));
@@ -1217,12 +1221,14 @@ void build_skillz() {
         case 66: if (get_property("fistSkillsKnown").to_int() > 1) fields.special = "meat -"+(meatpermp*mp_cost($skill[salamander kata])*have_effect($effect[salamanderenity])/(3*to_int(get_property("fistSkillsKnown"))));
            break;  // flying fire fist costs salamanderenity
         case 70: fields.special = happened($skill[chilled monkey brain technique]) ? "" : "stun 1"; break;  // monkey only stuns once
-        case 77: fields.special = (!happened($skill[torment plant]) && (item_drops(m) contains $item[clumsiness bark])) ? "item clumsiness bark" : "phylum plant";
+        case 77: fields.special = (!happened($skill[torment plant]) && (item_drops(m) contains $item[clumsiness bark])) ? "item clumsiness bark" : "phylum plant"; break;
         case 78: fields.special = (!happened($skill[pinch ghost]) && (item_drops(m) contains $item[jar full of wind])) ? "item jar full of wind" : "!! only affects ghosts";
+        case 7163: if (!(m.sub_types contains "ghost")) return; break;   // pinch/hammer ghost
         case 79: fields.special = (!happened($skill[tattle]) && (item_drops(m) contains $item[dangerous jerkcicle])) ? "item dangerous jerkcicle" : "att -7, def -12";
         case 93: if (m.boss) return; break;                   // carbo cudgel
         case 102: if (happened("skill 3004")) return; break;  // cannot use both entangling and shadow noodles in a single fight
         case 156: if (happened("skill 20001")) return; break; // Fan Hammer makes Shoot unavailable
+        case 162: if (where.zone != "Gingerbread City") return; break;  // Licorice Rope only works on gingerbread
         case 1022: d = to_spread(fields.dmg); d[$element[none]] += ceil(square_root(max(0,numeric_modifier("Weapon Damage"))));
            foreach el in $elements[hot, cold, spooky, sleaze, stench] d[el] = ceil(square_root(numeric_modifier(el+" Damage"))); break;   // clobber
         case 2028: for i from 1416 to 1418 if (have_effect(to_effect(i)) > 0) { d[$element[none]] = m_hit_chance()*(0.1 + (i - 1415)*0.05)*my_stat("Muscle"); break; }
@@ -1428,7 +1434,7 @@ void build_options() {
    if (mdata.noskills < 1.0 && have_effect($effect[temporary amnesia]) == 0 && 
        (have_effect($effect[more like a suckrament]) == 0 || round + equipped_amount($item[mer-kin prayerbeads]) > 8)) build_skillz();
   // 5. runaway
-   if (limit_mode() == "") addopt(to_event("runaway; repeat","custom runaway",1),runaway_cost(),0);
+   if (limit_mode() == "") addopt(to_event("runaway; repeat","custom runaway, endscombat",1),runaway_cost(),0);
    cleareventscreated();
    sort opts by -to_profit(value);
    sort opts by -kill_rounds(value)*max(1,value.profit);
@@ -1442,7 +1448,7 @@ advevent stasis_action(boolean maction) {  // returns most profitable lowest-dam
    sort opts by -to_profit(value,ignoredelevel);
    sort opts by -min(kill_rounds(value),max(0,mdata.maxround - round - 5));
    foreach i,opt in opts {  // skip multistuns, custom, and non-multi-usable items
-      if (opt.custom != "" || (opt.stun > 1 && maction) || (contains_text(opt.id,"use ") && !to_item(excise(opt.id,"use ","")).combat_reusable)) continue;
+      if (opt.custom != "" || opt.endscombat || (opt.stun > 1 && maction) || (contains_text(opt.id,"use ") && !to_item(excise(opt.id,"use ","")).combat_reusable)) continue;
       vprint("Stasis action chosen: "+opt.id+" (profit: "+rnum(opt.profit)+", kill rounds: "+kill_rounds(opt)+")",8);
       plink = opt;
       return opt;
@@ -1476,7 +1482,7 @@ advevent stun_action(boolean funkable) {    // returns cheapest stunned rounds, 
       meatperhp*m_dpr(-adj.att,0)*min(kill_rounds(smack)+count(custom) - 1,
         value.stun - 1 + to_int(funkable && contains_text(value.id,"use "))));
    foreach i,opt in opts {
-      if (opt.custom != "" || opt.stun <= 1-to_int(funkable && contains_text(opt.id,"use ")) || 
+      if (opt.custom != "" || opt.stun <= 1-to_int(funkable && contains_text(opt.id,"use ")) ||
          opt.profit < -meatperhp*m_dpr(-adj.att,0)*min(kill_rounds(smack)+count(custom) - 1,
          opt.stun - 1 + to_int(funkable && contains_text(opt.id,"use ")))) continue;
       vprint("Stun action chosen: "+opt.id+" (profit: "+rnum(opt.profit)+")",8);
@@ -1510,9 +1516,9 @@ void reset_queue() {
    }
    adj = new advevent;
    if (!havemanuel) {                           // stat adjustments
-      if (m.raw_attack == -1) adj.att = to_int(vars["unknown_ml"]);
-      if (m.raw_defense == -1) adj.def = to_int(vars["unknown_ml"])*0.9;
-      if (m.raw_hp == -1) adj.dmg[$element[none]] = to_int(vars["unknown_ml"]);
+      if (m.raw_attack == -1) adj.att = to_int(getvar("unknown_ml"));
+      if (m.raw_defense == -1) adj.def = to_int(getvar("unknown_ml"))*0.9;
+      if (m.raw_hp == -1) adj.dmg[$element[none]] = to_int(getvar("unknown_ml"));
       if (!m.boss) adj.dmg[$element[none]] += min(5,monster_hp(m)*0.05);     // be pessimistic about monster HP variance
    }
 }
@@ -1529,7 +1535,7 @@ string act(string action);
 // adds action to queue, adjusts script state; returns false if unable to enqueue the action
 boolean enqueue(advevent a, boolean allowfunk) {     // handle inserts/auto-funk
    if (my_fam() == $familiar[he-boulder] && have_effect($effect[everything looks yellow]) == 0 && contains_text(page," yellow eye") && 
-       contains_text(to_lower_case(vars["BatMan_yellow"]),to_lower_case(m.to_string())) && (count(custom) == 0 || die_rounds() <= 3)) {
+       contains_text(to_lower_case(getvar("BatMan_yellow")),to_lower_case(m.to_string())) && (count(custom) == 0 || die_rounds() <= 3)) {
       act(use_skill($skill[point at your opponent])); return true;
    }
    if (a.id == "") return vprint("Unable to enqueue empty action.",-8);  // allows if(enqueue())
@@ -1554,7 +1560,7 @@ boolean enqueue(advevent a, boolean allowfunk) {     // handle inserts/auto-funk
    if (allowfunk && have_skill($skill[ambidextrous funkslinging]) && count(queue) > 0 && m != $monster[the thorax] && bob.find()) {
       bob.reset(queue[count(queue)-1].id);
       if (bob.find() && (queue[count(queue)-1].id != a.id || (item_amount(to_item(to_int(bob.group(1)))) > 1 &&
-         m_dpr(0,-adj.stun)*meatperhp > to_float(vars["BatMan_profitforstasis"]))))
+         m_dpr(0,-adj.stun)*meatperhp > to_float(getvar("BatMan_profitforstasis")))))
          funk = vprint("Auto-funk: merging '"+queue[count(queue)-1].id+"' and '"+a.id+"'.",4);
    }
   // adjust combat environment
@@ -1620,6 +1626,23 @@ void set_monster(monster elmo) {  // initializes BB for a specific monster
       mdata = mdb[m];
      // initialize effects/gear
       fxngear();
+     // set block strings
+      if (my_fam() == $familiar[black cat]) {
+         skillblocks[0] = "jumps onto the keyboard";
+         itemblocks[0] = "bats it out of your hand";
+      }
+      if (m.random_modifiers contains "restless" || m.random_modifiers contains "phase-shifting") {
+         skillblocks[count(skillblocks)] = "before you can use that skill";
+         itemblocks[count(itemblocks)] = "you can finish using that item";
+      }
+      if (m.random_modifiers contains "annoying") {
+         skillblocks[count(skillblocks)] = "stopping you in your tracks";
+         itemblocks[count(itemblocks)] = "stopping you in your tracks";
+      }
+      if (m == $monster[Bonerdagon]) {
+         skillblocks[count(skillblocks)] = "furiously beating its wings";
+         itemblocks[count(itemblocks)] = "knocks it out of your hand";
+      }
 /*      
       if (happened("use 5048")) mdata.res = get_resistance($element[cold]);   // shard of double-ice
       if (happened("use 7642")) mdata.res = get_resistance($element[hot]);    // ingot turtle
@@ -1634,7 +1657,7 @@ void set_monster(monster elmo) {  // initializes BB for a specific monster
          ", Happenings: "+count(happenings[m,cid])+", ID: "+m.id,5);
 //      map_to_file(mdb,"monstercache.txt");     // uncomment for debugging
    }
-   if (m == $monster[none] && to_int(vars["unknown_ml"]) == 0)
+   if (m == $monster[none] && to_int(getvar("unknown_ml")) == 0)
       vprint("You would like to handle this unknown monster yourself. (unknown_ml is 0)",0);
    set_fvars(true);
    delevelenhance = have_equipped($item[dark porquoise ring]) ? 2.0 : 1.0;
@@ -1702,10 +1725,11 @@ void set_monster(monster elmo) {  // initializes BB for a specific monster
       }
    }
    combat_rec minf;
-   if (m.id == 0 && contains_text(m,"Hard Mode")) foreach i,mrec in factors["monster"] {
+   if (factors["monster"] contains m.id) minf = factors["monster",m.id];
+    else foreach i,mrec in factors["monster"] {
        if (mrec.ufname.to_monster() == m) { minf = mrec; break; }
        if (i > 0) break;
-   } else if (factors["monster"] contains m.id) minf = factors["monster",m.id];
+    }
    if (minf.ufname != "") {
       if (minf.dmg != "0") setmatt("res",minf.dmg);                                          // resistance
       if (minf.pdmg != "0") setmatt("pen",minf.pdmg);                                        // penetration
@@ -1714,7 +1738,7 @@ void set_monster(monster elmo) {  // initializes BB for a specific monster
    }
   // random monster attributes
    foreach atbute in m.random_modifiers switch(atbute) {
-      case "annoying":
+      case "annoying": setmatt("nofamiliar","");
       case "restless": setmatt("noitems","0.9"); setmatt("noskills","0.9"); setmatt("dodge","0.9"); break;
       case "cartwheeling": setmatt("dodge","0.5"); break;
       case "cloned": setmatt("multiattack","2"); setmatt("group",max(2,mdb[m].howmany)); break;
@@ -1964,7 +1988,7 @@ boolean loghaps() {   // load happenings/round info from session log
    round = last_index_of(log,"Encounter: "+get_property("lastEncounter"));
    if (round == -1) return vprint("This encounter cannot be found by name; logging happenings the old way.",-3);
    log = substring(log,round); // shorten to last combat; fight-finished agnostic
-   matcher rm = create_matcher("(?m)^Round (\\d+): "+my_name()+" (.+?)(?:$|!)",log);
+   matcher rm = create_matcher("(?m)^Round (\\d+): "+(limit_mode() == "batman" ? "Batfellow" : my_name())+" (.+?)(?:$|!)",log);
    string loghap;
    while (rm.find()) {
       round = rm.group(1).to_int();
@@ -1976,7 +2000,10 @@ boolean loghaps() {   // load happenings/round info from session log
          case "attacks": set_happened("attack",round,true); continue;
          case "casts RETURN": set_happened("runaway",round,true); continue;
          case "tries to steal an item": set_happened("pickpocket",round,true); continue;
+         case "throws a BAT-PUNCH": set_happened("skill 7255",round,true); continue;
+         case "does a BAT-KICK": set_happened("skill 7256",round,true); continue;
          default: if (index_of(loghap,"casts ") == 0) { set_happened("skill "+to_int(to_skill(excise(loghap,"casts ",""))),round,true); continue; }
+            if (limit_mode() == "batman" && index_of(loghap,"uses ") == 0) { set_happened("skill "+to_int(to_skill(excise(loghap,"uses ",""))),round,true); continue; }
             matcher actmat = create_matcher("uses the (.+?) and uses the (.+)",loghap);
             if (actmat.find()) { for i from 1 to 2 set_happened("use "+to_int(to_item(actmat.group(i))),round,true); continue; }
             if (index_of(loghap,"uses the ") >= 0) { set_happened("use "+to_int(to_item(excise(loghap,"uses the ",""))),round,true); continue; }
@@ -1986,7 +2013,7 @@ boolean loghaps() {   // load happenings/round info from session log
    }  // by the end, realround should still be one greater than round, so detections in act() aren't queued
    if (random(111) == 11) {  // sporadically cleanup the tracking file to prevent it becoming massive
       foreach m in happenings {
-         int toclean = count(happenings[m]) - to_int(vars["BatMan_maxmonsterstracked"]);
+         int toclean = count(happenings[m]) - to_int(getvar("BatMan_maxmonsterstracked"));
          if (toclean > 0) foreach t in happenings[m] { remove happenings[m,t]; toclean -= 1; if (toclean <= 0) break; }
       }
    }
@@ -2000,6 +2027,7 @@ string act(string action) {
    if (where == $location[none]) where = my_location();
    if (m == $monster[none]) set_monster(last_monster());
     else reset_queue();
+   if (m.phylum == $phylum[none] && havemanuel) vprint("Info: KoLmafia thinks this monster has no phylum!","olive",4);
    if (action == "") { round = 1; realround = 1; build_options(); return action; }  // if we're not actually in a fight, nothing below matters
   // set combat round and record happenings
    if (count(m.random_modifiers) == 0 && !equals(to_string(m), get_property("lastEncounter")) && 
@@ -2008,7 +2036,7 @@ string act(string action) {
    if (!loghaps()) {  // if we can't track happenings from the session log, track them the old way
       round = to_int(excise(action,"var onturn = ",";"));
       realround = round + 1;
-      matcher roundmatch = create_matcher("\\<!-- macroaction: (.+?)(?:, (\\d+))? -->",action);
+      matcher roundmatch = create_matcher("\\<!-- macroaction: (.+?)(?:, (\\d+))? -->",action);   
       boolean skipped;
       while (roundmatch.find()) {
          if (skipped) round += 1; else skipped = true;
@@ -2116,10 +2144,6 @@ string act(string action) {
              (contains_text(action,"A mechanical hand emerges") || contains_text(action,"liquid nitrogen") || contains_text(action,"freaky alien thing") ||
              contains_text(action,"vile-smelling, milky-white") || contains_text(action,"spinning, whirring, vibrating, tubular")))
          return act(attack()); break;
-      case $monster[guard turtle]: if (!contains_text(action,"frenchturtle.gif")) break;       
-      case $monster[french guard turtle]: if (have_equipped($item[fouet de tortue-dressage]) &&   // un-brainwash turtles
-             my_stat("mp") >= 5*mp_cost($skill[apprivoisez la tortue]))
-         return act(visit_url("fight.php?action=macro&macrotext=skill 7083; repeat")); break;
       case $monster[breakdancing raver]: if (!have_skill($skill[break it on down]) && have_skill($skill[gothy handwave]) &&  // learn dance moves
              !happened($skill[gothy handwave]) && contains_text(action,"he raver drops ") && my_stat("mp") > 0)
          return act(use_skill($skill[gothy handwave])); break;
@@ -2223,7 +2247,7 @@ string batround() {
          "if match \"begins to paw at the ground\"; skill 7160; endif; if match \"shuffles toward you\"; skill 7159; endif; "); break;
    }
    switch (my_fam()) {
-      case $familiar[he-boulder]: if (have_effect($effect[everything looks yellow]) > 0 || !contains_text(to_lower_case(vars["BatMan_yellow"]),to_lower_case(m.to_string()))) break;
+      case $familiar[he-boulder]: if (have_effect($effect[everything looks yellow]) > 0 || !contains_text(to_lower_case(getvar("BatMan_yellow")),to_lower_case(m.to_string()))) break;
          if (count(custom) > 0 && die_rounds() > 3) break;
          res.append("if !haseffect 790 && match \" yellow eye\"; skill 7082; endif; "); break;
    }

@@ -188,18 +188,16 @@ string to_html(advevent a, int i, boolean shorty) {
    buffer res;
    if (!shorty) res.append("\n  <tr><td><span style='cursor:help; font-size: 2.0em; color: "+to_htmlcolor(hitchance(a.id))+"' title='Hit chance: "+rnum(hitchance(a.id)*100)+"%'>&bull;</span> ");
   // Action
-   if (kill_rounds(a) <= min(die_rounds(),mdata.maxround-round)) res.append("<form name=spam"+random(999999)+" style='display: inline' action=fight.php method=post><input type=hidden name=action value='macro'>"+
+   if (kill_rounds(a) <= min(die_rounds(),mdata.maxround-round) && !a.endscombat && !is_once(a.id)) res.append("<form name=spam"+random(999999)+" style='display: inline' action=fight.php method=post><input type=hidden name=action value='macro'>"+
       "<input type='hidden' name='macrotext' value='"+batround()+"sub main; "+a.id+"; call batround; endsub; call main; repeat'><input type=image src='images/itemimages/sammich.gif'"+
       " width=18 height=18 title='Spam "+a.id+"! (kills monster in "+kill_rounds(a)+" rounds)' onclick='return bjilgt(this);'></form>");
-   if (my_fam() == $familiar[black cat]) {
-      if (contains_text(a.id,"use ")) res.append("<form name=kitty"+random(999999)+" style='display: inline' action=fight.php method=post><input type=hidden name=action value='macro'>"+
-         "<input type='hidden' name='macrotext' value='"+batround()+"sub main; "+a.id+"; call batround; endsub; call main; repeat match \"bats it out of your hand\"'><input type=image src='images/itemimages/bkitten.gif'"+
-         " width=18 height=18 title='Definitely "+a.id+" (at your peril!)' onclick='return bjilgt(this);'></form>");
-       else if (contains_text(a.id,"skill ")) res.append("<form name=kitty"+random(999999)+" style='display: inline' action=fight.php method=post><input type=hidden name=action value='macro'>"+
-         "<input type='hidden' name='macrotext' value='"+batround()+"sub main; "+a.id+"; call batround; endsub; call main; repeat match \"jumps onto the keyboard\"'><input type=image src='images/itemimages/bkitten.gif'"+
-         " width=18 height=18 title='Definitely "+a.id+" (at your peril!)' onclick='return bjilgt(this);'></form>");
-   }
-   if (a.profit >= to_float(vars["BatMan_profitforstasis"])) {
+   if (count(itemblocks) > 0 && contains_text(a.id,"use ")) res.append("<form name=kitty"+random(999999)+" style='display: inline' action=fight.php method=post><input type=hidden name=action value='macro'>"+
+         "<input type='hidden' name='macrotext' value='"+batround()+"sub main; "+a.id+"; call batround; endsub; call main; repeat match \""+join(itemblocks,"\" || match \"")+"\"'><input type=image "+
+         "src='images/itemimages/bkitten.gif' width=18 height=18 title='Definitely "+a.id+" (at your peril!)' onclick='return bjilgt(this);'></form>");
+    else if (count(skillblocks) > 0 && contains_text(a.id,"skill ")) res.append("<form name=kitty"+random(999999)+" style='display: inline' action=fight.php method=post><input type=hidden name=action value='macro'>"+
+         "<input type='hidden' name='macrotext' value='"+batround()+"sub main; "+a.id+"; call batround; endsub; call main; repeat match \""+join(skillblocks,"\" || match \"")+"\"'><input type=image "+
+         "src='images/itemimages/bkitten.gif' width=18 height=18 title='Definitely "+a.id+" (at your peril!)' onclick='return bjilgt(this);'></form>");
+   if (a.profit >= to_float(getvar("BatMan_profitforstasis"))) {
       res.append("<form name=stasis"+random(999999)+" style='display: inline' action=fight.php method=post><input type=hidden name=action value='macro'>"+
       "<input type='hidden' name='macrotext' value='"+batround()+"sub main; "+a.id+"; call batround; endsub; call main; repeat "+stasis_repeat()+"'><input type=image src='images/itemimages/watch.gif'"+
       " width=18 height=18 title='Stasis with "+a.id+"! ("+rnum(to_profit(a))+" profit)' onclick='return bjilgt(this);'></form>");
@@ -316,9 +314,9 @@ void batman_enhance() {
       foreach i,o in opts stasdex[o.id] = i;
       attack_action();
      // stasis!
-      if (plink.profit >= to_float(vars["BatMan_profitforstasis"]) || is_our_huckleberry()) {
+      if (plink.profit >= to_float(getvar("BatMan_profitforstasis")) || is_our_huckleberry()) {
          actbox.append("\n   <div class='onemenu'><form name='batstasis' style='display: inline' action=fight.php method=post><input type=hidden name=action value='macro'>"+
-           "<input type='hidden' name='macrotext' value='"+batround()+"sub main; "+plink.id+"; call batround; endsub; call main; repeat "+stasis_repeat()+"'><input type=image src='images/itemimages/watch.gif' "+
+           "<input type='hidden' name='macrotext' value='"+batround()+"sub main; "+plink.id+"; call batround; endsub; call main"+(is_once(plink.id) ? "" : "; repeat "+stasis_repeat())+"'><input type=image src='images/itemimages/watch.gif' "+
            "title='Stasis with "+plink.id+"' height=22 width=22 onclick='return bjilgt(this);'></form></div>\n<div class='popout'>");
          actbox.append(to_html(plink,0,true)+"<p><span id='stasissort' class='littlesort'><img src='images/itemimages/bgecalendar.gif'> Sort by stasis_action()</span></div>");
       }
@@ -423,14 +421,14 @@ void batman_enhance() {
       "<img src='../images/itemimages/2wingbat.gif' height=22 width=22 border=0></a></div>"+
       "<div class='popout'><a href='http://kolmafia.us/showthread.php?10042' title='Official thread' target='_new'>BatMan RE</a> "+
       "is powered by <a href='http://kolmafia.us/showthread.php?6445' title='Official thread' target='_new'>BatBrain</a>.<p>");
-   if (to_boolean(vars["BatMan_RE_enabled"])) actbox.append("<form name=disablebatman action=fight.php method=post><input type=hidden name=enabletoggle value=off>"+
+   if (to_boolean(getvar("BatMan_RE_enabled"))) actbox.append("<form name=disablebatman action=fight.php method=post><input type=hidden name=enabletoggle value=off>"+
       "<input class=button type=submit value='Disable BatMan RE'> <span title='You may disable BatMan RE on a per-character basis without uninstalling the script "+
       "and losing access to awesome parts like Factroid! and Sera.  It can be re-enabled by clicking the Enable button located underneath the Run Away button during a fight.'>?</span></form><p>");
    actbox.append((verstuff == "" ? "<div id='batquote'>"+quote()+"</div>" : verstuff)+"</div></div>");
   // Add unknown_ml editor if any stats are unknown
    if (!havemanuel && (m.raw_attack == -1 || m.raw_defense == -1 || m.raw_hp == -1) && contains_text(page,"monname"))
       actbox.append("<div id='undermon'><form name='changeml' action=fight.php method=post>Unknown monster stats treated as "+
-      "<input name=setml type=text size=4 value='"+vars["unknown_ml"]+"'>.</form></div>");
+      "<input name=setml type=text size=4 value='"+getvar("unknown_ml")+"'>.</form></div>");
   // Actions table
    if (!finished()) {
       if (round > realround) reset_queue();

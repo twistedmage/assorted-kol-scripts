@@ -3,7 +3,27 @@
 boolean [item] favGear;
 float [string, item] recommendedGear;
 boolean [string] forceSections;
+boolean aftercore = qprop("questL13Final");
 
+float equip_modifier(item it, string mod) {
+	if(my_path() == "Gelatinous Noob") return 0;
+	switch(it) {
+	case $item[your cowboy boots]:
+		return equipped_item($slot[bootskin]).numeric_modifier(mod)
+			+ equipped_item($slot[bootspur]).numeric_modifier(mod);
+	case $item[over-the-shoulder Folder Holder]:
+		float modtot;
+		foreach sl in $slots[folder1, folder2, folder3, folder4, folder5]
+			modtot += equipped_item(sl).numeric_modifier(mod);
+		return modtot;
+	}
+	return numeric_modifier(it, mod);
+}
+float equip_modifier(item it, string mod, int weight) {
+	if(weight == 0) return 0;
+	return equip_modifier(it, mod) * weight;
+}
+	
 string gearName(item it) {
 	string name = to_string(it);
 	string notes = "";
@@ -49,26 +69,31 @@ string gearName(item it) {
 	return name;
 }
 
-boolean aftercore = qprop("questL13Final");
-string [string] defaults;
-string defaults_str = vars["chit.gear.display." + (aftercore ? "aftercore" : "in-run") + ".defaults"];
-foreach i,opt in split_string(defaults_str, ", ?") {
-	string [int] spl = split_string(opt," ?= ?");
-	if(spl.count() == 2)
-		defaults[spl[0]] = spl[1];
-}
+string [string] defaults = 
+	aftercore? string [string] {
+		"create": "true",
+		"pull": "true",
+		"amount": "1",
+	}: string [string] {
+		"create": "false",
+		"pull": "false",
+		"amount": "all",
+	};
 string [string,string] reason_options;
-foreach i,s in split_string(vars["chit.gear.display." + (aftercore ? "aftercore" : "in-run")], ", ?") {
-	string [string] options;
-	string [int] spl = split_string(s,":");
-	if(spl.count() > 1) {
-		for i from 1 to spl.count() - 1 {
-			string [int] opt = split_string(spl[i], " ?= ?");
-			if(opt.count() == 2)
-				options[opt[0]] = opt[1];
+
+void gear_display_options() {
+	foreach i,s in split_string(vars["chit.gear.display." + (aftercore ? "aftercore" : "in-run")], ", ?") {
+		string [string] options;
+		string [int] spl = split_string(s,":");
+		if(spl.count() > 1) {
+			for i from 1 to spl.count() - 1 {
+				string [int] opt = split_string(spl[i], " ?= ?");
+				if(opt.count() == 2)
+					options[opt[0]] = opt[1];
+			}
 		}
+		reason_options[spl[0]] = options;
 	}
-	reason_options[spl[0]] = options;
 }
 
 string get_option(string reason, string option) {
@@ -79,9 +104,9 @@ string get_option(string reason, string option) {
 	return defaults[option];
 }
 
-int foldable_amount(item it, string reason);
+int foldable_amount(item it, string reason, boolean hagnk);
 
-int chit_available(item it, string reason, boolean foldcheck)
+int chit_available(item it, string reason, boolean hagnk, boolean foldcheck)
 {
 	int available = item_amount(it) + closet_amount(it);
 	if(to_boolean(reason.get_option("create")))
@@ -91,16 +116,19 @@ int chit_available(item it, string reason, boolean foldcheck)
 	
 	if(pulls_remaining() == -1)
 		available += storage_amount(it);
-	else if(pulls_remaining() > 0 && to_boolean(reason.get_option("pull")))
+	else if(hagnk && pulls_remaining() > 0 && to_boolean(reason.get_option("pull")))
 		available += min(pulls_remaining(), storage_amount(it));
 	available += equipped_amount(it);
 	
 	if(foldcheck)
-		available += foldable_amount(it, reason);
+		available += foldable_amount(it, reason, hagnk);
 	
 	return available;
 }
 
+int chit_available(item it, string reason, boolean hagnk) {
+	return chit_available(it, reason, hagnk, true);
+}
 int chit_available(item it, string reason)
 {
 	return chit_available(it, reason, true);
@@ -111,11 +139,11 @@ int chit_available(item it)
 	return chit_available(it, "");
 }
 
-int foldable_amount(item it, string reason) {
+int foldable_amount(item it, string reason, boolean hagnk) {
 	int amount = 0;
 	foreach foldable, i in get_related(it, "fold")
 		if(foldable != it)
-			amount += chit_available(foldable, reason, false);
+			amount += chit_available(foldable, reason, hagnk, false);
 	
 	return amount;
 }
@@ -159,8 +187,8 @@ void addGear(item it, string reason)
 	addGear(it, reason, 1);
 }
 
-void addFavGear() {	
-	boolean aftercore = (get_property("questL13Final") == "finished");
+void addFavGear() {
+	gear_display_options();
 
 	// Certain quest items need to be equipped to enter locations
 	if(available_amount($item[digital key]) + creatable_amount($item[digital key]) < 1 && get_property("questL13Final") != "finished")
@@ -258,7 +286,7 @@ void addFavGear() {
 						if(mod.mod == "flatval")
 							score += mod.multiplier;
 						else
-							score += numeric_modifier(it, mod.mod) * mod.multiplier;
+							score += equip_modifier(it, mod.mod) * mod.multiplier;
 					}
 					foreach attr,i,val in cat.attributes {
 							switch(attr) {
@@ -268,6 +296,8 @@ void addFavGear() {
 									break;
 							}
 					}
+					if(weapon_hands(it) > 1)
+						score /= 2;
 					if(score > 0)
 						cat.list[it] = score;
 				}
@@ -325,10 +355,9 @@ void addFavGear() {
 			addGear(cat.list, cat.name);
 		}
 	}
-		
 	
 	// manual favorites
-	foreach i,fav in split_string(vars["chit.gear.favorites"], "\\s*(?<!\\\\),\\s*") {
+	foreach i,fav in split_string(vars["chit.gear.favorites"], "\\s*(?<!\\\\)[,|]\\s*") {
 		item it = to_item(fav.replace_string("\\,", ","));
 		favGear[it] = true;
 		addGear(it, "favorites");
@@ -498,6 +527,11 @@ void pickerGear(slot s) {
 				picker.append('</a></td></tr>');
 			}
 			break;
+		case $item[Kremlin's Greatest Briefcase]:
+			start_option(in_slot, true);
+			picker.append('<td colspan="2"><a class="visit done" target=mainpane ' +
+				'href="place.php?whichplace=kgb">Examine the briefcase.</a></td></tr>');
+			break;
 	}
 	
 	void add_favorite_button(buffer result, item it) {
@@ -574,7 +608,7 @@ void pickerGear(slot s) {
 		} else if(boolean_modifier(it, "Free Pull") && available_amount(it) > 0) {
 			action = "free pull";
 			cmd = "equip ";
-		} else if(foldable_amount(it, reason) > 0) {
+		} else if(foldable_amount(it, reason, false) > 0) {
 			action = "fold";
 			cmd = "fold " + it + "; equip ";
 		} else if(storage_amount(it) > 0 && pulls_remaining() == -1) { // Out of ronin (or in aftercore), prefer pulls to creation
@@ -590,6 +624,17 @@ void pickerGear(slot s) {
 			danger_level = 2;
 			action_description += '(' + pulls_remaining() + ' left)';
 			cmd = "pull " + it + "; equip ";
+		} else if(foldable_amount(it, reason, true) > 0) {
+			item to_fold;
+			foreach foldable, i in get_related(it, "fold")
+				if(storage_amount(foldable) > 0) {
+					to_fold = foldable;
+					break;
+				}
+			action = "pull & fold";
+			danger_level = 2;
+			action_description += '(' + pulls_remaining() + ' left)';
+			cmd = "pull " + to_fold + "; fold " + it + "; equip ";
 		} else // no options were found, give up
 			return false;
 		
@@ -766,37 +811,19 @@ void pickerGear(slot s) {
 			add_gear_section(section, recommendedGear[section]);
 	}
 	
-	float mod_val(item it, string mod) {
-		switch(it) {
-		case $item[your cowboy boots]:
-			return equipped_item($slot[bootskin]).numeric_modifier(mod)
-				+ equipped_item($slot[bootspur]).numeric_modifier(mod);
-		case $item[over-the-shoulder Folder Holder]:
-			float modtot;
-			foreach sl in $slots[folder1, folder2, folder3, folder4, folder5]
-				modtot += equipped_item(sl).numeric_modifier(mod);
-			return modtot;
-		}
-		return numeric_modifier(it, mod);
-	}
-	float mod_val(item it, string mod, int weight) {
-		if(weight == 0) return 0;
-		return mod_val(it, mod) * weight;
-	}
-	
 	// Which gear is more desirable?
 	int gear_weight(item it) {
 		float weight;
 		
 		switch(item_type(it)) {
 		case "chefstaff":
-			weight = numeric_modifier(it, "Spell Damage Percent");  // They all have 10 power, so this number is a surrogate
+			weight = equip_modifier(it, "Spell Damage Percent");  // They all have 10 power, so this number is a surrogate
 			break;
 		case "accessory":
-			# weight = get_power(it) + mod_val(it, "Item Drop", 6) + mod_val(it, "Monster Level", my_level() < 13? 4: 0)
-				# + (mod_val(it, "MP Regen Max") + mod_val(it, "MP Regen Min")) * 5;
-			weight = get_power(it) + numeric_modifier(it, "Item Drop") * 6 + numeric_modifier(it, "Monster Level") * (my_level() < 13? 4: 0)
-				+ (numeric_modifier(it, "MP Regen Max") + numeric_modifier(it, "MP Regen Min")) * 5;
+			# weight = get_power(it) + equip_modifier(it, "Item Drop", 6) + equip_modifier(it, "Monster Level", my_level() < 13? 4: 0)
+				# + (equip_modifier(it, "MP Regen Max") + equip_modifier(it, "MP Regen Min")) * 5;
+			weight = get_power(it) + equip_modifier(it, "Item Drop") * 6 + equip_modifier(it, "Monster Level") * (my_level() < 13? 4: 0)
+				+ (equip_modifier(it, "MP Regen Max") + equip_modifier(it, "MP Regen Min")) * 5;
 			break;
 		case "club":
 			if(my_class() == $class[Seal Clubber])
@@ -831,20 +858,20 @@ void pickerGear(slot s) {
 		case $stat[Muscle]:
 			if(weapon_type(it) == $stat[Moxie])
 				weight *= 0.5;
-			weight += numeric_modifier(it, "MP Regen Max") + numeric_modifier(it, "MP Regen Min");
-			weight += numeric_modifier(it, "Muscle") * 2;
-			weight += numeric_modifier(it, "Muscle Percent") * my_basestat($stat[Muscle]) / 50;
+			weight += equip_modifier(it, "MP Regen Max") + equip_modifier(it, "MP Regen Min");
+			weight += equip_modifier(it, "Muscle") * 2;
+			weight += equip_modifier(it, "Muscle Percent") * my_basestat($stat[Muscle]) / 50;
 			break;
 		case $stat[Mysticality]:
-			weight += (numeric_modifier(it, "MP Regen Max") + numeric_modifier(it, "MP Regen Min")) * 2;
-			weight += numeric_modifier(it, "Spell Damage") * 3;
-			weight += numeric_modifier(it, "Spell Damage Percent");
+			weight += (equip_modifier(it, "MP Regen Max") + equip_modifier(it, "MP Regen Min")) * 2;
+			weight += equip_modifier(it, "Spell Damage") * 3;
+			weight += equip_modifier(it, "Spell Damage Percent");
 			break;
 		case $stat[Moxie]:
 			if(weapon_type(it) != $stat[Moxie] && !(have_skill($skill[Tricky Knifework]) && item_type(it) == "knife"))
 				weight *= 0.5;
-			weight += numeric_modifier(it, "Moxie") * 3;
-			weight += numeric_modifier(it, "Moxie Percent") * my_basestat($stat[Moxie]) / 33.3;
+			weight += equip_modifier(it, "Moxie") * 3;
+			weight += equip_modifier(it, "Moxie Percent") * my_basestat($stat[Moxie]) / 33.3;
 			break;
 		}
 
@@ -969,9 +996,10 @@ void bakeGear() {
 	buffer result;
 
 	result.append('<table id="chit_gear" class="chit_brick nospace"><tbody>');
-	result.append('<tr><th class="label"><a class="visit" target="mainpane" href="./inventory.php?which=2"><img src="');
+	result.append('<tr><th class="label"><img  class="chit_walls_stretch" src="');
 	result.append(imagePath);
-	result.append('equipment.png">Gear</a></th></tr>');
+	result.append('equipment.png">');
+	result.append('<a class="visit" target="mainpane" href="./inventory.php?which=2">Gear</a></th></tr>');
 	
 	result.addGear();
 

@@ -71,6 +71,23 @@ int check_swagger()
 		return 0;
 }
 
+int check_season_swagger()
+{
+	//get original page
+	string page=visit_url("peevpee.php?place=shop");
+	
+	//find swagger
+	matcher swagger_matcher = create_matcher("ve earned (\\d*) swagger during",page);
+	if(find(swagger_matcher))
+	{
+		int left = group(swagger_matcher,1).to_int();
+		print("You have "+left+" swagger.");
+		return left;
+	}
+	else
+		return 0;
+}
+
 void do_fights()
 {
 	if(my_name()=="asica" || my_name()=="anid")
@@ -96,8 +113,9 @@ void do_fights()
 //	}	
 	print("Done with pvp today");
 	int swagger=check_swagger();
-	if(swagger>1000 && can_interact())
-		abort("buy seasonal pvp item?");
+	int season_swagger=check_season_swagger();
+//	if(swagger>2000 && can_interact() && season_swagger>1000)
+//		abort("buy seasonal pvp item?");
 	
 	if(swagger>10000 && available_amount($item[cursed microwave])<1 && can_interact())
 		abort("buy cursed microwave");

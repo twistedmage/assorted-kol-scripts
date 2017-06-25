@@ -285,6 +285,8 @@ boolean ok(item it, string command, effect ef) {
 		return false;
 	if(contains_text(command, "play"))	//Don't waste precious cards
 		return false;
+	if(contains_text(command, "closet"))	//Don't confuse the speculate command with closet and uncloset confusion
+		return false;
 	if(command == "")	//Don't try things that Mafia doesn't think we can do
 		return false;
 	if(!use_percentage_potions && (numeric_modifier(ef, "Maximum HP Percent") > 0 || numeric_modifier(ef, "Maximum MP Percent") > 0 || numeric_modifier(ef, "Moxie Percent") > 0 || numeric_modifier(ef, "Muscle Percent") > 0 || numeric_modifier(ef, "Mysticality Percent") > 0))
@@ -357,7 +359,7 @@ void cache_outfits()
 		if(outfit("Mysticality")) {} //Make sure we don't abort if we cannot equip the outfit
 	}
 //	cli_execute("refresh equip");
-	maximize("Mysticality" + maximize_familiar, false);
+	maximize("-tie, Mysticality" + maximize_familiar, false);
 	cli_execute("outfit save Mysticality");
 	familiarCache["Mysticality"].f = my_familiar();
 	familiarCache["Mysticality"].i = familiar_equipped_equipment(my_familiar());
@@ -369,7 +371,7 @@ void cache_outfits()
 		if(outfit("Muscle")) {} //Make sure we don't abort if we cannot equip the outfit
 	}
 //	cli_execute("refresh equip");
-	maximize("Muscle" + maximize_familiar, false);
+	maximize("-tie, Muscle" + maximize_familiar, false);
 	cli_execute("outfit save Muscle");
 	familiarCache["Muscle"].f = my_familiar();
 	familiarCache["Muscle"].i = familiar_equipped_equipment(my_familiar());
@@ -381,7 +383,7 @@ void cache_outfits()
 		if(outfit("Moxie")) {} //Make sure we don't abort if we cannot equip the outfit
 	}
 //	cli_execute("refresh equip");
-	maximize("Moxie" + maximize_familiar, false);
+	maximize("-tie, Moxie" + maximize_familiar, false);
 	cli_execute("outfit save Moxie");
 	familiarCache["Moxie"].f = my_familiar();
 	familiarCache["Moxie"].i = familiar_equipped_equipment(my_familiar());
@@ -393,7 +395,7 @@ void cache_outfits()
 		if(outfit("Gauntlet")) {} //Make sure we don't abort if we cannot equip the outfit
 	}
 //	cli_execute("refresh equip");
-	maximize("HP" + maximize_familiar, false);
+	maximize("-tie, HP" + maximize_familiar, false);
 	cli_execute("outfit save Gauntlet");
 	familiarCache["Gauntlet"].f = my_familiar();
 	familiarCache["Gauntlet"].i = familiar_equipped_equipment(my_familiar());
@@ -405,15 +407,7 @@ void cache_outfits()
 		if(outfit("MPDrain")) {} //Make sure we don't abort if we cannot equip the outfit
 	}
 //	cli_execute("refresh equip");
-	string command = "MP" + maximize_familiar;
-#	foreach it in $items[]
-#	{
-#		if (it.boolean_modifier("Moxie May Control MP") || it.boolean_modifier("Moxie Controls MP"))
-#		{
-#			command = command + ", -equip " + it.to_string();
-#		}
-#	}
-	maximize(command, false);
+	maximize("-tie, MP" + maximize_familiar, false);
 	cli_execute("outfit save MPDrain");
 	familiarCache["MP"].f = my_familiar();
 	familiarCache["MP"].i = familiar_equipped_equipment(my_familiar());
@@ -425,12 +419,12 @@ void cache_outfits()
 		if(outfit("MP Regen")) {} //Make sure we don't abort if we cannot equip the outfit
 	}
 //	cli_execute("refresh equip");
-	maximize(".5 MP Regen min, .5 MP Regen max" + maximize_familiar, false);
+	maximize("-tie, .5 MP Regen min, .5 MP Regen max" + maximize_familiar, false);
 	cli_execute("outfit save MP Regen");
 	familiarCache["MP Regen"].f = my_familiar();
 	familiarCache["MP Regen"].i = familiar_equipped_equipment(my_familiar());
 
-	command = combat_stat.to_string() + (autoBasement_combat_maximizer_string != "" ? ", " + autoBasement_combat_maximizer_string : "");
+	string command = "-tie, " + combat_stat.to_string() + (autoBasement_combat_maximizer_string != "" ? ", " + autoBasement_combat_maximizer_string : "");
 	foreach i in combat_equipment
 	{
 		item equipment = combat_equipment[i].to_item();
@@ -461,7 +455,7 @@ void cache_outfits()
 		if(outfit("Elemental Resistance")) {} //Make sure we don't abort if we cannot equip the outfit
 	}
 //	cli_execute("refresh equip");
-	maximize(".01 hp, 5 all res" + maximize_familiar, false);
+	maximize("-tie, .01 hp, 5 all res" + maximize_familiar, false);
 	cli_execute("outfit save Elemental Resistance");
 	familiarCache["Elemental Resistance"].f = my_familiar();
 	familiarCache["Elemental Resistance"].i = familiar_equipped_equipment(my_familiar());	
@@ -685,7 +679,7 @@ boolean elemental_test(int level, element elem1, element elem2)
 			return true;
 	}
 	vprint("5", "purple", 7);	
-	foreach i, rec in maximize(".5 " + to_string(elem1) + " resistance, .5 " + to_string(elem2) + " resistance, 0.01 hp" + element_familiar, max_potion_price, 1, true, true) {
+	foreach i, rec in maximize("-tie, .5 " + to_string(elem1) + " resistance, .5 " + to_string(elem2) + " resistance, 0.01 hp" + element_familiar, max_potion_price, 1, true, true) {
 		if(!ok(rec.item, rec.command, rec.effect))
 			continue;
 		if(rec.score > 0) {
@@ -726,7 +720,7 @@ boolean elemental_test(int level, element elem1, element elem2)
 	vprint(9, "purple", 7);
 	if(have_effect(elementForm[elem1].e) > 0) {
 		if (elemental_damage(level, elem1) + elemental_damage(level, elem2) > my_maxhp() && have_effect(elementForm[elem1].e) > 0) {
-			foreach i, rec in maximize(to_string(elem2) + " resistance, 0.01 hp" + element_familiar, max_potion_price, 1, true, true) {
+			foreach i, rec in maximize(to_string(elem2) + " resistance, -tie, 0.01 hp" + element_familiar, max_potion_price, 1, true, true) {
 				if(!ok(rec.item, rec.command, rec.effect))
 					continue;
 				if(contains_text(rec.command, "phial"))
@@ -811,7 +805,7 @@ void maximize_mp_regen()
 {
 	if (!(outfits_cached && equip_cached_outfit("MP Regen")))
 	{
-		maximize(".5 mp regen min, .5 mp regen max" + maximize_familiar, false);
+		maximize("-tie, .5 mp regen min, .5 mp regen max" + maximize_familiar, false);
 	}
 }
 
@@ -1025,7 +1019,7 @@ void basement(int num_turns)
 			string[int] perform, perform_whatif;
 			int j;
 			if(damage > my_maxhp()) {
-				foreach i, rec in maximize((0.0009*hp) + " da, 1 hp" + maximize_familiar, max_potion_price, 1, true, true) {
+				foreach i, rec in maximize((0.0009*hp) + " da, -tie, 1 hp" + maximize_familiar, max_potion_price, 1, true, true) {
 					if(!ok(rec.item, rec.command, rec.effect))
 						continue;
 					if(rec.score > 0) {
@@ -1053,7 +1047,7 @@ void basement(int num_turns)
 				cli_execute("whatif quiet");
 				j = 0;
 				if (damage > my_maxhp() && raw_damage_absorption() < 1000) {
-					foreach i, rec in maximize("da, hp", max_potion_price, 1, true, true) {
+					foreach i, rec in maximize("-tie, da, hp", max_potion_price, 1, true, true) {
 						if(!ok(rec.item, rec.command, rec.effect))
 							continue;
 						if(rec.score > 0) {

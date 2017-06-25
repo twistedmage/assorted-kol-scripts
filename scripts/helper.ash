@@ -282,7 +282,8 @@ void add_food(consumable[int] con_map,string text,float avg_adv,int craft_turns,
 	con.fullness=fullness;
 	//account for crafting
 	con.efficiency=con.avg_adv;
-	if(!have_chef() && !(have_skill($skill[Inigo's Incantation of Inspiration]) && my_maxmp()>100 && my_path()!="Heavy Rains"))
+	boolean free_crafting = have_chef() || (have_skill($skill[Inigo's Incantation of Inspiration]) && my_maxmp()>100);
+	if(!free_crafting)
 		con.efficiency-=con.craft_turns;
 	con.efficiency/=fullness;
 	//then add it
@@ -351,7 +352,7 @@ void advise_food()
 			
 		if(my_level()>10 && (available_amount($item[astral hot dog dinner])>0 || available_amount($item[astral hot dog])>0))
 		{
-			add_food(con_map,"- ASTRAL HOTDOG ",22,0,3);
+			add_food(con_map,"- ASTRAL HOTDOG (from level 11+)",22,0,3);
 		}
 			
 		if(available_amount($item[knob pasty])!=0 && bees_ok)
@@ -389,7 +390,8 @@ void advise_food()
 		{			
 			if(my_path() != "Bees Hate You" && my_level()>5 && (available_amount($item[scrumptious reagent])!=0 || available_amount($item[scrumdiddlyumptious solution])!=0 )&& (my_class()==$class[sauceror] || my_class()==$class[pastamancer]) && have_skill($skill[transcendental noodlecraft]) && have_skill($skill[the way of sauce]))
 			{
-				add_food(con_map,"-    noodles + elemental nuggets + scrumdidly solution (<element> hi mein) ",25.5,3,5,false,true);
+				if(my_level()>=13)
+					add_food(con_map,"-    noodles + elemental wads + scrumdidly solution (<element> hi mein) ",25.5,3,5,false,true);
 				
 				if(my_level()>10 && (i_a("Fettris")>0 || i_a("imitation White Russian")>0 || i_a("Alexy sauce")>0))
 					add_food(con_map,"-    noodles + imitation White Russian + scrumdidly solution =  Fettris",22,3,5,false,true);
@@ -404,19 +406,7 @@ void advise_food()
 				if(my_level()>9 && (i_a("turkish mostaccioli")>0 || i_a("giant turkey leg")>0 || i_a("good gravy")>0))
 					add_food(con_map,"-    noodles + giant turkey leg + scrumdidly solution = turkish mostaccioli ",20.5,3,5,false,true);
 			}
-			
-			if(have_outfit("filthy hippy") || available_amount($item[herbs])>0)
-			{
-				if(my_class()==$class[sauceror] || my_class()==$class[pastamancer] && have_skill($skill[transcendental noodlecraft]) && available_amount($item[spices])>1)
-				{
-					add_food(con_map,"-    noodles + herb + spice + knoll mushroom + saus (knob sausage chow mein) ",24.5-1,1,5);
-					add_food(con_map,"-    noodles + herb + spice + knob mushroom + bat wing (bat wing chow mein) ",24.5-1,1,5);
-					add_food(con_map,"-    noodles + herb + spice + spooky mushroom + rat appendix (rat appendix chow mein) ",24.5-1,1,5);
-					add_food(con_map,"-    noodles + herb + spice + olive + pr0n (pr0n chow mein) ",19.5-1,1,4);
-					add_food(con_map,"-    noodles + herb + spice + asparagus + tofu (tofu chow mein) ",14.5-1,1,3);
-				}
-			}
-			
+						
 			if(my_level()>11 && my_class()==$class[sauceror] || my_class()==$class[pastamancer] && have_skill($skill[transcendental noodlecraft]))
 			{
 				add_food(con_map,"-    noodles + McMillicancuddy's lager + frat brats (sausage wonton) ",15-1,0,3);
@@ -666,9 +656,10 @@ void advise_food()
 		if(available_amount($item[Giant heirloom grape tomato])>0)
 			add_food(con_map,"- Giant heirloom grape tomato ",14,0,5);
 		cli_execute("use * Giant jar of protein powder");
+		cli_execute("use * Cornucopia");
 		if(available_amount($item[giant grain of protein powder])>0)
 			add_food(con_map,"- giant grains of protein powder ",2.5,0,1);
-		if(!get_property("_fancyHotDogEaten").to_boolean())
+		if(!get_property("_fancyHotDogEaten").to_boolean() && be_good($item[clan hot dog stand]))
 		{
 			if(my_primestat()==$stat[muscle])
 				add_food(con_map,"- Hot Dog (Savage Macho Dog) ",7,0,2);
@@ -694,7 +685,11 @@ void advise_food()
 			
 		if(!to_boolean(get_property("_pottedTeaTreeUsed")) && my_path()!="Nuclear Autumn")
 		{
-			print("**** USE CUPPA VORACI TEA ****","orange");
+			print("**** USING CUPPA VORACI TEA ****","orange");
+			visit_url("campground.php?action=teatree");
+			visit_url("choice.php?pwd&whichchoice=1104&option=2&choiceform2=Pick+a+low-hanging+tea");
+			visit_url("choice.php?itemid=8633&pwd&whichchoice=1105&option=1");
+			use(1,$item[cupp voraci tea]);
 		}
 		
 		if(equipped_amount($item[wrist-boy])>0 && my_meat()>2000)
@@ -718,6 +713,11 @@ void advise_food()
 			add_food(con_map,"- Insanely spicy enchanted bean burrito ",10.5,0,3);
 		if(available_amount($item[Insanely spicy jumping bean burrito])>0)
 			add_food(con_map,"- Insanely spicy jumping bean burrito ",10.5,0,3);
+			
+		if(can_interact())
+		{
+			add_food(con_map,"- *** affirmation cookie (gets better each day) ",9,0,1);
+		}
 		
 		//timespinner food
 		if(to_int( get_property("_timeSpinnerMinutesUsed"))<=7)
@@ -735,18 +735,17 @@ void advise_food()
 						c = c + 1;
 					}
 					advs = advs / c;
-					print("- Use time spinner to re-eat "+to_string(f)+advs+f.fullness);
 					add_food(con_map,"- Use time spinner to re-eat "+to_string(f),advs,0,f.fullness);
 				}
 			}
 		}
 		
-		if(to_int( get_property("_timeSpinnerMinutesUsed"))<=8 && to_boolean(get_property("_timeSpinnerReplicatorUsed")))
+		if(to_int( get_property("_timeSpinnerMinutesUsed"))<=8 && !get_property("_timeSpinnerReplicatorUsed").to_boolean())
 		{
 			add_food(con_map,"- Tea, Earl Grey, Hot from time spinner",6.5,0,1);
 		}
 		
-		if(i_a("source essence")>=10 || i_a("Browser cookie")>0)
+		if((i_a("source essence")>=10 && get_property("_sourceTerminalExtrudes").to_int()<3) || i_a("Browser cookie")>0)
 			add_food(con_map,"- Browser cookie ",21,0,4);
 			
 			
@@ -765,7 +764,7 @@ void advise_food()
 		if(available_amount($item[whole turkey leg])>0)
 			add_food(con_map,"- whole turkey leg ",4.5,0,1);
 		if(my_fullness() == 0 && (available_amount($item[spaghetti breakfast])>0 || (have_skill($skill[spaghetti breakfast]) && !get_property("_spaghettiBreakfast").to_boolean())))
-			add_food(con_map,"- *** spaghetti breakfast (prefer to eat at higher levels, but must be first food of the day)",0.5 + 0.5 * my_level(),0,1);
+			add_food(con_map,"- *** spaghetti breakfast (prefer to eat at higher levels, but must be first food of the day, cap=11)",0.5 + 0.5 * min(my_level(),11),0,1);
 		
 		
 		if(available_amount($item[Snow berries])>0 && (to_int(get_property("chasmBridgeProgress")) >= 30) && my_level()>=8)
@@ -844,9 +843,37 @@ void advise_food()
 		if(i_a("hardboiled egg")>0 || i_a("cop dollar")>3)
 			add_food(con_map,"- hardboiled egg ",3.5,0,1);
 
-		if(available_amount($item[time spinner])>0 && to_int( get_property("_timeSpinnerMinutesUsed"))<=8)
-			add_food(con_map,"- Tea, Earl Grey, Hot",6.5,0,1);
-
+		//cornucopia stuff
+		int num_cashews = i_a("cashew");
+		if(i_a("Cranberry cylinder")>0 || (i_a("raw cranberry sauce")>0 && num_cashews>=1))
+			add_food(con_map,"- Cranberry cylinder (1 cashew)",9,0,2);
+		if(i_a("Green bean casserole")>0 || (i_a("raw green beans")>0 && num_cashews>=1))
+			add_food(con_map,"- Green bean casserole (1 cashew)",9,0,2);
+		if(i_a("mashed potatoes")>0 || (i_a("raw potato")>0 && num_cashews>=1))
+			add_food(con_map,"- mashed potatoes (1 cashew)",9,0,2);
+			
+		if(i_a("bread roll")>0 || (i_a("raw bread")>0 && num_cashews>=2))
+			add_food(con_map,"- bread roll (2 cashew)",9,0,2);
+		if(i_a("Mince pie")>0 || (i_a("raw mincemeat")>0 && num_cashews>=2))
+			add_food(con_map,"- Mince pie (2 cashew)",9,0,2);
+		if(i_a("Candied sweet potatoes")>0 || (i_a("raw sweet potato")>0 && num_cashews>=2))
+			add_food(con_map,"- Candied sweet potatoes (2 cashew)",9,0,2);
+			
+		if(i_a("warm gravy")>0 || (i_a("raw gravy")>0 && num_cashews>=3))
+			add_food(con_map,"- warm gravy (3 cashew)",9,0,2);
+		if(i_a("Baked stuffing")>0 || (i_a("raw stuffing")>0 && num_cashews>=3))
+			add_food(con_map,"- Baked stuffing (3 cashew)",9,0,2);
+		if(i_a("Thanksgiving turkey")>0 || (i_a("raw turkey")>0 && num_cashews>=3))
+			add_food(con_map,"- Thanksgiving turkey (3 cashew)",9,0,2);
+			
+			
+		if(i_a("bowl of mummy guts")>0)
+			add_food(con_map,"- bowl of mummy guts",8,0,2);
+		if(i_a("bowl of eyeballs")>0)
+			add_food(con_map,"- bowl of eyeballs",8,0,2);
+		if(i_a("Bowl of maggots")>0)
+			add_food(con_map,"- Bowl of maggots",11,0,2);
+			
 		if(available_amount($item[magicberry tablets])>0)
 			print("**Maybe use magicberry tablets before eating!**","purple");
 	}
@@ -953,12 +980,12 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 		if(my_path() != "Bees Hate You" && available_amount($item[filthy lucre])>0)
 			add_drink(con_map,"- Oreille Divisée brandy from bounty hunter ",13.5,0,3);
 		
-		if(i_a("source essence")>=10 || i_a("Hacked gibson")>0)
+		if((i_a("source essence")>=10 && get_property("_sourceTerminalExtrudes").to_int()<3 )|| i_a("Hacked gibson")>0)
 			add_drink(con_map,"- Hacked gibson ",21,0,4);
-		
-		if(to_int( get_property("_timeSpinnerMinutesUsed"))<=8 && to_boolean(get_property("_timeSpinnerReplicatorUsed")))
+				
+		if(my_level()>10 && available_amount($item[astral pilsner])>0)
 		{
-			add_drink(con_map,"- Shot of Kardashian Gin from time spinner",5.5,0,1);
+			add_drink(con_map,"- ASTRAL PILSNER (from level 11+)",22,0,3);
 		}
 		
 		if(i_a("sacramento wine")>0)
@@ -1072,7 +1099,7 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 		if(available_amount($item[handful of honey])>4 || available_amount($item[honey mead])>0)
 			add_drink(con_map,"- Honey mead  (made with 4 handful of honey) ",5,0,2);
 		
-		if(have_skill($skill[advanced cocktailcrafting]) && i_a("bottle of vodka")>0 && i_a("magical ice cube")>0)
+		if(have_skill($skill[advanced cocktailcrafting]) && i_a("bottle of vodka")>0 && i_a("magical ice cubes")>0)
 			add_drink(con_map,"- make russian ice ",2.5,0,1);
 		
 		if(available_amount($item[cherry])>0 || available_amount($item[lime])>0 || available_amount($item[jumbo olive])>0)
@@ -1135,8 +1162,8 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 		
 		if(available_amount($item[cold one])>0 || (have_skill($skill[grab a cold one]) && !get_property("_coldOne").to_boolean()))
 		{
-			int advs = 0.5 * my_level() + 0.5;
-			add_drink(con_map,"- cold one (prefer to drink at higher levels)",advs,0,1);
+			int advs = 0.5 * min(my_level(),11) + 0.5;
+			add_drink(con_map,"- cold one (prefer to drink at higher levels, cap=11)",advs,0,1);
 		}
 		if(i_a("handful of smithereens")>0  || i_a("Paint A Vulgar Pitcher")>0 || (get_property("tomeSummons").to_int()<3 && have_skill($skill[summon smithsness])))
 			add_drink(con_map,"- Paint A Vulgar Pitcher (smithereens) ",11,0,2);
@@ -1188,7 +1215,7 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 			print("Maybe farm bottlles to use the perfect ice cube?","orange");
 		}
 		
-		if(available_amount($item[time spinner])>0 && to_int( get_property("_timeSpinnerMinutesUsed"))<=8)
+		if(available_amount($item[time spinner])>0 && to_int( get_property("_timeSpinnerMinutesUsed"))<=8 && !get_property("_timeSpinnerReplicatorUsed").to_boolean())
 			add_drink(con_map,"- Shot of Kardashian Gin",5.5,0,1);
 		
 		if(equipped_amount($item[wrist-boy])>0 && my_meat()>2000)
@@ -1200,7 +1227,7 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 			}
 		}
 		
-		if(to_int(get_property("_speakeasyDrinksDrunk")) < 3)
+		if(to_int(get_property("_speakeasyDrinksDrunk")) < 3 && be_good($item[clan speakeasy]))
 		{
 			add_drink(con_map,"-glass of \"milk\" (250 meat)",2.5,0,1);
 			add_drink(con_map,"-cup of \"tea\" (250 meat)",2.5,0,1);
@@ -1214,6 +1241,9 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 			add_drink(con_map,"-flivver (20,000 meat)",12.5,0,2);
 			add_drink(con_map,"-sloppy jalopy (100,000 meat) - +1 drunkenness",20,0,5);
 		}
+			
+		if(available_amount($item[Psychotic Train wine])>0)
+			add_drink(con_map,"- Psychotic Train wine",19.5,0,6);
 			
 		if(!to_boolean(get_property("_barrelPrayer")) && to_boolean(get_property("barrelShrineUnlocked")))
 		{

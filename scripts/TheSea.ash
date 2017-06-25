@@ -14,15 +14,15 @@ else if (my_primestat() == $stat[Moxie]) grandpa = $location[The Dive Bar];
 
 // Set default value to not closet meat.
 setvar("seafloor_closetMeat", -1);
-int TS_CLOSETMEAT = to_int(vars["seafloor_closetMeat"]) >= 0 ? max(0, my_meat() - to_int(vars["seafloor_closetMeat"])) : -1;
+int TS_CLOSETMEAT = to_int(getvar("seafloor_closetMeat")) >= 0 ? max(0, my_meat() - to_int(getvar("seafloor_closetMeat"))) : -1;
 
 // Sets the default outfit and maximization string. If both are set, it will use maximize.
 // Note if your outfit includes a weapon, you will potentially have problems with the Skate quest.
 // Also note that if you set these, you'll need to include some method of breathing underwater.
 setvar("seafloor_maximizeString", "");
 setvar("seafloor_outfit", "");
-string TS_MAXIMIZE = vars[ "seafloor_maximizeString" ];
-string TS_OUTFIT = vars[ "seafloor_outfit" ];
+string TS_MAXIMIZE = getvar("seafloor_maximizeString");
+string TS_OUTFIT = getvar("seafloor_outfit");
 
 // Quest completion. This should get set automatically.
 setvar("seafloor_monkeeAscension", my_ascensions());
@@ -31,65 +31,65 @@ setvar("seafloor_monkeeStep", 0);
 // How many monkees do you want to find?
 // 0 - Skip. 1 - Little Brother. 2 - Big Brother. 3 - Grandpa. 4 - Grandma, 5 - Mom.
 setvar("seafloor_monkeeQuest", 5);
-int TS_MONKEE_QUEST = to_int(vars["seafloor_monkeeQuest"]);
+int TS_MONKEE_QUEST = to_int(getvar("seafloor_monkeeQuest"));
 
 // Do you want to fax for the Neptune Flytrap, to increase the item drop rate and avoid underwater penalties?
 // This will abort if set to true and you are unable to access faxbot for some reason.
 setvar("seafloor_faxNeptune", false);
-boolean TS_FAX_NEPTUNE = to_boolean(vars["seafloor_faxNeptune"]);
+boolean TS_FAX_NEPTUNE = to_boolean(getvar("seafloor_faxNeptune"));
 
 // Which version of the grandpa chat series have you done? This skips unnecessary server hits.
 setvar("seafloor_grandpaChat", 0);
 
 // Do you want it to unlock the Trophyfish encounter? This defaults to false, since you'll likely only want to do this once.
 setvar("seafloor_unlockTrophyfish", false);
-boolean TS_UNLOCK_TROPHYFISH = to_boolean(vars["seafloor_unlockTrophyfish"]);
+boolean TS_UNLOCK_TROPHYFISH = to_boolean(getvar("seafloor_unlockTrophyfish"));
 
 // Do you want to speed up the abyss with the various equipment pieces?
 // 0 - Skip. 1 - Wear what we have. 2 - Buy everything.
 setvar("seafloor_abyssEquipment", 1);
-int TS_ABYSS_EQUIPMENT = to_int(vars["seafloor_abyssEquipment"]);
+int TS_ABYSS_EQUIPMENT = to_int(getvar("seafloor_abyssEquipment"));
 
 // How do you want to complete the Outfit quest?
 // 0 - Skip. 1 - Violence. 2 - Hatred. 3 - Loathing.
 setvar("seafloor_outfitQuest", 0);
-int TS_OUTFIT_QUEST = to_int(vars["seafloor_outfitQuest"]);
+int TS_OUTFIT_QUEST = to_int(getvar("seafloor_outfitQuest"));
 
 // Do you want to go through training and automation on the Gladiator quest?
 setvar("seafloor_automateGladiators", true);
-boolean TS_GLADIATORS = to_boolean(vars["seafloor_automateGladiators"]);
+boolean TS_GLADIATORS = to_boolean(getvar("seafloor_automateGladiators"));
 
 // How do you want to complete the Skate quest?
 // 0 - Skip. 1 - Ice. 2 - Roller. 3 - Board. 4 - Unlock, but don't do the quest.
 setvar("seafloor_skateQuest", 0);
-int TS_SKATE_QUEST = to_int(vars["seafloor_skateQuest"]);
+int TS_SKATE_QUEST = to_int(getvar("seafloor_skateQuest"));
 
 // Do you want to buy the sand dollars for the skate map if needed? If not, you will adventure for them.
 setvar("seafloor_buySkateMap", false);
-boolean TS_BUY_SKATEMAP = to_boolean(vars["seafloor_buySkateMap"]);
+boolean TS_BUY_SKATEMAP = to_boolean(getvar("seafloor_buySkateMap"));
 
 // Do you want to buy the skateboard if needed?
 setvar("seafloor_buySkateBoard", false);
-boolean TS_BUY_SKATEBOARD = to_boolean(vars["seafloor_buySkateBoard"]);
+boolean TS_BUY_SKATEBOARD = to_boolean(getvar("seafloor_buySkateBoard"));
 
 // Do you want to get the damp boot?
 // 0 - Skip. 1 - Das Boot. 2 - Fishy pipe. 3 - Fish meat. 4 - Damp wallet. 5 - Boot/Pipe/Meat. 6 - Boot/Pipe/Wallet.
 setvar("seafloor_bootQuest", 0);
-int TS_BOOT_QUEST = to_int(vars["seafloor_bootQuest"]);
+int TS_BOOT_QUEST = to_int(getvar("seafloor_bootQuest"));
 
 // Do you want to buy das boot?
 setvar("seafloor_buyBoot", false);
-boolean TS_BUY_BOOT = to_boolean(vars["seafloor_buyBoot"]);
+boolean TS_BUY_BOOT = to_boolean(getvar("seafloor_buyBoot"));
 
 // Do you want to get a sushi mat?
 // 0 - Skip. 1 - Buy sand dollars. 2 - Farm sand dollars.
 setvar("seafloor_getSushiMat", 0);
-int TS_GET_SUSHIMAT = to_int(vars["seafloor_getSushiMat"]);
+int TS_GET_SUSHIMAT = to_int(getvar("seafloor_getSushiMat"));
 
 // Do you want to get an aerated helmet?
 // 0 - Skip. 1 - Buy. 2 - Adventure. 3 - Fax.
 setvar("seafloor_getHelmet", 0);
-int TS_GET_HELMET = to_int(vars["seafloor_getHelmet"]);
+int TS_GET_HELMET = to_int(getvar("seafloor_getHelmet"));
 
 boolean getsome(int amount, item needed)
 {
@@ -243,7 +243,7 @@ void MonkeeQuest()
 	if (my_level() >= 13)
 	{
 		int loopcounter = 0;
-		if (my_ascensions() != to_int(vars["seafloor_monkeeAscension"]))
+		if (my_ascensions() != to_int(getvar("seafloor_monkeeAscension")))
 		{
 			print("Resetting Monkee quest status.");
 			vars["seafloor_monkeeAscension"] = my_ascensions();
@@ -256,7 +256,7 @@ void MonkeeQuest()
 			visit_url("place.php?whichplace=sea_oldman&action=oldman_oldman");
 			currentquests = visit_url("questlog.php?which=1");
 		}
-		if (TS_MONKEE_QUEST > 0 && to_int(vars["seafloor_monkeeStep"]) < TS_MONKEE_QUEST)
+		if (TS_MONKEE_QUEST > 0 && to_int(getvar("seafloor_monkeeStep")) < TS_MONKEE_QUEST)
 		{
 			string seafloor = visit_url("seafloor.php");
 			string monkeycastle;
@@ -291,7 +291,7 @@ void MonkeeQuest()
 				print("You were unable to unlock the many-windowed castle. Try again later.");
 				return;
 			}
-			if (to_int(vars["seafloor_monkeeStep"]) < 1)
+			if (to_int(getvar("seafloor_monkeeStep")) < 1)
 			{
 				visit_url("monkeycastle.php?who=1");
 				vars["seafloor_monkeeStep"] = 1;
@@ -303,7 +303,7 @@ void MonkeeQuest()
 				print("You'll need to figure out how you're going to breathe underwater first...");
 				return;
 			}
-			if (to_int(vars["seafloor_monkeeStep"]) >= TS_MONKEE_QUEST)
+			if (to_int(getvars("seafloor_monkeeStep")) >= TS_MONKEE_QUEST)
 			{
 				return;
 			}
@@ -323,7 +323,7 @@ void MonkeeQuest()
 				if (originalChoice != "1") set_property("choiceAdventure299", originalChoice);
 				monkeycastle = visit_url("monkeycastle.php");
 			}
-			if (to_int(vars["seafloor_monkeeStep"]) < 2 && monkeycastle.contains_text("\#brothers\""))
+			if (to_int(getvar("seafloor_monkeeStep")) < 2 && monkeycastle.contains_text("\#brothers\""))
 			{
 				monkeycastle = visit_url("monkeycastle.php");
 				if (!boolean_modifier("Adventure Underwater") || monkeycastle.contains_text("without some way of breathing underwater"))
@@ -336,7 +336,7 @@ void MonkeeQuest()
 				vars["seafloor_monkeeStep"] = 2;
 				updatevars();
 			}
-			if (to_int(vars["seafloor_monkeeStep"]) >= TS_MONKEE_QUEST)
+			if (to_int(getvars("seafloor_monkeeStep")) >= TS_MONKEE_QUEST)
 			{
 				return;
 			}
@@ -360,7 +360,7 @@ void MonkeeQuest()
 					monkeycastle = visit_url("monkeycastle.php");
 				}
 			}
-			if (to_int(vars["seafloor_monkeeStep"]) < 3 && monkeycastle.contains_text("\#gpa\""))
+			if (to_int(getvar("seafloor_monkeeStep")) < 3 && monkeycastle.contains_text("\#gpa\""))
 			{
 				monkeycastle = visit_url("monkeycastle.php");
 				if (!boolean_modifier("Adventure Underwater") || monkeycastle.contains_text("without some way of breathing underwater"))
@@ -369,7 +369,7 @@ void MonkeeQuest()
 					return;
 				}
 				cli_execute("refresh all");
-				if (to_int(vars["seafloor_grandpaChat"]) < 1) GrandpaChat();
+				if (to_int(getvar("seafloor_grandpaChat")) < 1) GrandpaChat();
 				if (TS_UNLOCK_TROPHYFISH)
 				{
 					print("Talking to Grandpa about the Trophyfish.");
@@ -382,7 +382,7 @@ void MonkeeQuest()
 				vars["seafloor_monkeeStep"] = 3;
 				updatevars();
 			}
-			if (to_int(vars["seafloor_monkeeStep"]) >= TS_MONKEE_QUEST)
+			if (to_int(getvar("seafloor_monkeeStep")) >= TS_MONKEE_QUEST)
 			{
 				return;
 			}
@@ -415,7 +415,7 @@ void MonkeeQuest()
 					}
 				}
 			}
-			if (to_int(vars["seafloor_monkeeStep"]) < 4 && monkeycastle.contains_text("\#gfolks\""))
+			if (to_int(getvar("seafloor_monkeeStep")) < 4 && monkeycastle.contains_text("\#gfolks\""))
 			{
 				monkeycastle = visit_url("monkeycastle.php");
 				if (!boolean_modifier("Adventure Underwater") || monkeycastle.contains_text("without some way of breathing underwater"))
@@ -426,7 +426,7 @@ void MonkeeQuest()
 				vars["seafloor_monkeeStep"] = 4;
 				updatevars();
 			}
-			if (to_int(vars["seafloor_monkeeStep"]) >= TS_MONKEE_QUEST)
+			if (to_int(getvar("seafloor_monkeeStep")) >= TS_MONKEE_QUEST)
 			{
 				return;
 			}
@@ -509,14 +509,14 @@ void MonkeeQuest()
 				}
 				outfit("checkpoint");
 			}
-			if (to_int(vars["seafloor_monkeeStep"]) < 5 && monkeycastle.contains_text("\#errybody\""))
+			if (to_int(getvar("seafloor_monkeeStep")) < 5 && monkeycastle.contains_text("\#errybody\""))
 			{
 				vars["seafloor_monkeeStep"] = 5;
 				updatevars();
 				print("You have completed the Sea Monkee quest.");
 			}
 		}
-		else if (to_int(vars["seafloor_monkeeStep"]) >= TS_MONKEE_QUEST)
+		else if (to_int(getvar("seafloor_monkeeStep")) >= TS_MONKEE_QUEST)
 		{
 			print("You have already completed the Monkee quest.");
 		}
@@ -535,7 +535,7 @@ void OutfitQuest()
 {
 	if (my_level() >= 13 && get_property("merkinQuestPath") != "done")
 	{
-		if (TS_MONKEE_QUEST < 4 || to_int(vars["seafloor_monkeeStep"]) < TS_MONKEE_QUEST)
+		if (TS_MONKEE_QUEST < 4 || to_int(getvar("seafloor_monkeeStep")) < TS_MONKEE_QUEST)
 		{
 			print("We need to find Grandma before we can continue on our grand adventure.");
 			return;
@@ -1388,7 +1388,7 @@ void BootQuest()
 {
 	if (my_level() >= 13)
 	{
-		if (currentquests.contains_text("An Old Guy and The Ocean") && to_int(vars["seafloor_monkeeStep"]) > 1)
+		if (currentquests.contains_text("An Old Guy and The Ocean") && to_int(getvar("seafloor_monkeeStep")) > 1)
 		{
 			print("You need 50 sand dollars to complete this quest.");
 			if (TS_BUY_BOOT && available_amount($item[damp old boot]) < 1)
@@ -1473,7 +1473,7 @@ void GetSushiMat()
 		{
 #			print("You already have a sushi mat.");
 		}
-		else if (to_int(vars["seafloor_monkeeStep"]) > 1)
+		else if (to_int(getvar("seafloor_monkeeStep")) > 1)
 		{
 			print("You need 50 sand dollars to buy a sushi mat.");
 			if (TS_GET_SUSHIMAT == 1 && available_amount($item[sushi-rolling mat]) < 1)

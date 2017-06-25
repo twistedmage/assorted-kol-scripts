@@ -77,6 +77,9 @@ if gotjump && !hppercentbelow 90
 	if hasskill extract
 		skill extract
 	endif
+	if hasskill extract jelly && !match "*monster has no particular elemental alignment"
+	   skill extract jelly
+	endif
 endif
 
 mark generic_spells1

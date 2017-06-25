@@ -8,7 +8,7 @@
 // ----------------------------------------------------------------------------
 script "EatDrink.ash"
 notify "Theraze"
-since r15804;
+since r17793;
 
 import <zlib.ash>;
 
@@ -35,18 +35,18 @@ boolean USE_STORAGE = to_boolean(get_property("autoSatisfyWithStorage"));
 // can use it when full). You do not actually drink or eat, and no item
 // updates are saved at the end.
 setvar("eatdrink_simConsume", true);
-boolean SIM_CONSUME = to_boolean(vars["eatdrink_simConsume"]);
+boolean SIM_CONSUME = to_boolean(getvar("eatdrink_simConsume"));
 // do not actually buy or consume, and pretend starting fullness is 0.
 
 // If true, you won't receive the "Are you sure you want to..." message on 
 // overdrink.
 setvar("eatdrink_suppressOverdrink", true);
-boolean SUPRESS_OVERDRINK = to_boolean(vars["eatdrink_suppressOverdrink"]);
+boolean SUPRESS_OVERDRINK = to_boolean(getvar("eatdrink_suppressOverdrink"));
 
 // If true, you won't receive the "Are you sure you want to..." message on 
 // eat without milk.
 setvar("eatdrink_suppressNoMilk", false);
-boolean SUPRESS_NOMILK = to_boolean(vars["eatdrink_suppressNoMilk"]);
+boolean SUPRESS_NOMILK = to_boolean(getvar("eatdrink_suppressNoMilk"));
 boolean wants_milk = true;
 boolean wants_lasagna = true;
 
@@ -67,15 +67,15 @@ boolean EAT_MALL = to_boolean(get_property("autoSatisfyWithMall"));
 
 // If true, you will make food if you have all the ingredients available.
 setvar("eatdrink_make", true);
-boolean EAT_MAKE = to_boolean(vars["eatdrink_make"]);
+boolean EAT_MAKE = to_boolean(getvar("eatdrink_make"));
 
 // If true, you will eliminate food if you no longer have all the ingredients available.
 setvar("eatdrink_accurateMake", true);
-boolean EAT_ACCURATE = to_boolean(vars["eatdrink_accurateMake"]);
+boolean EAT_ACCURATE = to_boolean(getvar("eatdrink_accurateMake"));
 
 // If true, you will try to acquire an accordion if need be.
 setvar("eatdrink_accordionGet", false);
-boolean EAT_ACCORDION = to_boolean(vars["eatdrink_accordionGet"]) && have_skill($skill[the ode to booze]);
+boolean EAT_ACCORDION = to_boolean(getvar("eatdrink_accordionGet")) && have_skill($skill[the ode to booze]);
 
 // If true, you will try to only get the items and not actually consume them. This always starts false, but can be overridden in aliases and imports.
 boolean EAT_NOPE = false;
@@ -83,20 +83,20 @@ boolean EAT_NOPE = false;
 // Do you want to invoke Song of the Glorious Lunch before eating?
 // This only works if you actually possess the skill
 setvar("eatdrink_gloriousLunch", true);
-boolean wants_lunch = have_skill($skill[song of the glorious lunch]) ? to_boolean(vars["eatdrink_gloriousLunch"]) : false;
+boolean wants_lunch = have_skill($skill[song of the glorious lunch]) ? to_boolean(getvar("eatdrink_gloriousLunch")) : false;
 
 // Do you want to invoke Ode before drinking?
 // This only works if you actually possess the skill
 setvar("eatdrink_ode", true);
-boolean wants_ode = have_skill($skill[the ode to booze]) ? to_boolean(vars["eatdrink_ode"]) : false;
+boolean wants_ode = have_skill($skill[the ode to booze]) ? to_boolean(getvar("eatdrink_ode")) : false;
 
 // Do you want to shrug your cheapest re-castable Accordion buff if you have too many?
 setvar("eatdrink_shrug", false);
-boolean ode_shrug = wants_ode ? to_boolean(vars["eatdrink_shrug"]) : false;
+boolean ode_shrug = wants_ode ? to_boolean(getvar("eatdrink_shrug")) : false;
 
 // If you have an appropriate barrel buff available, do you want to automatically use it?
 setvar("eatdrink_barrelBuff", true);
-boolean barrel_buff = get_property("barrelShrineUnlocked").to_boolean() && !get_property("_barrelPrayer").to_boolean() ? to_boolean(vars["eatdrink_barrelBuff"]) : false;
+boolean barrel_buff = get_property("barrelShrineUnlocked").to_boolean() && !get_property("_barrelPrayer").to_boolean() ? to_boolean(getvar("eatdrink_barrelBuff")) : false;
 
 // If shopping, ignore items that cost more than PRICE FLEXIBILITY * this 
 // (another safety precaution, but not as reliable as closeting your meat). 
@@ -104,7 +104,7 @@ boolean barrel_buff = get_property("barrelShrineUnlocked").to_boolean() && !get_
 // since the interplay of other variables ensures you won't spend more than
 // you're willing to... still, it's good to be safe. 
 setvar("eatdrink_budget", 20000);
-int BUDGET = to_int(vars["eatdrink_budget"]);
+int BUDGET = to_int(getvar("eatdrink_budget"));
 
 // This is an attempt to allow for maximum meat spent per step. If the value
 // is set to a negative number, consider all your meat as possible. If the
@@ -114,48 +114,48 @@ int BUDGET = to_int(vars["eatdrink_budget"]);
 // users kept getting confused by the results, but should probably be set to a
 // positive value to save users from themselves if not simulating carefully. :)
 setvar("eatdrink_stepMeat", -1);
-int STEP_MEAT = (my_path() == "Way of the Surprising Fist") ? 0 : to_int(vars["eatdrink_stepMeat"]);
+int STEP_MEAT = (my_path() == "Way of the Surprising Fist") ? 0 : to_int(getvar("eatdrink_stepMeat"));
 
 // Before buying, making, etc stuff, it will pause this many seconds.
 setvar("eatdrink_pause", 3);
-int pause = to_int(vars["eatdrink_pause"]);
+int pause = to_int(getvar("eatdrink_pause"));
 
 // 0: skip servants if in HC. 1: make servants; continue if it fails. 2: make servants; abort if it fails.
 setvar("eatdrink_hardcoreServants", 2);
-int HARDCORE_SERVANTS = to_int(vars["eatdrink_hardcoreServants"]);
+int HARDCORE_SERVANTS = to_int(getvar("eatdrink_hardcoreServants"));
 
 // If not 0, buy/pull a *****-in-the-box if one's required and it's
 // possible for under the set amount, and -1 meaning price is no object.
-if (vars["eatdrink_getChef"] == "true")
+if (getvar("eatdrink_getChef") == "true")
 {
   vars["eatdrink_getChef"] = 5000;
   updatevars();
 }
 setvar("eatdrink_getChef", 5000);
 int GET_CHEF = to_int(vars["eatdrink_getChef"]);
-if (vars["eatdrink_getBartender"] == "true")
+if (getvar("eatdrink_getBartender") == "true")
 {
   vars["eatdrink_getBartender"] = 30000;
   updatevars();
 }
 setvar("eatdrink_getBartender", 30000);
-int GET_BARTENDER = to_int(vars["eatdrink_getBartender"]);
+int GET_BARTENDER = to_int(getvar("eatdrink_getBartender"));
 
 // Estimated prices are often off; you should be willing to pay somewhat more.
 // Setting this closer to 1 will optimize slightly but slow things down a lot.
 // It cannot be less than 1 or you'll hang. A minimum of 1.25 is recommended.
 setvar("eatdrink_priceFlexibility", 1.25);
-float PRICE_FLEXIBILITY = to_float(vars["eatdrink_priceFlexibility"]);
+float PRICE_FLEXIBILITY = to_float(getvar("eatdrink_priceFlexibility"));
 
 // 'true' will cause you to consider the price of food that you own already.
 // 'false' means to treat items you own as free.
 setvar("eatdrink_considerCostWhenOwned", true);
 boolean CONSIDER_COST_WHEN_OWNED = 
-  to_boolean(vars["eatdrink_considerCostWhenOwned"]);
+  to_boolean(getvar("eatdrink_considerCostWhenOwned"));
 
 // This makes you use items in inventory by autosell price instead during ronin
 setvar("eatdrink_autosellWhileRonin", false);
-boolean AUTOSELL_RONIN = to_boolean(vars["eatdrink_autosellWhileRonin"]);
+boolean AUTOSELL_RONIN = to_boolean(getvar("eatdrink_autosellWhileRonin"));
 
 //Avoid consuming noodles for Carboloading trophy or stunt runs
 setvar("eatdrink_noNoodles", false);
@@ -199,74 +199,74 @@ int VALUE_OF_ADVENTURE = to_int(get_property("valueOfAdventure"));
 // This number also ensures that you favor high-fullness food for your pulls
 // (requiring fewer) since when it's calculated, it's first divided by fullness.
 setvar("eatdrink_costOfPull", 3000);
-int COST_OF_PULL = to_int(vars["eatdrink_costOfPull"]);
+int COST_OF_PULL = to_int(getvar("eatdrink_costOfPull"));
 
 // Likewise, "How much would I pay for a stat subpoint"
 setvar("eatdrink_valueOfPrimeStat", 10);
-float VALUE_OF_PRIME_STAT = to_float(vars["eatdrink_valueOfPrimeStat"]);
+float VALUE_OF_PRIME_STAT = to_float(getvar("eatdrink_valueOfPrimeStat"));
 setvar("eatdrink_valueOfNonPrimeStat", 2);
-float VALUE_OF_NONPRIME_STAT = to_float(vars["eatdrink_valueOfNonPrimeStat"]);
+float VALUE_OF_NONPRIME_STAT = to_float(getvar("eatdrink_valueOfNonPrimeStat"));
 
 // "What is the minimum average adventures per consumption point"
 setvar("eatdrink_minimumAverage", 1.0);
-float MINIMUM_AVERAGE = to_float(vars["eatdrink_minimumAverage"]);
+float MINIMUM_AVERAGE = to_float(getvar("eatdrink_minimumAverage"));
 
 // "What is the minimum quality of item we're going to consider"
 setvar("eatdrink_minimumQuality", 0);
-int MINIMUM_QUALITY = to_int(vars["eatdrink_minimumQuality"]);
+int MINIMUM_QUALITY = to_int(getvar("eatdrink_minimumQuality"));
 
 // "How many times should ingredients loop to look for creatable items"
 setvar("eatdrink_loopCount", 5);
-int LOOP_COUNT = to_int(vars["eatdrink_loopCount"]);
+int LOOP_COUNT = to_int(getvar("eatdrink_loopCount"));
 
 //If true, then any time your level permits it and you're missing a key
 //(Boris, Jarlsberg, or Sneaky Pete), eatdrink will make the corresponding
 //pie a top priority.
 setvar("eatdrink_piePriority", true);
-boolean PIE_PRIORITY = to_boolean(vars["eatdrink_piePriority"]);
+boolean PIE_PRIORITY = to_boolean(getvar("eatdrink_piePriority"));
 
 // Some items are nontradable, so their price can't be calculated. These items
 // tend to be very good (e.g. pan-galactic gargleblaster). You may not want
 // to consume them lightly, so set this at MAXMEAT. If you do want to eat 
 // the very best food available regardless of value, set this to 0.
 setvar("eatdrink_priceOfNontradeables", MAXMEAT);
-int PRICE_OF_NONTRADEABLES = to_int(vars["eatdrink_priceOfNontradeables"]);
+int PRICE_OF_NONTRADEABLES = to_int(getvar("eatdrink_priceOfNontradeables"));
 
 // Some items are quest nontradables, so their price can't be calculated.
 // These items tend to be okay (e.g. turtle soup). You may not want to
 // consume them automatically because you want their effects, so we set this
 // at MAXMEAT. If you do want to eat these, set this to something like 100.
 setvar("eatdrink_priceOfQuestItems", MAXMEAT);
-int PRICE_OF_QUESTITEMS = to_int(vars["eatdrink_priceOfQuestItems"]);
+int PRICE_OF_QUESTITEMS = to_int(getvar("eatdrink_priceOfQuestItems"));
 
 // Similar to the above, except sometimes the lookup fails for lousy items.
 // MAXMEAT will cause items where lookup fails to be ignored from consideration.
 setvar("eatdrink_priceOfUnknowns", MAXMEAT);
-int PRICE_OF_UNKNOWNS = to_int(vars["eatdrink_priceOfUnknowns"]);
+int PRICE_OF_UNKNOWNS = to_int(getvar("eatdrink_priceOfUnknowns"));
 
 //if true, assume everything must be pulled. If false, use your current character state.
 setvar("eatdrink_simRonin", false);
-boolean SIM_RONIN = to_boolean(vars["eatdrink_simRonin"]);
+boolean SIM_RONIN = to_boolean(getvar("eatdrink_simRonin"));
 
 // if 0, then use your actual level. If you'd like to simulate a different level (e.g. ascension planning), set it to that level.
 setvar("eatdrink_simLevel", 0);
-int SIM_LEVEL = to_int(vars["eatdrink_simLevel"]);
+int SIM_LEVEL = to_int(getvar("eatdrink_simLevel"));
 
 // If we have less than this meat currently on hand, ignore the value of mayoClinic. The MAYO_CLINIC still allows overriding this.
 setvar("eatdrink_mayoMeat", 25000);
-int MAYO_MEAT = to_int(vars["eatdrink_mayoMeat"]);
+int MAYO_MEAT = to_int(getvar("eatdrink_mayoMeat"));
 
 // Bit mask for choices: 1 is Mayodiol - drink/inebriety. 2 is Mayostat - items/mayoli. 3 [4] is Mayozapine - stats/effects. 4 [8] is Mayoflex - adventures.
 setvar("eatdrink_mayoClinic", 13);
 int MAYO_CLINIC = 0;
 if (npc_price($item[Mayodiol]) == 0 || my_meat() < MAYO_MEAT);
-else if (vars["eatdrink_mayoClinic"].length() < 3) MAYO_CLINIC = to_int(vars["eatdrink_mayoClinic"]);
+else if (getvar("eatdrink_mayoClinic").length() < 3) MAYO_CLINIC = to_int(getvar("eatdrink_mayoClinic"));
 else
 {
-  if (vars["eatdrink_mayoClinic"].to_lower_case().contains_text("mayodiol") || vars["eatdrink_mayoClinic"].to_lower_case().contains_text("drink") || vars["eatdrink_mayoClinic"].to_lower_case().contains_text("inebriety")) MAYO_CLINIC += 1;
-  if (vars["eatdrink_mayoClinic"].to_lower_case().contains_text("mayostat") || vars["eatdrink_mayoClinic"].to_lower_case().contains_text("item") || vars["eatdrink_mayoClinic"].to_lower_case().contains_text("mayol")) MAYO_CLINIC += 2;
-  if (vars["eatdrink_mayoClinic"].to_lower_case().contains_text("mayozapine") || vars["eatdrink_mayoClinic"].to_lower_case().contains_text("stat") || vars["eatdrink_mayoClinic"].to_lower_case().contains_text("effect")) MAYO_CLINIC += 4;
-  if (vars["eatdrink_mayoClinic"].to_lower_case().contains_text("mayoflex") || vars["eatdrink_mayoClinic"].to_lower_case().contains_text("adventure")) MAYO_CLINIC += 8;
+  if (getvar("eatdrink_mayoClinic").to_lower_case().contains_text("mayodiol") || getvar("eatdrink_mayoClinic").to_lower_case().contains_text("drink") || getvar("eatdrink_mayoClinic").to_lower_case().contains_text("inebriety")) MAYO_CLINIC += 1;
+  if (getvar("eatdrink_mayoClinic").to_lower_case().contains_text("mayostat") || getvar("eatdrink_mayoClinic").to_lower_case().contains_text("item") || getvar("eatdrink_mayoClinic").to_lower_case().contains_text("mayol")) MAYO_CLINIC += 2;
+  if (getvar("eatdrink_mayoClinic").to_lower_case().contains_text("mayozapine") || getvar("eatdrink_mayoClinic").to_lower_case().contains_text("stat") || getvar("eatdrink_mayoClinic").to_lower_case().contains_text("effect")) MAYO_CLINIC += 4;
+  if (getvar("eatdrink_mayoClinic").to_lower_case().contains_text("mayoflex") || getvar("eatdrink_mayoClinic").to_lower_case().contains_text("adventure")) MAYO_CLINIC += 8;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -737,7 +737,7 @@ int effective_price(item it, boolean inventoried)
     //We'll update only if the pricing data is >maxAge days out of date.
     //Note that this is updated earlier in the script from a server so
     //you should have fresh prices.
-      else if (historical_age(it) > to_float(vars["eatdrink_maxAge"]))
+      else if (historical_age(it) > to_float(getvar("eatdrink_maxAge")))
       {
         itemprice = mall_price(it);
         vprint("STALE     :"+it+" = "+itemprice,8);
@@ -784,7 +784,7 @@ int effective_price(item it, boolean inventoried)
     //We'll update only if the pricing data is >maxAge days out of date.
     //Note that this is updated earlier in the script from a server so
     //you should have fresh prices.
-      else if (historical_age(it.seller.item) > to_float(vars["eatdrink_maxAge"]))
+      else if (historical_age(it.seller.item) > to_float(getvar("eatdrink_maxAge")))
       {
         tokenprice = mall_price(it.seller.item);
         vprint("STALE     :"+it.seller.item+" = "+tokenprice,8);
@@ -857,7 +857,7 @@ int effective_price(item it, boolean inventoried)
   //We'll update only if the pricing data is >maxAge days out of date.
   //Note that this is updated earlier in the script from a server so
   //you should have fresh prices.
-    else if (historical_age(it) > to_float(vars["eatdrink_maxAge"]))
+    else if (historical_age(it) > to_float(getvar("eatdrink_maxAge")))
     {
       if (AUTOSELL_RONIN && get_ronin() && inventoried && autosell_price(it) > 0) price = autosell_price(it);
       else price = mall_price(it);
@@ -1606,6 +1606,8 @@ item reducechoc(item it) {
         return $item[vitachoconutriment capsule];
     else if($item[chocolate cigar] == it)
         return $item[chocolate cigar];
+    else if($item[LOV Extraterrestrial Chocolate] == it)
+        return $item[LOV Extraterrestrial Chocolate];
     return $item[fancy chocolate];   // all other chocos track together
 }
 
@@ -1615,17 +1617,18 @@ string choc_prop(item it) {
 setvar(choc_prop($item[vitachoconutriment capsule]),gameday_to_string() + ":0"); 
 setvar(choc_prop($item[chocolate cigar]),gameday_to_string() + ":0"); 
 setvar(choc_prop($item[fancy chocolate]),gameday_to_string() + ":0"); 
+setvar(choc_prop($item[LOV Extraterrestrial Chocolate]),gameday_to_string() + ":0"); 
 
 int chocval(item it) {
     int choc_adv;
     switch(simchoc[it.reducechoc()]) {
     case 0:
-        if(class_choco contains it)
+        if(class_choco contains it || it == $item[LOV Extraterrestrial Chocolate])
             choc_adv = 3;
         else choc_adv = 5;
         break;
     case 1:
-        if(class_choco contains it)
+        if(class_choco contains it || it == $item[LOV Extraterrestrial Chocolate])
             choc_adv = 2;
         else choc_adv = 3;
         break;
@@ -1645,13 +1648,14 @@ void get_choc() {
     //this is cheap, but I'm going to abuse simchoc to iterate over for the main loop here (irrespective of whether I'm simulating).
     simchoc[$item[vitachoconutriment capsule]] = 0;
     simchoc[$item[chocolate cigar]] = 0;
+    simchoc[$item[LOV Extraterrestrial Chocolate]] = 0;
     simchoc[$item[fancy chocolate]] = 0; //note this encompasses all other chocos too
     string choc_prop;
     foreach key in simchoc {
         choc_prop = choc_prop(key);
-        int mark = index_of(vars[choc_prop], ":");
-        if(index_of(vars[choc_prop], ":") != -1 && substring(vars[choc_prop], 0, mark) == gameday_to_string())
-            simchoc[key] = substring(vars[choc_prop], mark+1).to_int();
+        int mark = index_of(getvar(choc_prop), ":");
+        if(index_of(getvar(choc_prop), ":") != -1 && substring(getvar(choc_prop), 0, mark) == gameday_to_string())
+            simchoc[key] = substring(getvar(choc_prop), mark+1).to_int();
         else {
             vars[choc_prop] = gameday_to_string() + ":0";
             updatevars();
@@ -1684,6 +1688,12 @@ void get_choc() {
         cigar.consumptionGain.min = 1;
         cigar.type = "choc";
         cigar = set_price(cigar);
+    con_rec LOVE;
+        LOVE.it = $item[LOV Extraterrestrial Chocolate];
+        LOVE.consumptionGain.max = 1;
+        LOVE.consumptionGain.min = 1;
+        LOVE.type = "choc";
+        LOVE = set_price(LOVE);
     con_rec choc;
     int to_consume;
     foreach it in simchoc {  //will run twice
@@ -1691,6 +1701,8 @@ void get_choc() {
             choc = vita;
         else if(it == $item[chocolate cigar])
             choc = cigar;
+        else if(it == $item[LOV Extraterrestrial Chocolate])
+            choc = LOVE;
         boolean giveup = false;
         while(!giveup && simchoc[it] < 3) {
 #        for i from 1 upto 3 {  // Chocolates can only be consumed thrice
@@ -1873,7 +1885,7 @@ int special_values(item it, int startvalue)
 
 void update_from_mafia(string type)
 {
-  boolean skipnoodles = to_boolean(vars["eatdrink_noNoodles"]);
+  boolean skipnoodles = to_boolean(getvar("eatdrink_noNoodles"));
   int gc = 1;
   foreach it in $items[]
   {
@@ -2489,7 +2501,7 @@ int eatdrink(int foodMax, int drinkMax, int spleenMax, boolean overdrink)
   cli_execute("checkpoint");
 
 //Load favorites from settings
-  if (to_boolean(vars["eatdrink_favUse"]))
+  if (to_boolean(getvar("eatdrink_favUse")))
   {
     vprint("Loading favorite consumables from user settings...",3);
     foreach it in $items[]

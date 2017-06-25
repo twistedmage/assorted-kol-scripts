@@ -174,7 +174,7 @@ boolean canadv(location loc) {
 	case $location[The Haunted Billiards Room]:
 		return item_amount($item[Spookyraven billiards room key]) > 0;
 	case $location[The Haunted Library]:
-		return available_amount($item[Spookyraven library key]) > 0;
+		return available_amount($item[[7302]Spookyraven library key]) > 0;
 	case $location[The Haunted Bathroom]:
 	case $location[The Haunted Bedroom]:
 	case $location[The Haunted Gallery]:
@@ -274,7 +274,7 @@ boolean canadv(location loc) {
 location expensive_semi() {
 	location last_rare = get_property("semirareLocation").to_location();
 	// If ImprovePoolSkills, then play a game of pool at every opportunity!
-	if(get_property("poolSharkCount").to_int() < 25 && vars["BaleCC_ImprovePoolSkills"].to_boolean() && last_rare != $location[The Haunted Billiards Room])
+	if(get_property("poolSharkCount").to_int() < 25 && getvar("BaleCC_ImprovePoolSkills").to_boolean() && last_rare != $location[The Haunted Billiards Room])
 		return $location[The Haunted Billiards Room];
 
 	if(!canadv($location[Pandamonium Slums])) {  // Let's make sure the choice is ascension helpful
@@ -324,7 +324,7 @@ void eat_cookie() {
 	boolean toEat() {
 		if(my_path() == "Zombie Slayer")
 			return vprint("You can not find a brain flavored fortune cookie, so you will have to drink a Lucky Lindy on your own.", -3);
-		matcher cooks = create_matcher("(timely|always|true|never|false) ?([1-3]?)", vars["auto_semirare"]);
+		matcher cooks = create_matcher("(timely|always|true|never|false) ?([1-3]?)", getvar("auto_semirare"));
 		if(cooks.find())
 			switch(cooks.group(1)) {
 			case "false":
@@ -339,7 +339,8 @@ void eat_cookie() {
 			}
 		return count_counters() < 1;
 	}
-	if(item_amount($item[Clan VIP Lounge key]) > 0 && npc_price($item[Lucky Lindy]) > 0 && my_inebriety() < inebriety_limit() && my_meat() >= 500) { // if npc_price($item[Lucky Lindy]) > 0 then get_property("_speakeasyDrinksDrunk") < 3
+	if(item_amount($item[Clan VIP Lounge key]) > 0 && is_unrestricted($item[Lucky Lindy]) && my_inebriety() < inebriety_limit()
+	  && npc_price($item[Lucky Lindy]) > 0 && my_meat() >= 500) { // if npc_price($item[Lucky Lindy]) > 0 then get_property("_speakeasyDrinksDrunk") < 3
 		if(have_skill($skill[The Ode to Booze]))
 			use_skill(1, $skill[The Ode to Booze]);
 		cli_execute("drink lucky lindy");
@@ -366,7 +367,7 @@ void get_semirare() {
 	switch(locale) {
 	case $location[The Haunted Billiards Room]:
 		billiard = get_property("choiceAdventure330");
-		set_property("choiceAdventure330", (vars["BaleCC_ImprovePoolSkills"].to_boolean() ? "1" : "2"));
+		set_property("choiceAdventure330", (getvar("BaleCC_ImprovePoolSkills").to_boolean() ? "1" : "2"));
 		closet_clovers = item_amount($item[ten-leaf clover]);
 		put_closet(closet_clovers, $item[ten-leaf clover]);
 		break;
@@ -419,7 +420,7 @@ void get_semirare() {
 	(!adventure(1, locale));
 	if(get_property("semirareCounter").to_int() != last) {
 		// semi-rare acquired! Now set up for the next semi-rare
-		if(vars["BaleCC_SellSemirare"].to_boolean() && have_shop())
+		if(getvar("BaleCC_SellSemirare").to_boolean() && have_shop())
 			put_shop(historical_price(semi_rare[locale]), 0,
 			  (rare_quant contains semi_rare[locale]? rare_quant[semi_rare[locale]]: 1), semi_rare[locale]);
 		eat_cookie();
@@ -750,13 +751,13 @@ boolean lightsOut() {
 	location hauntedLoc;
 	
 	// Check for order to complete quests. In case of ambiguous information, Stephen will be preferred since it makes sense to do him first.
-	if(vars["BaleCC_LightsOutPreferred"].to_lower_case().contains_text("elizabeth") || vars["BaleCC_LightsOutPreferred"].to_lower_case().contains_text("ghost"))
+	if(getvar("BaleCC_LightsOutPreferred").to_lower_case().contains_text("elizabeth") || getvar("BaleCC_LightsOutPreferred").to_lower_case().contains_text("ghost"))
 		hauntedLoc = nextLightsOut($strings[nextSpookyravenElizabethRoom, nextSpookyravenStephenRoom]);
 	else 
 		hauntedLoc = nextLightsOut($strings[nextSpookyravenStephenRoom, nextSpookyravenElizabethRoom]);
 	
 	// Stop if it is the Boss fight and BaleCC_LightsOutFightAutomated is false.
-	if(vars["BaleCC_LightsOutFightAutomated"] == "false" && ($locations[The Haunted Laboratory, The Haunted Gallery] contains hauntedLoc)) {
+	if(getvar("BaleCC_LightsOutFightAutomated") == "false" && ($locations[The Haunted Laboratory, The Haunted Gallery] contains hauntedLoc)) {
 		visit_url(to_url(hauntedLoc));
 		if(hauntedLoc == $location[The Haunted Laboratory]) {
 			visit_url("choice.php?pwd&whichchoice=903&option=1");
@@ -806,13 +807,13 @@ boolean main(string name, int remain) {
 		switch(name) {
 		case "Semirare window begin":
 			counter_report(remain, " eat a fortune cookie");
-			return to_boolean(vars["BaleCC_SemirareWindowContinue"]);
+			return to_boolean(getvar("BaleCC_SemirareWindowContinue"));
 		case "Fortune Cookie":
 			return counter_report(remain, "adventure somwhere for a <i>semi-rare</i>");
 		case "Wormwood":
 			return counter_report(remain, "adventure at <u>Wormwood</u> for "+get_property("wormwood"));
 		case "Dance Card":
-			if(remain < 0 && vars["BaleCC_useDanceCards"].to_boolean() && (can_interact() || item_amount($item[dance card])> 0))
+			if(remain < 0 && getvar("BaleCC_useDanceCards").to_boolean() && (can_interact() || item_amount($item[dance card])> 0))
 				use(1, $item[dance card]);
 			return counter_report(remain, "adventure at the <u>Haunted Ballroom</u> for a dance with <i>Rotting Matilda</i>");
 		case "Spookyraven Lights Out":
@@ -831,9 +832,9 @@ boolean main(string name, int remain) {
 	switch(name) {
 	case "Semirare window begin":
 		print("Your semi-rare might happen any moment! You might want to eat a fortune cookie now. Or not?", "red");
-		return to_boolean(vars["BaleCC_SemirareWindowContinue"]);
+		return to_boolean(getvar("BaleCC_SemirareWindowContinue"));
 	case "Fortune Cookie":
-		if(!can_interact() && vars["BaleCC_SrInHC"] != "true") {
+		if(!can_interact() && getvar("BaleCC_SrInHC") != "true") {
 			print("Semi-rares choices are not automated in hardcore or ronin.", "red");
 			print_html("<font color=\"FF9900\">Your last semi-rare adventure was at <u>"+get_property("semirareLocation")+"</u>, so plan accordingly.</font>");
 			return false;
@@ -845,11 +846,14 @@ boolean main(string name, int remain) {
 		return do_wormwood();
 	case "Dance Card":
 		(!adventure(1, $location[The Haunted Ballroom]));
-		if(vars["BaleCC_useDanceCards"].to_boolean() && (can_interact() || item_amount($item[dance card])> 0))
+		if(getvar("BaleCC_useDanceCards").to_boolean() && (can_interact() || item_amount($item[dance card])> 0))
 			use(1, $item[dance card]);
 		return true;
 	case "Spookyraven Lights Out":
 		return lightsOut();
+	case "Digitize Monster":
+		print_html("<font color=\"blue\">It is time to encounter a digitized <u>" + get_property("_sourceTerminalDigitizeMonster") + "</u>.</font>");
+		return get_property("kingLiberated") == "true"; // In aftercore don't pause automation, but ABORT if still in run.
 	default:
 		// not something we know how to handle
 		counter_report(remain, "do something because your <u>"+ name+ "</u> counter is up");

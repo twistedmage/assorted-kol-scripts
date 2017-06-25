@@ -1,6 +1,6 @@
 script "snapshot.ash";
 notify cheesecookie;
-since r17349;
+since r18095;
 
 #	This is a fork of bumcheekcity's snapshot script.
 #	Code comes straight from that. Website layout is copied from it.
@@ -630,6 +630,7 @@ void main()
 			break;
 
 			case "s":				//Check mafia setting
+				itemAmount = i_a(to_item(mritems[x].gifname));
 				if(get_property(mritems[x].a).to_boolean())
 				{
 					itemAmount = itemAmount + 1;
