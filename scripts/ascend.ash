@@ -239,6 +239,7 @@ void stock_hagnks()
 	buy_item($item[perfect mimosa],30);
 	buy_item($item[perfect paloma],30);
 	buy_item($item[ice house],3);
+	buy_item($item[powdered gold],16);
 	
 	
 	//stuff for twistedmage
