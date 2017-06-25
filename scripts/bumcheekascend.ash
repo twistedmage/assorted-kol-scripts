@@ -3819,6 +3819,7 @@ boolean omNomNom() {
 	//Only do this if we're rich enough or something. Might want this to not be exactly the same as willMood(), so copying rather than using the function. 
 	if (!(haveElite() || my_meat() > 500 || my_mp() > 100 || my_level() > 9)) return false;
 	if (!in_hardcore()) return false;
+	if(my_path()=="License to Adventure") return false; //wait to make sure we make martinis
 	
 	if (have_skill($skill[Pastamastery]) && have_skill($skill[Advanced Saucecrafting])) {
 		print("BCC: Preparing Food (Have "+howManyDoWeHave("reagentpasta")+" Reagent Pastas)", "purple");
