@@ -5250,6 +5250,14 @@ save [$item[savory dry noodles]] = 0;
 save     [$item[hacked gibson]] = 15;
 save     [$item[improved martini]] = 0;
 save     [$item[splendid martini]] = 0;
+save [$item[can of Minions-Be-Gone]] = 0;
+save [$item[1952 Mickey Mantle card]] = 0;
+
+
+
+
+
+
 
 
 

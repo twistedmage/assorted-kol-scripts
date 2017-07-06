@@ -948,7 +948,8 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 	{
 		print("","olive");
 		print("--- Consider Drinking ---","olive");
-		int bonus = get_property("bondMartiniPlus").to_boolean().to_int() + get_property("bondMartiniTurn").to_boolean().to_int()*4;
+		int bonus = get_property("bondMartiniPlus").to_boolean().to_int();
+		int low_bonus = get_property("bondMartiniTurn").to_boolean().to_int()*4;
 		
 		if(i_a("kremlins greatest briefcase")>0)
 			cli_execute("briefcase drink");
@@ -964,58 +965,58 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 		
 		//martinis we already have
 		if(i_a("rockin' wagon")>0)
-			add_drink(con_map,"- rockin wagon ",12+bonus,0,4);
+			add_drink(con_map,"- rockin wagon ",12+bonus+low_bonus,0,4);
 		if(i_a("martini")>0)
-			add_drink(con_map,"- martini ",5.5+bonus,0,3);
+			add_drink(con_map,"- martini ",5.5+bonus+low_bonus,0,3);
 		if(i_a("vodka martini")>0)
-			add_drink(con_map,"- vodka martini ",5.5+bonus,0,3);
+			add_drink(con_map,"- vodka martini ",5.5+bonus+low_bonus,0,3);
 		if(i_a("soft green echo eyedrop antidote martini")>0)
-			add_drink(con_map,"- soft green echo eyedrop antidote martini ",13+bonus,0,4);
+			add_drink(con_map,"- soft green echo eyedrop antidote martini ",13+bonus+low_bonus,0,4);
 		if(i_a("dry martini")>0)
-			add_drink(con_map,"- dry martini ",7.5+bonus,0,3);
+			add_drink(con_map,"- dry martini ",7.5+bonus+low_bonus,0,3);
 		if(i_a("dry vodka martini")>0)
-			add_drink(con_map,"- dry vodka martini ",7.5+bonus,0,3);
+			add_drink(con_map,"- dry vodka martini ",7.5+bonus+low_bonus,0,3);
 		if(i_a("gibson")>0)
-			add_drink(con_map,"- gibson ",7.5+bonus,0,3);
+			add_drink(con_map,"- gibson ",7.5+bonus+low_bonus,0,3);
 		if(i_a("vodka gibson")>0)
-			add_drink(con_map,"- vodka gibson ",7.5+bonus,0,3);
+			add_drink(con_map,"- vodka gibson ",7.5+bonus+low_bonus,0,3);
 		if(i_a("barrel-aged martini")>0)
-			add_drink(con_map,"- barrel-aged martini ",6+bonus,0,2);
+			add_drink(con_map,"- barrel-aged martini ",6+bonus+low_bonus,0,2);
 		if(i_a("hacked gibson")>0)
 			add_drink(con_map,"- hacked gibson ",21+bonus,0,4);
 		if(i_a("basic martini")>0)
-			add_drink(con_map,"- basic martini ",3+bonus,0,1);
+			add_drink(con_map,"- basic martini ",3+bonus+low_bonus,0,1);
 		if(i_a("improved martini")>0)
-			add_drink(con_map,"- improved martini ",4.5+bonus,0,1);
+			add_drink(con_map,"- improved martini ",4.5+bonus+low_bonus,0,1);
 		if(i_a("splendid martini")>0)
-			add_drink(con_map,"- splendid martini ",6+bonus,0,1);
+			add_drink(con_map,"- splendid martini ",6+bonus+low_bonus,0,1);
 		
 		//martinis we can make
 		if(i_a("soft green echo eyedrop antidote martini")==0 && i_a("bottle of vodka")>0 && i_a("magical ice cubes")>0 && i_a("soft green echo eyedrop antidote")>0)
-			add_drink(con_map,"- craft soft green echo eyedrop antidote martini ",13+bonus,2,4);
+			add_drink(con_map,"- craft soft green echo eyedrop antidote martini ",13+bonus+low_bonus,2,4);
 		if(i_a("rockin' wagon")==0 && i_a("bottle of vodka")>0 && i_a("magical ice cubes")>0)
-			add_drink(con_map,"- craft rockin wagon ",12+bonus,1,4);
+			add_drink(con_map,"- craft rockin wagon ",12+bonus+low_bonus,1,4);
 		if(i_a("martini")==0 && i_a("bottle of gin")>0)
-			add_drink(con_map,"- craft martini ",5.5+bonus,0,3);
+			add_drink(con_map,"- craft martini ",5.5+bonus+low_bonus,0,3);
 		if(i_a("vodka martini")==0 && i_a("bottle of vodka")>0)
-			add_drink(con_map,"- craft vodka martini ",5.5+bonus,0,3);
+			add_drink(con_map,"- craft vodka martini ",5.5+bonus+low_bonus,0,3);
 		if(i_a("dry martini")==0 && i_a("bottle of gin")>0 && i_a("jumbo olive")>0)
-			add_drink(con_map,"- craft dry martini ",7.5+bonus,0,3);
+			add_drink(con_map,"- craft dry martini ",7.5+bonus+low_bonus,0,3);
 		if(i_a("dry vodka martini")==0 && i_a("bottle of vodka")>0 && i_a("jumbo olive")>0)
-			add_drink(con_map,"- craft dry vodka martini ",7.5+bonus,0,3);
+			add_drink(con_map,"- craft dry vodka martini ",7.5+bonus+low_bonus,0,3);
 		if(i_a("gibson")==0 && i_a("bottle of gin")>0 && stills_available()>=2)
-			add_drink(con_map,"- craft gibson ",7.5+bonus,1,3);
+			add_drink(con_map,"- craft gibson ",7.5+bonus+low_bonus,1,3);
 		if(i_a("vodka gibson")==0 && i_a("bottle of vodka")>0 && stills_available()>=2)
-			add_drink(con_map,"- craft vodka gibson ",7.5+bonus,1,3);
+			add_drink(con_map,"- craft vodka gibson ",7.5+bonus+low_bonus,1,3);
 			
 			
 		//martinis we can pull
 		if(i_a("barrel-aged martini")==0)
-			add_drink(con_map,"- pull barrel-aged martini ",6+bonus,0,2);
+			add_drink(con_map,"- pull barrel-aged martini ",6+bonus+low_bonus,0,2);
 		if(i_a("hacked gibson")==0)
 			add_drink(con_map,"- pull hacked gibson ",21+bonus,0,4);
 		if(i_a("splendid martini")==0)
-			add_drink(con_map,"- pull splendid martini ",6+bonus,0,1);
+			add_drink(con_map,"- pull splendid martini ",6+bonus+low_bonus,0,1);
 	}
 	else if(my_inebriety()< inebriety_limit() && can_drink() && my_path()!="KOLHS")
 	{

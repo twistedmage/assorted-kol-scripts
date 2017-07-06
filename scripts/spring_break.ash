@@ -461,10 +461,10 @@ void main()
 		if(i_a("Volcoino")>=5 && i_a("Electrician's hardhat")<2)
 			abort("buy Electrician's hardhat with Volcoino");
 	}
-	if(i_a("Volcoino")>=30)
-		abort("buy volcano tattoo with valcoino then uncomment below");
-	//if(i_a("Volcoino")>=)
-	//	abort("buy airport duty free tattoo then stop farming funfunds");
+	//if(i_a("Volcoino")>=30)
+	//	abort("buy volcano tattoo with valcoino then uncomment below");
+	if(i_a("Volcoino")>=20)
+		abort("buy airport duty free tattoo then stop farming funfunds");
 		
 
 	if(i_a("Wal-Mart gift certificate")>=75 && i_a("Wal-Mart snowglobe")<1)

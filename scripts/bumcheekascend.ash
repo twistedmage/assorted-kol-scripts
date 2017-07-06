@@ -11642,20 +11642,43 @@ void bcascNaughtySorceress() {
 		
 		//bone wall
 		abort("Try to code fighting the wall of bones using garbage nova, max myst and spell damage. No passives");
-		while(i_a("electric boning knife")==0)
+		if(false)
 		{
-			bumAdv($location[The Castle in the Clouds in the Sky (Ground Floor)], "", "", "1 electric boning knife", "getting electric boning knife", "");
+			// boning knife
+			while(i_a("electric boning knife")==0)
+			{
+				bumAdv($location[The Castle in the Clouds in the Sky (Ground Floor)], "", "", "1 electric boning knife", "getting electric boning knife", "");
+			}
+			
+			clear_combat_macro();
+			string page = visit_url("place.php?whichplace=nstower&action=ns_07_monster3");
+			if(contains_text(page, "wall of bone"))
+			{
+				page = throw_item($item[electric boning knife]);
+				if(!contains_Text(page, "You win the fight"))
+					abort("Something went wrong using electric boning knife on wall of bones");
+			}
+			else
+				abort("something went wrong fighting wall of bones");
+			set_combat_macro();
 		}
-		
-		clear_combat_macro();
-		string page = visit_url("place.php?whichplace=nstower&action=ns_07_monster3");
-		if(contains_text(page, "wall of bone"))
+		else
 		{
-			page = throw_item($item[electric boning knife]);
-			if(!contains_Text(page, "You win the fight"))
-				abort("Something went wrong using electric boning knife on wall of bones");
+			// garbage nova
+			//maximize("spell damage percent, mysticality");
+			clear_combat_macro();
+			
+			string page = visit_url("place.php?whichplace=nstower&action=ns_07_monster3");
+			while(contains_text(page, "wall of bone"))
+			{
+				//page = XXX;
+				if(contains_Text(page, "You win the fight"))
+					break;
+				if(contains_Text(page, "dejected and defeated"))
+					abort("Something went wrong using electric boning knife on wall of bones");
+			}
+			set_combat_macro();
 		}
-		set_combat_macro();
 		checkStage("lairwalls",true);
 	}
 	
