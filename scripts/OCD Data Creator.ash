@@ -4785,7 +4785,7 @@ save [$item[novelty fruit hat]] = 0;
 save [$item[handful of stubble]] = 0;
 save [$item[hermit factoid]] = 0;
 save [$item[pink slime]] = 0;
-save [$item[barrel-aged martini]] = 0;
+save [$item[barrel-aged martini]] = 15;
 save [$item[barrel pickle]] = 0;
 save [$item[barrel cracker]] = 0;
 save [$item[vibrating mushroom]] = 0;
@@ -5250,11 +5250,16 @@ save [$item[savory dry noodles]] = 0;
 save     [$item[hacked gibson]] = 15;
 save     [$item[improved martini]] = 0;
 save     [$item[splendid martini]] = 0;
+save [$item[Daily Affirmation: Adapt to Change     Eventually]] = 0;
+
+
+
 
 
 
 
 //stuff to sell later;s
+save [$item[can of Minions-Be-Gone]] = 15;
 save     [$item[License To Kill]] = -1;
 save [$item[Celsius 233]] = -1;
 save [$item[suspicious package]] = -1;

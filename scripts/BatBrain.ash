@@ -119,7 +119,6 @@ float my_stat(string which) {
       case "Muscle":
       case "Mysticality":
       case "Moxie": return max(1,numeric_modifier("Generated:_spec","Buffed "+which));
-     // TODO: track stat/level changes -- would improve accuracy in situations where you gain stats mid-combat
    } return 0;
 }
 // familiar, accounting for doppelshifter/costume wardrobe (possibly later: comma chameleon)
@@ -728,7 +727,8 @@ spread m_regular() {               // damage dealt by monster attack
    }
    spread res;
    res[m.attack_element] = max(1.0,max(0,max(0,monster_stat("att")) - my_defstat(true)) + 0.225*max(0,monster_stat("att")) - max(0,numeric_modifier("Damage Reduction") - mdata.drpen)) *
-      (1 - minmax((square_root(max(0,numeric_modifier("Damage Absorption"))/10) - 1)/10,0,0.9));    // TODO: glass pie plate halves damage from ghosts
+      (1 - minmax((square_root(max(0,numeric_modifier("Damage Absorption"))/10) - 1)/10,0,0.9));
+   if (have_equipped($item[glass pie plate]) && m.sub_types contains "ghost") res = factor(res, 0.5);   // glass pie plate halves damage from ghosts
    return factor(res,mdata.multiattack*(m.phylum == $phylum[undead] && have_equipped($item[gravy boat]) ? 0.5 : 1.0));  // gravy boat halves damage from undead
 }
 advevent m_event(float att_mod, float stun_mod) {      // monster event -- attack + retal, factored by hitchance
@@ -1097,7 +1097,7 @@ void build_items() {
             if (where != $location[the battlefield (hippy uniform)] || get_counters("Communications Windchimes",0,10) != "" ||
                 string_modifier("Outfit") != "War Hippy Fatigues" || !(appearance_rates(where) contains m)) continue; break;
          case 2453: if (my_fam() != $familiar[penguin goodfella] || my_meat() < fvars["fweight"]*3) continue; break;  // goodfella contract
-         case 2462: case 9481: if (have_effect($effect[on the trail]) > 0) continue; break;   // odor extractor, affirmation: interested
+         case 2462: case 9481: if (have_effect($effect[on the trail]) > 0 || happened($skill[transcendent olfaction])) continue; break;   // odor extractor, affirmation: interested
          case 2704: if ($monsters[Oscus, Zombo, Frosty, Chester, Hodgman\, The Hoboverlord, Ol' Scratch, mayor ghost, mayor ghost (hard mode)] contains m) continue; break;  // shrinking powder
          case 3101: rate *= 0.5; break;                                                       // rogue swarmer
          case 3195: if (dropspants()) {                                                       // naughty paper shuriken
@@ -2089,6 +2089,18 @@ string act(string action) {
    if (have_equipped($item[double-ice cap]) && contains_text(page,"solid, suffering")) set_happened("icecapstun");
    if (have_equipped($item[crown of thrones]) && have_equipped($item[buddy bjorn]) && create_matcher(my_enthroned_familiar().name+" and "+my_bjorned_familiar().name+
         " (are|ignore|argue|both roll for initiative and|do rock-paper|glance|glare|look|say |work)",page).find()) set_happened("buddymisfire");
+  // tracking for New-You quest until mafia adds it
+   if (eudora() == "New-You Club") {
+      matcher gnuu = create_matcher("You're really sharpening the old saw.  ?Looks like you've done (\\d+) out of (\\d+)!",page);
+      if (gnuu.find()) {
+         set_property("_newYouSharpeningsCast", gnuu.group(1));
+         set_happened("sawsharpened");
+         if (gnuu.group(2) != get_property("_newYouSharpeningsNeeded")) vprint("Sharpenings needed mismatch.  Please use the code posted in the BatBrain thread to set your current quest properties.", -4);
+      } else if (contains_text(page,"Your saw is so sharp!")) {
+         set_property("_newYouSharpeningsCast", get_property("_newYouSharpeningsNeeded") == "" ? to_string(get_property("_newYouSharpeningsCast").to_int() + 1) : get_property("_newYouSharpeningsNeeded"));
+         set_happened("sawsharpened");
+      }
+   }
    switch (m) {
       case $monster[batwinged gremlin]:
       case $monster[erudite gremlin]:
@@ -2198,7 +2210,7 @@ string batround() {
       "if haseffect "+to_int(m.poison)+" && hascombatitem 829; use 829; endif; "+
       "if haseffect "+to_int(m.poison)+"; abort \"BatBrain abort: poisoned.\"; endif; ");
    if (where == $location[the slime tube]) res.append("if match \"a massive loogie\"; abort \"BatBrain abort: loogie.\"; endif; ");
-   if (have_equipped($item[protonic accelerator pack]) && m.phylum == $phylum[undead]) res.append("if hasskill 7280; skill 7280; endif; ");
+   if (have_equipped($item[protonic accelerator pack]) && m.sub_types contains "ghost") res.append("if hasskill 7280; skill 7280; endif; ");
    switch (m) {
       case $monster[batwinged gremlin]:                                    // tool-revealing gremlins
       case $monster[erudite gremlin]:

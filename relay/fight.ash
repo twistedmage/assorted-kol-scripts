@@ -179,6 +179,7 @@ void handle_post() {
          case $location[the hidden temple]: if (item_amount($item[stone wool]) > 0 && have_effect($effect[stone-faced]) == 0)
             abox.append("<p>"+cliimg($item[stone wool],"use stone wool")); break;
         // Level 3: Rat
+         case $location[a barroom brawl]: abox.append("<p>You've found <b>"+get_property("_beerLensDrops")+" / 3</b> beer lenses available today."); break;
         // Level 4: Bat
          case $location[guano junction]: if (item_amount($item[sonar-in-a-biscuit]) > 0 && qprop("questL04Bat < 3")) 
             abox.append("<p>"+cliimg($item[sonar-in-a-biscuit],"use sonar-in-a-biscuit")); break;
@@ -192,7 +193,7 @@ void handle_post() {
          case $location[the defiled nook]: if (item_amount($item[evil eye]) > 0) abox.append("<p>"+cliimg($item[evil eye],"use * evil eye"));
          case $location[the defiled cranny]:
          case $location[the defiled alcove]:
-         case $location[the defiled niche]: abox.append("<p><b>"+get_property("cyrpt"+excise(myl,"d ","")+"Evilness")+"</b> evilness left here."); 
+         case $location[the defiled niche]: abox.append("<p><b>"+get_property("cyrpt"+excise(myl,"d ","")+"Evilness")+"</b> evilness left here.");
             if (equipgood($item[gravy boat])) abox.append("<p>"+cliimg($item[gravy boat],"equip gravy boat")); 
              else if (!have_equipped($item[gravy boat]) && item_amount($item[gravy boat]) == 0 && creatable_amount($item[gravy boat]) > 0)
                 abox.append("<p>"+cliimg($item[gravy boat],"create gravy boat")); break;
@@ -272,7 +273,7 @@ void handle_post() {
          case $location[the arid, extra-dry desert]: abox.append("<p>The desert is <b>"+get_property("desertExploration")+"%</b> explored.");
             if (have_effect($effect[ultrahydrated]) == 0)
                abox.append("<p>"+cliimg($item[personal raindrop],"adv 1 oasis")+" WARNING: NOT ULTRAHYDRATED");
-            if (equipgood($item[uv-resistant compass])) abox.append("<p>"+cliimg($item[uv-resistant compass],"equip uv-resistant compass")); break;
+            if (get_property("desertExploration").to_int() < 100 && equipgood($item[uv-resistant compass])) abox.append("<p>"+cliimg($item[uv-resistant compass],"equip uv-resistant compass")); break;
         // Level 12: IsleWar
          case $location[The Battlefield (Frat Uniform)]: abox.append("<p>Just <b>"+(1000-to_int(get_property("hippiesDefeated")))+"</b> hippies left."); 
             if (item_amount($item[stuffing fluffer]) > 0) abox.append(cliimg($item[stuffing fluffer],"use stuffing fluffer")); break;
