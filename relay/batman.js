@@ -130,9 +130,8 @@ jQuery(function($){
           'orderClasses': false,                                    // don't bother applying classes to sorted columns
           'columnDefs': [
               { "visible": false, "targets": [ 9, 10, 11, 12 ] },   // hidden action-type indices (attack, stasis, stun)
-              { "type": "batnum-html", "targets": [ 1, 2, 3, 6, 7 ] },
+              { "type": "batnum-html", "targets": [ 1, 2, 3, 5, 6, 7 ] },
               { "type": "html-num-fmt", "targets": [ 4 ] },
-              { "type": "html", "targets": [ 5 ] },
               { "type": "numeric", "targets": [ 9, 10, 11 ] },
               { "className": "attackcol", "targets": [ 0 ] },       // apply classes to all cells, per row
               { "className": "damagecol", "targets": [ 1 ] },
@@ -144,7 +143,7 @@ jQuery(function($){
               { "className": "blackcol", "targets": [ 8 ] },
               { "orderData": 9, "targets": [ 0 ] },                 // sort Attack column by hidden index
 //              { "orderData": 11, "targets": [ 4 ] },                // sort Stun column by hidden index
-//              { "aDataSort": [ 6, 7 ], "targets": [ 6 ] },        // sort MP column by itself, then profit
+//              { "aDataSort": [ 6, 7 ], "targets": [ 6 ] },          // sort MP column by itself, then profit
               { "orderSequence": [ "desc", "asc" ], "targets": [ 1, 7 ] },
               { "orderSequence": [ "desc" ], "targets": [ 4, 6 ] },
               { "orderSequence": [ "asc" ], "targets": [ 0, 2, 3, 5, 9, 10, 11 ] }
@@ -160,7 +159,7 @@ jQuery(function($){
           else $('#battable_filter label input').removeClass('goodtogo');
       });
       $(document).on('keyup','input.goodtogo', function(e) {
-         if (e.keyCode === 13) { bjilgt(this); $('#battable form:first').submit(); }  // 13 = ENTER
+         if (e.keyCode === 13) { bjilgt(this); $('#battable form.butt:first').submit(); }  // 13 = ENTER
       });
 
      // move a few things

@@ -117,24 +117,6 @@ void set_autoputtifaction() {
    if (m == $monster[lobsterfrogman] && get_property("sidequestLighthouseCompleted") == "none" && !qprop("questL12War") &&
        item_amount($item[barrel of gunpowder]) < 4) should_putty = true;
    if (should_putty && should_olfact) return;
-  // second, set puttifaction for bounty monsters
-   foreach s in $strings[currentEasyBountyItem, currentHardBountyItem, currentSpecialBountyItem]
-      if (to_bounty(get_property(s)).monster == m) should_olfact = true;
-   /*
-   boolean[location] blocs;
-   foreach s in $strings[currentEasyBountyItem, currentHardBountyItem, currentSpecialBountyItem] {
-      bounty thisb = to_bounty(get_property(s));
-      if (thisb.number == 0) continue;
-      if (m == thisb.monster && (!($locations[the "fun" house, the goatlet, lair of the ninja snowmen, cobb's knob laboratory] contains where) ||
-          (list_contains(getvar("BatMan_attract"),m)))) {
-         if (thisb.number <= to_int(getvar("BatMan_puttybountiesupto")) && item_amount(ihunt) < ihunt.bounty_count-1) should_putty = true;
-         should_olfact = true;
-      } else if (list_contains(getvar("BatMan_attract"),m) && ihunt.bounty != where)
-         should_olfact = true;
-  } else
-  */
-  
-  // next, handle effective goal-getting (this only olfacts if you set "goals" for autoOlfact)
    monster[int] sortm = get_monsters(where);
    boolean belongs;
    sort sortm by -has_goal(value);
@@ -144,7 +126,15 @@ void set_autoputtifaction() {
       if (has_goal(mon) == 0) continue;
       sources += 1;
    }
-   if (list_contains(getvar("BatMan_attract"),m) && (belongs || where == $location[none])) should_olfact = true;
+   if (!belongs && where != $location[none]) return;
+  // second, olfaction for bounty monsters
+   foreach s in $strings[currentEasyBountyItem, currentHardBountyItem, currentSpecialBountyItem]    // TODO: expand this to include puttying, not olfacting where unhelpful
+      if (to_bounty(get_property(s)).monster == m) should_olfact = true;
+  // third, olfaction for the New You daily quest
+   if (m == get_property("_newYouMonster").to_monster() && get_property("_newYouSharpeningsCast").to_int() + 1 < get_property("_newYouSharpeningsNeeded").to_int() &&
+      get_property("_newYouSharpeningsNeeded").to_int() < 35) should_olfact = true;
+  // next, handle effective goal-getting (this only olfacts if you set "goals" for autoOlfact)
+   if (list_contains(getvar("BatMan_attract"),m)) should_olfact = true;
    if (sources == 0) return;
    print(sources+"/"+count(get_monsters(where))+" monsters drop goals here.");
    if (sortm[0] == m) {
@@ -266,6 +256,10 @@ void build_custom() {
   // yellow ray actions
    if (have_effect($effect[everything looks yellow]) == 0 && list_contains(getvar("BatMan_yellow"),m) && 
        my_fam() != $familiar[he-boulder]) encustom(custom_action("yellow"));
+  // sharpening the saw
+   if (m == get_property("_newYouMonster").to_monster() && get_property("_newYouSharpeningsCast").to_int() < get_property("_newYouSharpeningsNeeded").to_int() &&
+       !happened(to_skill(get_property("_newYouSkill"))))
+      encustom(to_skill(get_property("_newYouSkill")));
   // banishing actions
    if (list_contains(getvar("BatMan_banish"),m)) encustom(custom_action("banish"));
   // summon mayflies (toward the end since it can result in free runaways)

@@ -202,7 +202,7 @@ string to_html(advevent a, int i, boolean shorty) {
       "<input type='hidden' name='macrotext' value='"+batround()+"sub main; "+a.id+"; call batround; endsub; call main; repeat "+stasis_repeat()+"'><input type=image src='images/itemimages/watch.gif'"+
       " width=18 height=18 title='Stasis with "+a.id+"! ("+rnum(to_profit(a))+" profit)' onclick='return bjilgt(this);'></form>");
    }
-   res.append(" <form name='"+a.id+"' style='display: inline' action=fight.php method=post><input type=hidden name=action value='macro'>"+
+   res.append(" <form name='"+a.id+"' style='display: inline' action=fight.php method=post class=butt><input type=hidden name=action value='macro'>"+
          "<input type='hidden' name='macrotext' value='"+batround()+a.id+"; call batround'><input type=submit title='"+a.id+"' class='buttlink");
    matcher funkmatch = create_matcher("use (\\d+),(\\d+)",a.id);
    string ufname;
