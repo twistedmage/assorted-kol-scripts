@@ -4785,7 +4785,7 @@ save [$item[novelty fruit hat]] = 0;
 save [$item[handful of stubble]] = 0;
 save [$item[hermit factoid]] = 0;
 save [$item[pink slime]] = 0;
-save [$item[barrel-aged martini]] = 0;
+save [$item[barrel-aged martini]] = -1;
 save [$item[barrel pickle]] = 0;
 save [$item[barrel cracker]] = 0;
 save [$item[vibrating mushroom]] = 0;
@@ -5252,6 +5252,12 @@ save     [$item[improved martini]] = 0;
 save     [$item[splendid martini]] = 0;
 save [$item[can of Minions-Be-Gone]] = 0;
 save [$item[1952 Mickey Mantle card]] = 0;
+save [$item[Daily Affirmation: Adapt to Change     Eventually]] = 0;
+save [$item[carrot claret]] = 0;
+save     [$item[meteoreo]] = 0;
+save [$item[meadeorite]]     = 0;
+
+
 
 
 
@@ -5263,6 +5269,9 @@ save [$item[1952 Mickey Mantle card]] = 0;
 
 
 //stuff to sell later;s
+save [$item[metal meteoroid]] = -1;
+save [$item[Meteorite-Ade]] = -1;
+save [$item[Pocket Meteor Guide]] = -1;
 save     [$item[License To Kill]] = -1;
 save [$item[Celsius 233]] = -1;
 save [$item[suspicious package]] = -1;

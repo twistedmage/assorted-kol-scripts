@@ -49,6 +49,9 @@ if(my_path() == "Avatar of Boris") {
 	avatarTree[4] = "The Path of Dessert";
 }
 
+
+
+
 string bcParseOptions(string inputString, string validOptions) {
 	boolean [string] optionUsed;
 	string outputString, char;
@@ -1740,6 +1743,15 @@ boolean checkStage(string what) {
 		return true;
 	}
 	print("BCC: We have not completed the stage ["+what+"].", "navy");
+	return false;
+}
+
+boolean dont_need_steel() {
+	if (my_path()=="Gelatinous Noob") return true;
+	if (my_path()=="License to Adventure") return true;
+	if (get_property("bcasc_skipSteel") == "true") return checkStage("friarssteel", true);
+	if (my_path() == "Nuclear Autumn") return true;
+	if (my_path() == "KOLHS" && my_name()!="twistedmage") return true; //in kolhs you don't get enough booze to go over 10 drunkeness, unless you have huge +item available and get it in hallowed halls
 	return false;
 }
 
@@ -8904,13 +8916,9 @@ boolean bcascFriarsSteel() {
 		return (have_skill($skill[Liver of Steel]) || have_skill($skill[Spleen of Steel]) || have_skill($skill[Stomach of Steel]));
 	}
 	if (checkStage("friarssteel")) return true;
-	if (my_path()=="Gelatinous Noob") return true;
-	if (my_path()=="License to Adventure") return true;
-	if (get_property("bcasc_skipSteel") == "true") return checkStage("friarssteel", true);
+	if(dont_need_steel()) return true;
 	if (have_steel()) return checkStage("friarssteel", true);
 	if (my_path() == "Avatar of Boris" && (minstrel_instrument() != $item[Clancy's lute] && i_a("Clancy's lute") == 0)) return false;
-	if (my_path() == "Nuclear Autumn") return false;
-	if (my_path() == "KOLHS" && my_name()!="twistedmage") return false; //in kolhs you don't get enough booze to go over 10 drunkeness, unless you have huge +item available and get it in hallowed halls
 
 	boolean logicPuzzleDone() {
 		/*    
@@ -9560,7 +9568,7 @@ void bcascLairFightNS() {
 	set_property("choiceAdventure688", "1"); //AoJ choiceadv
 	if (canMCD()) cli_execute("mcd 0");
 		
-	if (my_path() != "Avatar of Boris" && my_path() != "Avatar of Sneaky Pete" && my_path() != "Avatar of Jarlsberg" && my_path() != "Zombie Slayer" && my_path() != "KOLHS" && my_path() != "Heavy Rains") {
+	if (my_path() != "Avatar of Boris" && my_path() != "Avatar of Sneaky Pete" && my_path() != "Avatar of Jarlsberg" && my_path() != "Zombie Slayer" && my_path() != "KOLHS" && my_path() != "Heavy Rains" && my_path() != "License to Adventure") {
 		if (item_amount($item[wang]) > 0) cli_execute("untinker wang");
 		if (item_amount($item[ng]) > 0) cli_execute("untinker ng");
 		if (item_amount($item[wand of nagamar]) == 0) {
@@ -11641,7 +11649,6 @@ void bcascNaughtySorceress() {
 		}
 		
 		//bone wall
-		abort("Try to code fighting the wall of bones using garbage nova, max myst and spell damage. No passives");
 		if(false)
 		{
 			// boning knife
@@ -11665,13 +11672,14 @@ void bcascNaughtySorceress() {
 		else
 		{
 			// garbage nova
-			//maximize("spell damage percent, mysticality");
+			cli_execute("maximize spell damage percent, mysticality");
+			cli_execute("restore hp; restore mp");
 			clear_combat_macro();
 			
 			string page = visit_url("place.php?whichplace=nstower&action=ns_07_monster3");
 			while(contains_text(page, "wall of bone"))
 			{
-				//page = XXX;
+				page = use_skill( $skill[garbage nova] );
 				if(contains_Text(page, "You win the fight"))
 					break;
 				if(contains_Text(page, "dejected and defeated"))
@@ -11683,33 +11691,36 @@ void bcascNaughtySorceress() {
 	}
 	
 	//make wand
-	if(i_a("wand of nagamar")<1)
+	if(my_path()!="License to Adventure")
 	{
-		if(i_a("ruby w")>1 && i_a("metallic A")>1)
-			create(1, $item[wa]);
-		if(i_a("wa")<1 && can_interact())
-			take_storage(1,$item[wa]);
-			
-		if(i_a("lowercase n")>1 && i_a("heavy d")>1)
-			create(1, $item[nd]);
-		if(i_a("nd")<1 && can_interact())
-			take_storage(1,$item[nd]);
-			
-		if(i_a("wa")<1)
+		if(i_a("wand of nagamar")<1)
 		{
-			while(i_a("ruby w")<1)
-				bumAdv($location[pandamonium slums], "+item drop", "items", "1 ruby w", "Getting ruby W", "i");
-			while(i_a("metallic A")<1)
-				bumAdv($location[The penultimate fantasy airship], "+item drop", "items", "1 metallic A", "Getting metallic A", "i");
+			if(i_a("ruby w")>1 && i_a("metallic A")>1)
+				create(1, $item[wa]);
+			if(i_a("wa")<1 && can_interact())
+				take_storage(1,$item[wa]);
+				
+			if(i_a("lowercase n")>1 && i_a("heavy d")>1)
+				create(1, $item[nd]);
+			if(i_a("nd")<1 && can_interact())
+				take_storage(1,$item[nd]);
+				
+			if(i_a("wa")<1)
+			{
+				while(i_a("ruby w")<1)
+					bumAdv($location[pandamonium slums], "+item drop", "items", "1 ruby w", "Getting ruby W", "i");
+				while(i_a("metallic A")<1)
+					bumAdv($location[The penultimate fantasy airship], "+item drop", "items", "1 metallic A", "Getting metallic A", "i");
+			}
+			if(i_a("nd")<1)
+			{
+				while(i_a("lowercase n")<1)
+					bumAdv($location[The Valley of Rof l'm fao], "+item drop", "items", "1 lowercase n", "Getting lowercase n", "i");
+				while(i_a("heavy d")<1)
+					bumAdv($location[the castle in the clouds in the sky (basement)], "+item drop", "items", "1 heavy d", "Getting heavy d", "i");
+			}
+			create(1, $item[wand of nagamar]);
 		}
-		if(i_a("nd")<1)
-		{
-			while(i_a("lowercase n")<1)
-				bumAdv($location[The Valley of Rof l'm fao], "+item drop", "items", "1 lowercase n", "Getting lowercase n", "i");
-			while(i_a("heavy d")<1)
-				bumAdv($location[the castle in the clouds in the sky (basement)], "+item drop", "items", "1 heavy d", "Getting heavy d", "i");
-		}
-		create(1, $item[wand of nagamar]);
 	}
 	
 	//smash the mirror
@@ -12703,7 +12714,7 @@ void bcs1() {
 	if(my_level()>2)
 		bcascTavern();
 	//SImON ADDED: check for friars before others
-	if(my_level()>5)
+	if(my_level()>5 && !dont_need_steel())
 	{
 		//if in hardcore, dont go here till stats are higher
 		if(!in_hardcore() || my_buffedstat(my_primestat())>safeMox($location[The Dark Heart of the Woods]))
@@ -12727,7 +12738,7 @@ void bcs2() {
 	bcCouncil();
 	fix_clockwork_maid();
 	bcascSpookyForest();
-	if(my_level()>5)
+	if(my_level()>5 && !dont_need_steel())
 	{
 		if(!in_hardcore() || my_buffedstat(my_primestat())>safeMox($location[The Dark Heart of the Woods]))
 			bcascFriars();
@@ -12743,7 +12754,7 @@ void bcs3() {
 	//If we're an AT, we should make our Epic Weapon now. It'll be the best weapon for a long time. 
 	bcascEpicWeapons();
 	bcascTavern();
-	if(my_level()>5)
+	if(my_level()>5 && !dont_need_steel())
 	{
 		if(!in_hardcore() || my_buffedstat(my_primestat())>safeMox($location[The Dark Heart of the Woods]))
 			bcascFriars();
@@ -12770,7 +12781,7 @@ void bcs4() {
 void bcs5() {
 	bcCouncil();
 	//SImON ADDED: check for friars before others
-	if(my_level()>5)
+	if(my_level()>5 && !dont_need_steel())
 	{
 		if(!in_hardcore() || my_buffedstat(my_primestat())>safeMox($location[The Dark Heart of the Woods]))
 			bcascFriars();
@@ -12778,10 +12789,10 @@ void bcs5() {
 			bcascFriarsSteel();
 	}
 	
+	if (my_inebriety() < 15) bcascManorBilliards();//lastLibraryUnlock?
 	bcascKnobKing();	//questL05Knob
 	bcascDinghyHippy();	//lastIslandUnlock?
 	bcCrumHorn();
-	if (my_inebriety() < 15) bcascManorBilliards();//lastLibraryUnlock?
 	
 	levelMe(29, true);
 }

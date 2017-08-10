@@ -397,7 +397,19 @@ void dinsey()
 	sexism - 15 tusn?
 	racism - 15 turns?
 	*/
-	abort("do dinsey then glaciest");
+	
+	
+	
+	use_familiar($familiar[disembodied hand]);
+	string max_str = "maximize mainstat";
+	if(my_primestat()==$stat[moxie])
+		max_str += ", -melee";
+	else if(my_primestat()==$stat[muscle])
+		max_str += ", +melee";
+	print(max_str + ", +equip mayfly bait necklace", "green");
+	cli_execute(max_str + ", +equip mayfly bait necklace");
+		
+	abort("do dinsey");
 }
 
 void glaciest()
@@ -407,8 +419,8 @@ void glaciest()
 
 void main()
 {
-	if(i_a("beach buck")>=500)
-		abort("buy airport duty free tattoo then stop farming bucks");
+//	if(i_a("beach buck")>=500)
+//		abort("buy airport duty free tattoo then stop farming bucks");
 	
 	if(i_a("coinspiracy")>=50 && i_a("mercenary rifle")<1)
 		abort("buy mercenary rifle wtih coinspiracy");
@@ -463,8 +475,8 @@ void main()
 	}
 	//if(i_a("Volcoino")>=30)
 	//	abort("buy volcano tattoo with valcoino then uncomment below");
-	if(i_a("Volcoino")>=20)
-		abort("buy airport duty free tattoo then stop farming funfunds");
+	//if(i_a("Volcoino")>=20)
+	//	abort("buy airport duty free tattoo then stop farming funfunds");
 		
 
 	if(i_a("Wal-Mart gift certificate")>=75 && i_a("Wal-Mart snowglobe")<1)
@@ -475,13 +487,13 @@ void main()
 		abort("buy Wal-Mart overalls with Wal-Mart gift certificate");
 //	if(i_a("Wal-Mart gift certificate")>=250)
 //		abort("buy volcano tattoo with Wal-Mart gift certificate then uncomment below");
-	if(i_a("Wal-Mart gift certificate")>=200)
-		abort("buy airport duty free tattoo then stop farming Wal-Mart gift certificate");
+//	if(i_a("Wal-Mart gift certificate")>=200)
+//		abort("buy airport duty free tattoo then stop farming Wal-Mart gift certificate");
 		
-	spring_break();
+	//spring_break();
 	//conspiracy();
-	volcano();
-	diner_farm();
+	//volcano();
+	//diner_farm();
 	dinsey();
-	glaciest();
+//	glaciest();
 }

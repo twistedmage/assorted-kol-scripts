@@ -76,6 +76,8 @@ boolean good(item it) {
 		if($items[chewing gum on a string] contains it) return false; 
 		break;
 	//TEMPORARY TO FIX MAFIA FAIL
+	case "License to Adventure":
+		if(it==$item[loathing legion universal screwdriver]) return false;
 	case "Standard":
 		if(it==$item[Meat Tenderizer is Murder]) return false;
 		if(contains_text(it,"psychoses") )return false;
@@ -1158,6 +1160,8 @@ void special(boolean bonus_actions) {
 				pull_and_wear_from_list(hol_list);
 			}
 			
+			//misc
+			pull_if_good($item[license to chill]);
 					
 		}
 	}

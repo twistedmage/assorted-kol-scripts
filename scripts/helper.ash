@@ -868,6 +868,9 @@ void advise_food()
 			add_food(con_map,"- Thanksgiving turkey (3 cashew)",9,0,2);
 			
 			
+		if(i_a("Meteoreo")>0)
+			add_food(con_map,"- Meteoreo",6,0,1);
+			
 		if(i_a("bowl of mummy guts")>0)
 			add_food(con_map,"- bowl of mummy guts",8,0,2);
 		if(i_a("bowl of eyeballs")>0)
@@ -942,6 +945,9 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 {
 	consumable [int] con_map;
 	boolean bees_ok= (my_path() != "Bees hate you");
+	
+	//use l2c
+	cli_execute("use * license to chill");
 
 	//l2a - only martinis
 	if(my_inebriety()< inebriety_limit() && can_drink() && my_path()=="License to Adventure")
@@ -964,6 +970,8 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 		}
 		
 		//martinis we already have
+		if(i_a("afternoon delight")>0)
+			add_drink(con_map,"- afternoon delight ",13+bonus,0,4);
 		if(i_a("rockin' wagon")>0)
 			add_drink(con_map,"- rockin wagon ",12+bonus+low_bonus,0,4);
 		if(i_a("martini")>0)
@@ -1214,6 +1222,12 @@ void advise_drink(string woods_string, string beach_string, string manor_string)
 			add_drink(con_map,"- imitation white russian ",5,0,2);
 		if(available_amount($item[pan-dimensional gargle blaster])>0)
 			add_drink(con_map,"- pan-dimensional gargle blaster ",25,0,5);
+			
+		if(available_amount($item[Meadeorite])>0)
+			add_drink(con_map,"- Meadeorite ",6,0,1);
+			
+		if(i_a("afternoon delight")>0)
+			add_drink(con_map,"- afternoon delight ",13,0,4);
 			
 		if(my_primestat()==$stat[muscle] && ((available_amount($item[handful of barley])>0 && available_amount($item[cluster of hops])>0) || available_amount($item[can of Br&uuml;talbr&auml;u])>0))
 			add_drink(con_map,"- can of Br&uuml;talbr&auml;u ",6,0,1);
